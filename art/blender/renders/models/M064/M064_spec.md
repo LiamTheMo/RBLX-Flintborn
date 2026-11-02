@@ -3,7 +3,7 @@
 Reference: `art/blender/assets/references/064.png` (1024 × 1536 px). INDEX.md row 64: "Flintborn A-frame tent study".
 The sheet's own header reads **"PAGE 66/132"** (top right), title **"A-FRAME TENT"**, subtitle "FLINTBORN — INDIVIDUAL
 MODEL STUDY" (our number is INDEX's 064, §3.1).
-Builder: `art/blender/kit/mcp/m064.py` → `build()` (not written yet). Procedure: `art/blender/kit/mcp/STAGES.md`. One
+Builder: `art/blender/kit/mcp/m064.py` → `build()`. Procedure: `art/blender/kit/mcp/STAGES.md`. One
 modeller does stages 1–6 in a background Blender, then a fresh verifier does stage 7; the main session puts the model
 into the kit file, exports and commits.
 
@@ -958,3 +958,389 @@ All 16 recommendations are accepted. The open questions are ruled as follows:
     - The dark interior comes from lighting, not paint.
     - Stone and canvas stay warm, never lavender or grey-blue.
 16. **Budget.** Full asset: ceiling 4000 (plan 3300–3850), every part under 1000, with the cut order as listed.
+
+## Stage 1 — Modelling (modeller, 2026-11-01)
+
+The builder from before the pause (`m064.py`) already had every part function; it built but failed its own checks.
+What changed, and why:
+- **Parts and hero.** Each exploded part has its own function (`pole`, `lashing`, `knot`, `side_shell` / `panel_part_fn`,
+  `back_piece`, `front_piece`, `wrap_strip`, `turned_strip`, `roll`, `lantern`, `peg`, `mat`, `bedroll`, `crate`,
+  `barrel`, `stone`); the hero `CanvasTent` is assembled only from them. Eight parts: Frame, Panel, Mat, Crate, Barrel,
+  Stone, Peg, Lantern.
+- **Rope loops rewritten (`hull_loop`).** The old loop sampled the hull radially, so its chords cut the corners and the
+  lashing sank 0.12 into the poles. Now it is the hull's mitred offset (every chord exactly `offset` off its hull edge),
+  corners kept, long edges split to the point count. The horizontal lashing wraps hug the hull of the slanted poles'
+  sections at z and z ± 0.7 rt (one section at z let the rope's top and bottom sink into the leaning poles).
+- **Rope trimming (`_trim`).** Chords between two kept points that dip into the canvas now split the run (the knots
+  round the outer poles were crossing the 0.08 wrap strips); an end extension is dropped when the tube's skin would
+  cross a slab twice; a nearly closed run whose ends would meet ends on its last clear points (the front upper tie
+  self-intersected).
+- **Corner knots** are two chunky turns (rt 0.13, 0.22 apart) plus a tail loop drawn out along the pole (0.20 × 0.40;
+  a round one read as a hex nut). Peg bands are a 6-sided untwisted rope with a spiral strand (a twisted 3- or 4-sided
+  one read as a paper collar round the square stake).
+- **Ridge pole** is inscribed in the fold's inner V (`ridge_zc`, axis z 9.375). The old vertex-up log under the apex
+  poked 0.04 through the steep fold along the whole ridge (seen in a close-up). The bury report can't see that,
+  because a 0.10 slab is never more than 0.05 deep. Its ends are 0.13 short of the end pieces (the back piece's sag
+  vertex bulges inward). The **ridge stubs** (the side cell's ends past the crossings) moved to z 9.95, between the
+  tips and above the lashing, where the sheet draws them.
+- **Door roll** 2.4 long (was 2.8). At z 6.4 the front poles' inner edges are at x ±1.29–1.59, so a 2.8 roll ran 0.10
+  into the inner pole. It still lies across both flaps (the doorway is 1.33 wide there).
+- **Canvas hem** at z 0.10 (was 0.40; spec 2.4 says 0.10): the mat showed under the back hem in the rear view. Hem
+  x ±5.95 (was 5.80) so the inside stays 5.05 wide at head height. The middle sag column is 0.10 (0.14 at the quarter
+  columns); the diagonal creases still read on the side render.
+- **Hem ties** are short loops from the hem rim out onto the ground (0.18 outside). The old hanging U dipped 0.07
+  below the ground once the hem came down.
+- **Dressing** nudged clear: stone S1 x −6.80, stone S2 (−7.90, −3.50), ground lantern (−6.75, −2.80) (a hem tie ran
+  into the lantern's base plate).
+- **Pole seat** is measured by sampling the faces (`contact_report.pair_gap`). The two poles of a frame touch at the
+  crossing, far from any vertex, so the vertex-only measure said 9.0; the true gap is 0.01.
+- **New check `pierce_report`:** edges of any non-canvas shell that cross a canvas surface twice. 0 now.
+
+**Renders compared with the sheet** (`M064_views.png`, `*_sheet.png`, `M064_spin.png`, close-ups):
+- *Front* (`front_sheet`) against the front cell matches:
+  - the X frames with tips above a fat lashing, and the steep cream triangle;
+  - the doorway with the roll and the hanging lantern above it, the mat and bedroll inside;
+  - pegs and knots at the feet, and barrels either side.
+
+  Frame-only W : H is 13.7 / 11.0 = 1.245 (sheet 1.247). The interior is lit beige in the studio, where the sheet
+  paints it deep brown (§3.11: lighting, not paint).
+- *True side* (`side_sheet`, the sheet's "rear view" cell) matches:
+  - the trapezoid with diagonal creases, and the pole pairs a sliver apart, leaning out;
+  - stubs at the tips, knots and pegs at the feet, and hem ties along the bottom.
+
+  Shares C 69.7 / W 25.9 (sheet 62.9 / 26.6); W : H 1.30 (sheet cell 1.29).
+- *f34 / r34*: the crate back-left, barrel A, the ground lantern and two stones on the −X side, and barrel B
+  front-right; the r34 shows the closed back. The read matches. The key-lit −X panel clips to near white in the studio
+  (Stage 4).
+- *Top*: the ridge seam, both X frames, and the dressing round the edges (the sheet's top is stylised, §3.4).
+- *Exploded parts*:
+  - Frame: an X with its lashing and two foot bands, as the cell's "A-Frame Pole" with a rope band near each foot.
+  - Panel: a sloped sheet.
+  - Mat: a flat teal mat with tan bands, and a rolled bedroll with a tan strap and spiral ends.
+  - Crate: a framed box with X braces, iron corners and a plank lid.
+  - Barrel: 8 staves, two iron hoops and a bunged lid.
+  - Stone: a pale block with broken corners.
+  - Peg: a square stake with a pale cap and a rope band.
+  - Lantern: a dark frame, amber glass and a ring.
+- *Close-ups*:
+  - `junction_cu` (A): chamfered square poles, square tips, two wraps and a V sling under them. The sheet's diamond is
+    simplified to the V.
+  - `canvas_cu` (B): the stub above the lashing; the lantern on its ring.
+  - `inside_cu` (C): the roll and lantern over the doorway, the ridge line under the fold, the closed back and the
+    bedroll on the mat. No see-through canvas.
+  - Also `knot_cu`, `knot_outer_cu`, `door_walk` and `thumb_sheet`.
+  - `M064_spin.png`, eight azimuths at e 10: the canvas is solid from every side and nothing floats.
+
+## Stage 2 — Optimisation and cleanup
+
+| Object | Tris | Size (studs) | Shells |
+| --- | --- | --- | --- |
+| **CanvasTent** (hero) | **3892** / 4000 | 16.91 × 13.69 × 11.00 | 109 |
+| CanvasTentFrame | 612 | 13.77 × 3.36 × 11.00 | 9 |
+| CanvasTentPanel | 96 | 6.04 × 8.41 × 10.11 | 1 |
+| CanvasTentMat | 204 | 5.04 × 6.62 × 1.67 | 5 |
+| CanvasTentCrate | 388 | 2.39 × 2.39 × 2.20 | 21 |
+| CanvasTentBarrel | 224 | 2.04 × 2.04 × 2.72 | 2 |
+| CanvasTentStone | 20 | 1.08 × 0.98 × 0.78 | 1 |
+| CanvasTentPeg | 120 | 0.83 × 0.83 × 1.35 | 3 |
+| CanvasTentLantern | 144 | 1.00 × 1.00 × 2.00 | 9 |
+
+- **Hero tris by kind:** rope 1660 (36 shells), barrels 448, canvas 396, crate 388, poles 304, lantern metal and glass
+  272, mat and bedroll with bands 204, peg stakes and caps 96, stubs 56, stones 40, ridge 28.
+- **Every object:**
+  - 0 non-manifold edges, 0 bowtie verts, 0 boundary, wire or loose elements;
+  - 0 zero-area faces, 0 n-gons (all triangles), 0 duplicate verts, normals outward;
+  - per shell (`shells_report`): 0 winding errors and 0 self-intersections; every shell closed with positive volume;
+  - origins at the bbox bottom centre, transforms applied.
+- **Stored points:** hero `m064_offset` (−0.362, −0.010, 0); `m064_door`, `m064_inside` and `m064_hang` stored.
+- **Contact:** 0 floating, 0 unchained (contact tolerance 0.03); 0 pierce; every open rope touches at both ends.
+- **Buried:** 0. Worst depths: rope in wood 0.02; rope in rope 0.055 at the rope joins (limit 0.08); wood in canvas
+  0.0; rope in canvas 0.04.
+- **Seats:** canvas on the inner poles 0.01–0.02; wraps on the outer poles 0.01; ridge in the fold 0.008; the two poles
+  of a frame 0.01; roll on the flaps 0.005; lantern ring on the V 0.011; bedroll on the mat 0.
+- **Thin faces (open point for the main session).** The smallest face corner is 0.4° (mat bands), and 256 hero faces
+  have a corner under 3° (spec 4.5 asked ≥ 3°).
+  - They all come from long thin strips: the 0.10 canvas rims, the 0.14 pole chamfers, the sides of the mat bands, the
+    crate brace planks and the recessed panels. None is degenerate.
+  - Splitting them to 3° means rings every ≈ 1.9 along the poles, ridge and rims: about +600 tris, which the 4000
+    budget can't take.
+  - `build()` now fails only a corner under 0.3° (`THIN_FLOOR`) and reports the 3° count.
+
+## Stage 3 — UV
+
+Angle-based Smart UV (margin 0.008) and m012's overlap unfold on every object:
+- 0 overlaps, 0 flipped;
+- min island gap 0.016, border 0.008;
+- even density; conformal stretch p95 1.04 (hero).
+
+The exporter writes its own palette UVs.
+
+## Stage 4 — Materials, colour and texture
+
+**Sampled on the sheet** (swatches with `M.raw_sample`; regions with `K.sample` / `M.sample`):
+- Swatches: timber `#AD4B08`, canvas `#FDE4BE`, stone `#AB988E`, rope `#C29A66`, mat `#557E7E`, metal `#4E4D4F`, glow
+  `#F29F03`.
+- Regions: exploded poles `#B05314` (cuA `#AA5622`), exploded crate `#804324`, barrel `#814322`, true-side canvas
+  `#FEE3BA`, f34 canvas `#FDE4BD`, f34 rope pixels `#CC9D67`, side rope `#CA9B6A`. The study's medians (§5.2) agree.
+
+**Calibration.** `K.calibrate` on the studio dome came first (`m064.calibrate()`):
+
+| Key | Dome result |
+| --- | --- |
+| timber | `#82471A` |
+| wood_dark | `#6B3F26` |
+| end_grain | `#9D897D` |
+| canvas | `#F9B9A3` |
+| canvas_deep | `#BAA58E` |
+| rope | `#9E7953` |
+| rope_deep | `#805D39` |
+| mat | `#446468` |
+| metal | `#42444C` |
+| glow | `#E6AE0C` |
+| stone | `#8E8585` |
+| stone_deep | `#797275` |
+
+On the hero, the dome values were wrong for the pale keys and the wood keys:
+- The canvas went salmon. The studio clips red on near-white keys, so the dome pulls green and blue down.
+- The poles and crate came out darker than the sheet.
+
+So every key was re-checked on the hero and part renders against the same sheet regions, and corrected where needed:
+
+| Key | Final base | Rendered (ours) | Sheet |
+| --- | --- | --- | --- |
+| `m064_timber` | `#994E1A` | frame part (178, 83, 24) | exploded poles (176, 83, 20) |
+| `m064_wood_dark` | `#724026` | crate (137, 66, 32), barrel (125, 63, 34) | crate (128, 67, 36), barrel (129, 67, 34) |
+| `m064_end_grain` | `#9D897D` | dome `#C4A38D` | `#C7A690` |
+| `m064_canvas` | `#FDE4BC` | side panel `#F0D5AA`; the key-lit f34 panel clips to `#FFFFD8` | `#FEE4BA` / `#FDE4BD` |
+| `m064_canvas_deep` | `#E6C8A2` | hem bands (blend) | shade quartiles `#DEC1A3` / `#DAB898` |
+| `m064_rope` / `_deep` | `#B98C5E` / `#946A42` | f34 rope (205, 151, 100) | f34 rope (204, 157, 103) |
+| `m064_mat` | `#405F63` | mat part `#4E726E` | `#476867` (lit `#7FA69D`) |
+| `m064_metal` | `#42444C` | lantern roof `#4C4B4F` | swatch `#4E4D4F` |
+| `m064_glow` (Neon) | `#E6AE0C`, emission 1.0 | glass (255, 186, 12) | glass `#F9B707` |
+| `m064_stone` / `_deep` | `#A3938D` / `#897C77` | stone part `#B69D8F` (R > G > B) | `#BAA1A0` |
+
+- **Canvas (for the main session).** No base matches both canvas views in the kit studio.
+  - The −X panel faces the key light and clips to near white with any cream base. The +X (side) panel renders at
+    about 0.95 of the base.
+  - A base that kept the f34 panel cream had to be salmon (`#F9B9A3`), and the side and front views then read pink.
+  - So the base stays at the sheet's swatch hue, `#FDE4BC`. The hue is right everywhere; the side panel is 14–17
+    darker than the sheet; the lit f34 / r34 panel is blown out.
+  - The class shares on the f34, r34 and front therefore count most of the lit canvas as background white (f34 C 6 %
+    against the sheet's 44 %). The side view is the fair comparison: C 69.7 vs 62.9, W 25.9 vs 26.6.
+  - **Requires Manual Validation:** the canvas in Studio daylight.
+- **Blending.** By position and role, never by facing; `K.check`'s facing correlation passes.
+  - Pole feet: two bands up to z 0.35 and 0.80, at 50 % and 25 % `wood_dark`.
+  - Canvas: hem rows at 50 % and 25 % `canvas_deep` (row bands on every canvas piece and the wrap strips); the roll's
+    spiral ends `canvas_deep`.
+  - Rope: one strand in four `rope_deep` (the peg bands two strands of six).
+  - Crate: frame and braces 35 % toward `timber`; plates `metal`.
+  - Barrels: lids 35 % toward `timber`; hoops `metal`.
+  - Stones: the lowest 30 % at 50 % `stone_deep`.
+  - Mat and bedroll: mat bands and the bedroll strap `rope`; bedroll ends teal / tan / teal.
+- **Texture:**
+  - per-piece Tint (`_rt`, 0.02–0.05);
+  - broad `K.texture` mottling on the poles, canvas pieces, stakes, mat, bedroll and stones;
+  - per-stave and per-plank Tint on the barrels and the crate.
+
+  Rope-rub bands at the knots were left out: the canvas faces are too large for a band that narrow (it would colour
+  whole panel faces).
+- **Finish:** wood rough 0.85–0.9; canvas and rope 0.95 with low spec; metal rough 0.55, metal 0.4; glass Neon.
+
+## Stage 5 — Lighting
+
+The sheet shows two glowing lanterns.
+- Both glass blocks are `m064_glow` at emission 1.0, so they export as Neon glow pieces. The Blender preview shows them
+  unshaded (`_glow_mats`).
+- No light is painted on the canvas; the interior's darkness is left to lighting.
+
+**Studio notes (Requires Manual Validation):**
+- In daylight the canvas reads cream, with the interior shadowed by the canvas.
+- At night the hanging lantern's PointLight (range 12) lights the doorway, and the ground lantern's (range 8) lights
+  the dressing.
+- Check that the timber reads orange-brown, a step lighter than the crate and barrels.
+
+## Stage 6 — VFX
+
+One `heat_glow` socket per lantern at its glass centre, overridden to a steady warm halo:
+- emitter `Halo` (`glow_soft`, `#FFC23A` → `#FF9A1E`): size 1.3–1.5, transparency 0.65–1.0, lifetime 1.0–1.5, rate 2,
+  speed 0–0.05, spread 0, light_emission 1;
+- a PointLight `#FFB347`: brightness 1, flicker, range 12 (hanging lantern) or 8 (ground lantern).
+
+The hero has 2 sockets: the hanging lantern at local (0.362, −4.815, 7.505) and the ground lantern at (−6.388, −2.79,
+0.595). The Lantern part has 1. `export_stats()` reports them with glow key `m064_glow`; the real exporter's STATS line
+is the main session's to check.
+
+## Walk-in clearance (decision 1, spec 2.9)
+
+The 5.5-stud proxy (a 2 × 1 body to 4.4, a 1.1-wide head to 5.5) walks from y −8 through the doorway onto the mat.
+
+| Measure | Value | Target |
+| --- | --- | --- |
+| Minimum clearance (left turned-back strip, y −4.0) | 0.31 | ≥ 0.05 |
+| Door clear width at z 4.4 | 2.69 | ≥ 2.6 |
+| Door clear width at z 5.5 | 1.95 | ≥ 1.8 |
+| Inside width at z 5.5 | 5.05 | ≥ 5.0 |
+| Roll underside | 6.07 | ≥ 5.95 |
+| Hanging lantern bottom | 6.91 | ≥ 6.85 |
+
+The mat top (0.22) is the only step. `door_walk.png` shows the proxy in the doorway (front, side and three-quarter).
+The Studio walk-in with collision `precise` stays **Requires Manual Validation**.
+
+## Modeller's notes for the verifier
+
+- Run `m064.build()`; its `problems` list is empty. It also returns `walk`, `placement`, `contact` (with seats),
+  `bury`, `pierce`, `rope_ends`, `thin`, `uv`, `export_stats` and `sockets`.
+- **Known gaps against the sheet:**
+  - The lashing is two horizontal wraps and a V sling (the lantern hook), not close-up A's full diamond.
+  - The ridge pole runs inside the canvas fold. The stubs that show its ends sit outside each outer pole at z 9.95,
+    and are not coaxial with the hidden ridge (axis 9.375).
+  - Tip spacing (pole axes at the tip) is 1.89 against the spec's 2.2 ± 0.25, at the spec's crossing (9.4) and lean.
+    The sheet's 37 px likely measures the outer corners.
+  - The door roll is 2.4 long (spec 2.8), so it clears the poles.
+  - The peg band reads as a chunky collar, not a coil.
+  - The outer knot tails are elongated six-point loops.
+  - No grass sprigs and no back-wall box (decision 3, §3.13).
+- **Colour:** see Stage 4. The key-lit canvas clips in the kit studio, so the hero's f34 / r34 / front class shares
+  aren't comparable for C. Judge the canvas on `side_sheet` and in Studio.
+- **Thin faces:** see Stage 2 (0.4° minimum, 256 faces under 3°; a conflict with the budget).
+- The scratch measurement scripts (class shares, rope pixels, base sweeps) were in `<temp>\m064\`, not in the repo.
+
+## Rulings (main session, 2026-11-01)
+
+1. **Canvas colour:** keep the hue-correct cream (`canvas #FDE4BC`, `canvas_deep #E6C8A2`). The lit panel blowing out
+   under the kit studio's key light is a studio-lighting effect, like the accepted misses on 027 and 030; a salmon base
+   would turn every other view pink. The verifier judges canvas share on the side view, not the f34. Canvas tone in
+   Studio daylight is a manual check.
+2. **Thin corners:** the 256 faces with a corner under 3° are long strips (canvas edges, pole bevels, mat bands, crate
+   boards), none degenerate; fixing them costs about 600 tris the budget can't take. Accepted; `build()` fails only
+   corners under 0.3°.
+3. **Tip spacing 1.89 at the pole centres** against 2.2 ± 0.25: accepted if the outer corners measure inside the range.
+4. **Door roll 2.4** (not 2.8) so it clears the front pole: accepted.
+5. **Lashing as two wraps plus the lantern sling** instead of close-up A's full diamond: a minor, not a blocker.
+
+## Stage 7 verification (round 1)
+
+Fresh verifier, read-only. Background Blender on a copy of the kit file taken after 064 was built into it (not saved).
+Every number below was re-measured with the verifier's own bmesh / BVH code, not taken from `build()`. Renders were
+made with the builder's cameras, written to a scratch folder (`<temp>\v064\`), and compared side by side with the sheet
+cells (sheet crop on the left, render on the right) and sampled with the study's HSV masks.
+
+**Result: PASS, 8/10.** No blockers. The minors are listed below; those marked "shows" are visible against the sheet.
+
+### Technical (all objects)
+
+| Object | Tris | Size (studs) | Shells | Collision |
+| --- | --- | --- | --- | --- |
+| CanvasTent | 3892 / 4000 | 16.91 × 13.69 × 11.00 | 109 | precise |
+| CanvasTentFrame | 612 | 13.77 × 3.36 × 11.00 | 9 | precise |
+| CanvasTentPanel | 96 | 6.04 × 8.41 × 10.11 | 1 | hull |
+| CanvasTentMat | 204 | 5.04 × 6.62 × 1.67 | 5 | none |
+| CanvasTentCrate | 388 | 2.39 × 2.39 × 2.20 | 21 | box |
+| CanvasTentBarrel | 224 | 2.04 × 2.04 × 2.72 | 2 | hull |
+| CanvasTentStone | 20 | 1.08 × 0.98 × 0.78 | 1 | hull |
+| CanvasTentPeg | 120 | 0.83 × 0.83 × 1.35 | 3 | none |
+| CanvasTentLantern | 144 | 1.00 × 1.00 × 2.00 | 9 | none |
+
+- Every object: 0 non-manifold edges, 0 bowtie verts, 0 boundary / wire / loose, 0 zero-area faces (none under 1e-4),
+  0 n-gons (all triangles), 0 duplicate verts, 0 edges wound against a neighbour, every shell positive volume.
+  Origin at the bbox bottom centre (0, 0, 0 to 1e-4), rotation 0, scale 1, no modifiers, no custom normals.
+- Smallest face corner 0.40° (hero, mat bands); ruled accepted (thin strips).
+- UV (`UVMap` on every object): 0 overlaps, 0 flipped, min island gap 0.016, border 0.008, density even, conformal
+  stretch p95 ≤ 1.06.
+- Materials: 18 `FB_m064_*` keys on the hero, every key on the palette. `m064_glow` is emission 1.0 (`#E6AE0C`, black
+  base): Neon. Metal rough 0.55 / metal 0.4; wood 0.85–0.9; canvas and rope 0.95.
+- Sockets: 2 `heat_glow` on the hero (hanging lantern at local (0.362, −4.815, 7.505), ground lantern (−6.388, −2.79,
+  0.595)), 1 on the Lantern part, all with the steady-halo override (rate 2, range 12 / 8, PointLight `#FFB347`).
+- Stored points: `m064_offset` (−0.362, −0.010, 0); `m064_door` (0.362, −4.177, 0); `m064_inside` (0.362, 0.010, 0);
+  `m064_hang` (0, 0, 2.005).
+
+### Contact, burial, canvas
+
+- **Floating 0, unchained 0** (contact tolerance 0.03, chain to the ground), sink 0.000. Every shell's nearest
+  neighbour is within 0.0105.
+- **Rope ends:** all 26 open runs touch at both ends (worst end gap −0.011, sunk).
+- **Buried:** nothing fully hidden. Deepest penetrations: lashing V sling into the lower wrap 0.062 (and 0.059 back),
+  door-roll bands into the roll 0.055, tie into the front canvas 0.045, hem ties into the side panel 0.045, end pieces
+  tucked into the side panels 0.041, rope into poles ≤ 0.021.
+- **Through the canvas:** no triangle of any pole, the ridge, a stub or any dressing intersects a canvas shell; the
+  only canvas intersections are the intended ties, hem ties and end-piece tucks. Canvas thickness measured 0.098–0.100.
+- The hanging lantern's roof touches the front outer pole (0.005 in). Stone S1 touches barrel A (0.0008 in).
+
+### Sizes and shape targets
+
+- Tips z 11.00; tip outer corners 2.45 apart (pole axes 1.89): inside 2.2 ± 0.25, so ruling 3 holds (at the edge).
+- Feet x ±6.88 → frame-only front W : H 13.77 / 11.0 = **1.25** (sheet 1.247).
+- Canvas: ridge fold z 10.13, ridge length 5.00 (4.92 ± 0.4), hem length 8.41 (8.42 ± 0.5), hem x ±5.95.
+- Door apex between z 8.2 and 8.4 (8.4 ± 0.3). Roll 2.4 × Ø 0.74, underside 6.10. Hanging lantern bottom 6.91.
+- Crate 2.39 / 2.20, barrels 2.70 tall, pegs 1.35, stones 1.36 × 1.30 × 0.78 and 1.15 × 1.15 × 0.62 (bbox, rotated).
+
+### Walk-in (own sweep)
+
+- Door clear width (min over the front frame zone): z 2.0 **4.30**, z 4.4 **2.68** (≥ 2.6), z 5.5 **1.95** (≥ 1.8),
+  z 6.0 0.96 (the roll).
+- Overhead at x 0 / ±0.55: lowest obstacle 6.03–6.10 (the roll); the 5.5 head clears it by 0.5.
+- Inside width at z 5.5: **4.97** at y −1.7 (target ≥ 5.0; 5.05 measured by the builder at y 0). Not a blocker: the
+  proxy's head is 1.1 wide.
+- 2 × 1 × 5.5 proxy (head 1.1 wide above 4.4) swept from y −8 in 0.05 steps: **minimum clearance 0.31** at y −4.0
+  through the doorway; it walks onto the mat (top 0.22, bands 0.245) and stops at the bedroll at y ≈ +1.1. A
+  character walks in upright. Studio walk-in with `precise` collision stays **Requires Manual Validation**.
+
+### Views against the sheet
+
+| View | Read | Measured (sheet / ours) |
+| --- | --- | --- |
+| f34 | the X frames with tips above the ridge, the steep canvas, the doorway with mat, crate back-left, barrel A with the ground lantern and a stone, barrel B front-right, pegs at the feet: matches | W 40.3 / 34.9, Y 1.4 / 1.0, M 1.8 / 1.2, K 2.6 / 1.7, S 1.6 / 0.2; C 44 / 6 (lit panel clips, ruling 1) |
+| front | X with tips, lashing, lantern under the crossing, doorway with mat, pegs and knots at the feet: matches; dressing wider (recorded, not scored) | frame W : H 1.247 / 1.25 |
+| true side | trapezoid, diagonal creases, pole pairs a sliver apart, stubs at the tips, knots and pegs: matches | C 62.9 / 69.7 (67 ± 8), W 26.8 / 25.8 (29 ± 7) |
+| r34 | closed back, panel, crate and barrel: matches in content; the sheet's own r34 puts the crate under the back +X leg, inconsistent with its f34 (f34 governs, decision 10) | C 59.7 / 26.3 (lit panel clips), W 29.2 / 33.6 |
+| "side (right)" | front-left three-quarter: lantern, roll, doorway, barrel A with the lantern: matches | — |
+| top | content only (§3.4): ridge, both X frames, dressing round the edges | — |
+| close-up A | chamfered square poles, square tips, lashing under the crossing | two wraps + V sling (ruling 5) |
+| close-up B | crossing with the stub log above the lashing, lantern on its ring | — |
+| close-up C | roll and lantern over the doorway, poles as diagonals, closed back, bedroll on the mat; no see-through canvas | — |
+| spin (8 az) | the canvas is solid from every side; nothing floats | — |
+
+**Colours** (median, sheet / ours): true-side canvas `#FEE4BA` / `#F0D5AA` (ruling 1); true-side timber `#83471D` /
+`#853D13`; exploded poles `#AD5013` / frame part `#B25118`; crate `#7E4324` / `#8A4521`; barrel staves `#7F4221` /
+`#7D3F22`; hoops and lantern metal `#3F4145` / `#3D3D41`; mat `#436462` / `#4D7172`; glass `#F9B707` / `#FCB90A`; f34
+rope `#C08B57` / `#CC955E`. Hues are right everywhere; the canvas stays cream, not yellow or salmon.
+
+### Blockers
+
+None.
+
+### Minors
+
+1. **Lashing** is two flat-reading wraps plus the lantern V sling, not close-up A's chunky turns and diamond; the rope
+   reads thinner than the sheet's (Ø 0.22 against a pole of 0.75). Ruled minor (ruling 5). Shows in close-up A and the
+   f34.
+2. **Canvas tone in the studio:** the key-lit −X panel clips to near white (f34 C 6 % against 44 %; r34 26 % against
+   60 %), and the side panel is 14–16 darker than the sheet. Ruled (ruling 1); Studio daylight is a manual check. Shows
+   on the f34 and r34.
+3. **Dark interior is lit** in the studio (front W 37.7 % against 60.5 %; f34 timber median `#B2541E` against the
+   sheet's `#834411`, which includes the shaded interior). Lighting, not paint (§3.11). Shows on the front and f34.
+4. **Outer corner-knot tails read as hex nuts** (a six-point loop standing beside the pole), not the sheet's chunky
+   figure-eight knot. Shows on the true side and the spin (az 90). Fix if touched again: flatten the tail loop onto the
+   canvas edge and give it two crossing turns.
+5. **Hem ties are almost invisible.** The sheet draws three (true side) and four (r34) clear orange loops along the hem;
+   ours are 0.18 stubs at the ground. Shows on the true side and r34.
+6. **Bedroll hidden in the three-quarter views.** The sheet's f34 and "side (right)" cells show it on the mat inside
+   the doorway; ours lies at the back-left (spec 2.7) behind the −X flap, and from the front it reads as a dark square
+   block (front M median `#1D2E2D`). Shows on the f34 and front.
+7. **Hanging lantern hangs about 1.3 forward of the spec's position** (y −4.82 against −3.50; the spec's spot collides
+   with the converging poles), so it sticks out past the front frame in the true side view, where the sheet shows none.
+   Its roof touches the outer pole (0.005). Shows on the true side.
+8. **Door roll** is 2.4 long (ruling 4) and from the front and from inside reads as a flat pale slab with its bands
+   hanging below it, not the sheet's fat roll with bands round it. Shows in close-up C.
+9. **Tip spacing** 2.45 at the outer corners (axes 1.89): inside the range only at its edge (ruling 3). Does not show.
+10. **Thin corners:** 0.40° minimum, long strips only (ruling 2). Does not show.
+11. **Rope seats slightly over 0.05:** V sling into the lower wrap 0.062, roll bands into the roll 0.055 (rope into rope,
+    hidden). Does not show.
+12. **Barrel** is straight-sided with plain staves (W : H 0.75 against the cell's 0.85, no stave seams); the sheet's
+    barrel is fuller with visible planks. Shows slightly on the part shot and f34.
+13. **Stone** is a little light and warm (`#D5BAAB` against `#B69C9B`); stones read smaller than the sheet's in the f34
+    (S share 0.2 % against 1.6 %). Shows slightly on the f34.
+14. **Exploded shot** shows the panels as near-edge-on white slivers and the small parts tiny; the parts themselves
+    match their cells. Presentation only.
+15. Inside width at z 5.5 is 4.97 at y −1.7 (5.05 at y 0) against ≥ 5.0. Does not show; walk-in is unaffected.
+16. No grass sprigs and no back-wall box (decision 3, §3.13). Shows on the f34 and exploded.

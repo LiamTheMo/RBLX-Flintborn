@@ -260,7 +260,7 @@ Skill vs design doc / repo (design doc wins, reported):
 | 061 | Flintborn Meadow Herb Study | World & resources | ✅ | 1338 (+5 parts) | V1 PASS 8/10 | rim leaves read as thin dark spikes; left head's stem hidden in front; narrow low rosette |
 | 062 | Flintborn Ground Scatter Study | World & resources | ✅ | 2118 (+9 parts) | V1 FAIL 6/10, V2 PASS 8/10 | pinecone scales small pointed diamonds vs broad lozenges; stones rounder and lighter; looser pile (fill 0.57 vs 0.65); top-view yellow high; wood lighter; rear X weak |
 | 063 | Flintborn hanging vine model study | World & resources | ⬜ | | | |
-| 064 | Flintborn A-frame tent study | World & resources | ⬜ | | | |
+| 064 | Flintborn A-frame tent study | World & resources | ✅ | 3892 (+8 parts) | V1 PASS 8/10 | Studio checks: walk-in with precise collision, canvas tone in daylight; lashing thinner than the sheet; lit canvas clips white in the studio; hem ties faint; corner-knot tails read as nuts; hanging lantern 1.3 forward; door roll a flat slab; plain barrel |
 | 065 | Flintborn wildflowers model study | World & resources | ⬜ | | | |
 | 066 | Canvas Shelter Model Study | World & resources | ⬜ | | | |
 | 067 | Flintborn Table and Seating Study | World & resources | ⬜ | | | |
@@ -453,3 +453,4 @@ Skill vs design doc / repo (design doc wins, reported):
   - Passed since the last PR (#98): 060 and 061. They are on `feat/world-kit-rebuild`, not yet merged into v0.18.
 - 2026-11-01: resumed on a second machine (repo root now found from `kit_mcp.py`'s own path). 067 studied with decisions; PRs now target v0.19.
 - 2026-11-01: 062 Ground Scatter built by a parallel modeller: a 4.6-stud forest-floor pile of ten lobed leaves (yellow, lime, olive, rust, green) whose stems all start inside their own leaf bases, an X of two twigs, a domed egg pinecone shingled with 58 faceted scales, warm stones and chips, every shell chained to the ground. R1 FAIL 6 (cut-off petioles, lidded pinecone), R2 PASS 8.
+- 2026-11-01: 064 A-Frame Tent built by a parallel modeller: a 16.9 × 13.7 × 11-stud walk-in canvas tent on two lashed A-frames with a ridge in the canvas fold, 0.10 canvas panels wrapped round the poles, a rolled door flap, rope lashings and peg ties, a bedroll, crate, barrel, stones and two Neon lanterns with steady halo sockets. A 5.5-stud character walks in with 0.31 clearance. R1 PASS 8. The kit file also holds 063's round-2 build (not passed; round 3 in progress).
