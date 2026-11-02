@@ -4,6 +4,12 @@
 -- press on the track sets the value, snapped to `step`; with a gamepad, left /
 -- right step it while it is selected.
 --
+-- In a scrolling list a touch first waits to see which way it goes
+-- (KitModel.DragAxis, DRAG_SLOP screen px): sideways, the slider takes the drag
+-- and the list stops scrolling until the finger lifts; up or down, the list
+-- scrolls and the value stays; a tap sets the value where it lands. The mouse
+-- drags at once (the wheel scrolls the list).
+--
 --   Kit.Slider.new(page, { rect = { 0, 40, 375, 34 }, min = 10, max = 100, step = 1, value = 50,
 --       format = function(v) return ("%.1f"):format(v / 50) end, onChange = set })
 
@@ -30,13 +36,18 @@ Slider.BOX_W = 74
 -- slider shorter than that keeps the knob inside its own height.
 Slider.KNOB_ASPECT = 60 / 58
 Slider.KNOB_OVER = 8
+-- Screen px a touch in a scrolling list moves before it counts as a drag.
+Slider.DRAG_SLOP = 10
 
 local count = 0
 
 -- props: rect | size, min, max, step, value, valueBox (true), boxWidth (74),
--- format(value) -> string, onChange(value), zIndex, name. `knob` and `track`
--- are still accepted for older callers but no longer change the look: every
--- slider draws the same track and knob.
+-- format(value) -> string, onChange(value), zIndex, name, selectable (true:
+-- false keeps it out of gamepad selection, where a stepper beside it does the
+-- job), touchBand (false: true grows the drag band to touchMin screen px tall
+-- on touch screens, whatever the window's scale; the layout must leave room).
+-- `knob` and `track` are still accepted for older callers but no longer change
+-- the look: every slider draws the same track and knob.
 function Slider.new(parent: Instance, props)
 	local w, h = Core.Size(props, 375, 34)
 	local base = Core.Root(parent, "Slider", "slider.track", props, w, h)
@@ -122,9 +133,11 @@ function Slider.new(parent: Instance, props)
 		Text = "",
 		ZIndex = base.z + 8,
 	}, base.root)
+	self.hit = hit
 	self.control = Interact.attach(base, {
 		hit = hit,
 		pressScale = false,
+		selectable = props.selectable,
 		render = function(state)
 			self.knobPlate:Show(state)
 			local grow = state == "pressed" or state == "hover" or state == "focused"
@@ -132,11 +145,50 @@ function Slider.new(parent: Instance, props)
 		end,
 	})
 	local maid = base.maid
+	if props.touchBand then
+		-- On touch screens the band grows to touchMin screen px tall at the
+		-- slider's real scale (as Interact grows other controls' pads).
+		local function fitTouch()
+			local shown = base.root.AbsoluteSize
+			if not UserInputService.TouchEnabled or shown.X <= 0 or w <= 0 then
+				return
+			end
+			local tall = math.max(band, Tokens.Space("touchMin", 44) / (shown.X / w))
+			hit.Position = UDim2.fromOffset(-kw / 2, (h - tall) / 2)
+			hit.Size = UDim2.fromOffset(trackW + kw, tall)
+		end
+		maid:Give(base.root:GetPropertyChangedSignal("AbsoluteSize"):Connect(fitTouch))
+		fitTouch()
+	end
 	local dragging: InputObject? = nil
+	-- A touch in a scrolling list that has not yet shown which way it goes, and
+	-- the list whose scrolling is held off while this slider drags.
+	local pending: { input: InputObject, x: number, y: number, list: ScrollingFrame, canvas: Vector2 }? = nil
+	local held: ScrollingFrame? = nil
+	local function release()
+		if held then
+			held.ScrollingEnabled = true
+			held = nil
+		end
+	end
+	maid:Give(release)
 	maid:Give(hit.InputBegan:Connect(function(input: InputObject)
 		local kind = input.UserInputType
 		if self.control.flags.enabled == false then
 			return
+		end
+		if kind == Enum.UserInputType.Touch then
+			local list = hit:FindFirstAncestorWhichIsA("ScrollingFrame")
+			if list and list.ScrollingEnabled then
+				pending = {
+					input = input,
+					x = input.Position.X,
+					y = input.Position.Y,
+					list = list,
+					canvas = list.CanvasPosition,
+				}
+				return
+			end
 		end
 		if kind == Enum.UserInputType.MouseButton1 or kind == Enum.UserInputType.Touch then
 			dragging = input
@@ -144,6 +196,25 @@ function Slider.new(parent: Instance, props)
 		end
 	end))
 	maid:Give(UserInputService.InputChanged:Connect(function(input: InputObject)
+		local wait = pending
+		if wait and input == wait.input then
+			local axis = KitModel.DragAxis(input.Position.X - wait.x, input.Position.Y - wait.y, Slider.DRAG_SLOP)
+			if axis == "x" then
+				-- Sideways: the slider takes the drag; the list stays where it was.
+				pending = nil
+				release()
+				held = wait.list
+				wait.list.ScrollingEnabled = false
+				wait.list.CanvasPosition = wait.canvas
+				dragging = input
+				self:_fromScreenX(input.Position.X)
+			elseif axis == "y" then
+				-- Up or down: the list scrolls and the value stays.
+				pending = nil
+				self.control:_endPress()
+			end
+			return
+		end
 		if dragging == nil then
 			return
 		end
@@ -155,8 +226,15 @@ function Slider.new(parent: Instance, props)
 		end
 	end))
 	maid:Give(UserInputService.InputEnded:Connect(function(input: InputObject)
+		local wait = pending
+		if wait and input == wait.input then
+			-- A tap: the value goes where it landed.
+			pending = nil
+			self:_fromScreenX(input.Position.X)
+		end
 		if dragging and (input == dragging or input.UserInputType == Enum.UserInputType.MouseButton1) then
 			dragging = nil
+			release()
 		end
 	end))
 	-- Gamepad: left / right step the value while selected, bound above the

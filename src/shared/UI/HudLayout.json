@@ -50,10 +50,10 @@
   "vitals": {
     "anchor": [1, 0],
     "pos": [1, -53, 0, 60],
-    "size": [315, 65],
-    "pitch": 76,
+    "size": [240, 50],
+    "pitch": 58,
     "low": 0.25,
-    "lowMark": [42, 36, 24],
+    "lowMark": [32, 28, 18],
     "rows": [
       { "key": "health", "label": "Health", "fill": "health", "icon": "heart" },
       { "key": "stamina", "label": "Stamina", "fill": "stamina", "icon": "lightning" },
@@ -62,13 +62,13 @@
   },
   "status": {
     "anchor": [1, 0],
-    "pos": [1, -53, 0, 289],
+    "pos": [1, -53, 0, 236],
     "size": [315, 38],
     "gap": 8
   },
   "objective": {
     "anchor": [1, 0],
-    "pos": [1, -53, 0, 337],
+    "pos": [1, -53, 0, 284],
     "size": [315, 134],
     "header": [22, 16, 271, 34],
     "rowTop": 58,
@@ -83,7 +83,7 @@
   },
   "event": {
     "anchor": [1, 0],
-    "pos": [1, -53, 0, 483],
+    "pos": [1, -53, 0, 430],
     "size": [315, 128],
     "header": [22, 16, 271, 34],
     "nameY": 56,
@@ -92,7 +92,7 @@
     "descriptionH": 36,
     "descriptionSize": 13,
     "maxLines": 3,
-    "touch": { "pos": [1, -53, 0, 511], "descriptionSize": 15 },
+    "touch": { "pos": [1, -53, 0, 458], "descriptionSize": 15 },
     "phone": { "anchor": [0, 0], "pos": [0, 39, 0, 238] }
   },
   "tiles": {

@@ -402,7 +402,7 @@ Kit.Checkbox.new(page, { rect = { 0, 230, 380, 50 }, label = "Show Damage Number
 `Kit.Toggle.new(parent, {rect = 89 × 49, on, onToggle(on)})`; `:Set(on)`, `:SetEnabled`.
 
 ### Slider
-`Kit.Slider.new(parent, {rect, min, max, step?, value, valueBox = true, boxWidth = 74, format?(v) → string, onChange(v)})`;
+`Kit.Slider.new(parent, {rect, min, max, step?, value, valueBox = true, boxWidth = 74, format?(v) → string, onChange(v), selectable = true, touchBand = false})`;
 `:SetValue(v)` (no callback), `:SetEnabled`. Every slider has one look: the
 dark track (14 px) with the yellow fill, and the square parchment knob with
 leather corners (`lk_button_square_paper`, 60 × 58) drawn whole at its own
@@ -410,7 +410,16 @@ aspect, 8 px past the track above and below (31 × 30; a slider shorter than
 30 px keeps it inside its height). The knob is never 9-sliced or stretched,
 so its rim and corners keep their shape at any size. The older `knob` and
 `track` props are still accepted and ignored. Drag, track press, or gamepad
-left / right while selected.
+left / right while selected. `selectable = false` keeps it out of gamepad
+selection (a stepper beside it does the job: the Market's Sell rows);
+`touchBand = true` grows the drag band to 44 screen px tall on touch screens
+at the slider's real scale (the layout must leave room). Inside a scrolling
+list a touch waits until it has moved `Slider.DRAG_SLOP` (10) screen px
+(`KitModel.DragAxis`): mostly sideways, the slider takes the drag and turns
+the list's `ScrollingEnabled` off (and puts back the scroll the list had when
+the finger landed) until the finger lifts; mostly up or down, the list
+scrolls and the value stays; a tap sets the value where it lands. The mouse
+drags at once.
 ```lua
 Kit.Slider.new(page, { rect = { 0, 40, 375, 34 }, min = 10, max = 100, step = 1, value = 50,
     format = function(v) return ("%.1f"):format(SettingsRules.MouseSensitivity(v)) end, onChange = set })
@@ -483,7 +492,7 @@ Kit.PlayerRow.new(list, { size = { 330, 52 }, userId = id, name = name, level = 
 `Kit.Badge.new(parent, {variant = "leader" | "ready" | "notReady" | "count" | "number" | "new" | "dot", text?, rect = {x, y, 0, h} (0 fits the text), anchor? = "topRight"})`;
 `:SetText`, `:SetVisible`. "ready" = green dot on the light green pill,
 "notReady" = grey dot on the value pill: generic set / not-set status pills
-(trade lock, save status). The party no longer uses them or the "leader"
+(trade lock). The party no longer uses them or the "leader"
 plaque (D24): the leader is marked by the crown alone. `readyPill` is removed.
 
 ### CurrencyPill

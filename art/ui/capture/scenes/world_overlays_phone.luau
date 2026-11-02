@@ -1,5 +1,5 @@
 -- The world overlays on a phone held sideways (844 × 390, touch only): the
--- banner column, boosts and save status at the HUD's phone scale, the loot and
+-- banner column and boosts at the HUD's phone scale, the loot and
 -- tribe windows fitted to the whole height, the build palette, and the world
 -- menu. Real controllers, mocked remotes, sample data as in world_overlays.
 --
@@ -65,7 +65,6 @@ local BoostRules = require(ReplicatedStorage.Shared.Survival.BoostRules)
 local started = {}
 for _, name in
 	{
-		"SaveStatusController",
 		"TutorialController",
 		"DownedController",
 		"BoostHudController",
@@ -97,19 +96,9 @@ check(
 -- Shown for three seconds when the run starts (the world menu's toast).
 find("Transition").Visible = false
 
+-- The profile's save state draws no indicator (the server still saves).
 player:SetAttribute("SaveStatus", "Saving")
--- On touch the save tag sits in the top bar's free area, clear of the jump
--- button (bottom right) and the thumbstick (bottom left).
-local saveHolder = gui:FindFirstChild("SaveStatus"):FindFirstChild("Holder", true)
-local saveScale = saveHolder.Parent:FindFirstChildWhichIsA("UIScale").Scale
-check(
-	saveHolder.Visible
-		and saveHolder.AnchorPoint.X == 1
-		and saveHolder.AnchorPoint.Y == 0.5
-		and math.abs(saveHolder.Position.Y.Offset * saveScale - 29) < 0.5
-		and math.abs(saveHolder.Position.X.Offset * saveScale - (W - 20)) < 0.5,
-	"the save tag sits in the top bar on touch"
-)
+check(find("SaveStatus") == nil, "no save-status indicator")
 events.TutorialChanged.OnClientEvent:Fire({
 	id = "Gather",
 	index = 3,

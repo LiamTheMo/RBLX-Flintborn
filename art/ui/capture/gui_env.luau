@@ -517,6 +517,7 @@ local function defaults(className)
 		p.ScrollBarImageColor3 = Color3.new(0, 0, 0)
 		p.ScrollBarImageTransparency = 0
 		p.ScrollingDirection = __enum("ScrollingDirection.XY")
+		p.ScrollingEnabled = true
 		p.VerticalScrollBarInset = __enum("ScrollBarInset.None")
 		p.AbsoluteCanvasSize = Vector2.new(0, 0)
 		p.AbsoluteWindowSize = Vector2.new(0, 0)

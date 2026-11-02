@@ -146,6 +146,37 @@ test("slice scale shrinks corners for small widgets", function()
 	expectEq(HudModel.SliceScale(400, 100, 800, 200, nil), 1, "no art scale: as before")
 end)
 
+test("the corner settings button keeps clear of the touch jump button", function()
+	local phone = HudModel.JumpButton(844, 390)
+	expectEq(phone.size, 70, "a phone's jump button is 70 px")
+	expectEq(phone.x, 749, "95 px from the right")
+	expectEq(phone.y, 300, "90 px from the bottom")
+	local tablet = HudModel.JumpButton(1024, 768)
+	expectEq(tablet.size, 120, "a tablet's is 120 px")
+	expectEq(tablet.x, 854, "170 px from the right")
+	expectEq(tablet.y, 558, "210 px from the bottom")
+
+	local spec = { right = 53, bottom = 49, h = 46, gap = 12 }
+	local right, bottom = HudModel.CornerButton(1672, 941, 1, false, spec)
+	expectEq(right, 53, "desktop: the corner margin")
+	expectEq(bottom, 49, "desktop: the hotbar's bottom margin")
+
+	-- Above the jump button: its foot `gap` screen px over the button's top.
+	right, bottom = HudModel.CornerButton(844, 390, 0.5, true, spec)
+	expectEq(right, 53, "above: the right margin stays")
+	expectEq(bottom, 204, "above: (90 + 12) / 0.5")
+	expect(390 - bottom * 0.5 + 12 <= phone.y, "above: clear of the phone's jump button")
+	right, bottom = HudModel.CornerButton(1024, 768, 0.55, true, spec)
+	expect(768 - bottom * 0.55 + 12 <= tablet.y + 0.01, "above: clear of the tablet's jump button")
+
+	-- Beside it: `gap` px to its left, centred on its height.
+	local beside = { right = 53, bottom = 49, h = 46, gap = 12, beside = true }
+	right, bottom = HudModel.CornerButton(844, 390, 0.5, true, beside)
+	expectEq(right, 214, "beside: (95 + 12) / 0.5")
+	expectEq(bottom, 87, "beside: centred on the button (55 / 0.5 - 23)")
+	expect(844 - right * 0.5 + 12 <= phone.x + 0.01, "beside: clear of the jump button")
+end)
+
 test("hotbar stepping wraps", function()
 	expectEq(HudModel.HotbarStep(1, 1, 6), 2, "next")
 	expectEq(HudModel.HotbarStep(6, 1, 6), 1, "wraps forward")

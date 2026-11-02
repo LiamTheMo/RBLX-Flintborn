@@ -61,12 +61,46 @@ local function xpPopups(hud)
 	end
 end
 
+-- The Settings button sits left of where Roblox puts the jump button, centred
+-- on its height, clear of the Party panel above and the hotbar to its left.
+local function gearClear(hud, scale)
+	local HudModel = require(Shared.UI.HudModel)
+	local g = LobbyHud.GEAR
+	local at = hud.settingsRegion.Position
+	-- Screen rectangles {x1, y1, x2, y2}.
+	local x2, y2 = W + at.X.Offset * scale, H + at.Y.Offset * scale
+	local gear = { x2 - g.w * scale, y2 - g.h * scale, x2, y2 }
+	local jumpAt = HudModel.JumpButton(W, H)
+	local party = hud.partyRegion
+	local partyFoot = (party.Position.Y.Offset + party.Size.Y.Offset) * scale
+	local bottom = hud.bottom
+	local hotbarRight = W / 2 + bottom.Size.X.Offset / 2 * scale
+	local ok = gear[3] + g.gap <= jumpAt.x and gear[2] > partyFoot and gear[1] > hotbarRight
+	print(
+		("  %s lobby_hud_phone: the gear (%d..%d x %d..%d) clears the jump button (x %d), the Party panel (foot %d) and the hotbar (right %d)"):format(
+			if ok then "ok" else "FAIL",
+			gear[1],
+			gear[3],
+			gear[2],
+			gear[4],
+			jumpAt.x,
+			partyFoot,
+			hotbarRight
+		)
+	)
+	if not ok then
+		error("lobby_hud_phone: the settings gear overlaps")
+	end
+end
+
 local function page(view, notice)
 	local gui, root = __screen(W, H)
 	local hud = LobbyHud.new(root, {})
 	Kit.Scale.Hud(gui, root)
 	local scale = root:FindFirstChildWhichIsA("UIScale").Scale
 	hud:SetTopInset(TOP_BAR / scale)
+	hud:SetScreen(W, H, scale, true)
+	gearClear(hud, scale)
 	hud:SetProgress({ level = 12, xp = 450, xpToNext = 750 }, true)
 	hud:SetCurrency(2450, 125, true)
 	hud:SetParty(LobbyHudModel.Party(view, ME))

@@ -80,4 +80,16 @@ if UserInputService.TouchEnabled then
 	attack.Parent = root
 	Kit.IconButton.new(attack, { rect = { 0, 0, cfg.size[1], cfg.size[2] }, variant = "round", icon = "spear" })
 end
+-- The world ⚙ as SettingsController places it, at the bottom right.
+do
+	local SettingsController = require(Client.Controllers.SettingsController)
+	local g = SettingsController.GEAR
+	Kit.IconButton.new(root, {
+		name = "Settings",
+		variant = "settings",
+		size = { g.w, g.h },
+		position = SettingsController.GearPosition(W, H, scale, false),
+		anchorPoint = Vector2.new(1, 1),
+	})
+end
 __dump(gui, W, H, BACKGROUND)

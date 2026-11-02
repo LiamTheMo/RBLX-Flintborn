@@ -109,4 +109,71 @@ if UserInputService.TouchEnabled then
 	attack.Parent = root
 	Kit.IconButton.new(attack, { rect = { 0, 0, cfg.size[1], cfg.size[2] }, variant = "round", icon = "spear" })
 end
+
+-- The stat bars' values read at 9 screen px or more and show whole.
+do
+	local ok = true
+	for _, row in hud.vitals.rows do
+		local label = row.bar.label
+		local role = label:GetAttribute("KitTextRole") or "value"
+		local base = label.TextSize / Kit.Core.TextBoost(role, label.TextSize)
+		local whole = Kit.Text.Width(label.Text, role, base) <= label.Size.X.Offset
+		local px = label.TextSize * scale
+		print(
+			("  %s world_hud_phone: %q at %.1f design px = %.1f screen px%s"):format(
+				if px >= 9 and whole then "ok" else "FAIL",
+				label.Text,
+				label.TextSize,
+				px,
+				if whole then "" else " (cut)"
+			)
+		)
+		ok = ok and px >= 9 and whole
+	end
+	if not ok then
+		error("world_hud_phone: a stat bar value is too small")
+	end
+end
+
+-- The world ⚙ as SettingsController places it (its own HUD-scaled gui in
+-- game): above where Roblox puts the jump button, under the right column.
+do
+	local SettingsController = require(Client.Controllers.SettingsController)
+	local g = SettingsController.GEAR
+	local at = SettingsController.GearPosition(W, H, scale, true)
+	Kit.IconButton.new(root, {
+		name = "Settings",
+		variant = "settings",
+		size = { g.w, g.h },
+		position = at,
+		anchorPoint = Vector2.new(1, 1),
+	})
+	-- Screen rectangles {x1, y1, x2, y2}.
+	local gx2, gy2 = W + at.X.Offset * scale, H + at.Y.Offset * scale
+	local gear = { gx2 - g.w * scale, gy2 - g.h * scale, gx2, gy2 }
+	local jumpAt = HudModel.JumpButton(W, H)
+	local jump = { jumpAt.x, jumpAt.y, jumpAt.x + jumpAt.size, jumpAt.y + jumpAt.size }
+	local objective = hud.objective.root
+	local objectiveFoot = (objective.Position.Y.Offset + objective.Size.Y.Offset) * scale
+	local attackRight = W + layout.attack.phone.pos[2] * scale
+	local function apart(a, b)
+		return a[3] <= b[1] or b[3] <= a[1] or a[4] <= b[2] or b[4] <= a[2]
+	end
+	local ok = apart(gear, jump) and gear[4] + g.gap <= jump[2] and gear[2] > objectiveFoot and gear[1] > attackRight
+	print(
+		("  %s world_hud_phone: the gear (%d..%d x %d..%d) clears the jump button (y %d), the objective (foot %d) and the attack button (right %d)"):format(
+			if ok then "ok" else "FAIL",
+			gear[1],
+			gear[3],
+			gear[2],
+			gear[4],
+			jump[2],
+			objectiveFoot,
+			attackRight
+		)
+	)
+	if not ok then
+		error("world_hud_phone: the settings gear overlaps")
+	end
+end
 __dump(gui, W, H, BACKGROUND)

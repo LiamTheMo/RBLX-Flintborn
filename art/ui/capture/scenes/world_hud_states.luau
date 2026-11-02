@@ -53,6 +53,25 @@ do
 	check(#spent > 0 and spent[1].ImageTransparency == Vitals.EMPTY_FADE, "the spent stamina icon is greyed out")
 	check(hud.vitals.rows.health.bar.root:GetAttribute("HudEmpty") == false, "low health is not empty")
 	check(#hud.vitals.chips == 2, "hunger slow and food healing plaques")
+	-- The values stay at or above the 12 design px floor and show whole, the
+	-- widest one ("100/100") included.
+	for key, row in hud.vitals.rows do
+		local label = row.bar.label
+		local before = label.Text
+		label.Text = "100/100"
+		local width = require(Client.Hud.Kit).Text.Width(label.Text, "value", label.TextSize)
+		check(
+			label.TextSize >= 12 and width <= label.Size.X.Offset,
+			("%s value at %d design px, %q fits (%d <= %d)"):format(
+				key,
+				label.TextSize,
+				label.Text,
+				width,
+				label.Size.X.Offset
+			)
+		)
+		label.Text = before
+	end
 	hud.objective:Set(HudModel.ExtractionObjective({
 		name = "Old Quarry",
 		kind = "Fixed",
