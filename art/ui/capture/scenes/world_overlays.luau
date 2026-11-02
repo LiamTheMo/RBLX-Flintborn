@@ -2,7 +2,7 @@
 -- remotes and attributes with sample data, over the island backdrop:
 --
 --   1 in a run: tutorial hint with key caps, downed (bleeding out), boss bar,
---     Horn of War, an event banner, two boosts (one ending soon), save status
+--     Horn of War, an event banner, two boosts (one ending soon)
 --   2 revived / shielded / legacy lists: downed while revived, shielded boss,
 --     the extraction and event lists, the boss cue plaque and a subtitle
 --   3 body loot window        4 storage chest window
@@ -131,7 +131,6 @@ InventoryController.Snapshot.slots = {
 local started = {}
 for _, name in
 	{
-		"SaveStatusController",
 		"TutorialController",
 		"DownedController",
 		"BossUiController",
@@ -164,7 +163,9 @@ local function check(cond, msg)
 end
 
 -- Page 1 ----------------------------------------------------------------------------
+-- The profile's save state draws no indicator (the server still saves).
 player:SetAttribute("SaveStatus", "Saved")
+check(find("SaveStatus") == nil, "no save-status indicator")
 events.TutorialChanged.OnClientEvent:Fire({
 	id = "Gather",
 	index = 3,

@@ -1,6 +1,6 @@
 -- The lobby's always-on HUD (GDD §11, §25; docs/ui/LobbyScreen.md, ARCHITECTURE
--- §4.1): Coins, Gems and Settings, the menu tiles, the Party panel, the XP bar
--- and the hotbar that shows the deploy loadout, drawn by
+-- §4.1): Coins and Gems, the menu tiles, the Party panel, the XP bar, the
+-- hotbar that shows the deploy loadout and Settings (bottom right), drawn by
 -- Hud/Screens/LobbyHud from the shared Kit. There is no Enter button or server
 -- choice here: the Play tile opens the Play window, which deploys.
 -- Lobby place only (HudMode.ReplacesLobby); the older lobby visuals stay hidden.
@@ -16,6 +16,7 @@ local ContextActionService = game:GetService("ContextActionService")
 local GuiService = game:GetService("GuiService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local UserInputService = game:GetService("UserInputService")
 
 local LobbyHudModel = require(ReplicatedStorage.Shared.UI.LobbyHudModel)
 local ForgeController = require(script.Parent.ForgeController)
@@ -157,16 +158,19 @@ local function build()
 	gui.Parent = player:WaitForChild("PlayerGui")
 end
 
--- Root scale (HudModel.HudScale, × 0.9 on short touch screens) and the top bar's
--- reach in design px.
+-- Root scale (HudModel.HudScale, × 0.9 on short touch screens), the top bar's
+-- reach in design px and, on touch screens, the jump button's corner.
 local function watchScale()
 	table.insert(stops, Kit.Scale.Hud(gui, root))
 	local scale = root:FindFirstChildWhichIsA("UIScale") :: UIScale
 	local function inset()
 		hud:SetTopInset(Kit.Scale.WindowTop(gui) / math.max(scale.Scale, 0.01))
+		local size = gui.AbsoluteSize
+		hud:SetScreen(size.X, size.Y, scale.Scale, UserInputService.TouchEnabled)
 	end
 	keep(scale:GetPropertyChangedSignal("Scale"):Connect(inset))
 	keep(gui:GetPropertyChangedSignal("AbsoluteSize"):Connect(inset))
+	keep(UserInputService:GetPropertyChangedSignal("TouchEnabled"):Connect(inset))
 	pcall(function()
 		keep(GuiService:GetPropertyChangedSignal("TopbarInset"):Connect(inset))
 	end)

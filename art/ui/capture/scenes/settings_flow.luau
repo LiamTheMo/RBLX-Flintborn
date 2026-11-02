@@ -228,18 +228,29 @@ check(state(view.keycaps.Interact[2]) == "disabled", "no keyboard: caps disabled
 check(view.notes.Controls.root.Text:find("Connect a keyboard") ~= nil, "no keyboard: the note says why")
 UserInputService.KeyboardEnabled = true
 
--- The world ⚙ sits in the HUD's top row left of the vitals, on a HUD-scaled
--- root (not at the bottom right, where Roblox's jump button is on phones).
+-- The world ⚙ sits at the bottom right on a HUD-scaled root; on touch screens
+-- it stands above Roblox's jump button.
 local gear = SettingsController.gear
 local gearRoot = gear.root.Parent
 check(
 	gear.root.Position.X.Scale == 1
 		and gear.root.Position.X.Offset == -SettingsController.GEAR.right
-		and gear.root.Position.Y.Scale == 0
-		and gear.root.AnchorPoint.Y == 0,
-	"the world gear is top right, left of the vitals"
+		and gear.root.Position.Y.Scale == 1
+		and gear.root.AnchorPoint.X == 1
+		and gear.root.AnchorPoint.Y == 1,
+	"the world gear is at the bottom right"
 )
 check(gearRoot:FindFirstChildWhichIsA("UIScale") ~= nil, "the gear scales with the HUD")
+do
+	local HudModel = require(game:GetService("ReplicatedStorage").Shared.UI.HudModel)
+	local at = SettingsController.GearPosition(844, 390, 0.5, true)
+	local jump = HudModel.JumpButton(844, 390)
+	local foot = 390 + at.Y.Offset * 0.5
+	check(
+		foot + SettingsController.GEAR.gap <= jump.y,
+		("touch: the world gear's foot (%d) stands above the jump button (%d)"):format(foot, jump.y)
+	)
+end
 
 -- Leak check counts: the PlayerGui's instances, and the live connections on
 -- every instance still in the game (a destroyed one drops out with its

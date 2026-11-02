@@ -6,7 +6,7 @@ is the authority, this guide summarises it and links to it:
 
 | Document | Authority for |
 |---|---|
-| [ARCHITECTURE.md](ARCHITECTURE.md) | The contract: scaling, ScreenGuis, the Kit's structure, server work, atlas plan, file ownership. **§12 decisions (D1–D26) override everything else**, this guide included |
+| [ARCHITECTURE.md](ARCHITECTURE.md) | The contract: scaling, ScreenGuis, the Kit's structure, server work, atlas plan, file ownership. **§12 decisions (D1–D27) override everything else**, this guide included |
 | [KIT.md](KIT.md) | The Kit's API: every component's constructor, props, methods and states; roles; stand-ins; capture limits |
 | Screen specs: [LobbyScreen](LobbyScreen.md), [InventoryScreen](InventoryScreen.md), [SettingsScreen](SettingsScreen.md), [PartyScreen](PartyScreen.md), [PlayScreen](PlayScreen.md), [ForgeScreen](ForgeScreen.md), [CraftingScreen](CraftingScreen.md), [JournalScreen](JournalScreen.md), [ListWindows](ListWindows.md), [HudScreen](HudScreen.md) | Per-screen measurements, element trees, data and deviations |
 | [ITEM_ART.md](ITEM_ART.md) | Which art and tint every catalog item draws |
@@ -106,7 +106,7 @@ cleaned by the slicer (§9.1), never cut by hand.
 
 | File | Source of truth for | Built as |
 |---|---|---|
-| [`01_hud.png`](../../art/reference/ui/lobby/01_hud.png) | Lobby HUD layout: currencies and settings (top right), 2 × 3 menu tiles (left), Party panel (right), XP bar and six-slot hotbar (bottom centre); HUD positions under every window (D8) | `Screens/LobbyHud` (no player card: owner decision) |
+| [`01_hud.png`](../../art/reference/ui/lobby/01_hud.png) | Lobby HUD layout: currencies (top right; the settings button moved to the bottom right, D27), 2 × 3 menu tiles (left), Party panel (right), XP bar and six-slot hotbar (bottom centre); HUD positions under every window (D8) | `Screens/LobbyHud` (no player card: owner decision) |
 | [`02_inventory.png`](../../art/reference/ui/lobby/02_inventory.png) | The model window: frame, banner header (icon, title, ink underline, close), category column, slot grid, detail card, primary action; also the Play window's chrome (D25) | `Screens/InventoryWindow` |
 | [`03_settings.png`](../../art/reference/ui/lobby/03_settings.png) | Large notched tabs, sliders, checkboxes with descriptions, key-bind boxes, Reset / Apply footer | `Screens/SettingsWindow` (D1, D2, D21) |
 | [`04_party.png`](../../art/reference/ui/lobby/04_party.png) | Centred header with ornaments, member rows, invite search and list, Party Details | `Screens/PartyWindow` (D5, D6, D17, D24: no Readied Status) |
@@ -176,6 +176,7 @@ the specs and every other section. Full text:
 | D24 | Ready removed | No Ready anywhere (server, Party window, HUD dots, Play); only a solo player or the leader presses Play; the leader is marked by the crown alone (no Leader tag) | [PartyScreen](PartyScreen.md), [PlayScreen](PlayScreen.md) |
 | D25 | Play window chrome | Inventory's size (1187 × 650), header, clasps and close corner; map in an inset panel; section headings instead of plaques; primary leather PLAY at the bottom right | [PlayScreen](PlayScreen.md) |
 | D26 | Play rune art | Sheet 21: the crystal arrow is the Play tile's and the Play header's icon and the PLAY button's glyph; two rune pillars stand at the PLAY button's ends; own atlas `atlas_lk_play`; portal and white glyph until it is uploaded | [PlayScreen](PlayScreen.md#play-rune-art-d26), §9.6 |
+| D27 | HUD corner round | Both HUDs' Settings button at the bottom right (beside the hotbar's end; on touch clear of Roblox's jump button: above it in the world, left of it in the lobby); world vitals 240 × 50 at pitch 58; no client save-status tag | [LobbyScreen](LobbyScreen.md), [HudScreen](HudScreen.md) |
 
 Other recorded deviations (not numbered): the lobby HUD has no player card
 (each party row shows level and XP instead; [LobbyScreen](LobbyScreen.md)),
@@ -255,7 +256,7 @@ PLAY 4.5 are limited by the art).
 | `checkTint` | `#FFD52A` | Check gold (multiply) | Tint of the ticked checkbox (`variant = "gold"`, M03) |
 | `badge` | `#7B2E0D` | Badge leather | Number badge plate (sheet 05); no current colour reader (the art carries it) |
 | `toggleOn` | `#698010` | Toggle green | Toggle on stand-in; "on" accents in lists and notices |
-| `readyFill` / `readyDot` / `readyEdge` | `#E7E9A2` / `#0CE01A` / `#9DA35A` | Status green | The generic set-status pill (`badge.ready`) and green dot (trade lock, save status); not used by the party since D24 |
+| `readyFill` / `readyDot` / `readyEdge` | `#E7E9A2` / `#0CE01A` / `#9DA35A` | Status green | The generic set-status pill (`badge.ready`) and green dot (trade lock); not used by the party since D24 |
 | `leaderTint` | `#FFF0D2` | Leader gold (multiply) | Badge "leader" plaque tint; not used by the party since D24 |
 | `emptyIconTint` | `#78746E` | Empty grey (multiply) | The icon of an empty stat bar (Vitals), darkened toward grey |
 | `veil` | `#050403` | Veil | Full-screen dim behind windows, at transparency 0.30 (D8; `veil.transparency`) |
@@ -503,17 +504,19 @@ a root sized to 1/scale of the screen (`Kit.Scale.Hud`):
 
 | Region | Anchor | Place and size (design px) |
 |---|---|---|
-| Coins, Gems, Settings | top right | 53 from the right, y 70; 302 × 46 (phones: 350 wide, pills 150 / 124) |
+| Coins, Gems | top right | 53 from the right, y 70; 234 × 46 (phones: 286 wide, pills 150 / 124) |
 | Menu tiles 2 × 3 | left, vertically centred | x 68, centre at 448 / 941 of the height; 190 × 272; tiles 88 × 84 at a 102 × 94 pitch |
 | Party panel | top right | 53 from the right, y 258; 294 × 244 |
 | XP bar and hotbar | bottom centre | 49 from the bottom; 572 × 124; slot lefts 0, 96, 193, 289, 386, 482 |
+| Settings (D27) | bottom right | 53 from the right, 49 from the bottom; 52 × 46; on touch 12 screen px left of Roblox's jump button, centred on its height (`HudModel.CornerButton`) |
 
 The run's HUD uses the same parts and measures from
 [`HudLayout.json`](../../src/shared/UI/HudLayout.json) ([HudScreen](HudScreen.md)):
 party frames top left (39, 60), compass top centre (y 60, 481 × 46), vitals top
-right (53 in, y 60, 315 × 65 rows at a 76 pitch), status, objective and event
-cards under them (y 289, 337, 483), tiles at x 68, the same bottom bar, and the
-touch attack button bottom right.
+right (53 in, y 60, 240 × 50 rows at a 58 pitch, D27), status, objective and
+event cards under them (y 236, 284, 430), tiles at x 68, the same bottom bar,
+the touch attack button and the Settings button bottom right (on touch 12
+screen px above Roblox's jump button).
 
 While a window is open the HUD stays where M01 has it (D8) under the veil
 (`#050403` at 0.30) and, on Medium and High graphics, a size 8 blur.

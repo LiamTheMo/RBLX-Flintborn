@@ -641,6 +641,8 @@ end
 -- Windows' own B (Kit.Modal, higher priority) still closes them first.
 local releaseBound = false
 local remounted = Signal.new()
+-- Fires after the regions are mounted again (the world ⚙ re-links to the hotbar).
+HudController.Remounted = remounted
 
 -- Registers `object` as the HUD's navigation target (it is never selected here).
 local function registerHudDefault(object: GuiObject?)

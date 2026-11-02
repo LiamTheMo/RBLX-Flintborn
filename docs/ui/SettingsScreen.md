@@ -12,8 +12,8 @@ the reference image. The old parchment spec this file replaces described
 
 ## Overview
 
-The modal Settings window, opened by the HUD gear button (top right), the ⚙
-button in the world, or the Settings key (O). A dark overlay covers the whole
+The modal Settings window, opened by the lobby HUD's gear button or the ⚙
+button in the world (both at the bottom right, D27), or the Settings key (O). A dark overlay covers the whole
 screen, including the HUD (same overlay as the Inventory screen, see
 [`InventoryScreen.md` → Dim overlay](InventoryScreen.md#dim-overlay); 03 measures
 k ≈ 0.30, overlay ≈ #080807 at 70 % opacity). Tabs down the left choose a page;
@@ -318,10 +318,12 @@ Each has the default that will be used if unanswered.
   Gameplay (gears) and Graphics (magnifier) show a glyph; Audio and Controls
   show their label in the same column. RESET has no icon (the "refresh"
   stand-in read as a rune).
-- **World ⚙** (R4): on a HUD-scaled root (Kit.Scale.Hud, so it follows the HUD
-  and UI Scale) in the HUD's top row, 14 px left of the vitals, moved below
-  the Roblox top bar where it reaches down; it no longer sits on the phone
-  jump button. `SettingsController.GEAR` holds its place.
+- **World ⚙** (R4, moved by D27): on a HUD-scaled root (Kit.Scale.Hud, so it
+  follows the HUD and UI Scale) at the bottom right, 53 px in with its foot on
+  the hotbar's bottom line; on touch screens 12 screen px above Roblox's jump
+  button (`HudModel.CornerButton`). `SettingsController.GEAR` holds its place
+  and `SettingsController.GearPosition` places it; gamepad reaches it right of
+  the last hotbar slot.
 - Opens with the gamepad flag when the last input is a gamepad.
 
 ## Final audit fixes (phones)

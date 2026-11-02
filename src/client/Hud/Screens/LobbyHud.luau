@@ -1,9 +1,11 @@
 -- The lobby's always-on HUD (docs/ui/LobbyScreen.md, art/reference/ui/lobby/01_hud.png,
 -- ARCHITECTURE §4.1), built only from Kit components at the 1672 × 941 design
--- size: Coins, Gems and Settings, the 2 × 3 menu tiles, the Party panel (each
--- member with their level and XP bar), the level/XP bar and the six-slot
--- hotbar that shows the deploy loadout. (The mockup's top-left player card is
--- left out; the level/XP bar opens Progress instead.)
+-- size: Coins and Gems, the 2 × 3 menu tiles, the Party panel (each member
+-- with their level and XP bar), the level/XP bar, the six-slot hotbar that
+-- shows the deploy loadout and the Settings button at the bottom right. (The
+-- mockup's top-left player card is left out; the level/XP bar opens Progress
+-- instead. The mockup's Settings button beside the pills moved to the bottom
+-- right: owner decision, ARCHITECTURE D27.)
 --
 -- Display only: LobbyHudController feeds it through the setters and handles the
 -- presses it reports through `actions`. Regions are pinned to the screen edges
@@ -15,6 +17,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local UserInputService = game:GetService("UserInputService")
 
+local HudModel = require(ReplicatedStorage.Shared.UI.HudModel)
 local KitModel = require(ReplicatedStorage.Shared.UI.KitModel)
 local LobbyHudModel = require(ReplicatedStorage.Shared.UI.LobbyHudModel)
 local Kit = require(script.Parent.Parent.Kit)
@@ -27,7 +30,7 @@ LobbyHud.__index = LobbyHud
 -- reaches past the mockup's top margin TOP_Y (phones), keeping TOP_GAP below
 -- it.
 LobbyHud.TOP_Y = 60
-LobbyHud.TOP_RIGHT = { right = 53, y = 70, w = 302, h = 46 }
+LobbyHud.TOP_RIGHT = { right = 53, y = 70, w = 234, h = 46 }
 LobbyHud.TILES = { x = 68, centreY = 448 / 941, w = 190, h = 272, pitchX = 102, pitchY = 94, tileW = 88, tileH = 84 }
 LobbyHud.PARTY = { right = 53, y = 258, w = 294, h = 244 }
 LobbyHud.BOTTOM = { bottom = 49, w = 572, h = 124 }
@@ -70,14 +73,21 @@ LobbyHud.PHONE = {
 	-- 14: at a touch tablet's HUD scale (1024 × 768) "LV. n" still draws at
 	-- 9 screen px or more.
 	memberLevel = 14,
-	pills = { coins = { 0, 0, 150, 46 }, gems = { 162, 0, 124, 46 }, settings = { 298, 0, 52, 46 }, w = 350 },
+	pills = { coins = { 0, 0, 150, 46 }, gems = { 162, 0, 124, 46 }, w = 286 },
 	noticeH = 72,
 	respond = { 98, 6, 125, 40 },
 	-- The add-player button moves into the title row (panel px), so the first
 	-- member's row has the panel's width for the larger name.
 	invite = { 222, 21, 45, 34 },
 }
-LobbyHud.PILLS = { coins = { 0, 0, 116, 46 }, gems = { 133, 0, 101, 46 }, settings = { 250, 0, 52, 46 }, w = 302 }
+LobbyHud.PILLS = { coins = { 0, 0, 116, 46 }, gems = { 133, 0, 101, 46 }, w = 234 }
+
+-- The Settings button (the kit's square HUD button) at the bottom right: its
+-- foot on the hotbar's bottom line, its right edge on the pills' and the Party
+-- panel's. On touch screens it sits `gap` screen px left of Roblox's jump
+-- button, centred on its height (HudModel.CornerButton; the Party panel takes
+-- the room above the button on phones).
+LobbyHud.GEAR = { right = 53, bottom = 49, w = 52, h = 46, gap = 12, beside = true }
 
 -- The XP pop-up lane in the bottom region's px: over the bar's width, its
 -- foot `gap` above the bar (or above the notice plaque while it shows).
@@ -151,7 +161,7 @@ function LobbyHud.new(parent: Instance, actions)
 	end
 	self.fire = fire
 
-	-- Top right: Coins, Gems, Settings.
+	-- Top right: Coins and Gems.
 	local tr = LobbyHud.TOP_RIGHT
 	self.topRight = region(parent, "TopRight", {
 		Position = UDim2.new(1, -(tr.right + tr.w), 0, tr.y),
@@ -361,6 +371,23 @@ function LobbyHud.new(parent: Instance, actions)
 		self.slots[index] = slot
 	end
 
+	-- Bottom right: Settings (SetScreen keeps it clear of the touch jump button).
+	local g = LobbyHud.GEAR
+	self.settingsRegion = region(parent, "Settings", {
+		AnchorPoint = Vector2.new(1, 1),
+		Position = UDim2.new(1, -g.right, 1, -g.bottom),
+		Size = UDim2.fromOffset(g.w, g.h),
+	})
+	self.settings = Kit.IconButton.new(self.settingsRegion, {
+		name = "Settings",
+		rect = { 0, 0, g.w, g.h },
+		variant = "settings",
+		onPress = function()
+			fire("onSettings")
+		end,
+	})
+	self.parts.settings = self.settings.root
+
 	-- XP pop-ups stack just above the XP bar, where the run's HUD shows them
 	-- (HudLayout bottom.popups; ProgressionController.MountPopups), and above
 	-- the game-update notice while it shows (_placePopups).
@@ -394,9 +421,9 @@ function LobbyHud.new(parent: Instance, actions)
 	return self
 end
 
--- Coins, Gems and Settings (rebuilt when the form factor changes).
+-- Coins and Gems (rebuilt when the form factor changes).
 function LobbyHud:_buildTopRight()
-	for _, part in { self.coins, self.gems, self.settings } do
+	for _, part in { self.coins, self.gems } do
 		part:Destroy()
 	end
 	local layout = if self.phone then LobbyHud.PHONE.pills else LobbyHud.PILLS
@@ -426,17 +453,9 @@ function LobbyHud:_buildTopRight()
 			fire("onCurrency", "gems")
 		end,
 	})
-	self.settings = Kit.IconButton.new(self.topRight, {
-		name = "Settings",
-		rect = layout.settings,
-		variant = "settings",
-		onPress = function()
-			fire("onSettings")
-		end,
-	})
 	self.coins:SetValue(self.coinValue, true)
 	self.gems:SetValue(self.gemValue, true)
-	self.parts.coins, self.parts.gems, self.parts.settings = self.coins.root, self.gems.root, self.settings.root
+	self.parts.coins, self.parts.gems = self.coins.root, self.gems.root
 end
 
 -- The game-update plaque: one line on desktop, two on phones.
@@ -498,8 +517,8 @@ function LobbyHud:_formChanged()
 	end
 end
 
--- Gamepad neighbours: the tile grid, the top-right row, the party column and
--- the hotbar, joined where they face each other.
+-- Gamepad neighbours: the tile grid, the top-right row, the party column, the
+-- hotbar and the Settings button after it, joined where they face each other.
 function LobbyHud:_link()
 	local function hit(component): GuiButton?
 		local control = component and component.control
@@ -513,13 +532,13 @@ function LobbyHud:_link()
 		button.NextSelectionLeft = if n.left then hit(self.tiles[n.left]) else nil
 		button.NextSelectionRight = if n.right then hit(self.tiles[n.right]) else self.titleControl.hit
 	end
-	local top = { hit(self.coins), hit(self.gems), hit(self.settings) }
+	local top = { hit(self.coins), hit(self.gems) }
 	for index, button in top do
 		button.NextSelectionLeft = top[index - 1] or hit(self.tiles[2])
 		button.NextSelectionRight = top[index + 1]
 		button.NextSelectionDown = self.titleControl.hit
 	end
-	self.titleControl.hit.NextSelectionUp = top[3]
+	self.titleControl.hit.NextSelectionUp = top[#top]
 	self.titleControl.hit.NextSelectionLeft = hit(self.tiles[2])
 	-- The XP bar sits between the tiles and the hotbar.
 	local xp = self.xpControl.hit
@@ -532,6 +551,12 @@ function LobbyHud:_link()
 	xp.NextSelectionUp = hit(self.tiles[#self.tiles - 1])
 	xp.NextSelectionDown = hit(self.slots[1])
 	xp.NextSelectionLeft = hit(self.tiles[#self.tiles - 1])
+	-- Settings sits right of the last slot, under the Party panel.
+	local gear = hit(self.settings) :: GuiButton
+	local last = hit(self.slots[#self.slots]) :: GuiButton
+	last.NextSelectionRight = gear
+	gear.NextSelectionLeft = last
+	gear.NextSelectionUp = self.titleControl.hit
 end
 
 -- The control a gamepad selects first: the Inventory tile.
@@ -542,6 +567,14 @@ end
 -- Shows the gamepad "RB Menu" hint over the tiles.
 function LobbyHud:SetMenuHint(visible: boolean)
 	self.menuHint.Visible = visible
+end
+
+-- The screen (w × h screen px) and the HUD's scale: on touch screens the
+-- Settings button moves beside Roblox's jump button (LobbyHud.GEAR).
+function LobbyHud:SetScreen(width: number, height: number, scale: number, touch: boolean)
+	local g = LobbyHud.GEAR
+	local right, bottom = HudModel.CornerButton(width, height, scale, touch, g)
+	self.settingsRegion.Position = UDim2.new(1, -right, 1, -bottom)
 end
 
 -- How far the Roblox top bar reaches down, in design px: the top regions move
@@ -825,7 +858,7 @@ function LobbyHud:Destroy()
 	self.pinned:Destroy()
 	self.notice:Destroy()
 	self.titleRow.maid:Clean()
-	for _, frame in { self.topRight, self.tileRegion, self.partyRegion, self.bottom } do
+	for _, frame in { self.topRight, self.tileRegion, self.partyRegion, self.bottom, self.settingsRegion } do
 		frame:Destroy()
 	end
 end

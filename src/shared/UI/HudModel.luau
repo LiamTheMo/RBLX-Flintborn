@@ -222,6 +222,41 @@ function HudModel.SliceScale(
 	return math.clamp(math.min(targetWidth / width, targetHeight / height), 0.15, 1) / k
 end
 
+-- Roblox's touch jump button on a screen w × h (screen px), as the default
+-- PlayerModule (TouchJump) places it: 70 px square, 95 px from the right and
+-- 90 from the bottom when the short side is 500 px or less; otherwise 120 px
+-- square, 170 from the right and 210 from the bottom. Returns {x, y, size},
+-- its top-left corner and side.
+function HudModel.JumpButton(width: number, height: number)
+	local small = math.min(width, height) <= 500
+	local size = if small then 70 else 120
+	return {
+		x = width - (size * 1.5 - 10),
+		y = height - (if small then size + 20 else size * 1.75),
+		size = size,
+	}
+end
+
+-- Where a bottom-right corner button (the HUDs' ⚙) sits, as its distance from
+-- the HUD root's right and bottom edges in design px, on a screen w × h
+-- (screen px) at HUD scale k. Without touch: spec.right and spec.bottom. With
+-- touch it keeps `spec.gap` screen px from Roblox's jump button: above it
+-- (its right edge kept at spec.right), or with `spec.beside` left of it and
+-- centred on its height. spec: {right, bottom, h, gap, beside?}.
+function HudModel.CornerButton(width: number, height: number, k: number, touch: boolean, spec): (number, number)
+	if not touch or width <= 0 or height <= 0 then
+		return spec.right, spec.bottom
+	end
+	k = math.max(k, 0.01)
+	local jump = HudModel.JumpButton(width, height)
+	if spec.beside then
+		local right = math.ceil((width - jump.x + spec.gap) / k)
+		local bottom = math.floor((height - jump.y - jump.size / 2) / k - spec.h / 2)
+		return math.max(spec.right, right), math.max(0, bottom)
+	end
+	return spec.right, math.max(spec.bottom, math.ceil((height - jump.y + spec.gap) / k))
+end
+
 -- Next hotbar slot for a step (the right bumper = +1), wrapping around. The mouse
 -- wheel never steps the hotbar: it stays on camera zoom.
 function HudModel.HotbarStep(current: number, step: number, count: number): number
