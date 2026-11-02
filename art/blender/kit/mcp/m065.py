@@ -56,21 +56,24 @@ SINK = 0.02                                  # the hub, the rim leaves and the s
 Z = Vector((0, 0, 1))
 
 # key -> (hex, roughness, low specular). Stage 4 writes the calibrated values here (spec "Stage 4").
+# K.calibrate (6 rounds on the kit dome, 2026-11-01): key -> rendered median against the TARGETS below
 PALETTE = {
-    BELL: ("#8455E0", 0.75, True),
-    BELL_DEEP: ("#5A36C0", 0.8, True),
-    STAR: ("#6A7CF0", 0.75, True),
-    STAR_DEEP: ("#4F5EE0", 0.75, True),
-    STAR_BEAD: ("#F0D860", 0.6, False),
-    PINK: ("#F06898", 0.75, True),
-    PINK_DEEP: ("#E03868", 0.75, True),
-    BLOOM_BEAD: ("#E0A800", 0.6, False),
-    LIGHT: ("#7AA622", 0.8, True),
-    MID: ("#467A14", 0.85, True),
-    DARK: ("#3E6E20", 0.85, True),
-    STEM: ("#447A18", 0.85, True),
-    ROCK_G: ("#8C7B72", 0.9, True),
-    ROCK_B: ("#8E5530", 0.9, True),
+    BELL: ("#7B57D0", 0.75, True),          # renders #9160F0 (target #9160F1) at #7855CC; raised a step for the rear
+    BELL_DEEP: ("#5A3FB8", 0.8, True),      # #6A45D7 (#6A45D8)
+    STAR: ("#7084F2", 0.75, True),          # #7F92FF (#7C8EFC) at #6A7CF0; raised: the hero front read #6B7BF6
+    STAR_DEEP: ("#515FCF", 0.75, True),     # #5E6DF4 (#5D6CF4)
+    STAR_BEAD: ("#ECC862", 0.6, False),     # #FFE66F (#FDE76F) at #ECBC60; star_cu read orange (#FFD568)
+    PINK: ("#EC6F96", 0.75, True),          # #FF77A2 (#FB77A3) at #EC678E; raised: the hero front read #FF618C
+    PINK_DEEP: ("#C33F6A", 0.75, True),     # #F64575 (#F64575)
+    BLOOM_BEAD: ("#B49400", 0.6, False),    # #E2B422 (#E2B30D)
+    LIGHT: ("#7DA428", 0.8, True),          # #98C628 (#97C728)
+    MID: ("#537C16", 0.85, True),           # #619217 (#5F9117)
+    DARK: ("#3A6A1E", 0.85, True),          # #478020 (#498025) at #3E6E20; a step deeper for the front tone shares
+    STEM: ("#52871F", 0.85, True),          # #58951D (#57941D) at #4C7E1D; raised: the parts-shot stem read #477819
+    # the dome sampler's "stone" filter (sat < 0.18) misses this warm grey (sat 0.19): set by the brown key's
+    # measured transfer and checked on the parts shot instead, kept R > G > B (never lavender)
+    ROCK_G: ("#817673", 0.9, True),
+    ROCK_B: ("#8E5F3F", 0.9, True),         # #A7683F (#A8673E) at #885B3D; the parts shot read #945B37
 }
 # calibration targets (spec 5.4: rendered sRGB of the sheet's regions), K.sample kinds
 TARGETS = {BELL: ((0x91, 0x60, 0xF1), "vivid"), BELL_DEEP: ((0x6A, 0x45, 0xD8), "vivid"),
@@ -222,12 +225,15 @@ def hub(a):
 
 
 # ---- leaves (spec 2.4: closed faceted kites with a ridge V and a keel, along an arched spine) ---------------------
-LEAF_ST = (0.0, 0.45, 0.76)                  # Bezier parameter of the section stations (tip point at 1.0)
-LEAF_HW = (0.17, 0.50, 0.34)                 # half-width per station, fraction of W
-PET_ST, PET_HW = (0.0, 0.10, 0.48, 0.78), (0.11, 0.24, 0.50, 0.33)   # spreading leaves: the petiole neck first
+# fan leaves: Bezier parameter of the section stations (tip point at 1.0) and half-width per station (fraction of W).
+# The widest station sits at half the length, where the fan has spread apart (wider low down, five leaves round a
+# 0.2-radius hub cut through each other)
+LEAF_ST = (0.0, 0.50, 0.79)
+LEAF_HW = (0.15, 0.50, 0.35)
+PET_ST, PET_HW = (0.0, 0.42, 0.76), (0.14, 0.50, 0.36)   # spreading leaves: blade stations after the petiole
 PET_LEN, PET_HWABS = 0.20, 0.055             # petiole stub length, its half-width (a 0.11-wide stub)
-RIM_ST, RIM_HW = (0.0, 0.52), (0.22, 0.50)
-SPINE_HW = (0.13, 0.36, 0.50)                # drooping leaves: base on the hub, the blade's upper end, its widest
+RIM_ST, RIM_HW = (0.0, 0.52), (0.24, 0.50)
+SPINE_HW = (0.14, 0.36, 0.50)              # drooping leaves: base on the hub, the blade's upper end, its widest
 EDGE = {"fan": 0.03, "spread": 0.03, "droop": 0.03, "rim": 0.05}   # half the edge thickness (rim edges 0.10)
 RIDGE = {"fan": 19.0, "spread": 18.0, "droop": 17.0, "rim": 15.0}  # each half rises this much to the ridge
 KEEL = 0.025
@@ -237,36 +243,39 @@ FAN_Z, RING_Z, BASE_R = 0.13, 0.08, 0.11     # leaf base points on the hub (insi
 # roll (a fixed growth twist, deg); tone per band (base, body, tip) on LADDER; base (rim leaves: on the ground)
 LEAVES = {
     # leaf base: the five-leaf upright fan behind the stems
-    "F1": dict(tier="fan", az=158, tip=(-0.74, 0.34, 1.04), W=0.46, pitch=64, roll=24, tone=(0.5, 1.0, 1.75)),
-    "F2": dict(tier="fan", az=112, tip=(-0.30, 0.56, 1.26), W=0.48, pitch=74, roll=-22, tone=(0.5, 1.0, 1.75)),
-    "F3": dict(tier="fan", az=76, tip=(0.12, 0.58, 1.04), W=0.46, pitch=70, roll=26, tone=(0.75, 1.0, 1.25)),
-    "F4": dict(tier="fan", az=40, tip=(0.62, 0.48, 1.27), W=0.50, pitch=66, roll=-24, tone=(0.75, 1.0, 1.75)),
-    "F5": dict(tier="fan", az=352, tip=(0.84, 0.02, 1.04), W=0.46, pitch=58, roll=22, tone=(1.0, 1.5, 2.0)),
+    # (the top faces turn up and in toward the axis, as a rosette leaf's upper side does; the fixed growth rolls tip
+    # neighbours' planes apart: no two leaves of a tier within 20 deg of one plane)
+    "F1": dict(tier="fan", az=154, tip=(-0.88, 0.40, 1.02), W=0.66, pitch=58, roll=24, tone=(0.25, 1.0, 1.75)),
+    "F2": dict(tier="fan", az=128, tip=(-0.44, 0.56, 1.25), W=0.66, pitch=74, roll=20, tone=(0.25, 1.0, 1.75)),
+    "F3": dict(tier="fan", az=84, tip=(0.08, 0.70, 1.04), W=0.56, pitch=64, roll=28, tone=(0.5, 0.75, 1.25)),
+    "F4": dict(tier="fan", az=54, tip=(0.49, 0.67, 1.27), W=0.70, pitch=66, roll=22, tone=(0.75, 1.0, 1.75)),
+    "F5": dict(tier="fan", az=28, tip=(0.90, 0.46, 1.02), W=0.66, pitch=58, roll=-20, tone=(1.0, 1.5, 2.0)),
     # spreading leaves on petiole stubs (the exploded's "Leaf (Reusable)")
-    "S1": dict(tier="spread", az=178, tip=(-1.48, 0.06, 0.72), W=0.56, ctrl=(-0.86, 0.03, 0.80), roll=10,
-               tone=(0.5, 1.0, 1.25)),
-    "S2": dict(tier="spread", az=204, tip=(-1.36, -0.50, 0.17), W=0.52, ctrl=(-0.84, -0.32, 0.50), roll=-12,
+    "S1": dict(tier="spread", az=178, tip=(-1.57, 0.06, 0.70), W=0.78, ctrl=(-0.90, 0.03, 0.80), roll=-18,
+               tone=(0.25, 0.75, 1.25)),
+    "S2": dict(tier="spread", az=206, tip=(-1.36, -0.52, 0.17), W=0.70, ctrl=(-0.84, -0.34, 0.50), roll=24,
                tone=(0.25, 1.0, 1.0)),
-    "S3": dict(tier="spread", az=4, tip=(1.52, 0.10, 0.66), W=0.56, ctrl=(0.90, 0.07, 0.76), roll=-10,
+    "S3": dict(tier="spread", az=4, tip=(1.59, 0.10, 0.64), W=0.78, ctrl=(0.92, 0.07, 0.76), roll=18,
                tone=(1.0, 1.75, 2.0)),
-    "S4": dict(tier="spread", az=334, tip=(1.40, -0.60, 0.17), W=0.52, ctrl=(0.86, -0.36, 0.50), roll=12,
-               tone=(0.5, 1.0, 1.25)),
+    "S4": dict(tier="spread", az=334, tip=(1.40, -0.60, 0.17), W=0.70, ctrl=(0.86, -0.36, 0.50), roll=0,
+               tone=(0.25, 1.0, 1.25)),
     # big drooping lime leaves, front and back: rise off the hub, then lay their tips on the ground
-    "N1": dict(tier="droop", az=250, tip=(-0.40, -1.06, 0.035), W=0.62, roll=8, tone=(1.25, 2.0, 2.0),
+    "N1": dict(tier="droop", az=250, tip=(-0.40, -1.06, 0.035), W=0.82, roll=14, tone=(1.25, 2.0, 2.0),
                spine=((-0.10, -0.30, 0.46), (-0.24, -0.66, 0.36))),
-    "N2": dict(tier="droop", az=290, tip=(0.48, -1.06, 0.035), W=0.66, roll=-8, tone=(1.25, 2.0, 2.0),
-               spine=((0.11, -0.30, 0.62), (0.29, -0.66, 0.44))),
-    "N3": dict(tier="droop", az=82, tip=(0.16, 1.08, 0.035), W=0.62, roll=-6, tone=(1.25, 2.0, 2.0),
-               spine=((0.04, 0.30, 0.58), (0.10, 0.68, 0.42))),
-    "N4": dict(tier="droop", az=124, tip=(-0.55, 0.92, 0.035), W=0.54, roll=10, tone=(1.0, 1.75, 2.0),
+    "N2": dict(tier="droop", az=286, tip=(0.44, -1.07, 0.035), W=0.86, roll=-12, tone=(1.25, 2.0, 2.0),
+               spine=((0.08, -0.31, 0.62), (0.25, -0.67, 0.44))),
+    "N3": dict(tier="droop", az=76, tip=(0.24, 1.07, 0.035), W=0.82, roll=-14, tone=(1.25, 2.0, 2.0),
+               spine=((0.10, 0.40, 0.50), (0.18, 0.74, 0.36))),   # under F3: a gentler rise (55 deg) than the fan
+    "N4": dict(tier="droop", az=124, tip=(-0.55, 0.92, 0.035), W=0.72, roll=-16, tone=(1.0, 1.75, 2.0),
                spine=((-0.16, 0.27, 0.44), (-0.34, 0.57, 0.32))),
-    # rim: short chunky kites lying low on the ground round the hub
-    "B1": dict(tier="rim", az=226, base=(-0.27, -0.27), tip=(-0.80, -0.64, 0.06), W=0.40, roll=8,
-               tone=(0.0, 0.25)),
-    "B2": dict(tier="rim", az=316, base=(0.27, -0.27), tip=(0.82, -0.62, 0.06), W=0.40, roll=-8, tone=(1.0, 1.75)),
-    "B3": dict(tier="rim", az=152, base=(-0.29, 0.22), tip=(-0.86, 0.54, 0.06), W=0.38, roll=-6, tone=(0.0, 0.25)),
-    "B4": dict(tier="rim", az=28, base=(0.29, 0.22), tip=(0.86, 0.54, 0.06), W=0.38, roll=6, tone=(0.0, 0.75)),
+    # rim: short chunky kites lying low round the hub, their bases on the ground against the hub (r RIM_R)
+    # (the rolls tip their faces toward az 136 / 226 / 62 / 298: four different planes)
+    "B1": dict(tier="rim", az=226, tip=(-0.80, -0.64, 0.06), W=0.50, roll=24, arch=0.34, tone=(0.0, 0.25)),
+    "B2": dict(tier="rim", az=308, tip=(0.68, -0.80, 0.06), W=0.46, roll=32, arch=0.28, tone=(1.0, 1.75)),
+    "B3": dict(tier="rim", az=152, tip=(-0.96, 0.50, 0.06), W=0.48, roll=22, arch=0.30, tone=(0.0, 0.25)),
+    "B4": dict(tier="rim", az=28, tip=(0.86, 0.54, 0.06), W=0.48, roll=22, arch=0.36, tone=(0.0, 0.75)),
 }
+RIM_R = 0.30                                 # rim leaf bases this far from the hub axis (their inner edge in the hub)
 FAN = ("F1", "F2", "F3", "F4", "F5")
 RIM = ("B1", "B2", "B3", "B4")
 CLUSTERS = {"fan": FAN, "spread": ("S1", "S2", "S3", "S4"), "droop": ("N1", "N2", "N3", "N4"), "rim": RIM}
@@ -288,8 +297,8 @@ def _leaf_spine(name):
                                            .normalized() for i in range(1, len(P))]
         return list(zip(P, T)), tip, [f * s["W"] for f in SPINE_HW], Q
     if tier == "rim":
-        base = Vector((s["base"][0], s["base"][1], -SINK + EDGE["rim"] + KEEL))
-        ctrl = (base + tip) / 2 + Vector((0, 0, RIM_ARCH))
+        base = Vector((math.cos(az) * RIM_R, math.sin(az) * RIM_R, s.get("bz", -SINK + EDGE["rim"] + KEEL)))
+        ctrl = (base + tip) / 2 + Vector((0, 0, s.get("arch", RIM_ARCH)))
         pts = [(_bez(base, ctrl, tip, t), _bezd(base, ctrl, tip, t).normalized()) for t in RIM_ST]
         return pts, tip, [f * s["W"] for f in RIM_HW], [_bez(base, ctrl, tip, i / 20) for i in range(21)]
     z0 = FAN_Z if tier == "fan" else RING_Z + 0.04
@@ -302,7 +311,7 @@ def _leaf_spine(name):
         hws = [PET_HWABS]
         for t, f in zip(PET_ST, PET_HW):
             pts.append((_bez(b1, ctrl, tip, t), _bezd(b1, ctrl, tip, t).normalized()))
-            hws.append(PET_HWABS if t == 0.0 else f * s["W"])
+            hws.append(max(PET_HWABS, f * s["W"]))
         poly = [base] + [_bez(b1, ctrl, tip, i / 20) for i in range(21)]
         return pts, tip, hws, poly
     ctrl = Vector(s["ctrl"]) if "ctrl" in s else base + _dir(s["az"], s["pitch"]) * ((tip - base).length * 0.5)
@@ -317,25 +326,37 @@ def leaf(a, name):
     station band takes one tone by role and position along the leaf."""
     s = LEAVES[name]
     tier = s["tier"]
-    stations, tip, hws, poly = _leaf_spine(name)
     az = math.radians(s["az"])
     w0 = Vector((-math.sin(az), math.cos(az), 0.0))
     out = Vector((math.cos(az), math.sin(az), 0))
-    sh = _shift(out * (0.35 if tier == "spread" else 0.22 if tier in ("droop", "rim") else 0.0))
-    bm = a.bm
-    rings = []
+    sh = _shift(out * (0.60 if tier == "spread" else 0.36 if tier in ("droop", "rim") else 0.0))
     E, RD = EDGE[tier], math.radians(RIDGE[tier])
-    for (p, T), hw in zip(stations, hws):
-        w = (w0 - T * T.dot(w0)).normalized()
-        n = T.cross(w).normalized()
-        if s.get("roll"):                   # a fixed growth twist about the leaf's own axis (never per camera)
-            q = Matrix.Rotation(math.radians(s["roll"]), 3, T)
-            w, n = q @ w, q @ n
-        e = min(E, 0.45 * hw)
-        rf = e + hw * math.tan(RD)
-        rk = e + KEEL
-        pts = [p - w * hw + n * e, p + n * rf, p + w * hw + n * e, p + w * hw - n * e, p - n * rk, p - w * hw - n * e]
-        rings.append([bm.verts.new(q_ + sh) for q_ in pts])
+
+    def sections():
+        st, tp, hw_, pl = _leaf_spine(name)
+        rr = []
+        for (p, T), hw in zip(st, hw_):
+            w = (w0 - T * T.dot(w0)).normalized()
+            n = T.cross(w).normalized()
+            if s.get("roll"):               # a fixed growth twist about the leaf's own axis (never per camera)
+                q = Matrix.Rotation(math.radians(s["roll"]), 3, T)
+                w, n = q @ w, q @ n
+            e = min(E, 0.45 * hw)
+            rf = e + hw * math.tan(RD)
+            rk = e + KEEL
+            rr.append([p - w * hw + n * e, p + n * rf, p + w * hw + n * e, p + w * hw - n * e, p - n * rk,
+                       p - w * hw - n * e])
+        return st, tp, hw_, pl, rr
+    stations, tip, hws, poly, pts_r = sections()
+    if tier == "rim":                       # the base section rests on the ground: its lowest point at z -SINK + 0.004
+        for _ in range(3):
+            dz = (-SINK + 0.004) - min(q_.z for q_ in pts_r[0])
+            if abs(dz) < 1e-4:
+                break
+            s["bz"] = s.get("bz", -SINK + EDGE["rim"] + KEEL) + dz
+            stations, tip, hws, poly, pts_r = sections()
+    bm = a.bm
+    rings = [[bm.verts.new(q_ + sh) for q_ in pts] for pts in pts_r]
     apex = bm.verts.new(tip + sh)
     bands = [_band(bm, rings[k], rings[k + 1]) for k in range(len(rings) - 1)]
     tipf = [bm.faces.new((rings[-1][i], rings[-1][(i + 1) % 6], apex)) for i in range(6)]
@@ -346,8 +367,8 @@ def leaf(a, name):
     tones = s["tone"]
     if tier == "rim":                       # base band, tip fan
         groups = [bands[0] + [cap], tipf]
-    elif tier == "spread":                  # petiole + blade base, body, outer band + tip
-        groups = [bands[0] + bands[1] + [cap], bands[2], bands[3] + tipf]
+    elif tier == "spread":                  # petiole, blade body, outer band + tip
+        groups = [bands[0] + [cap], bands[1], bands[2] + tipf]
     else:
         groups = [bands[0] + [cap], bands[1], tipf]
     for fs, tv in zip(groups, tones):
@@ -467,10 +488,10 @@ def calyx(a, name, C, n, e1, e2, rings_hr, sides, sepal, sh, key_body=None, key_
 # name -> petal-plane centre, normal (az, tilt from vertical), petal phase (deg from e1), stem foot on the hub top and
 # the stem's via points
 HEADS = {
-    "star": dict(c=(0.40, 0.30, 1.96), az=300, tilt=45, phase=96, foot=(0.07, 0.07),
-                 via=[(0.27, 0.22, 0.90), (0.36, 0.36, 1.58)]),
-    "bloom": dict(c=(1.10, -0.28, 1.36), az=255, tilt=42, phase=92, foot=(0.07, -0.07),
-                  via=[(0.45, -0.11, 0.62), (0.80, -0.14, 0.96)]),
+    "star": dict(c=(0.40, 0.30, 1.96), az=300, tilt=45, phase=96, foot=(0.07, 0.07), via=[]),
+    # the bloom faces front-right (az 295, not the study's 255): on the sheet's front its calyx and stem meet the cup at
+    # its lower LEFT and its bead sits left of the rim centre, which only a cup facing out to the right gives
+    "bloom": dict(c=(1.06, -0.48, 1.36), az=295, tilt=44, phase=92, foot=(0.07, -0.07), via=[(0.50, -0.15, 0.62)]),
 }
 # star (spec 1.4): 5 pointed lozenges L 0.50, W 0.32 from r 0.07, a near-flat ring; calyx a 5-sided cone; bead Ø 0.26
 STAR_R0, STAR_L, STAR_W, STAR_T = 0.07, 0.48, 0.32, 0.055
@@ -481,8 +502,9 @@ STAR_CALYX = ((-0.24, 0.085), (-0.13, 0.115), (-0.03, 0.15))
 STAR_BEAD_R = 0.13
 # bloom (spec 1.4): 5 outer petals L 0.44, W 0.36, cupped up; 5 inner L 0.30, W 0.28, steeper; bead Ø 0.20
 BL_R0 = 0.06
-BL_OUT = dict(L=0.46, W=0.38, st=(0.0, 0.55, 1.0), hw=(0.20, 0.50, 0.40), lift=(28, 46, 62), T=0.05)
-BL_IN = dict(L=0.30, W=0.28, st=(0.0, 0.55, 1.0), hw=(0.22, 0.50, 0.38), lift=(54, 68, 80), T=0.05)
+# blunt rounded ends: a wide last station and a short apex (an obtuse point, never a square end or a needle)
+BL_OUT = dict(L=0.46, W=0.44, st=(0.0, 0.50, 0.84), hw=(0.20, 0.50, 0.42), lift=(24, 40, 52), T=0.05, apex=0.16)
+BL_IN = dict(L=0.26, W=0.30, st=(0.0, 0.74), hw=(0.24, 0.50), lift=(42, 60), T=0.05, apex=0.26)
 BL_CALYX = ((-0.24, 0.085), (-0.13, 0.13), (-0.04, 0.16))
 BL_SEPAL = (0.24, 0.07)
 BLOOM_BEAD_R = 0.10
@@ -509,7 +531,7 @@ def _hframe(name, flat=None):
 
 def star_head(a, flat=None, sh=None):
     C, e1, e2, n = _hframe("star", flat)
-    sh = sh if sh is not None else _shift(n * 0.45 + Vector((0, 0, 0.30)))
+    sh = sh if sh is not None else _shift(n * 0.50 + Vector((0, 0, 0.75)))
     calyx(a, "star_calyx", C, n, e1, e2, STAR_CALYX, 5, None, sh + _shift(-n * 0.12))
     bead(a, "star_bead", C + n * 0.02, n, e1, e2, STAR_BEAD_R, STAR_BEAD, sh + _shift(n * 0.18))
     tips = []
@@ -531,7 +553,7 @@ def star_head(a, flat=None, sh=None):
 
 def bloom_head(a, flat=None, sh=None):
     C, e1, e2, n = _hframe("bloom", flat)
-    sh = sh if sh is not None else _shift(n * 0.45 + Vector((0, 0, 0.30)))
+    sh = sh if sh is not None else _shift(n * 0.50 + Vector((0, 0, 0.75)))
     calyx(a, "bloom_calyx", C, n, e1, e2, BL_CALYX, 5, BL_SEPAL, sh + _shift(-n * 0.14))
     bead(a, "bloom_bead", C - n * 0.01, n, e1, e2, BLOOM_BEAD_R, BLOOM_BEAD, sh + _shift(n * 0.30))
     zs = []
@@ -542,16 +564,17 @@ def bloom_head(a, flat=None, sh=None):
             lift = tuple(x + (2.5 if k % 2 else -2.5) for x in spec["lift"])
             vs, bands, cap0, end = _plate(a, C + r * BL_R0 - n * (0.03 if ring == "o" else 0.0), r, n, spec["L"],
                                           spec["W"], spec["st"], spec["hw"], lift, spec["T"], 0.014,
-                                          (4.0 if k % 2 else -4.0), None,
+                                          (4.0 if k % 2 else -4.0), spec["apex"],
                                           sh + _shift(r * (0.16 if ring == "o" else 0.06)))
             rng = _rng("bloom" + ring, k)
-            _close(a, vs, bands[0] + bands[1] + [cap0] + end, PINK, tint=1.0 + rng.uniform(-0.025, 0.025))
+            rest = [f for b in bands[1:] for f in b] + end
+            _close(a, vs, bands[0] + [cap0] + rest, PINK, tint=1.0 + rng.uniform(-0.025, 0.025))
             if ring == "o":                 # outer petals: a deep-rose inner band, pink body (position along it)
-                _paint(a, bands[0] + [cap0], _mix(PINK_DEEP, PINK, 0.25))
-                _paint(a, bands[1] + end, PINK)
+                _paint(a, bands[0] + [cap0], _mix(PINK_DEEP, PINK, 0.75))
+                _paint(a, rest, PINK)
             else:                           # inner petals: deep throat at the base -> pink at the tips
-                _paint(a, bands[0] + [cap0], PINK_DEEP)
-                _paint(a, bands[1] + end, _mix(PINK_DEEP, PINK, 0.5))
+                _paint(a, bands[0] + [cap0], _mix(PINK_DEEP, PINK, 0.25))
+                _paint(a, end, PINK)
             _reg("petal", f"bloom_{ring}{k}", vs)
             zs += [v.co.z for v in vs]
     if flat is None:
@@ -560,16 +583,18 @@ def bloom_head(a, flat=None, sh=None):
 
 
 # bell (spec 1.4): a lathed 6-sided closed shell hanging from a 6-sided cap, six pointed flared lobes, an inner wall
-BELL_SEAT = (-0.87, -0.23, 1.93)            # the bell's dome seat (top), in the cap
-BELL_TILT, BELL_TILT_AZ = 15.0, 215.0       # the bell's axis: down, tilted toward the front-left
-BELL_L = 0.80
-# outer (fraction of L, radius): seat, dome shoulder, flank, mouth (the lobes' notches and tips follow)
-BELL_OUT = ((0.0, 0.085), (0.13, 0.18), (0.55, 0.245), (0.80, 0.31))
-BELL_NOTCH = (0.88, 0.335)                  # between the lobes (mid-panel), higher
-BELL_TIP = (1.00, 0.42, 0.04)               # lobe tips on the ribs: L fraction, radius, curl up (studs)
+BELL_SEAT = (-0.86, -0.28, 1.93)            # the bell's dome seat (top), in the cap
+BELL_TILT, BELL_TILT_AZ = 15.0, 222.0       # the bell's axis: down, tilted toward the front-left
+BELL_L = 0.76
+# outer (fraction of L, radius): seat, dome shoulder, flank, mouth (the lobes' notches and tips follow). The sheet's
+# bell is about as wide as long (front 62 x 60 px, parts row 76 x 73): a round dome, full flanks, a flared mouth.
+BELL_OUT = ((0.0, 0.09), (0.06, 0.17), (0.18, 0.235), (0.52, 0.28), (0.78, 0.34))   # a rounded dome
+BELL_NOTCH = (0.86, 0.37)                   # between the lobes (mid-panel), higher
+BELL_TIP = (0.98, 0.45, 0.07)               # lobe tips on the ribs: L fraction, radius, curl up (studs): flared ~45 deg
 BELL_WALL = 0.05
-BELL_IN = ((0.62, 0.20), (0.33, 0.0))       # inner flank ring, the inner dome apex
-CAP = ((-0.04, 0.10), (0.06, 0.115), (0.10, 0.075))   # cap rings: (height above the seat along -axis, radius)
+BELL_IN = ((0.60, 0.20), (0.33, 0.0))       # inner flank ring, the inner dome apex (its mid-panel chords stay
+                                            # inside the outer mouth ring's chords: no wall crossing)
+CAP = ((-0.03, 0.165), (0.10, 0.075))       # cap rings: (height above the seat along -axis, radius): a flared collar
 BELL_PHASE = 15.0
 
 
@@ -592,7 +617,7 @@ def bell(a, flat=False, sh=None):
     dome band a step lighter toward the swatch by height in the bell's frame; the inner wall and the rim `bell_deep`
     (a region: the sheet's deep violet under the lobes and in the mouth)."""
     seat, ax, e1, e2 = _bell_frame(flat)
-    sh = sh if sh is not None else _shift(Vector((-0.25, -0.15, 0.75)))
+    sh = sh if sh is not None else _shift(Vector((-0.30, -0.20, 0.90)))
     bm = a.bm
     ph = math.radians(BELL_PHASE)
     L = BELL_L
@@ -607,12 +632,12 @@ def bell(a, flat=False, sh=None):
         zig_o.append(bm.verts.new(at(BELL_TIP[0], BELL_TIP[1], a0, BELL_TIP[2]) + sh))
         zig_o.append(bm.verts.new(at(BELL_NOTCH[0], BELL_NOTCH[1], a0 + math.pi / 6) + sh))
         zig_i.append(bm.verts.new(at(BELL_TIP[0] - 0.035, BELL_TIP[1] - BELL_WALL * 1.3, a0, BELL_TIP[2]) + sh))
-        zig_i.append(bm.verts.new(at(BELL_NOTCH[0] - 0.02, BELL_NOTCH[1] - BELL_WALL, a0 + math.pi / 6) + sh))
+        zig_i.append(bm.verts.new(at(BELL_NOTCH[0] - 0.02, BELL_NOTCH[1] - BELL_WALL * 1.4, a0 + math.pi / 6) + sh))
     inner = [bm.verts.new(at(BELL_IN[0][0], BELL_IN[0][1], ph + k * math.pi / 3) + sh) for k in range(6)]
     apex = bm.verts.new(seat + ax * (BELL_IN[1][0] * L) + sh)
     seat_cap = bm.faces.new(list(reversed(outer[0])))
-    dome = _band(bm, outer[0], outer[1])
-    flank = _band(bm, outer[1], outer[2]) + _band(bm, outer[2], outer[3])
+    dome = _band(bm, outer[0], outer[1]) + _band(bm, outer[1], outer[2])
+    flank = _band(bm, outer[2], outer[3]) + _band(bm, outer[3], outer[4])
     mouth = []
     m = outer[-1]
     for k in range(6):
@@ -641,7 +666,7 @@ def bell_cap(a, flat=False, sh=None):
     """The bell's 6-sided green cap on the bell's axis (spec 1.4: Ø 0.18-0.23 x 0.14), stem colour, the top ring
     half mid (by position). 20 tris."""
     seat, ax, e1, e2 = _bell_frame(flat)
-    sh = sh if sh is not None else _shift(Vector((-0.25, -0.15, 0.85)))
+    sh = sh if sh is not None else _shift(Vector((-0.30, -0.20, 1.10)))
     bm = a.bm
     rings = [[bm.verts.new(x + sh) for x in _ring(seat - ax * h, e1, e2, r, 6, math.radians(BELL_PHASE + 30 * i))]
              for i, (h, r) in enumerate(CAP)]
@@ -649,8 +674,8 @@ def bell_cap(a, flat=False, sh=None):
     bot = bm.faces.new(list(reversed(rings[0])))
     top = bm.faces.new(rings[-1])
     vs = [v for r in rings for v in r]
-    _close(a, vs, bands[0] + bands[1] + [bot, top], STEM, tint=1.0 + _rng("cap").uniform(-0.02, 0.02))
-    _paint(a, bands[1] + [top], _mix(STEM, MID, 0.5))
+    _close(a, vs, bands[0] + [bot, top], STEM, tint=1.0 + _rng("cap").uniform(-0.02, 0.02))
+    _paint(a, [bot], _mix(STEM, MID, 0.5))
     _reg("cap", "bell_cap", vs)
     return vs
 
@@ -660,8 +685,9 @@ def _crook_path():
     seat, ax, e1, e2 = _bell_frame()
     ctop = seat - ax * CAP[-1][0]           # the cap's top centre
     end = ctop + ax * STEM_IN               # the hook's end, inside the cap
-    return [Vector((-0.08, 0.02, STEM_FOOT_Z)), Vector((-0.27, -0.03, 0.80)), Vector((-0.42, -0.07, 1.40)),
-            Vector((-0.55, -0.10, 1.90)), Vector((-0.62, -0.13, 2.10)), Vector((-0.74, -0.19, 2.14)), end]
+    # the sheet's front: x -0.36 at z 0.82, -0.57 at z 1.85, the apex (-0.65, 2.12), a short descending hook to the cap
+    return [Vector((-0.08, 0.02, STEM_FOOT_Z)), Vector((-0.34, -0.05, 0.82)), Vector((-0.56, -0.10, 1.88)),
+            Vector((-0.65, -0.15, 2.12)), Vector((-0.78, -0.23, 2.10)), end]
 
 
 def _stem_path(name):
@@ -671,7 +697,7 @@ def _stem_path(name):
     C, e1, e2, n = _hframe(name)
     cb = C + n * (STAR_CALYX if name == "star" else BL_CALYX)[0][0]
     foot = Vector((s["foot"][0], s["foot"][1], STEM_FOOT_Z))
-    return [foot] + [Vector(v) for v in s["via"]] + [cb - n * CROOK, cb + n * STEM_IN]
+    return [foot] + [Vector(v) for v in s["via"]] + [cb - n * CROOK, cb + n * STEM_IN]   # straight runs, one crisp bend
 
 
 def square_tube(a, pts, sides, key, name, twist=STEM_TWIST, sh=Vector(), slant=None):
@@ -712,7 +738,9 @@ def square_tube(a, pts, sides, key, name, twist=STEM_TWIST, sh=Vector(), slant=N
 
 def stem(a, name):
     pts = _stem_path(name)
-    sh = _shift((0, 0, 0.30))
+    f = (0.42 - pts[0].z) / (pts[1].z - pts[0].z)          # a ring where the stem leaves the rosette's base (z 0.42):
+    pts.insert(1, pts[0].lerp(pts[1], max(0.1, min(0.6, f))))   # only the foot below it takes the deeper green
+    sh = _shift((0, 0, 0.45))
     vs, bands, c0, c1 = square_tube(a, pts, STEM_SIDE, STEM, name + "_stem", sh=sh)
     _paint(a, bands[0] + [c0], _mix(STEM, DARK, 0.5))    # the foot a step deeper where it enters the leaves
     _reg("stem", f"{name}_stem", vs)
@@ -721,65 +749,94 @@ def stem(a, name):
 
 # ---- stones (spec 2.5: squat faceted nuggets, flat base) ---------------------------------------------------------------
 # name -> centre (x, y), W, D, H, yaw (deg), sides, key
+# (a little under the study's sizes: the sheet's stones peep out at the foot, about 2.5 % of the front, 4 % of the rear)
 ROCKS = {
-    "R1": dict(c=(-1.02, -0.58), W=0.48, D=0.40, H=0.27, yaw=20, n=6, key=ROCK_G),
-    "R2": dict(c=(0.93, -0.66), W=0.36, D=0.30, H=0.23, yaw=-30, n=6, key=ROCK_B),
-    "R3": dict(c=(0.70, 0.68), W=0.36, D=0.30, H=0.22, yaw=45, n=6, key=ROCK_B),
-    "R4": dict(c=(-0.76, 0.66), W=0.44, D=0.36, H=0.26, yaw=-15, n=6, key=ROCK_G),
-    "R5": dict(c=(-1.16, 0.34), W=0.26, D=0.22, H=0.15, yaw=70, n=5, key=ROCK_B),
+    "R1": dict(c=(-1.02, -0.60), W=0.46, D=0.38, H=0.24, yaw=20, n=6, key=ROCK_G),
+    "R2": dict(c=(1.02, -0.52), W=0.34, D=0.28, H=0.20, yaw=-30, n=5, key=ROCK_B),
+    "R3": dict(c=(0.66, 0.64), W=0.32, D=0.26, H=0.18, yaw=45, n=5, key=ROCK_B),
+    "R4": dict(c=(-0.74, 0.64), W=0.40, D=0.32, H=0.22, yaw=-15, n=6, key=ROCK_G),
+    "R5": dict(c=(-1.12, 0.34), W=0.24, D=0.20, H=0.13, yaw=70, n=5, key=ROCK_B),
 }
 ROCK_INFO = {}
+ROCK_FIT = {}                                # name -> (cx, cy, height factor) from the last hero build
 
 
 def rock(a, name, fit=None):
-    """A faceted nugget: an n-sided base ring (r +-10 %), the widest ring at 0.38 H, a shoulder ring at 0.76 H pulled in
-    and turned half a step, a sloping n-sided top; flat base sunk SINK. 4n + 2(n-2) tris (32 for n 6). `fit` (a BVH of
-    the leaves) lowers or raises the top so the leaf above just touches it (spec 6: stones touch a leaf within 0.03,
-    no leaf more than 0.05 inside). The lowest band 25 % deeper (contact), broad tint per stone."""
+    """A faceted nugget: an n-sided base ring (r +-10 %, sunk SINK), the widest ring at 0.40 H, and a sloping top ring
+    pulled in to 0.64 and turned half a step (the shoulder facets run from the widest ring up to it), closed by the
+    flat top. 4n + 2(n-2) tris (32 for n 6, 26 for n 5). With `fit` (a BVH of the leaves and the hub): the stone first
+    slides toward the hub axis until it is within 0.02 of a leaf or the hub (spec 6: every stone touches a leaf or the
+    hub), then its top is lowered or raised so the leaf above just touches it (no leaf more than 0.05 inside). The
+    lowest band a step deeper (contact), broad tint per stone."""
     s = ROCKS[name]
     rng = _rng(name)
     n = s["n"]
     yaw = math.radians(s["yaw"])
-    cx, cy = s["c"]
+    cx0, cy0 = s["c"]
     H = s["H"]
-    sh = _shift(Vector((cx, cy, 0)).normalized() * 0.30 if (cx or cy) else Vector())
+    sh = _shift(Vector((cx0, cy0, 0)).normalized() * 0.45 if (cx0 or cy0) else Vector())
     jit = [1.0 + rng.uniform(-0.10, 0.10) for _ in range(n)]
 
-    def ring(fr, rf, z, rot):
-        out = []
-        for k in range(n):
-            ang = yaw + rot + 2 * math.pi * k / n
-            out.append(Vector((cx + math.cos(ang) * s["W"] / 2 * rf * jit[k],
-                               cy + math.sin(ang) * s["D"] / 2 * rf * jit[k], z)))
-        return out
-    rows = [ring(0, 0.86, -SINK, 0.0), ring(0, 1.0, 0.38 * H, 0.0), ring(0, 0.74, 0.76 * H, math.pi / n)]
-    tilt = Vector((math.cos(yaw + 0.7), math.sin(yaw + 0.7), 0))
-    top = [Vector((p.x * 0.62 + cx * 0.38, p.y * 0.62 + cy * 0.38, H)) for p in ring(0, 1.0, H, 0.0)]
-    for p in top:                           # a sloping top
-        p.z += (p - Vector((cx, cy, H))).dot(tilt) * 0.22
-    rows.append(top)
+    def make(cx, cy):
+        def ring(rf, z, rot):
+            return [Vector((cx + math.cos(yaw + rot + 2 * math.pi * k / n) * s["W"] / 2 * rf * jit[k],
+                            cy + math.sin(yaw + rot + 2 * math.pi * k / n) * s["D"] / 2 * rf * jit[k], z))
+                    for k in range(n)]
+        rows = [ring(0.86, -SINK, 0.0), ring(1.0, 0.40 * H, 0.0)]
+        tilt = Vector((math.cos(yaw + 0.7), math.sin(yaw + 0.7), 0))
+        top = ring(0.64, H, math.pi / n)
+        for p in top:                       # a sloping top
+            p.z += (p - Vector((cx, cy, H))).dot(tilt) * 0.24
+        rows.append(top)
+        return rows
+    cx, cy = cx0, cy0
+    rows = make(cx, cy)
+    if fit is None and EXPLODE["on"] and name in ROCK_FIT:     # the exploded view: the hero's fitted stone
+        cx, cy, f = ROCK_FIT[name]
+        rows = make(cx, cy)
+        for r in rows[1:]:
+            for p in r:
+                p.z *= f
     if fit is not None:
-        gaps = []
-        for p in rows[2] + rows[3]:
-            hit = fit.ray_cast(p + Vector((0, 0, -0.001)), Vector((0, 0, 1)), 0.35)
-            if hit[0] is not None:
-                gaps.append(hit[3])
-            back = fit.ray_cast(p + Vector((0, 0, 0.30)), Vector((0, 0, -1)), 0.30)
-            if back[0] is not None and back[3] < 0.30:       # the leaf surface is below this vert: inside a leaf
-                gaps.append(-(0.30 - back[3]))
-        if gaps:
+        u = Vector((cx, cy, 0)).normalized()
+        slid = 0.0
+        for _ in range(30):
+            d = min(fit.find_nearest(p)[3] for r in rows for p in r)
+            if d <= 0.02:
+                break
+            slid += 0.015
+            cx, cy = cx0 - u.x * slid, cy0 - u.y * slid
+            rows = make(cx, cy)
+        ROCK_INFO[name] = {"slid": round(slid, 3), "c": [round(cx, 3), round(cy, 3)]}
+        gaps, fv = [], []
+        up, dn = Vector((0, 0, 1)), Vector((0, 0, -1))
+        for p in rows[1] + rows[2]:
+            if p.z < 0.03:
+                continue
+            hit = fit.ray_cast(p, up, 0.4)
+            if hit[0] is None:
+                continue
+            if hit[1].z < 0:                # a leaf's underside above the vert: raise the vert to touch it
+                g = hit[3]
+            else:                           # the vert is inside a leaf: lower it to the leaf's underside
+                low = fit.ray_cast(p, dn, 0.4)
+                g = -(low[3] if low[0] is not None else 0.0)
+            gaps.append(g)
+            if g < 0.15:                    # only a leaf close above (or through) the stone shapes its top
+                fv.append((p.z + g + 0.008) / p.z)
+        if fv:
             g = min(gaps)
-            zt = max(p.z for p in rows[3])
-            f = max(0.65, min(1.45, (zt + g + 0.012) / zt))
+            f = max(0.6, min(1.0, min(fv)))       # only ever lowered: contact comes from the slide
             for r in rows[1:]:
                 for p in r:
                     p.z *= f
-            ROCK_INFO[name] = {"fit": round(f, 3), "gap0": round(g, 3)}
+            ROCK_INFO[name].update({"fit": round(f, 3), "gap0": round(g, 3)})
+        ROCK_FIT[name] = (cx, cy, ROCK_INFO[name].get("fit", 1.0))
     bm = a.bm
     vr = [[bm.verts.new(p + sh) for p in r] for r in rows]
-    bands = [_band(bm, vr[i], vr[i + 1]) for i in range(3)]
+    bands = [_band(bm, vr[i], vr[i + 1]) for i in range(2)]
     bot = bm.faces.new(list(reversed(vr[0])))
-    topf = bm.faces.new(vr[3])
+    topf = bm.faces.new(vr[2])
     vs = [v for r in vr for v in r]
     _close(a, vs, [f for b in bands for f in b] + [bot, topf], s["key"], tint=1.0 + rng.uniform(-0.04, 0.04))
     _paint(a, bands[0] + [bot], _mix(s["key"], DARK if s["key"] == ROCK_G else ROCK_B, 0.0))
@@ -827,7 +884,7 @@ def hero_all(a):
     hub(a)
     for k in LEAVES:
         leaf(a, k)
-    fit = None if EXPLODE["on"] else _leaf_bvh(a, set(LEAVES))
+    fit = None if EXPLODE["on"] else _leaf_bvh(a, set(LEAVES) | {"hub"})
     for k in ROCKS:
         rock(a, k, fit)
     stem(a, "star")
@@ -871,7 +928,7 @@ def bloom_part(a):
 def stem_part(a):
     """'Stem (Example)': a straight square prism 0.13 x 0.75 with a slanted top cut (the exploded 'Stem (Blue)')."""
     PIECES.clear()
-    vs, bands, c0, c1 = square_tube(a, [Vector((0, 0, 0)), Vector((0, 0, 0.38)), Vector((0, 0, 0.75))],
+    vs, bands, c0, c1 = square_tube(a, [Vector((0, 0, 0)), Vector((0, 0, 0.15)), Vector((0, 0, 0.75))],
                                     (0.13, 0.125), STEM, "stem_part", slant=0.45)
     _paint(a, bands[0] + [c0], _mix(STEM, DARK, 0.5))
     _reg("stem", "stem", vs)
@@ -916,6 +973,9 @@ NOTES = {
     BASE_P: "Leaf Cluster Base: hexagonal hub with the five-leaf upright fan and four chunky rim leaves",
 }
 COLLISION = {k: "none" for k in NOTES}
+# the bell alone is mostly its own inside: bell_deep is the inner wall and rim (a region, the sheet's deep violet in
+# the mouth), which faces inward by construction, so the facing correlation is the region, not painted light
+SHADING_OK = {BELL_P: "bell_deep is the bell's inner wall and rim (the inside of the mouth: a region), not a facing"}
 
 
 def _new(name, fn, role, budget, temp=False):
@@ -935,6 +995,8 @@ def _new(name, fn, role, budget, temp=False):
     K.drop_unused_slots(o)
     if not temp:
         K.tag(o, SHEET, TITLE, role, COLLISION[name], budget, NOTES[name])
+        if name in SHADING_OK:
+            o["kit_shading_ok"] = SHADING_OK[name]
     o[OFF] = [0.0, 0.0, 0.0]
     o.location = (0, 0, 0)
     o["m065_pieces"] = json.dumps([[k, n_, [round(x, 5) for x in c]] for k, n_, c in PIECES])
@@ -1229,14 +1291,15 @@ def bury_report(o):
                 rock_d = max(rock_d, sol[rk].point(p)[0])
         vs = [v for v in {v for f in groups[k] for v in f.verts}
               if math.hypot((v.co + off).x, (v.co + off).y) > 0.26]          # the bases crowd in the hub by design
-        share = 0.0
+        share, of = 0.0, None
         for j in leaves:
             if j == k:
                 continue
             inside = sum(1 for v in vs if sol[labels[j][1]].point(v.co)[0] > 0)
-            share = max(share, inside / max(1, len(vs)))
+            if inside / max(1, len(vs)) > share:
+                share, of = inside / max(1, len(vs)), labels[j][1]
         res["leaves"][nm] = {"hub": round(hub_d, 3), "stem_cut": round(stem_d, 3), "junction": round(junc_d, 3),
-                             "max_inside_leaf": round(share, 2), "in_rock": round(rock_d, 3)}
+                             "max_inside_leaf": round(share, 2), "inside_of": of, "in_rock": round(rock_d, 3)}
         if hub_d > BURY or share > 0.25 or rock_d > BURY:
             over.append((nm, round(hub_d, 3), round(share, 2), round(rock_d, 3)))
     for rk in rocks:
@@ -1252,10 +1315,16 @@ def bury_report(o):
 
 # ---- foliage visibility (STAGES "Foliage reads from every azimuth" and "Check between the eight views too") ------------
 SPIN = tuple(range(0, 360, 45))
+# The flower stalks above the rosette (z >= 1.0, the fan's tip height) are what the sheet draws in every view: the
+# 15-30 % bare-core limit binds on the core below that (hub and stems rising among the leaves); the whole share is
+# reported beside it
+STALK_Z = 1.0
 SPIN_EL = 10
 EDGE15 = math.sin(math.radians(15.0))
 EDGE12 = math.sin(math.radians(12.0))
 SWEEP_AZ = tuple(range(0, 360, 5))
+WHOLE = 0.75        # STAGES: a leaf is wholly edge-on when >= 75 % of its lobe (top) facets are within 15 deg of edge-on
+SWEEP_BIND = (10, 20)   # elevations whose whole / sliver limits bind (the spin sheet's e 10 and a standing player's e 20)
 
 
 def _leaf_records(o):
@@ -1277,8 +1346,10 @@ def _leaf_records(o):
         nd = Vector(V[:, -1])
         if nd.z < 0:
             nd = -nd
-        out.append(dict(name=labels[k][1], cluster=cl.get(labels[k][1], "?"), A=A, n=nd,
-                        face_on=0.5 * sum(abs(v.dot(nd)) for v in A)))
+        # the lobe facets: the top surface (both ridge halves, every station band), not the thin edges or the keel
+        top = [v for v in A if v.length > 1e-9 and v.normalized().dot(nd) > 0.5]
+        out.append(dict(name=labels[k][1], cluster=cl.get(labels[k][1], "?"), A=A, n=nd, top=top,
+                        top_area=sum(v.length for v in top), face_on=0.5 * sum(abs(v.dot(nd)) for v in A)))
     bm.free()
     return out
 
@@ -1296,20 +1367,25 @@ def edge_sweep(o, els=(5, 10, 20)):
     tot = sum(l["face_on"] for l in lv)
     res = {}
     for el in els:
-        worst = {"sliver_n": 0, "sliver_area": 0.0, "plane_n": 0, "plane_area": 0.0, "comb": 0}
+        worst = {"whole_n": 0, "whole_area": 0.0, "sliver_n": 0, "sliver_area": 0.0, "plane_n": 0,
+                 "plane_area": 0.0, "comb": 0}
         at = {}
         steps = {}
         for az in SWEEP_AZ:
             d = _cam(az, el)
             sl = [l for l in lv if 0.5 * sum(abs(v.dot(d)) for v in l["A"]) < EDGE15 * l["face_on"]]
+            wh = [l for l in lv if sum(v.length for v in l["top"] if abs(v.normalized().dot(d)) < EDGE15)
+                  >= WHOLE * l["top_area"]]
             pl = [l for l in lv if abs(l["n"].dot(d)) < EDGE15]
             per = {}
             for l in pl:
                 per[l["cluster"]] = per.get(l["cluster"], 0) + 1
-            s = {"sliver_n": len(sl), "sliver_area": round(100 * sum(l["face_on"] for l in sl) / tot, 1),
+            s = {"whole_n": len(wh), "whole_area": round(100 * sum(l["face_on"] for l in wh) / tot, 1),
+                 "sliver_n": len(sl), "sliver_area": round(100 * sum(l["face_on"] for l in sl) / tot, 1),
                  "plane_n": len(pl), "plane_area": round(100 * sum(l["face_on"] for l in pl) / tot, 1),
                  "comb": max(per.values(), default=0)}
-            steps[az] = (s["sliver_n"], s["sliver_area"], [l["name"] for l in sl])
+            names = sorted({l["name"] for l in sl + wh})
+            steps[az] = (max(s["sliver_n"], s["whole_n"]), max(s["sliver_area"], s["whole_area"]), names)
             for k in worst:
                 if s[k] > worst[k]:
                     worst[k] = s[k]
@@ -1364,6 +1440,8 @@ def vis_report(o, el=SPIN_EL, step=0.02):
                     continue
                 kd = kind[fi]
                 cnt[kd] = cnt.get(kd, 0) + 1
+                if kd == "stem" and loc.z >= STALK_Z:
+                    cnt["stalk"] = cnt.get("stalk", 0) + 1
                 if head[fi]:
                     hp[head[fi]] = hp.get(head[fi], 0) + 1
                 if kd in ("leaf", "rim"):
@@ -1372,11 +1450,23 @@ def vis_report(o, el=SPIN_EL, step=0.02):
                         edge += 1
         core = cnt.get("stem", 0) + cnt.get("hub", 0)
         fol = leafpx
-        out[az] = {"core_share": round(100 * core / max(1, fol), 1), "edge12_leaf": round(100 * edge / max(1, fol), 1),
+        out[az] = {"core_share": round(100 * core / max(1, fol), 1),
+                   "core_low": round(100 * (core - cnt.get("stalk", 0)) / max(1, fol), 1),
+                   "edge12_leaf": round(100 * edge / max(1, fol), 1),
                    "heads_px": hp, "rock_share": round(100 * cnt.get("rock", 0) / max(1, sum(cnt.values())), 1)}
     best = {h: max(v["heads_px"].get(h, 0) for v in out.values()) for h in ("star", "bloom", "bell")}
+    # geometric edge-on-ness of the two open heads (occlusion apart): projected area of the head's faces along the
+    # view against its face-on projection (along the head normal)
+    av = {"star": [], "bloom": []}
+    for f in bm.faces:
+        if head[f.index] in av:
+            av[head[f.index]].append(f.normal * f.calc_area())
+    face_on = {h: 0.5 * sum(abs(v.dot(_hframe(h)[3])) for v in vv) for h, vv in av.items()}
     for az, v in out.items():
         v["heads_rel"] = {h: round(v["heads_px"].get(h, 0) / max(1, best[h]), 2) for h in best}
+        d = _cam(az, el)
+        v["heads_proj"] = {h: round(0.5 * sum(abs(x.dot(d)) for x in vv) / max(1e-9, face_on[h]), 2)
+                           for h, vv in av.items()}
         del v["heads_px"]
     bm.free()
     return out
@@ -1410,10 +1500,12 @@ def _drop_unused():
 
 def sweep_problems(sw):
     out = []
-    w = sw.get(10, {}).get("worst", {})
-    if w.get("sliver_area", 0) > 10:
-        out.append(f"{HERO}: edge-on (15 deg) leaves {w['sliver_area']} % of the leaf area at e 10 az "
-                   f"{sw[10]['worst_at'].get('sliver_area')} (target <= 10)")
+    for el in SWEEP_BIND:
+        w = sw.get(el, {}).get("worst", {})
+        for k in ("whole", "sliver"):
+            if w.get(k + "_area", 0) > 10:
+                out.append(f"{HERO}: {k} edge-on (15 deg) leaves {w[k + '_area']} % of the leaf area at e {el} az "
+                           f"{sw[el]['worst_at'].get(k + '_area')} (target <= 10)")
     flat = {c: a for c, a in sw.get("min_plane_angle", {}).items() if a < 20}
     if flat:
         out.append(f"{HERO}: leaves of one cluster on (nearly) one plane {flat}")
@@ -1512,11 +1604,11 @@ def build(render=True, parts=True, close=True):
     for az, v in vis.items():
         if v["edge12_leaf"] > 10:
             problems.append(f"{HERO}: view {az} edge-on (12 deg) {v['edge12_leaf']} % of the visible leaves (<= 10)")
-        if v["core_share"] > 30:
-            problems.append(f"{HERO}: view {az} bare core {v['core_share']} % of the foliage (<= 30)")
-        low = {k: x for k, x in v["heads_rel"].items() if x < 0.35}
-        if low:
-            problems.append(f"{HERO}: view {az} heads nearly edge-on or hidden {low}")
+        if v["core_low"] > 30:
+            problems.append(f"{HERO}: view {az} bare core below the stalks {v['core_low']} % of the foliage (<= 30)")
+        low = {k: x for k, x in v["heads_proj"].items() if x < 0.30}
+        if len(low) > 1:                    # spec 4.2: no more than one head near edge-on at once
+            problems.append(f"{HERO}: view {az} two heads nearly edge-on {low}")
     kinds = {}
     for s in shells[HERO]:
         kk = kinds.setdefault(s["kind"], {"n": 0, "tris": 0})

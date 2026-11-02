@@ -1,7 +1,7 @@
 """063 Hanging Vine (references/063.png): one wall-mounted vine. A cracked, faceted warm-beige stone attachment pad
 (flat back on the wall, flat underside, a socket groove in its front face) holds a thick woody stub; below the stub two
 6-sided woody strands twist round each other (right-handed, a full turn every 2.2 studs) and hang to a pointed end,
-carrying three-leaf clusters of chunky broad five-lobed slab leaves that alternate round the vine, two single small leaves,
+carrying three-leaf clusters of chunky broad five-lobed slab leaves that alternate round the vine, one single small leaf,
 one fork spur, three green tendril curls and a tip cluster.
 
     import importlib, kit_models, m063; importlib.reload(kit_models); importlib.reload(m063); m063.build()
@@ -10,7 +10,7 @@ Build frame = attach frame: studs, front -Y, +X right, the wall plane y = 0 (the
 it; z = 0 at the lowest leaf tip, the pad top at z 7.5. Every object ends with its origin at its bbox bottom centre;
 o["m063_offset"] is that origin in the build frame and o["m063_attach"] the attach point in object coordinates
 (spec 2.6). W06 owns HangingVine* / StraightVine / Vine*, so the family is TwistedVine*:
-- TwistedVine (hero): pad + stub + strands A / B + spur + 9 clusters + 2 singles + 3 tendrils, one object of closed
+- TwistedVine (hero): pad + stub + strands A / B + spur + 9 clusters + 1 single + 3 tendrils, one object of closed
   shells (attach: the pad's back-face centre, normal +Y into the wall).
 - TwistedVinePad: the pad with its socket groove (attach: back-face centre).
 - TwistedVineSegment: one 6-sided stick, Ø 0.36 x 1.8, one 15 deg bend, flat cut ends (attach: top end centre, -Z).
@@ -618,103 +618,69 @@ def spur(a, g):
 
 
 # ---- leaves (spec 1.4) ---------------------------------------------------------------------------------------------------
-# A broad fig / grape leaf as on the sheet's close-ups (never a star): a pointed main lobe, two broad side lobes with
-# blunt two-point ends (52 and 72 deg, 0.93 / 0.90 R), small basal lobes (128 deg, 0.62 R), notches (32 deg 0.64 R,
-# 100 deg 0.55 R) and a heart notch at the stalk: 12 outline points (spec 1.4 allows 10-12).
-# (angle from the tip axis, radius as a fraction of L)
-LEAF_R = ((32.0, 0.64), (52.0, 0.93), (72.0, 0.90), (100.0, 0.55), (128.0, 0.62))
-NO = 12                # outline points
+# A broad fig / grape leaf as on the sheet's close-ups and cluster cell (never a star). Fix round 3: five broad lobes
+# with ONE point each - the main tip (about 83 deg), two broad side lobes (about 67 deg), two small rounded basal
+# lobes flanking the stalk - between shallow notches and a shallow heart notch at the stalk: 10 outline points. The
+# top is a fan from one hub vertex on the midrib, so each lobe is exactly two planar facets meeting on its vein (one
+# lit, one shaded): the main lobe's two facets meet on the midrib. Round 2's pleat (12 points, raised mid-vein verts,
+# deep notches) read as crumpled stars. (u across, v along the leaf toward the tip; x L, the stalk notch at 0, 0)
+LEAF_RIGHT = ((0.44, 0.50), (0.80, 0.30), (0.47, 0.04), (0.34, -0.16))   # notch, side lobe, notch, basal lobe
+LEAF_HEART = -0.02
+LEAF_NOTCH = (1, 3, 7, 9)       # outline indices of the notches between lobes (the heart notch, 5, stays level)
+NO = 10                # outline points
+HUB_V = 0.15           # the fan's hub on the midrib (x L along from the stalk notch)
 
 
 def _leaf_uv():
-    right = [(r * math.sin(math.radians(a_)), r * math.cos(math.radians(a_))) for a_, r in LEAF_R]
-    return [(0.0, 1.0)] + right + [(0.0, -0.10)] + [(-u, v) for u, v in reversed(right)]
+    right = list(LEAF_RIGHT)
+    return [(0.0, 1.0)] + right + [(0.0, LEAF_HEART)] + [(-u, v) for u, v in reversed(right)]
 
 
 LEAF_UV = _leaf_uv()
-VEIN_R = (0.55 * math.sin(math.radians(61)), 0.55 * math.cos(math.radians(61)))
-C_, VM_, VR_, VL_ = 2 * NO, 2 * NO + 1, 2 * NO + 2, 2 * NO + 3
-# top: the main lobe and the two side lobes each fold along a raised vein (lit and shaded facets), the basal lobes are
-# fanned from the hub; 0-11 top outline, 12-23 bottom outline, then hub, main / right / left veins
-LOBES = (((11, 0, 1), VM_), ((1, 2, 3, 4), VR_), ((4, 5, 6), C_), ((6, 7, 8), C_), ((8, 9, 10, 11), VL_))
+C_, CB_ = 2 * NO, 2 * NO + 1        # top and bottom hub
+# lobe of each outline edge i -> i+1: 2 the main lobe, 1 a side lobe, 0 a basal lobe (tone by position on the leaf)
+EDGE_LOBE = (2, 1, 1, 0, 0, 0, 0, 1, 1, 2)
 
 
 def _leaf_top():
-    out = []
-    for vs, X in LOBES:
-        out += [[a_, b_, X] for a_, b_ in zip(vs, vs[1:])]
-        if X != C_:
-            out += [[X, vs[-1], C_], [X, C_, vs[0]]]
-    return out
+    """0-9 top outline (tip, then the right side down to the heart notch and up the left), 10-19 bottom, 20 / 21 the
+    hubs: one facet per outline edge, fanned from the hub."""
+    return [[i, (i + 1) % NO, C_] for i in range(NO)]
 
 
-def _ear_clip(pts2):
-    """Triangles of a simple polygon (ear clipping; counter-clockwise or not)."""
-    idx = list(range(len(pts2)))
-    area = sum(pts2[i][0] * pts2[(i + 1) % len(pts2)][1] - pts2[(i + 1) % len(pts2)][0] * pts2[i][1] for i in idx)
-    sgn = 1.0 if area > 0 else -1.0
-
-    def cross(o, a_, b_):
-        return ((a_[0] - o[0]) * (b_[1] - o[1]) - (a_[1] - o[1]) * (b_[0] - o[0])) * sgn
-
-    def inside(p, a_, b_, c_):
-        return cross(a_, b_, p) > 1e-9 and cross(b_, c_, p) > 1e-9 and cross(c_, a_, p) > 1e-9
-    out = []
-    while len(idx) > 3:
-        for k in range(len(idx)):
-            i0, i1, i2 = idx[k - 1], idx[k], idx[(k + 1) % len(idx)]
-            a_, b_, c_ = pts2[i0], pts2[i1], pts2[i2]
-            if cross(a_, b_, c_) <= 1e-9:
-                continue
-            if any(inside(pts2[j], a_, b_, c_) for j in idx if j not in (i0, i1, i2)):
-                continue
-            out.append([i0, i1, i2])
-            idx.pop(k)
-            break
-        else:
-            break
-    out.append(idx[:3])
-    return out
-
-
-# the underside: the outline polygon ear-clipped (no hub vertex: 10 triangles)
-LEAF_BOTTOM = [[NO + i for i in t] for t in _ear_clip(LEAF_UV)]
+# the underside: the same fan from its own hub, so the slab keeps one thickness (top and bottom parallel)
+LEAF_BOTTOM = [[NO + (i + 1) % NO, NO + i, CB_] for i in range(NO)]
 LEAF_POLYS = (_leaf_top() + LEAF_BOTTOM +
               [q for i in range(NO) for q in ([i, (i + 1) % NO, NO + (i + 1) % NO], [i, NO + (i + 1) % NO, NO + i])])
-_LR = [math.hypot(u, v) for u, v in LEAF_UV]
-LEAF_RAD = _LR + _LR + [0.20, 0.55, 0.55, 0.55]
-LEAF_FR = [(sum(LEAF_RAD[i] for i in p) / len(p) + max(LEAF_RAD[i] for i in p)) / 2 for p in LEAF_POLYS]
-SPAN = 2 * max(u for u, v in LEAF_UV)   # the leaf's span (its width across the side lobes) in units of L (1.71)
+# the lobe of every face (top, bottom, rim) for its tone
+LEAF_LOBE = list(EDGE_LOBE) + list(EDGE_LOBE) + [l for l in EDGE_LOBE for _ in range(2)]
+SPAN = 2 * max(u for u, v in LEAF_UV)   # the leaf's span (its width across the side lobes) in units of L (1.60)
 
 
-# a gentle pleat: lobe ends up, notches down (top and bottom together, so the slab keeps its thickness); with the
-# raised veins each lobe folds into a lit and a shaded facet (the sheet's creases), in units of L
-PLEAT = (0.008, -0.005, 0.007, 0.007, -0.005, 0.002, 0.0, 0.002, -0.005, 0.007, 0.007, -0.005)
+# Fix round 3: the folds follow the veins only. The lobes droop away from the face by DOME deg (a shallow dome: every
+# outline point sits tan(DOME) x its distance from the hub behind the hub), and the four lobe notches sit a further
+# DROP x L back, so each vein (hub -> lobe point) is a ridge and each notch spoke a valley: per lobe one lit and one
+# shaded planar facet, the midrib a fold between the main lobe's two. No other creases.
+DOME = 12.0
+DROP = 0.03
 
 
-# Lobe creases (fix round 1): the main and side vein verts stand CREASE x L above the slab top, so each lobe folds into
-# two facets 15-25 deg off the leaf plane (the sheet's lit and shaded lobe facets). A creased leaf never collapses to a
-# line: seen exactly edge-on its projected area stays >= 0.26 of its face-on area (a flat 0.055 slab: 0.15), which is
-# what keeps a cluster from reading as a comb of slivers between the test views (edge_sweep).
-CREASE = 0.20
-
-
-def leaf_pts(N, d, n, L, thick=0.055, cup=0.018, vein=0.008, aspect=1.0, crease=CREASE):
+def leaf_pts(N, d, n, L, thick=0.055, dome=None, drop=None, aspect=1.0):
     """A closed broad five-lobed slab: the stalk notch at N, the main tip along d (length L), facing n. aspect < 1
-    narrows it across (the parts cell's longer centre leaf); crease raises the vein verts (x L)."""
+    narrows it across (the parts cell's longer centre leaf)."""
     x = d.cross(n).normalized()
     n = x.cross(d).normalized()
-    vein = vein + crease * L
+    t = math.tan(math.radians(DOME if dome is None else dome))
+    dr = DROP if drop is None else drop
 
     def P(u, v, h):
         return N + (x * (u * aspect) + d * v) * L + n * h
 
-    hs = [cup * min(1.0, math.hypot(u, v)) ** 1.5 + PLEAT[i] * L for i, (u, v) in enumerate(LEAF_UV)]
+    hs = [-(t * math.hypot(u * aspect, v - HUB_V) + (dr if i in LEAF_NOTCH else 0.0)) * L
+          for i, (u, v) in enumerate(LEAF_UV)]
     top = [P(u, v, thick / 2 + h) for (u, v), h in zip(LEAF_UV, hs)]
     bot = [P(u, v, -thick / 2 + h) for (u, v), h in zip(LEAF_UV, hs)]
-    return top + bot + [P(0, 0.20, thick / 2 + cup * 0.09), P(0, 0.55, thick / 2 + cup * 0.4 + vein),
-                        P(VEIN_R[0], VEIN_R[1], thick / 2 + cup * 0.4 + vein),
-                        P(-VEIN_R[0], VEIN_R[1], thick / 2 + cup * 0.4 + vein)]
+    return top + bot + [P(0, HUB_V, thick / 2), P(0, HUB_V, -thick / 2)]
 
 
 # ladder positions (base, body, lobe ends) per role; one step brighter than spec 5.3's first plan after the hero
@@ -723,29 +689,18 @@ ROLE = {"under": (0.25, 0.75, 1.25), "outer": (0.5, 1.25, 2.0), "young": (1.25, 
 
 
 def leaf_keys(role, shift=0.0):
-    """A key per leaf face: radial bands from the stalk notch, the band set by the leaf's role (spec 5.3)."""
+    """A key per leaf face by its lobe, base to tip (spec 5.3; fix round 3: whole planar lobe facets, so one tone per
+    lobe, half a band apart so a leaf reads as one green with its lit and shaded facets): the basal lobes at the stalk
+    between base and body, the side lobes the body, the main lobe between body and tip; the role sets the band."""
     b, m, t = (x + shift for x in ROLE[role])
-    out = []
-    for r in LEAF_FR:
-        if r < 0.44:
-            p = b
-        elif r < 0.52:
-            p = (b + m) / 2
-        elif r < 0.72:
-            p = m
-        elif r < 0.80:
-            p = (m + t) / 2
-        else:
-            p = t
-        out.append(_tone(p))
-    return out
+    pos = ((b + m) / 2, m, (m + t) / 2)
+    return [_tone(pos[k]) for k in LEAF_LOBE]
 
 
 def leaf_tints(base, rng):
     band = {}
     out = []
-    for r in LEAF_FR:
-        k = 0 if r < 0.5 else 1 if r < 0.75 else 2
+    for k in LEAF_LOBE:
         if k not in band:
             band[k] = rng.uniform(-0.02, 0.02)
         out.append(base + band[k])
@@ -769,30 +724,42 @@ def leaf_frame(n0, phi, tilt, roll):
 
 
 # ---- clusters (spec 2.4) -------------------------------------------------------------------------------------------------
-# name: host, hub z (stalk root height), stalk azimuth, normal azimuth, normal pitch, stalk length, spans (centre first),
-# role. Normal azimuths: outward by the stalk, the back-half ones blended toward -Y (away from the wall).
-# stilt: the side leaves' tilt range (negative = tips back toward the vine and wall, so their normals fan out round the
-# vine and the layers part); the centre leaf's tip always comes forward. Normal azimuths sit near the bisectors of the
-# front views' edge-on directions (multiples of 45 deg), so no view sees a whole cluster edge-on.
+# name: host, hub z (stalk root height), stalk azimuth, cluster facing azimuth (naz) and pitch, fan (the side leaves'
+# swing, deg), croll (the centre leaf's roll, deg), stalk length, spans (centre first), role.
 # The back-right clusters hang behind the rope (stalks toward the wall) with their leaves turned out to the front-right,
 # so they peek out on both sides of the rope as on the front cell, never facing the wall.
-# Fix round 1: the leaves' normal azimuths (naz - fan, naz, naz + fan per cluster) are spread over the whole front half
-# (186 ... 354) so the edge-on bands of the 5 deg sweep each catch about five leaves of different clusters, never two
-# of one cluster (a small search over naz and fan, then checked with edge_sweep on the build).
+# Fix round 1: each cluster is a fan (fan_frames), so its leaves face naz - fan, naz + croll and naz + fan: three planes
+# >= 36 deg apart. naz / fan / croll come from a small search that spreads the 28 leaf planes evenly over the front
+# half (normals 185 ... 355, every one off the wall), so each 5 deg step of the sweep sees only the unavoidable ~1/6 of
+# the leaf planes near edge-on, from different clusters, never two of one cluster (edge_sweep checks the build). swing:
+# the side-leaf swing tried first (the one the search assumed; placement may take the other).
+# Fix round 3: the smooth leaves (facets within ~14 deg of their plane) no longer hide edge-on behind a crumple, so
+# naz / fan / croll / pitch were searched again on the built leaves (whole-leaf sweep, every leaf off the wall, a
+# ray-free stand-in for vis_report's edge-on share): pitch now varies -10 ... 16 per cluster (leaf normals -10 ... 25
+# deg) as well as yaw (normals 187 ... 358).
 CLUSTERS = (
-    dict(cid="J1", host="stub", z=6.10, az=222, naz=219, fan=32, pitch=2, L=0.30, spans=(1.24, 1.13, 1.08), role="under"),
-    dict(cid="J2", host="stub", z=6.60, az=318, naz=277, fan=34, pitch=2, L=0.28, spans=(1.19, 1.08, 1.03), role="outer"),
-    dict(cid="C1", host="strand", z=4.95, az=35, naz=318, fan=36, pitch=2, L=0.36, spans=(1.19, 1.13, 1.07), role="under"),
-    dict(cid="C2", host="strand", z=4.50, az=318, naz=304, fan=32, pitch=2, L=0.16, spans=(0.65, 0.59), role="young"),
-    dict(cid="C3", host="spur", z=None, az=232, naz=224, fan=32, pitch=2, L=0.20, spans=(1.19, 1.08, 1.03), role="outer"),
-    dict(cid="C4", host="strand", z=2.65, az=58, naz=307, fan=34, pitch=2, L=0.34, spans=(1.10, 1.04, 0.98), role="under"),
-    dict(cid="C5", host="strand", z=2.00, az=212, naz=221, fan=32, pitch=2, L=0.25, spans=(1.13, 1.07, 1.01), role="outer"),
-    dict(cid="C6", host="strand", z=1.10, az=35, naz=321, fan=32, pitch=2, L=0.34, spans=(1.09, 1.01, 0.95), role="under"),
-    dict(cid="C7", host="strand", z=0.70, az=275, naz=249, fan=38, pitch=-2, L=0.18, spans=(0.89, 0.78, 0.71), role="young"),
+    dict(cid="J2", host="stub", z=6.60, az=318, naz=285, fan=48, croll=-5, pitch=14, L=0.28, spans=(1.19, 1.08, 1.03),
+         role="outer", swing="fwd"),
+    dict(cid="J1", host="stub", z=6.10, az=222, naz=220, fan=33, croll=10, pitch=-10, L=0.30, spans=(1.24, 1.13, 1.08),
+         role="under"),
+    dict(cid="C1", host="strand", z=4.95, az=35, naz=318, fan=36, croll=-3, pitch=8, L=0.36, spans=(1.19, 1.13, 1.07),
+         role="under"),
+    dict(cid="C2", host="strand", z=4.50, az=318, naz=325, fan=33, croll=-4, pitch=2, L=0.16, spans=(0.65, 0.59),
+         role="young"),
+    dict(cid="C3", host="spur", z=None, az=232, naz=262, fan=41, croll=-14, pitch=2, L=0.20, spans=(1.19, 1.08, 1.03),
+         role="outer"),
+    dict(cid="C4", host="strand", z=2.65, az=58, naz=293, fan=44, croll=-8, pitch=14, L=0.34, spans=(1.10, 1.04, 0.98),
+         role="under", swing="fwd"),
+    dict(cid="C5", host="strand", z=2.00, az=212, naz=231, fan=33, croll=0, pitch=2, L=0.25, spans=(1.13, 1.07, 1.01),
+         role="outer"),
+    dict(cid="C6", host="strand", z=1.10, az=35, naz=325, fan=30, croll=-1, pitch=5, L=0.34, spans=(1.09, 1.01, 0.95),
+         role="under", swing="fwd"),
+    dict(cid="C7", host="strand", z=0.70, az=275, naz=228, fan=45, croll=8, pitch=16, L=0.18, spans=(0.89, 0.78, 0.71),
+         role="young"),
 )
-# two single small leaves (the lean alternative of spec 4.3 drops the singles; two of the four are kept so the twist can
-# keep a station every 45 deg within the 2500 ceiling)
-SINGLES = (dict(cid="S1", z=5.32, az=340, naz=336, span=0.50), dict(cid="S3", z=2.45, az=300, naz=203, span=0.56))
+# one single small leaf (the lean alternative of spec 4.3 drops the singles; fix round 1: the fanned clusters fill the
+# space round the rope, and S3 found no place clear of the strands at z 2.45-3.3, so only S1 is kept: 27 leaves)
+SINGLES = (dict(cid="S1", z=5.32, az=340, naz=339, span=0.50),)
 TENDRILS = (dict(cid="T1", z=3.25, az=185, L=0.95, curl=0.15), dict(cid="T2", z=1.62, az=355, L=0.85, curl=0.13),
             dict(cid="T3", z=2.62, az=268, L=1.25, curl=0.16))
 
@@ -810,7 +777,7 @@ def _n0(naz, pitch):
 def host_point(host, z, o):
     """Where a stalk / tendril leaves the wood: (point inside the surface, seat plane normal, host tag)."""
     if host == "stub":
-        return Vector((0.0, STUB_Y, z)) + o * (STUB_R * COS30 - 0.018), o, "stub"
+        return Vector((0.0, STUB_Y, z)) + o * (STUB_R * COS30 - 0.012), o, "stub"
     if host == "spur":
         return SPUR["end"] - SPUR["dir"] * 0.03, SPUR["dir"], "spur"
     s = max("AB", key=lambda k: (strand_centre(k, z) - axis_at(z)).normalized().dot(o))
@@ -823,96 +790,102 @@ def _yaw(v, deg):
     return Matrix.Rotation(math.radians(deg), 3, "Z") @ v
 
 
-def cluster_geom(spec, rng, az_off=0.0, len_k=1.0, size_k=1.0, sep=0.08, calm=False, dz=0.0, swing="back",
-                 lat=0.12):
-    """Stalk + leaves of one cluster (lists of shells), not yet added. Leaves are stacked along n0 at `sep` (back to
-    front: side leaves, then the centre leaf), each threaded on the stalk's last piece (the stalk axis passes 0.05 in
-    from the leaf's notch, so every leaf touches its stalk).
-    Fan (fix round 1): each leaf has its own facing. The side leaves turn about the vertical through their notch by
-    +-fan, so their normals sit at naz - fan and naz + fan and the centre leaf's at naz + cyaw: three planes >= 32 deg
-    apart, never parallel. swing "back" turns both side tips back (away from the centre leaf), "fwd" forward."""
+# fix round 1: the fanned clusters spread wider than the stacked ones and hid the rope (front B 12 vs the sheet's
+# 19): every hero cluster leaf is scaled by FAN_K
+FAN_K = 0.94
+
+
+def fan_frames(n0, n, fan, croll, lr, swing="back", calm=False):
+    """Tip directions and normals of the leaves of one cluster facing n0 (fix round 1: a fan, never a stack of parallel
+    leaves). Order: [side, side, centre] (three leaves) or [side, centre] (two). The side leaves leave the hub at
+    +-(100..110) deg from straight down in the cluster plane and swing their tips `fan` deg back toward the vine
+    (swing "back") or forward ("fwd"); the centre leaf hangs below the hub, its tip 6-10 deg forward, rolled `croll` deg
+    about its own axis. So the normals sit near naz - fan, naz + croll and naz + fan: no two leaves of a cluster share a
+    plane, whichever way they swing."""
+    dn = -Z - n0 * (-Z).dot(n0)
+    dn.normalize()
+    s = n0.cross(dn).normalized()
+    b = math.radians(fan) * (-1.0 if swing == "back" else 1.0)
+    out = []
+    sg = 1 if lr.random() < 0.5 else -1
+    phis = [sg * lr.uniform(100, 110), -sg * lr.uniform(100, 110)][:max(0, n - 1)]
+    for phi in phis:
+        f = math.radians(phi)
+        din = dn * math.cos(f) + s * math.sin(f)
+        d = din * math.cos(b) + n0 * math.sin(b)
+        nl = n0 * math.cos(b) - din * math.sin(b)
+        r = math.radians(lr.uniform(3, 8) * lr.choice((-1, 1)) * (0.5 if calm else 1.0))
+        x = d.cross(nl)
+        out.append((d, (nl * math.cos(r) + x * math.sin(r)).normalized(), phi))
+    f = math.radians(lr.uniform(-6, 6))
+    din = dn * math.cos(f) + s * math.sin(f)
+    t = math.radians(lr.uniform(6, 10))
+    d = din * math.cos(t) + n0 * math.sin(t)
+    nl = n0 * math.cos(t) - din * math.sin(t)
+    r = math.radians(croll + lr.uniform(-3, 3))
+    x = d.cross(nl)
+    out.append((d, (nl * math.cos(r) + x * math.sin(r)).normalized(), 0.0))
+    return out
+
+
+def cluster_geom(spec, rng, az_off=0.0, len_k=1.0, size_k=1.0, sep=0.12, calm=False, dz=0.0, swing="back",
+                 lat=0.18, cfront=True, stag=0.08):
+    """Stalk + leaves of one cluster (lists of shells), not yet added (fix round 1: a fan, as the sheet's cluster cell
+    and close-up 2 draw it). The stalk runs out and down from the wood to the hub, then on as a short cross-piece from
+    one side leaf's notch to the other's (`lat` either side of the hub, the second `stag` in front of the first, so
+    their overlapping bases stack); the side leaves spread out to their sides from those notches; the centre leaf
+    hangs below the hub, its notch on the cross-piece, `sep` in front of the side leaves (cfront) or behind them. Each
+    leaf faces its own way (fan_frames)."""
     o = _o(spec["az"] + az_off)
     n0 = _n0(spec["naz"], spec["pitch"])          # a placement turn moves the stalk, never the leaves' facing
     z = (spec["z"] + dz) if spec["z"] is not None else SPUR["end"].z
     root, seat, host = host_point(spec["host"], z, o)
     p = math.radians(25.0 if spec["host"] != "spur" else 40.0)
     L = spec["L"] * len_k
-    P1 = root + (o * math.cos(p) - Z * math.sin(p)) * L
+    H = root + (o * math.cos(p) - Z * math.sin(p)) * L
     spans = list(spec["spans"])
     n = len(spans)
     lr = random.Random(rng.random())
-    lay = []
-    # A cluster faces n0 (a bisector of the front views' edge-on directions, so no front view sees it edge-on). Leaf
-    # variety is a pitch only - the side leaves roll 8-18 deg about their tip axes, the centre leaf's tip comes 6-12 deg
-    # forward - which keeps every leaf off the edge-on bands (a turn in azimuth would push leaves into one; a 45 deg
-    # wrap round the rope was tried and its leaves cut through each other in every cluster). "wrap" (deg) is kept as an
-    # option. "calm" flattens the rolls.
-    ax = axis_at(P1.z)
-    fwd = (P1 - ax).dot(n0) >= 0
-    wrap = spec.get("wrap", 0.0) * (-1.0 if fwd else 1.0)
-    sg = 1 if lr.random() < 0.5 else -1
-    side = [(sg * lr.uniform(84, 100), wrap, lr.uniform(5, 12) * lr.choice((-1, 1))),
-            (-sg * lr.uniform(80, 96), wrap, lr.uniform(5, 12) * lr.choice((-1, 1)))]
-    centre = (lr.uniform(-12, 12), lr.uniform(4, 9), 0.0)
-    # stack order back to front: side leaf, centre leaf, side leaf (two-leaf: side, centre); the side leaves sit `lat`
-    # out to their own sides, so the last stalk piece runs diagonally from the back side leaf's notch through the centre
-    # leaf's to the front side leaf's and threads all three
-    if n == 3:
-        lay = [(spans[1],) + side[0], (spans[0],) + centre, (spans[2],) + side[1]]
-    elif n == 2:
-        lay = [(spans[1],) + side[0], (spans[0],) + centre]
-    else:
-        lay = [(spans[0],) + centre]
-    sidx = [0, 2] if n == 3 else [0] if n == 2 else []
-    cidx = 1 if n >= 2 else 0
+    fr = fan_frames(n0, n, spec.get("fan", 36.0), spec.get("croll", 0.0), lr, swing, calm)
     shift_i = lr.randrange(n)
     shift = lr.choice((-0.5, 0.5))
-    shells = []
-    Qs = []
-    # the layers stack away from the rope: forward for a cluster in front of it, back toward the wall for one behind it
-    base = P1 if fwd else P1 - n0 * ((n - 1) * sep)
-    frames = []
-    for k, (span, phi, tilt, roll) in enumerate(lay):
-        if calm:
-            roll *= 0.5
-        frames.append(leaf_frame(n0, math.radians(phi), math.radians(tilt), math.radians(roll)))
-    fan = spec.get("fan", 34.0)
-    yaws = [0.0] * n
-    yaws[cidx] = spec.get("cyaw", 0.0)
-    if sidx:
-        # the side leaves: one turns +fan, the other -fan (opposite tips, so both swing the same way along n0); a lone
-        # side leaf (two-leaf cluster) turns +fan
-        best = None
-        for sgn in ((1, -1), (-1, 1)) if n == 3 else ((1,),):
-            mv = sum(_yaw(frames[i][0], fan * s_).dot(n0) - frames[i][0].dot(n0) for i, s_ in zip(sidx, sgn))
-            key = mv if swing == "back" else -mv
-            if best is None or key < best[0]:
-                best = (key, sgn)
-        for i, s_ in zip(sidx, best[1]):
-            yaws[i] = fan * s_
-    sx = n0.cross(Z).normalized()
-    lat_off = [sx * (lat * (1.0 if frames[k][0].dot(sx) >= 0 else -1.0)) if k in sidx else Vector() for k in range(n)]
-    if n == 3:
-        lat_off[1] = (lat_off[0] + lat_off[2]) / 2
-    frames = [(_yaw(d_, y), _yaw(n_, y)) for (d_, n_), y in zip(frames, yaws)]
-    for k, (span, phi, tilt, roll) in enumerate(lay):
-        d, nl = frames[k]
-        Q = base + n0 * (k * sep) + lat_off[k]
-        Lf = span * size_k / SPAN
-        N = Q - d * 0.05
+    tints = [1.0 + lr.uniform(-0.03, 0.03) for _ in range(n)]
+    # spans: centre first in the spec; the frames list the side leaves first
+    order = list(range(1, n)) + [0]
+    shells, ends = [], []
+    cdep = (sep + stag) if cfront else -sep
+    for k, (d, nl, phi) in enumerate(fr):
+        span = spans[order[k]]
+        if k < n - 1:
+            sd = (d - n0 * d.dot(n0)).normalized()
+            hz = (sd - Z * sd.dot(Z))
+            hz = hz.normalized() if hz.length > 1e-4 else sd
+            Q = H + hz * lat + n0 * (stag * k)
+            ends.append(Q)
+            N = Q - d * 0.04
+        else:
+            Q = H + n0 * cdep
+            N = Q - d * 0.05
+        Lf = span * size_k * FAN_K / SPAN
         pts = leaf_pts(N, d, nl, Lf)
         keys = leaf_keys(spec["role"], shift if k == shift_i else 0.0)
         shells.append(dict(kind="leaf", pts=pts, polys=LEAF_POLYS, keys=keys,
-                           tints=leaf_tints(1.0 + lr.uniform(-0.03, 0.03), lr), info=dict(c=Q, n=nl, span=span * size_k,
-                                                                                          role=spec["role"])))
-        Qs.append(Q)
-    spts = [root, Qs[0], Qs[-1]] if (Qs[-1] - Qs[0]).length > 0.02 else [root, Qs[0]]
-    sr = [0.04, 0.036, 0.034][:len(spts)]
-    SP, spolys, rings, caps = tube(spts, sr, 3, Z if abs(o.z) < 0.9 else Vector((1, 0, 0)), phase=math.radians(90),
-                                   t_start=seat)
-    shells.insert(0, dict(kind="stalk", pts=SP, polys=spolys, keys=[STALK] * len(spolys), tints=[1.0] * len(spolys),
-                          info={}))
-    return shells, host
+                           tints=leaf_tints(tints[k], lr), info=dict(c=Q, n=nl, span=span * size_k * FAN_K,
+                                                                     role=spec["role"], N=N, d=d, L=Lf)))
+    Hc = H + n0 * cdep                  # the centre leaf's notch point: the stalk passes 0.05 inside the leaf there
+    # the stalk: out and down from its seat to the hub, then on to the centre leaf's notch; the side leaves sit on the
+    # ends of a short cross-stalk through the hub (a second shell crossing the first, as the parts cell draws it)
+    SP, spolys, rings, caps = tube([root, H, Hc], [0.04, 0.036, 0.033], 3, Z if abs(o.z) < 0.9 else Vector((1, 0, 0)),
+                                   phase=math.radians(90), t_start=seat)
+    stalks = [dict(kind="stalk", pts=SP, polys=spolys, keys=[STALK] * len(spolys), tints=[1.0] * len(spolys),
+                   info={})]
+    if ends:
+        a_, b_ = (ends[0], ends[1]) if len(ends) == 2 else (ends[0], H)
+        ax_ = (b_ - a_).normalized()
+        XP, xpolys, rings, caps = tube([a_ - ax_ * 0.02, b_ + ax_ * 0.02], [0.03, 0.03], 3, n0, phase=math.radians(90))
+        stalks.append(dict(kind="stalk", pts=XP, polys=xpolys, keys=[STALK] * len(xpolys),
+                           tints=[1.0] * len(xpolys), info={}))
+    return stalks + shells, host
 
 
 def _leaf_clash(shells):
@@ -942,8 +915,12 @@ def _fits(g, shells, host):
 # placement variants, cheapest change first: (azimuth offset, stalk length factor, leaf size factor, height shift)
 VARIANTS = [(da, lk, sk, dz) for dz in (0.0, 0.12, -0.12, 0.25, -0.25) for sk in (1.0, 0.93, 0.86)
             for lk in (1.0, 1.2, 0.85) for da in (0, 12, -12, 24, -24)]
-SEPS = (0.08, 0.10, 0.12, 0.14, 0.17, 0.20)
-LATS = (0.10, 0.15, 0.20)      # the side leaves' notches out to their sides (fix round 1)
+SEPS = (0.08, 0.10, 0.12, 0.14, 0.17, 0.20)     # (the parts cell's cluster search)
+# fix round 1, the fanned hero clusters: (calm, side stagger, centre-leaf depth, side-notch offset, swing, centre in
+# front), tightest first
+CLUSTER_TRIES = [(calm, stag, sep, lat, sw, cf) for calm in (False, True) for cf in (True, False)
+                 for lat in (0.28, 0.22, 0.34) for sep in (0.20, 0.16, 0.24, 0.12) for stag in (0.06, 0.10, 0.14)
+                 for sw in ("first", "second")]
 
 
 def _commit(a, g, shells, cid, host):
@@ -994,18 +971,19 @@ def cluster(a, g, spec, rng):
     def make(v):
         da, lk, sk, dz = v
         best = None
-        for calm in (False, True):
-            for sep in SEPS:
-                for lat in LATS:
-                    for sw in swings:
-                        cand, host = cluster_geom(spec, random.Random(seed), da, lk, sk, sep, calm, dz, sw, lat)
-                        if _leaf_clash(cand):
-                            continue
-                        bad = _fits(g, cand, host)
-                        if best is None or bad < best[0]:
-                            best = (bad, cand, host, dict(sep=sep, calm=calm, swing=sw, lat=lat))
-                        if bad == 0:
-                            return best[1:]
+        for calm, stag, sep, lat, sw, cf in CLUSTER_TRIES:
+            if sw == "first":
+                sw = swings[0]
+            elif sw == "second":
+                sw = swings[1]
+            cand, host = cluster_geom(spec, random.Random(seed), da, lk, sk, sep, calm, dz, sw, lat, cf, stag)
+            if _leaf_clash(cand):
+                continue
+            bad = _fits(g, cand, host)
+            if best is None or bad < best[0]:
+                best = (bad, cand, host, dict(sep=sep, calm=calm, swing=sw, lat=lat, cfront=cf, stag=stag))
+            if bad == 0:
+                return best[1:]
         return best[1:] if best else None
     return _place(a, g, spec["cid"], make)
 
@@ -1017,12 +995,13 @@ def single_geom(spec, rng, az_off=0.0, len_k=1.0, size_k=1.0, dz=0.0):
     n0 = _n0(spec["naz"], 6)
     d, nl = leaf_frame(n0, math.radians(rng.uniform(-25, 25)), math.radians(rng.uniform(6, 12)), 0.0)
     Lf = spec["span"] * size_k / SPAN
-    pts = leaf_pts(P1 - d * 0.04, d, nl, Lf, thick=0.045, cup=0.03, vein=0.015)
+    pts = leaf_pts(P1 - d * 0.04, d, nl, Lf, thick=0.045)
     SP, spolys, rings, caps = tube([root, P1], [0.032, 0.028], 3, Z, phase=math.radians(90), t_start=seat)
     return [dict(kind="stalk", pts=SP, polys=spolys, keys=[STALK] * len(spolys), tints=[1.0] * len(spolys), info={}),
             dict(kind="leaf", pts=pts, polys=LEAF_POLYS, keys=leaf_keys("young"),
                  tints=leaf_tints(1.0 + rng.uniform(-0.03, 0.03), rng),
-                 info=dict(c=P1, n=nl, span=spec["span"] * size_k, role="young"))], host
+                 info=dict(c=P1, n=nl, span=spec["span"] * size_k, role="young", N=P1 - d * 0.04, d=d, L=Lf,
+                           thick=0.045))], host
 
 
 def single(a, g, spec, rng):
@@ -1162,45 +1141,54 @@ def part_fork(a):
 
 
 CLUS_SPEC = dict(cid="P", spans=(1.0, 0.80, 0.78), role="outer")
+CLUS_DROP = 0.14         # the part's centre-leaf notch under the hub
+CLUS_JOIN = 0.10         # fix round 3: the side leaves' notches this far under the hub, behind the centre leaf's top
+CLUS_TOP = 0.65          # the stalk's top (the pivot) above the hub
 
 
 def part_cluster(a):
-    """The parts cell's cluster: the stalk rising from the hub to the pivot on top; at its foot a short cross-stalk
-    whose ends hold the two side leaves, spreading out and up so they barely overlap; one bigger centre leaf hanging
-    down in front on the stalk's own end. Leaves face -Y (the part's front)."""
+    """The parts cell's cluster: the stalk rising from the hub to the pivot on top; at its foot a short V-stalk
+    whose ends hold the two side leaves, spreading out; one bigger, longer centre leaf hanging below
+    the hub on the stalk's own end, in front, overlapping only the side leaves' inner lobes. Leaves face about -Y (the
+    part's front), each its own way."""
     REC.clear()
     rng = random.Random(77)
     hub = Vector((0.0, 0.0, 0.0))
-    top = hub + Vector((0.0, 0.03, 0.40))
+    top = hub + Vector((0.0, 0.03, CLUS_TOP))
     n0 = _n0(270, 8)
     xs = Vector((1.0, 0.0, 0.0))
-    side = [(CLUS_SPEC["spans"][1], 108, -4, -5, 1), (CLUS_SPEC["spans"][2], -106, -4, 5, -1)]
+    # fix round 1: laid out like the cell - the side leaves spread out from the ends of the V-stalk,
+    # clear of the centre leaf, which hangs below the hub (its notch DROP under it) and overlaps their inner lobes
+    # only; each leaf faces its own way (fan_frames: sides +-22 deg, centre rolled 8 deg), never one plane.
+    # Fix round 3: the side leaves hang from a short V-stalk (hub -> each notch, CLUS_JOIN under the hub) that the
+    # centre leaf's top hides, instead of round 2's straight cross-stalk, which showed as a T-bar above it.
     best = None
-    for spread in (0.16, 0.20, 0.24):
-        for sep in SEPS + (0.24,):
-            shells, ends = [], []
-            for k, (span, phi, tilt, roll, sg) in enumerate(side):
-                d, nl = leaf_frame(n0, math.radians(phi), math.radians(tilt), math.radians(roll))
-                E = hub + xs * (sg * spread) + Z * 0.04 + n0 * (k * 0.08)
-                shells.append(dict(kind="leaf", pts=leaf_pts(E - d * 0.05, d, nl, span / SPAN), polys=LEAF_POLYS,
-                                   keys=leaf_keys("outer" if k else "under"),
-                                   tints=leaf_tints(1.0 + rng.uniform(-0.03, 0.03), rng)))
-                ends.append(E)
-            span, phi, tilt = CLUS_SPEC["spans"][0], 2, 8
-            d, nl = leaf_frame(n0, math.radians(phi), math.radians(tilt), 0.0)
-            Qc = hub + n0 * (0.08 + sep)
-            shells.append(dict(kind="leaf", pts=leaf_pts(Qc - d * 0.05, d, nl, span / SPAN * 1.3, aspect=0.6),
-                               polys=LEAF_POLYS,
-                               keys=leaf_keys("outer"), tints=leaf_tints(1.0 + rng.uniform(-0.03, 0.03), rng)))
-            if not _leaf_clash(shells):
-                best = (shells, ends, Qc)
-                break
-        if best:
+    for sw, spread, sep in [(sw, sp, se) for sw in ("fwd", "back") for sp in (0.30, 0.34, 0.38)
+                            for se in (0.16, 0.20, 0.24, 0.28)]:
+        fr = fan_frames(n0, 3, 22.0, 8.0, random.Random(77), sw)
+        shells, ends = [], []
+        for k in range(2):
+            d, nl, phi = fr[k]
+            sg = 1.0 if d.x > 0 else -1.0
+            E = hub + xs * (sg * spread) - Z * CLUS_JOIN + n0 * (k * 0.05)
+            shells.append(dict(kind="leaf", pts=leaf_pts(E - d * 0.04, d, nl, CLUS_SPEC["spans"][1 + k] / SPAN),
+                               polys=LEAF_POLYS, keys=leaf_keys("outer" if k else "under"),
+                               tints=leaf_tints(1.0 + rng.uniform(-0.03, 0.03), rng)))
+            ends.append(E)
+        d, nl, phi = fr[2]
+        Qc = hub + n0 * sep - Z * CLUS_DROP
+        shells.append(dict(kind="leaf", pts=leaf_pts(Qc - d * 0.05, d, nl, CLUS_SPEC["spans"][0] / SPAN * 1.25,
+                                                     aspect=0.70),
+                           polys=LEAF_POLYS,
+                           keys=leaf_keys("outer"), tints=leaf_tints(1.0 + rng.uniform(-0.03, 0.03), rng)))
+        if not _leaf_clash(shells):
+            best = (shells, ends, Qc)
             break
     shells, ends, Qc = best
     SP, spolys, rings, caps = tube([top, hub, Qc], [0.04, 0.034, 0.03], 4, Vector((1, 0, 0)), phase=math.radians(45))
     _add(a, SP, spolys, STALK, 1.0, kind="stalk", tag="stalk")
-    BP, bpolys, rings, caps = tube([ends[1] - xs * 0.03, ends[0] + xs * 0.03], [0.03, 0.03], 4, Z,
+    BP, bpolys, rings, caps = tube([ends[1] + (ends[1] - hub).normalized() * 0.03, hub,
+                                    ends[0] + (ends[0] - hub).normalized() * 0.03], [0.03, 0.03, 0.03], 4, Z,
                                    phase=math.radians(45))
     _add(a, BP, bpolys, STALK, 1.0, kind="stalk", tag="crossstalk")
     for i, s in enumerate(shells):
@@ -1219,8 +1207,8 @@ ATTACH_NOTES = {
 }
 NOTES = {
     HERO: "063 Hanging Vine hero: a 2.3 x 2.0 x 7.5 wall-mounted vine: a cracked faceted stone pad with a socket groove, "
-          "a woody stub, two twisted 6-sided strands with a fork spur, nine five-point-leaf clusters, two single "
-          "leaves and three tendril curls. Dressing: no collision. No VFX (the sheet shows none). " + ATTACH_NOTES[HERO],
+          "a woody stub, two twisted 6-sided strands with a fork spur, nine fanned five-point-leaf clusters, one "
+          "single leaf and three tendril curls. Dressing: no collision. No VFX (the sheet shows none). " + ATTACH_NOTES[HERO],
 }
 NOTES.update({k: f"063 Hanging Vine part. {v}. No collision: dressing." for k, v in ATTACH_NOTES.items() if k != HERO})
 COLLISION = {HERO: "none", **{k: "none" for k in PART_NAMES}}
@@ -1563,7 +1551,7 @@ def vis_report(o, el=5.0, step=0.03):
 
 NT_TOP = len(_leaf_top())
 EDGE15 = math.sin(math.radians(15.0))
-SWEEP_AZ = tuple(range(-90, 91, 5))      # camera az (0 = the front, -Y); build plan azimuths 180 ... 360
+SWEEP_AZ = tuple(range(-175, 181, 5))    # all 72 camera azimuths (0 = the front, -Y); |az| <= 90 is the front half
 
 
 def _leaf_solids(recs):
@@ -1584,20 +1572,31 @@ def _leaf_solids(recs):
         fs = [f for f, t in fs]
         # a closed shell's projected area is half the sum of |area vector . view| (every ray crosses it twice)
         face_on = 0.5 * sum(abs(f.dot(n)) for f in fs)
-        out.append(dict(cid=r["cid"], tag=r["tag"], n=n, fs=fs, face_on=face_on))
+        # fix round 3: how far the top (lobe) facets tilt off the leaf plane, area-weighted mean and max (deg)
+        tilts = [(math.degrees(math.acos(min(1.0, abs(f.normalized().dot(n))))), f.length) for f in top]
+        out.append(dict(cid=r["cid"], tag=r["tag"], n=n, fs=fs, top=top, top_area=sum(f.length for f in top),
+                        face_on=face_on, tilt=sum(t * a_ for t, a_ in tilts) / sum(a_ for t, a_ in tilts),
+                        tilt_max=max(t for t, a_ in tilts)))
     return out
 
 
+WHOLE = 0.75       # a leaf is wholly edge-on when this share of its top-face area is within 15 deg of edge-on
+
+
 def edge_sweep(recs=None, el=5.0):
-    """Edge-on leaves between the eight test views (STAGES "Check between the eight views too"), camera az -90 ... 90 in
-    5 deg steps at e 5. Per step:
-    - plane: leaves whose mean (top-face) plane is within 15 deg of edge-on (|n.d| < sin 15), the verifier's leafn.py
-      measure. Every plane contains one horizontal direction, so every leaf passes through this band once in any
-      180 deg sweep: with N leaves the average count is N x 7 / 37 whatever the facings, so this measure has a floor
-      (28 leaves: 5.3) and is reported, not limited; what it must not show is a comb (two leaves of one cluster at once);
-    - sliver: whole leaves that read as a sliver: the leaf's projected area under sin 15 (0.26) of its face-on area,
-      which is exactly "within 15 deg of edge-on" for a flat card, and counts the slab thickness and the lobe creases
-      that keep a creased leaf from collapsing to a line. Limits: at most 2 leaves and 10 % of the leaf area.
+    """Edge-on leaves between the eight test views (STAGES "Check between the eight views too"): all 72 camera azimuths
+    in 5 deg steps at e 5 (binding in the front half, |az| <= 90; the wall hides the rest). Per step:
+    - plane: leaves whose mean (top-face) plane is within 15 deg of edge-on (|n.d| < sin 15): the verifier's leafn.py
+      measure. Every plane contains a horizontal direction, so every leaf is in this band for >= 30 of every 180 deg
+      of azimuth, whatever its facing: averaged over the sweep the band holds >= 1/6 (16.7 %) of the leaf area for any
+      leaf set, so this measure has a floor and is reported, not limited. What it must not show is a comb (two leaves
+      of one cluster at once) or a pile-up well above the floor; the facings are spread so it stays near it;
+    - whole: whole leaves edge-on: >= 75 % of the leaf's top-face area (its lobe facets) within 15 deg of edge-on;
+    - sliver: the leaf's projected area under sin 15 (0.26) of its face-on area (exactly "within 15 deg of edge-on"
+      for a flat card; a creased slab keeps its lobe facets and thickness in view).
+    Limits (front half; SWEEP_LIMITS, ruling for round 3): whole at most 10 % of the leaf area, sliver at most 15 %,
+    at every step; never two leaves of one cluster whole-edge-on or slivers together (comb_edge). The plane-band comb
+    is reported only.
     Also the closest pair of leaf planes in each cluster (no two leaves of a cluster on one plane: >= 20 deg)."""
     recs = recs if recs is not None else RECS.get(HERO, [])
     lv = _leaf_solids(recs)
@@ -1605,20 +1604,33 @@ def edge_sweep(recs=None, el=5.0):
         return {}
     tot = sum(l["face_on"] for l in lv)
     steps = {}
-    worst = {"plane_n": 0, "plane_area": 0.0, "sliver_n": 0, "sliver_area": 0.0, "comb": 0}
+    keys = ("plane_n", "plane_area", "whole_n", "whole_area", "sliver_n", "sliver_area", "comb", "comb_edge")
+    worst = {k: 0 for k in keys}
+    worst_rear = {k: 0 for k in keys}
+    worst_at = {}
     for az in SWEEP_AZ:
         d = _cam(az, el)
         pl = [l for l in lv if abs(l["n"].dot(d)) < EDGE15]
+        wh = [l for l in lv if sum(f.length for f in l["top"] if abs(f.normalized().dot(d)) < EDGE15)
+              >= WHOLE * l["top_area"]]
         sl = [l for l in lv if 0.5 * sum(abs(f.dot(d)) for f in l["fs"]) < EDGE15 * l["face_on"]]
-        per = {}
+        per, pe = {}, {}
         for l in pl:
             per[l["cid"]] = per.get(l["cid"], 0) + 1
+        for l in {id(l): l for l in sl + wh}.values():
+            pe[l["cid"]] = pe.get(l["cid"], 0) + 1
         s = {"plane_n": len(pl), "plane_area": round(100 * sum(l["face_on"] for l in pl) / tot, 1),
+             "whole_n": len(wh), "whole_area": round(100 * sum(l["face_on"] for l in wh) / tot, 1),
              "sliver_n": len(sl), "sliver_area": round(100 * sum(l["face_on"] for l in sl) / tot, 1),
-             "comb": max(per.values(), default=0), "slivers": [l["tag"] for l in sl]}
+             "comb": max(per.values(), default=0), "comb_edge": max(pe.values(), default=0),
+             "slivers": [l["tag"] for l in sl + wh]}
         steps[az] = s
-        for k in worst:
-            worst[k] = max(worst[k], s[k])
+        w = worst if abs(az) <= 90 else worst_rear
+        for k in keys:
+            if s[k] > w[k]:
+                w[k] = s[k]
+                if w is worst:
+                    worst_at[k] = az
     planes = {}
     for cid in sorted({l["cid"] for l in lv}):
         ns = [l["n"] for l in lv if l["cid"] == cid]
@@ -1626,19 +1638,32 @@ def edge_sweep(recs=None, el=5.0):
             planes[cid] = round(min(math.degrees(math.acos(min(1.0, abs(ns[i].dot(ns[j])))))
                                     for i in range(len(ns)) for j in range(i + 1, len(ns))), 1)
     naz = sorted(round(math.degrees(math.atan2(l["n"].y, l["n"].x)) % 180) + 180 for l in lv)   # as lines, front half
-    return {"worst": worst, "steps": steps, "min_plane_angle": planes, "normal_az": naz, "leaves": len(lv)}
+    fr = [s["plane_area"] for az, s in steps.items() if abs(az) <= 90]
+    tl = [l["tilt"] for l in lv]
+    return {"worst": worst, "worst_at": worst_at, "worst_rear": worst_rear, "plane_mean": round(sum(fr) / len(fr), 1),
+            "steps": steps, "min_plane_angle": planes, "normal_az": naz, "leaves": len(lv),
+            "facet_tilt": {"mean": round(sum(tl) / len(tl), 1), "leaf_min": round(min(tl), 1),
+                           "leaf_max": round(max(tl), 1), "max": round(max(l["tilt_max"] for l in lv), 1)},
+            "outline_points": NO}
+
+
+# front-half limits per 5 deg step (ruling, targeted round 3): whole leaves edge-on at most about 10 % of the leaf
+# area (3 leaves); sliver leaves at most 15 %; never two leaves of one cluster whole-edge-on or slivers together
+SWEEP_LIMITS = {"whole": (3, 10.0), "sliver": (99, 15.0)}
 
 
 def sweep_problems(sw):
     out = []
     w = sw.get("worst", {})
-    if w.get("sliver_n", 0) > 2 or w.get("sliver_area", 0) > 10:
-        bad = {az: (s["sliver_n"], s["sliver_area"]) for az, s in sw["steps"].items()
-               if s["sliver_n"] > 2 or s["sliver_area"] > 10}
-        out.append(f"{HERO}: sliver leaves over 2 / 10 % at az {bad}")
-    if w.get("comb", 0) > 1:
-        out.append(f"{HERO}: two leaves of one cluster edge-on together at az "
-                   f"{[az for az, s in sw['steps'].items() if s['comb'] > 1]}")
+    front = {az: s for az, s in sw.get("steps", {}).items() if abs(az) <= 90}
+    for k, (ln, la) in SWEEP_LIMITS.items():
+        if w.get(k + "_n", 0) > ln or w.get(k + "_area", 0) > la:
+            bad = {az: (s[k + "_n"], s[k + "_area"]) for az, s in front.items()
+                   if s[k + "_n"] > ln or s[k + "_area"] > la}
+            out.append(f"{HERO}: {k} edge-on leaves over {ln} / {la} % at az {bad}")
+    if w.get("comb_edge", 0) > 1:
+        out.append(f"{HERO}: two leaves of one cluster edge-on (whole or sliver) together at az "
+                   f"{[az for az, s in front.items() if s['comb_edge'] > 1]}")
     flat = {c: a for c, a in sw.get("min_plane_angle", {}).items() if a < 20}
     if flat:
         out.append(f"{HERO}: leaves of one cluster on (nearly) one plane {flat}")
@@ -1746,6 +1771,8 @@ def build(render=True, parts=True, close=True):
             problems.append(f"{o.name}: has VFX sockets (decision 11: none)")
     if li.get("dropped"):
         problems.append(f"{HERO}: clusters dropped {li['dropped']}")
+    sweep = edge_sweep(RECS.get(HERO, []))
+    problems += sweep_problems(sweep)
     vis = vis_report(h)
     for az in FRONT_HALF:
         v = vis[az]
@@ -1767,7 +1794,8 @@ def build(render=True, parts=True, close=True):
                                          "boundary_edges", "wire_edges", "loose_verts", "zero_area_faces", "normals",
                                          "ngons", "dup_verts", "origin_offset", "transforms_applied")} for au in audits],
            "hero_shells": kinds, "contact": contact, "clash": clash, "bury": bury, "wall": wall, "winding": winding,
-           "vis": vis, "leaves": li, "log": log, "problems": problems, "uv": uv,
+           "vis": vis, "sweep": {k: v for k, v in sweep.items() if k != "steps"}, "leaves": li, "log": log,
+           "problems": problems, "uv": uv,
            "offsets": {o.name: [round(x, 3) for x in o[OFF]] for o in order},
            "attach": {o.name: list(o.get(ATT, [])) for o in order}, "socket": list(h.get("m063_socket", [])),
            "materials": {o.name: [m.name[3:] for m in o.data.materials] for o in order},

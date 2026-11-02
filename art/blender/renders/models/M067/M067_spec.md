@@ -911,3 +911,18 @@ Stool, Trestle, Seat, Picnic, Furniture, Plank and the candidates:
 7. **Swatches S3, S4 and S5 are unused.** Bolt heads stay dark slate `#474E56`, as every drawn bolt.
 8. **Six parts** (Table, Top, Trestle, Crossbar, Bench, Stool). 066 keeps its own furniture for now; reusing this set's
    parts there is a later option, not part of this model.
+
+## Paused (2026-11-01)
+
+Paused by the main session (user request) before the first build.
+- **Done:** read the spec, the decisions, STAGES, the skill and the sheet. The first full draft of
+  `art/blender/kit/mcp/m067.py` is written: every piece builder (plank, leg, trestle, crossbar, knee brace, bench, stool,
+  `_bolt`), the hero and six parts, the stage 2–3 pass, the contact, bury, winding, seat-level, knee-room and walk reports,
+  the render set and the `measure()` masks.
+- **Half done:** the builder has **never been run**, so it is untested. No geometry is in the wip file, there are no
+  renders, no audit numbers and no calibration. The `PALETTE` hexes are starting values, not calibrated. Stage 1–6
+  sections are not yet recorded in this spec.
+- **Next:** start the session on port 9879 with the wip file and run `m067.build(render=False)`. Fix the errors and
+  then `problems`; check the tris (plan about 2300–2600 with the colour-band rings). Save the wip, then run
+  `calibrate()`, render, and compare each view and part with the sheet using `measure()`. Record stages 1–6 here and
+  add "Modeller's notes for the verifier".

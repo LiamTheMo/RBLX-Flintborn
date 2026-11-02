@@ -3,7 +3,7 @@
 Reference: `art/blender/assets/references/065.png` (1024 × 1536 px). INDEX.md row 65: "Flintborn wildflowers model study".
 The sheet's own header reads **"63"** (top left) and the footer **"PAGE 63/132"**, title **"WILDFLOWERS"**, subtitle "Forest
 wildflowers in blue, purple and pink."; footer "FLINTBORN — INDIVIDUAL MODEL STUDY" (our number is INDEX's 065, §3.1).
-Builder: `art/blender/kit/mcp/m065.py` → `build()` (not written yet). Procedure: `art/blender/kit/mcp/STAGES.md`. One
+Builder: `art/blender/kit/mcp/m065.py` → `build()` (stages 1–6 below). Procedure: `art/blender/kit/mcp/STAGES.md`. One
 modeller does stages 1–6 in a background Blender, then a fresh verifier does stage 7; the main session puts the model
 into the kit file, exports and commits.
 
@@ -998,3 +998,314 @@ All 14 recommendations are accepted. The open questions are ruled as follows:
     - Use the colours as listed, by role and position, **never by facing**.
     - Keep the three flower colours clearly distinct: violet bell, periwinkle star, pink bloom.
 14. **Budget.** Small prop extended: hero ceiling 1600 (plan 1330–1500), every part under 1000.
+
+## Stage 1 — Modelling (modeller, 2026-11-01)
+
+Built in a background Blender (port 9878, `art/blender/assets/kit/wip/M065.blend`) from the paused partial
+`m065.py`, which was reworked rather than patched. Every exploded part has its own function (`hub`, `leaf`, `_plate` /
+`star_head` / `bloom_head`, `bead`, `calyx`, `bell`, `bell_cap`, `square_tube` / `stem`, `rock`), the hero
+`ForestBlooms` is assembled strictly from them, and the eight parts are built by the same functions.
+
+**What changed from the partial builder and why (compared view by view with the sheet):**
+- **Leaves were narrow straps (L : W 2.5–2.8, read as a hedgehog of blades).** Every tier widened to the sheet's broad
+  ovate kites: fan W 0.56–0.70 (L : W 1.9), spreading 0.70–0.78 (2.0–2.1), drooping lime 0.72–0.86 (1.7–1.9), rim
+  0.46–0.50 (1.7). The fan's widest station moved to half the length (`LEAF_ST` 0 / 0.50 / 0.79, `LEAF_HW` 0.15 / 0.50 /
+  0.35): five wide leaves round a 0.2-radius hub otherwise cut through each other low down. Spreading leaves lost a
+  station (46 tris each) and reach x −1.57 / +1.59 (front W : H 1.24, sheet 1.335).
+- **Fan re-spaced** to az 154 / 128 / 84 / 54 / 28, so the side fan leaves are not edge-on flaps from the front and the
+  bloom stem passes in front of F5; F2 steeper (74°) than F3 (64°) so they nest instead of crossing. N3 rises at 55°
+  under F3 (it shared F3's plane). N2 and B2 moved off the bloom stem and S4.
+- **Every leaf's face turns up and in toward the axis** (a rosette leaf's upper side) with a fixed growth roll per leaf,
+  chosen so no two leaves of a tier lie within 20° of one plane (min: fan 30.4°, spread 22.8°, droop 24.2°, rim 23.6°).
+  Nothing is turned per camera.
+- **Rim leaves** now sit with their base on the ground against the hub (r 0.30, lowest point z −0.016, found by
+  iteration in `leaf()`), so they chain to the ground in the `LeafBase` part too (they floated there before).
+- **Bell** was a narrow cone; now about as wide as long (the sheet's 62 × 60 px): a rounded dome (two dome bands), flank
+  r 0.28, mouth r 0.34, six lobes flared ~45° to r 0.45 and curled up 0.07, a 0.05 inner wall and an inner dome. The
+  inner ring was shrunk (r 0.20) after the first build found the inner wall crossing the outer between the ribs (60
+  self-hits). Cap: one flared six-sided collar (r 0.165 → 0.075, 20 tris) clear of the dome.
+- **Bloom** petals got blunt rounded ends (a wide last station and an obtuse apex), outer petals cupped 24 → 52°, inner
+  petals shorter (0.26) and opener (42 → 60°) so the throat and golden bead show; inner petals are one band (18 tris).
+- **Bloom facing (deviation from decision 3's az 255°): az 295°, tilt 44°, centre (1.06, −0.48, 1.36).** On the sheet's
+  front the bloom's calyx and stem meet the cup at its lower *left* (stem x +0.78 → calyx +0.83 against the bead at
+  +1.13) and the bead sits left of the rim centre: only a cup facing out to the right gives that. Facing 255° put the
+  calyx right of the head, so the stem had to swing out past the head in an elbow. y −0.48 (between the side's −0.58
+  and the top's −0.18) moves it in front of the bell in the side view. **Main session to confirm.**
+- **Stems:** straight runs with one crisp bend into each calyx (the star's one straight leaning run, the bloom's two),
+  plus a foot ring at z 0.42 so only the foot below it takes the deeper green. Crook: foot → (−0.34, 0.82) →
+  (−0.56, 1.88) → apex (−0.65, −0.15, 2.12) → hook (−0.78, −0.23, 2.10) → cap; bell seat (−0.86, −0.28, 1.93), axis
+  15° toward az 222°.
+- **Stones:** two-band nuggets (n 6 grey, 32 tris; n 5 brown, 26) a little under the study's sizes. Each stone slides
+  toward the hub until it is within 0.02 of a leaf or the hub, then its top is only ever lowered under a leaf above it
+  (the old fit's inside-leaf test was inverted and squashed every stone to 0.6). R2 sits under S4 at (1.02, −0.52), the
+  sheet's "lying out right-front, over the brown stone".
+- The exploded shot spreads wider (heads lifted 0.75 plus 0.5 along their axis, stems 0.45, spreads 0.6, droop and rim
+  0.36, stones 0.45).
+
+**Checks `build()` runs and reports (all feed `problems`):** audit per object; per shell manifold / boundary / bowtie /
+winding / self-intersection / closed volume; contact (floating, unchained, 37 named seats, stone to leaf); bury (petal,
+bead, stem and bell seats, leaf in hub, leaf-in-leaf share with the culprit, leaf cutting a stem, leaf in a stone); thin
+corners; UV; the 5° sweep at e 5 / 10 / 20 (binding at e 10 and 20); the eight-azimuth ray grid.
+- **Sweep** (STAGES "Check between the eight views too"), all 72 azimuths: *whole* = at least 75 % of the leaf's top
+  facets within 15° of edge-on; *sliver* = projected area under 0.26 of face-on; the plane band reported only.
+- **Bare core:** the ray grid reports the whole stem + hub share and, binding, the share below z 1.0 (the fan's tip
+  height); see note 2 for the verifier.
+- **Heads:** a geometric edge-on ratio per open head (projected / face-on area); a problem only if two heads are under
+  0.30 in one view.
+
+**Measured against the sheet** (floor hidden, the study's masks re-implemented in a scratch `meas.py` run in Blender):
+
+| View | W : H (sheet) | fill (sheet) | G / U / B / P / Y % (sheet; front and f34 bud-free) | green tones l / m / d (sheet) |
+| --- | --- | --- | --- | --- |
+| front_sheet (0, 5) | 1.24 (1.335) | 0.52 (0.59) | 64.7 / 9.5 / 7.6 / 9.1 / 0.9 (63.3 / 9.1 / 9.7 / 10.5 / 1.0) | 24 / 52 / 24 (27 / 43 / 30) |
+| f34_sheet (−10, 14) | 1.17 (1.38) | 0.51 (0.55) | 67.0 / 8.8 / 7.4 / 8.7 / 0.9 (63.0 / 9.9 / 8.7 / 10.2 / 1.1) | 28 / 55 / 18 (28 / 45 / 27) |
+| rear_sheet (180, 5) | 1.25 (1.16) | 0.48 (0.58) | 66.3 / 10.0 / 7.8 / 6.4 / 0.0 (61.3 / 8.9 / 9.3 / 10.7 / 0.2) | 1 / 66 / 32 (23 / 47 / 30) |
+| side_sheet (90, 5) | 0.84 (0.79) | 0.50 (0.56) | 69.0 / 4.2 / 8.5 / 11.2 / 0.9 (64.3 / 13.2 / 0.2 / 17.2 / 0.1) | 10 / 56 / 34 (22 / 45 / 34) |
+
+- Front head centroids (x, h of the bbox): bell (0.19, 0.65) vs the sheet's (0.21, 0.62); star (0.62, 0.84) vs
+  (0.63, 0.84); bloom (0.87, 0.63) vs the bud-free bloom ≈ (0.86, 0.57). The top profile matches within 0.08 at
+  f .1–.9 except f .4 (0.52 vs 0.69: our crook-to-star gap is deeper). Green fifths front 31 / 44 / 17 / 5 / 4 (sheet
+  34 / 46 / 13 / 4 / 2).
+- Exploded and parts row compared cell by cell: bell (dome, flared six-lobed mouth, green cap), star (five lozenges
+  round the octagonal bead, calyx and neck), bloom (two rings, throat, bead), square stem with a slanted cut, the
+  reusable leaf with its petiole stub, two faceted stones, and the leaf base (tall fan over chunky rim leaves round the
+  hex hub) all match their cells in outline; the bell is a touch longer than the parts-row cell (0.77 tall vs 0.87
+  wide).
+
+## Stage 2 — Optimisation and cleanup
+
+- **Hero `ForestBlooms` 1500 tris** (ceiling 1600): leaves 490 (fan 34 ×5, droop 34 ×4, spread 46 ×4), rim 88, petals
+  370 (star 28 ×5, bloom outer 28 ×5, inner 18 ×5), bell 118, cap 20, beads 60, calyces 64, stems 116, hub 32, stones 142.
+  Parts: PurpleBell 138, BlueStar 208, PinkBloom 310, Stem 20, Leaf 46, RockGrey 32, RockBrown 26, LeafBase 290.
+- 47 closed shells in one object, no booleans. Every object: 0 non-manifold edges and verts (bowties), 0 boundary, wire,
+  loose or zero-area faces, 0 n-gons; normals outward; **0 winding errors and 0 self-intersections per shell**; minimum
+  corner 4.2° (hero). Origin bottom centre on every object, transforms applied. Hub, rim leaves and stones sink 0.02
+  (decision 10). Hero 3.16 × 2.14 × 2.41 (target 3.0 ± 0.2 × 2.3 ± 0.2 × 2.4 ± 0.08); the origin sits 0.01 off the hub
+  axis.
+- **Contact:** 0 floating, 0 unchained (hero and every part); all 37 seats touch (every star and bloom petal on its
+  calyx, the beads, the stems in calyx / cap / hub, the bell in its cap, 13 leaves in the hub); stones 0.000–0.020 from a
+  leaf or the hub.
+- **Buried:** none. Stem feet 0.07 in the hub, tops 0.065 in their calyx or cap; bell seat 0.03 in the cap, nothing
+  beyond; beads 0.01 / 0.02 in their calyx; no petal inside a bead or calyx beyond its seat; leaf-in-leaf at most 23 %
+  (limit 25); leaves cut stems by at most 0.014 (limit 0.03); deepest leaf in a stone 0.013.
+- **Foliage from every azimuth:** worst whole-leaf edge-on step 8.3 % of the leaf area at e 10 (2 leaves), 8.1 % at
+  e 20, 6.5 % at e 5; slivers 0 at every step and elevation (the ridge V keeps each half at least 19° off edge-on from
+  the side). Ray grid at e 10: edge-on (12°) leaf pixels 1.3–9.7 %; core below the stalks 1.4–14.5 %, whole core
+  20.9–38.5 %; rock pixels 3.3–7.2 %. Heads: the star turns to 0.39 of face-on at az 135 (the bloom stays at 0.71 or
+  more); never two heads at once.
+
+## Stage 3 — UV
+
+`M.smart_uv` (angle-based, 45°, margin 0.008), then `m012._uv_unfold`: hero 521 islands, 0 overlaps, 0 flipped, minimum
+gap 0.016, border 0.008, even density, conformal stretch p95 1.007; every part the same (stretch p95 at most 1.049, the
+bell). The exporter writes its own palette UVs; this layer only has to exist clean.
+
+## Stage 4 — Materials, colour and texture
+
+**Swatches (`M.raw_sample`, inner boxes):** Flower Purple `#A767FC`, Flower Blue `#6474FD`, Flower Pink `#FE97B5`, Leaf
+Light `#6CA928`, Leaf Dark `#498025`, Stone Pale Gray `#9D9B9A`, Stone Warm Brown `#A66A43` (the study's values).
+**Rendered regions** re-measured with the study's masks: front G `#5D8F18`, U `#9160F1`, B `#7C8EFC`, P `#FB77A3`, green
+light / mid / dark `#97C728` / `#5F9117` / `#29540C` (the study's §5.2 targets).
+
+**Calibration** (`m065.calibrate()` → `K.calibrate`, six rounds on the kit dome), then a few corrections on the hero
+and part renders:
+
+| Key | Calibrated (dome render) | Final key | Why changed | Hero / part render | Sheet |
+| --- | --- | --- | --- | --- | --- |
+| bell | `#7855CC` (`#9160F0`) | `#7B57D0` | a step up for the darker rear | front U `#9160EE`, part `#9462F2` | `#9160F1` |
+| bell_deep | `#5A3FB8` (`#6A45D7`) | same | | the inside in bell_under | `#6A45D8` |
+| star | `#6A7CF0` (`#7F92FF`) | `#7084F2` | the hero front read `#6B7BF6` | front B `#6F81F8`, part `#788CFF` | `#7C8EFC` / parts `#6F83FB` |
+| star_deep | `#515FCF` (`#5E6DF4`) | same | | | `#5D6CF4` |
+| star_bead | `#ECBC60` (`#FFE66F`) | `#ECC862` | star_cu read orange `#FFD568` | star_cu `#FFE36A` | `#FDE76F` |
+| pink | `#EC678E` (`#FF77A2`) | `#EC6F96` | the front read `#FF618C` (too red) | front P `#FF6990`, part `#FF7BA5` | `#FB77A3` / parts `#FC76A4` |
+| pink_deep | `#C33F6A` (`#F64575`) | same | | the throat | `#F64575` |
+| bloom_bead | `#B49400` (`#E2B422`) | same | | | `#E2B30D` |
+| leaf_light | `#7DA428` (`#98C628`) | same | | front light tone `#9FCD2D` | `#97C728` |
+| leaf_mid | `#537C16` (`#619217`) | same | | front mid tone `#608D19` | `#5F9117` |
+| leaf_dark | `#3E6E20` (`#478020`) | `#3A6A1E` | a step deeper for the dark share | front dark tone `#2F500C` | `#29540C` |
+| stem | `#4C7E1D` (`#58951D`) | `#52871F` | the parts stem read `#477819` | part `#497E1A` | `#57941D` |
+| rock_grey | the dome sampler failed (below) | `#817673` | from the brown key's measured transfer | part `#A79388` | `#A89388` |
+| rock_brown | `#885B3D` (`#A7683F`) | `#8E5F3F` | the parts shot read `#945B37` | part `#9B6039`, front N `#8F5B38` | `#A8673E` / front `#92582F` |
+
+- `K.sample`'s "stone" filter keeps sat < 0.18; the warm grey is sat 0.19, so the dome kept sampling the background.
+  The grey key stays R > G > B (never lavender) and renders `#A79388` (21°, 0.19) on the parts shot.
+- **Front all-green median `#608D1A`** (target `#5D8F18` ± 15). Hues stay apart: bell 259°, star 231°, pink 340–346°.
+- **Blending by role and position only** (never facing): leaves take one tone per cross-band (base → body → tip) on the
+  dark / mid / light ladder in 25 % mixes (the drooping N leaves lime; F5, S3, B2 lighter; rim B1 / B3 / B4 dark; bases
+  a step deeper); star petals a deeper base band; bloom outer petals a 75 %-pink base band, inner petals 25 %-pink bases
+  and pink tips; the bell's inner wall and rim `bell_deep` (a region); calyx rims half stem; stem feet half dark; stone
+  feet a step deeper. Hard edges only between materials.
+- **Tint:** broad, per leaf (±3.5 %) and band (±2.5 %), per petal (±2.5 %), per bell lobe panel (±3 %), per stone (±4 %)
+  and band. `K.check` facing correlation: hero 0.04; BlueStar 0.28, PinkBloom 0.23 (the cupped petals' base bands, by
+  position); PurpleBell carries `kit_shading_ok` (bell_deep is its inner wall and rim, a region).
+- **Finish:** greens 0.8–0.85 rough with low specular; petals 0.75; beads 0.6; stones 0.9; no metal, no emission.
+
+## Stage 5 — Lighting: skipped
+
+The sheet shows nothing glowing and no light source; its shading is the render's (lit from the upper right). No
+emission, no lights. Studio notes (Requires Manual Validation): the bell stays lavender-violet and the star periwinkle
+under the game sun (not one blue-violet), the pink stays pink, the beads yellow, the stems green, the grey stones warm
+grey.
+
+## Stage 6 — VFX: skipped
+
+The sheet shows no effect (no pollen, sparkle or wind marks), so there are no sockets (`build()` checks there are none).
+Collision `none` on the hero and every part (decision 8).
+
+## Renders
+
+`art/blender/renders/models/M065/`: `M065_views.png` (contact sheet), `front_sheet`, `f34_sheet`, `rear_sheet`,
+`r34_sheet`, `side_sheet`, `side270_sheet`, `top_sheet`, `front34`, `rear34`, `front`, `side`, `rear`, `top`,
+`underside`, `exploded`, `parts_row`, `part_*` (eight), `M065_spin.png` (and `spin_*_sheet` ×8), `scale`, `star_cu`,
+`star_edge`, `petal_edge`, `bell_cu`, `bell_under`, `bloom_cu`, `bloom_edge`, `rosette_cu`, `junction_cu`, `base_under`,
+`base_part_under`, `edge_side`, `edge_front`, `thumb_sheet`.
+
+## Modeller's notes for the verifier
+
+1. **The bloom's facing deviates from decision 3** (az 295° instead of 255°, centre y −0.48): see Stage 1. It matches
+   the sheet's front (calyx at the cup's lower left, bead left of centre) and removes the stem's elbow.
+2. **Bare core:** the whole stem + hub share is 21–38 % of the leaf pixels (38.5 % from +X, where the three stalks stand
+   side by side); below z 1.0 it is 1.4–14.5 %. The sheet draws the flower stalks above the rosette in every view (the
+   bell stem from z 0.6 up, the crook, the star and bloom stalks), so `build()` binds the 30 % limit on the core below
+   the stalks. A ruling is welcome.
+3. **Side view:** from +X the bloom (nearest) hides most of the bell (U 4 % against the sheet's 13 %): the sheet's side
+   cell draws the bell 0.35 higher than every other view (§3.4), and the front governs heights. The crook reads, hooking
+   to the front.
+4. **The rear reads darker** (light tone 1 % against 23 %; G median `#4C7816` against `#548C1A`; rear bell `#7851D4`
+   against `#985FF3`, rear pink `#DB5C81` against `#FB7EAA`): the kit studio keys from the front-left (as on 061). The
+   front and the parts match; pushing the keys further would over-brighten the front.
+5. **Front mid tone 52 % against 43 ± 8** (light 24, dark 24 against 27 / 30): just outside. A deeper dark key barely
+   moved it (the dark pixels are shading).
+6. **The stones read more than the sheet's:** ray-grid rock pixels 3.3–7.2 % (front 4.4, rear 6.4, side 3.3) against
+   about 2.5 / 4 / 0. They are already a little under the study's sizes and tucked under leaf tips.
+7. **Leaf tip angles are 61–83°** (study 50–70°): the broader kites made them blunter; they still end in a point.
+8. **Front W : H 1.24** (sheet 1.335, accepted 1.20–1.38); f34 1.17 (061 reached 1.04 with this camera).
+9. Scratch measurement scripts (`meas.py`, run inside Blender) are in `<temp>\...\scratchpad\`, not in the repo.
+
+## Rulings (main session, 2026-11-01)
+
+1. **Bloom facing az 295 / tilt 44** (centre y −0.48) replaces the earlier az 255: it is the only facing that puts the
+   calyx at the cup's lower left with the bead left of centre, as the sheet's front shows, and az 255 forced an elbow
+   into the stem.
+2. **Bare-core limit:** the 30 % limit applies to stem and hub below z 1.0. The flower stalks above the rosette show in
+   every sheet view, so they count as skeleton the sheet shows (STAGES.md), not bare core.
+3. **Rear darkness** from the studio's front-left key light is a lighting miss, not paint; the verifier judges tone on the
+   front and part shots.
+
+## Stage 7 verification (round 1)
+
+**FAIL, 6 / 10.** Read-only, in a background Blender on a copy of the kit file taken after the main session's build
+(`build()` not called; nothing saved). Every number below was re-measured with the verifier's own scripts (bmesh audit,
+per-shell BVH contact and ray-parity burial, volumetric sample-point overlap, max-projection leaf normals, 5° sweep, ray
+grid, the study's HSV masks on the sheet and on fresh renders). Renders and scripts are in `<temp>\...\v065\`.
+
+**What passes**
+- **Technical, every object:** 0 non-manifold edges, 0 bowties, 0 boundary / wire / loose, 0 zero-area faces, 0 n-gons,
+  0 winding errors, 0 inward shells; transforms applied; origin at the bbox bottom centre; one `UVMap`, 0 overlapping
+  pixels at 1024², minimum island gap 16 px (0.016), border 0.008. Tris: hero **1500** (ceiling 1600), PurpleBell 138,
+  BlueStar 208, PinkBloom 310, Stem 20, Leaf 46, RockGrey 32, RockBrown 26, LeafBase 290. Minimum corner 4.2°.
+- **Size:** hero 3.16 × 2.14 × 2.41 (targets 3.0 ± 0.2 × 2.3 ± 0.2 × 2.4 ± 0.08): inside, at opposite ends of the X and Y
+  bands. The origin is 0.01 off the hub axis; the ground (hub base) is 0.02 above the origin.
+- **Contact:** 47 shells (hub, 17 leaves, 5 stones, 3 stems, cap, bell, star 5 petals + bead + calyx, bloom 10 petals +
+  bead + calyx). 0 floating, 0 unchained. Every petal touches its calyx or bead, both beads sit on their calyx, each stem
+  reaches its calyx / cap and the hub, the bell sits in its cap. The stones are 0.000–0.020 from a leaf.
+  Seat depths: stem feet 0.07–0.09 in the hub, bell 0.03 in the cap, inner bloom petals ≤ 0.049 into the bead.
+- **5° sweep** (72 azimuths; whole = ≥ 75 % of the top facets within 15° of edge-on; sliver = projected < 0.26 of the
+  max-projection area): worst whole-leaf step **6.6 % / 8.4 % / 6.4 %** of the leaf area at e 5 / 10 / 20 (N1; N4 + B3 at
+  az 0; N3). **Slivers 0** at every step. The plane share is reported only: 50–65 %. Most of that is the flat-lying droop
+  and rim leaves at low elevation.
+- **Ray grid** (8 azimuths, e 10 / e 20):
+  - core below z 1.0: 1.8–15.1 % of the leaf pixels; whole core with the stalks: 20.5–38.1 % (ruling 2);
+  - leaf pixels within 12° of edge-on: 1.4–9.7 %.
+- **Heads** (projected / face-on area, 15° steps): the star dips to 0.34 at az 135 (e 10). The bloom stays at 0.67 or
+  more and the bell at 0.90 or more. There is never more than one head near edge-on.
+- **Colour by facing:** none. Face colour against normal z / front: leaves −0.01 / −0.03, star −0.02 / −0.01,
+  pink −0.04 / −0.04. The bell shows 0.41 against x: that is its `bell_deep` inner wall, a region. Stones show 0.33
+  against z: that is their deeper foot band, by height.
+- **Front sheet (0, 5)** against the sheet's front cell. The sheet values are re-measured; the bud-free targets are
+  from §1.2.
+  - W : H 1.245 (1.335; band 1.20–1.38).
+  - G 65.1, U 9.6, B 7.7, P 9.1, Y 1.0 (targets 63.3 / 9.1 / 9.7 / 10.5 / 1.0).
+  - Green fifths 31 / 43 / 17 / 5 / 4 (34 / 46 / 13 / 4 / 2). Tones 25 / 51 / 24 (27 / 43 / 30 ± 8).
+  - Head centroids (x, h): bell (0.19, 0.66) against (0.21, 0.62); star (0.63, 0.84) against (0.63, 0.84); bloom
+    (0.87, 0.63).
+  - Medians: G `#608E1D` (`#5D8F18`), U `#9160EE` (`#9160F1`), B `#7183F9` (`#7C8EFC`).
+  - Green tones: light `#9ECD2E` (`#97C728`), mid `#5F8D1C` (`#5F9117`), dark `#2F4F0E` (`#29540C`).
+  - Beads: star `#FFE26A` (cu1 `#FDE76F`); bloom bead in the top view `#D9AB1B` (`#DCA30C`). Bloom throat `#E24A71`
+    (parts row `#E44B81`).
+  - The front read is right: the star is the highest head, the bell hangs at the left from a crisp crook, the bloom
+    sits low at the right, and the stems show where the sheet shows them.
+- Star, bloom, square stems, stones and the leaf kite each match their cells in outline. Stone W : H: grey 1.53
+  (sheet 1.6), brown 1.35 (sheet 1.4). Both stones are faceted, and the grey one keeps R > G > B.
+
+**Blockers**
+1. **The bell's mouth is a flat flared brim, not six pointed lobes.** This is the bell head's defining feature.
+   - **Measured** on `ForestBloomsPurpleBell`: the lobe tips (r 0.45) sit only **0.021 below the notches** (r 0.37–0.385).
+     That is **2.7 % of the 0.775 height**. The tips flare horizontally, at the notch height.
+   - **The sheet** (front, f34, rear, r34, exploded, parts row) draws six deep petal lobes, about 30 % of the bell's
+     length, each pointing down and out. The lobes give a zigzag hem, and 4–5 of them show per view. The flanks are
+     convex under a rounded dome.
+   - **Ours** is a straight-sided lampshade with a horizontal hexagonal skirt (front_sheet, rear_sheet, part shot,
+     `bell_cmp`).
+   - **Fix** in `bell()`:
+     - put the mid-panel notches near 0.65–0.70 L (r ≈ 0.31–0.33) and the lobe tips at 1.0 L (r ≈ 0.42), pointing down
+       and out (flare 25–35°, curl ≤ 0.02), so each lobe is a pointed petal about 0.25–0.30 L long;
+     - round the dome and flanks (convex, Ø ≈ 0.38 at 0.15 L);
+     - keep the inner wall following the lobes, so the dark inside still reads from below.
+2. **The fan leaves cut through each other and swallow the stems.**
+   - **Leaf in leaf** (volumetric sampling, 1500 points per leaf):
+     - **F3 is 31 % inside F4** (the spec's limit is 25 %; 20 % of it above the hub junction, up to z 0.93);
+     - F5 24 % inside F4 (18 % above the junction);
+     - F3 22 % inside F2;
+     - N4 15 % inside N3, B2 15 % inside S4.
+   - **Leaf through stem:** the **star stem runs inside F4's blade**.
+     - 55–81 % of the stem's cross-section is inside F4 from z 0.2 to 0.8, and 29 % at z 0.8–0.9. That is outside the
+       junction (r < 0.30, z < 0.45) from z 0.45 up.
+     - F2 cuts the bell stem: 21–27 % of its cross-section at z 0.4–0.6.
+     - The spec's limit is a 0.03 cut outside the junction.
+   - **Why the builder missed it:** it reported 23 % and 0.014. Its vertex-based test misses a stem whose straight run
+     has no vertices inside the leaf.
+   - **Where it shows:**
+     - in rear_sheet and r34_sheet the back fan reads as a jagged block of interlocking facets, where the sheet draws
+       clean, separate tall leaves;
+     - the close-ups show stepped intersection edges on the leaves.
+   - **Fix:**
+     - re-space or narrow F3, F4 and F5 so no leaf is more than 25 % inside another;
+     - turn F4 off the star stem's lean, or set it behind the stem by at least 0.1;
+     - move F2 off the bell stem;
+     - re-measure with a volumetric (sample-point) test.
+
+**Minors** (whether each shows against the sheet)
+1. **Rear and r34 spreading leaves read as narrow spikes (shows).** S1 and S3 tilt their faces toward the front
+   (normals az +44° / −43°, el 57–59°). From the rear they are seen underside-on at about 0.32 of face-on, so the rear
+   half reads as a spiky rosette where the sheet has broad leaves. The sweep still passes. Fix: give S1 and S3 a roll
+   that tilts them straight inward (az ±90°).
+2. **Stones read larger than the sheet's (shows, most of all from the side).** Ray-grid rock share at e 10: front 4.9 %,
+   rear 7.1 %, +X side 3.8 %. The sheet has about 2.5 %, 4 % and 0 %: the side cell draws no stones; ours shows two.
+3. **Front fill and footprint (shows a little).**
+   - Front fill 0.52 (0.59 ± 0.05).
+   - The top view is W : D 1.53 against 1.09: wide and shallow. The top is judged for content only, and the content is
+     all there.
+4. **Front pink is a little redder (shows a little).** The front pink median is `#FF6992` against `#FB77A3` (blue
+   channel off by 17, limit 12). f34 reads `#FF759C`, which is fine.
+5. **Part-shot colours (each at the builder's part camera, against the parts row; show a little).**
+   - Stem `#477A18` against `#58941D`: darker by 26 in green.
+   - Leaf `#73A322` against `#5B9728`: lighter and yellower (82° against 92°).
+   - Grey stone `#917F76` against `#A9978C`: 24 darker; still R > G > B.
+   - Bell `#9462F2` against the parts row's `#AA70FA`. The hero front matches the study's `#9160F1`.
+   - Star bead `#FFFB75` against `#FDE76F`: paler lemon; it is fine on the hero.
+6. **Drooping leaf tips rest 0.035 above the ground** (spec ≤ 0.03; does not show).
+7. **Leaf planes measured by max-projection normal.**
+   - Droop N1 / N4 6.9° apart, N1 / N3 9.0°; rim B1 / B3 9.8°; fan F3 / F4 16.1°. The builder's eigen-normal measure gave
+     at least 22.8°.
+   - The droop and rim leaves lie nearly flat, so their planes are near-parallel by nature, and the sweep passes.
+   - F3 / F4 will move with blocker 2. This does not show.
+8. **The LeafBase fan leaves narrow to wedges at the base (shows against the exploded cell).** The fan reads as a cluster of
+   crystal shards; the sheet's fan leaves are broad ovals from low down.
+9. **The PinkBloom part reads as an open, flat rose (shows a little).** The parts row draws a deep cup (W : H 1.17). The
+   hero's front bloom compares well.
+10. **The exploded shot barely separates the pieces** (presentation only; shows against the exploded cell).
+11. **Settled rulings, where they show:**
+    - the rear is dark: light tone 1–2 % against 23–30 %; rear pink `#DB5C81`, bell `#7851D4`;
+    - from +X the bloom hides the bell: U 4.2 % against 13.4 %;
+    - with the bloom facing az 295, the top view puts it far front-right.

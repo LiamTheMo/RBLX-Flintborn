@@ -1039,3 +1039,31 @@ All 16 recommendations are accepted. The open questions are ruled as follows:
     - Canvas and stone stay warm, never lavender or grey-blue.
     - The banner red is saturated, not pink.
 16. **Budget.** Full asset: ceiling 4000 (plan 3300–3700), every part under 1000, with the cut order as listed.
+
+## Paused (2026-11-01)
+
+Paused on request after the modeller's first full pass. The wip file (`art/blender/assets/kit/wip/M066.blend`) was saved
+after the last good build.
+- **Done:** builder `art/blender/kit/mcp/m066.py` (`build()`), stages 1–3 and most of 4–6. `build()` returns
+  `problems: []`. Hero `CanvasShelter` 3796 / 4000 tris, 17.94 × 12.49 × 12.0, 157 closed shells. Eleven parts, each
+  under 1000 tris (largest Crate 260). 0 non-manifold, boundary, bowtie, winding, n-gon, zero-area or duplicate-vertex
+  errors. 0 floating, 0 buried, 0 canvas or banner pass-through; every rope end touches. UV margin 0.016 with no
+  overlaps. Walk lanes clear by ≥ 0.155; the canvas underside is ≥ 7.02 over the floor (1.52 above a 5.5 head); the
+  lantern bottom is at 7.165. One `heat_glow` socket on the hero and one on the Lantern part; Neon `m066_glow` on the
+  glass and both jars.
+- **Colour (stage 4), first calibrated pass in `PALETTE`:** part renders against the sheet: post `#A74913` vs `#A0480F`,
+  bench `#AD5825` vs `#AD5E27`, crate `#86411E` vs `#894322`, barrel `#7A3A1D` vs `#7B3B1B`. f34 rope `#DA9843` vs
+  `#DFA447`, banner `#D81314` vs `#D81315`, glow `#FBB308` vs `#F6B009`. The dome (`m066.calibrate()`) pulled the
+  canvas salmon (`#FAC1A7`), so the canvas keeps the sheet's cream hue, as ruled for 064. The lit canvas top clips, so
+  f34 C reads 5.9 % against the sheet's 24 %.
+- **Half done / next:**
+  1. Write the Stage 1–6 headings and "Modeller's notes for the verifier" into this spec. The numbers are above.
+  2. Optionally add a wider canvas hem band. At present the hem is only the rim faces at 75 % `canvas_deep`, plus the
+     corner facets and the tabs at 25 %.
+  3. Look at `thumb_sheet.png` and `lantern_cu.png`.
+  4. Main session to rule on these known deviations:
+     - 330 thin corners (min 0.41°), as on 064;
+     - hero 17.9 W against the spec's ≈ 17.3, from the 35° pegs and the rod knob;
+     - FR canvas corner at 9.1 (the spec has 9.2), so the FR lashing stack fits;
+     - ridge at z 10.40–11.20 (the spec has 10.2–11.0), with the tips 0.8 above it;
+     - banner 1.9 wide.

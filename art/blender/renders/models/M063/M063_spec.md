@@ -1218,3 +1218,351 @@ darken anything. **Nothing is coloured by face normal.**
 | 13 | side view pad in shade | visible, but it is the studio light on the +X face; the key is warm beige (`#B19E91` from the front) | accepted, Studio note |
 | 14 | pad red channel 13 off | numeric only; against my own front-pad box `#B9A599` it is within (Δ 8 / 7 / 8) | accepted |
 | 15 | az 135 edge-on 19.6 % | rear, content only (my 135: 19.6 %, rims 23.6 %); no floating pieces from behind | accepted (fanning helps) |
+
+## Fix round 1 (modeller, 2026-11-01)
+
+Fresh modeller, background Blender on port 9878, work file `art/blender/assets/kit/wip/M063.blend` (saved after the final
+clean build). Builder `art/blender/kit/mcp/m063.py` only; no shared helper touched. Scratch scripts (facing search,
+share measure, large renders) in `<temp>\...\scratchpad\m063_fix\`.
+
+**Starting state.** A fix round had been half done before the pause: lobe creases (`CREASE = 0.20`), a yaw-about-the-
+vertical fan in `cluster_geom`, `edge_sweep` / `sweep_problems` written but not called by `build()`. Re-running `build()`
+dropped 8 of 9 clusters (every candidate had leaves cutting each other: the front side leaf, stacked in front of the
+centre leaf and swung back, passed through it), so the hero had 4 leaves.
+
+### Blocker 1: fanned clusters, checked between the eight views
+
+- **New cluster layout** (`fan_frames`, `cluster_geom`), as the cluster cell and close-up 2 draw it: the stalk runs out
+  and down from its seat to a hub, then on to the centre leaf's notch; a short cross-stalk (a second stalk shell)
+  through the hub holds the two side leaves at its ends (`lat` 0.22-0.34 either side, the second `stag` 0.06-0.14 in
+  front so their basal lobes stack instead of crossing); the side leaves leave at +-(100-110) deg from straight down
+  (out and a little up) and swing their tips `fan` deg back toward the vine or forward; the centre leaf hangs below the
+  hub, its tip 6-10 deg forward, rolled `croll` deg, 0.20-0.24 in front of the side leaves. So the three normals sit
+  near naz - fan, naz + croll, naz + fan: **every cluster's leaves are on three different planes** (closest pair per
+  cluster 29.7-47.3 deg, see below). Placement still goes through the guard; the search (`CLUSTER_TRIES`: calm, centre
+  in front / behind, lat, sep, stag, swing) runs inside the old variant list.
+- **Facings** (`CLUSTERS` naz / fan / croll): a small search (scratch `opt2.py` / `opt3.py`, on the true mean normals of
+  the creased leaves) spreads the 27 leaf planes evenly over the front half, keeps every normal off the wall (plan az
+  185-356) and no two leaves of a cluster in the edge-on band at once. Fans 36-48 deg. C3's centre roll was then set by
+  hand to -9 (search: +3) to take one big front-facing leaf off the az 90 edge-on band (vis 11.1 -> 9.3 %).
+- **Creases** `CREASE = 0.12` (the half-done 0.20 read as crumpled stars on the renders; 0.10-0.12 gives the sheet's
+  lit / shaded lobe facets): a creased leaf seen edge-on keeps >= 0.23 of its face-on projected area and its lobe facets
+  turn edge-on at different azimuths.
+- **`build()` now runs `edge_sweep` on every build** and reports into `problems` (`sweep_problems`): all 72 camera
+  azimuths in 5 deg steps at e 5, binding for |az| <= 90 (the wall hides the rest, decision 9). Three measures per
+  step:
+  - **plane** (the round-1 verifier's `leafn.py` measure): leaves whose mean plane is within 15 deg of edge-on. This
+    measure has a hard floor. Every plane contains a horizontal direction, so each leaf is inside the +-15 deg band for
+    at least 30 of every 180 deg of azimuth, whatever its facing (pitching a leaf only widens its band). Averaged over
+    the sweep, the band therefore holds >= 1/6 (16.7 %) of the leaf area for any set of leaves, and some step must hold
+    at least that much. **A limit of 10 % at every step can't be met on this measure by any arrangement.** So it is
+    reported, not limited. Facings are spread so it stays near the floor, and it must show no comb.
+  - **whole**: whole leaves edge-on, meaning >= 75 % of the leaf's lobe-facet area within 15 deg of edge-on. Limit:
+    <= 2 leaves and <= 10 % of the leaf area at every front-half step.
+  - **sliver**: projected area under sin 15 (0.26) of the face-on area. That is exactly "within 15 deg of edge-on" for a
+    flat card, and it counts the slab thickness and creases. Same limit.
+  - **comb**: two leaves of one cluster in the plane band together. Limit: none.
+- Also kept: the eight-view ray grid (`vis_report`, binding in the five front views).
+
+**Measured (final build):**
+
+| Sweep, front half (az -90 … 90) | Worst step | Value |
+| --- | --- | --- |
+| whole leaves edge-on | every step | **0 leaves, 0 %** |
+| sliver leaves | az -90, -70, -45, -40, -35, -5, 45, 50 | **1 leaf, 5.2 % of the leaf area** (limit 2 / 10 %) |
+| comb (two of one cluster) | — | **never** (max 1 per cluster at every step) |
+| plane band (leafn.py measure) | az -85 | 6 leaves, **25.7 %** (az -75: 7 leaves, 25.5 %); mean over the front half 16.6 % (floor 16.7 %); 2.5-11.6 % at az 15-30 and 60-75 |
+| rear half (content only) | az 95 / 105 | plane 25.7 %; sliver max 1 leaf; no comb |
+
+Per front step, plane band leaves / % (az: n / %): -90: 5 / 20.5, -85: 6 / 25.7, -80: 5 / 21.9, -75: 7 / 25.5, -70: 6 / 20.1,
+-65: 6 / 20.4, -60…-50: 5 / 17.0, -45: 4 / 17.9, -40: 4 / 18.3, -35: 5 / 16.2, -30: 6 / 19.7, -25: 5 / 14.5, -20: 6 / 19.2,
+-15: 6 / 18.6, -10: 5 / 14.3, -5: 4 / 16.1, 0: 4 / 16.3, 5: 5 / 18.2, 10: 4 / 13.5, 15-20: 3 / 9.8, 25: 2 / 5.6, 30: 3 / 10.8,
+35-40: 3 / 13.8, 45: 4 / 16.7, 50-55: 5 / 20.6, 60: 4 / 15.6, 65-70: 3 / 10.8, 75: 3 / 11.6, 80-85: 4 / 17.0, 90: 5 / 20.5.
+Round 1 had 9 leaves / 29 % at az -35…-15 with three of them from one cluster; now no cluster has two.
+
+Closest leaf-plane pair per cluster (deg): J1 37.4, J2 46.9, C1 36.9, C2 41.3, C3 29.7, C4 36.7, C5 36.6, C6 35.3,
+C7 47.3. Leaf normals (plan az): 185 191 198 222 223 229 238 245 252 265 272 272 280 284 289 296 298 301 309 318 327 333 340
+340 345 354 356.
+
+**Eight-view ray grid** (`vis_report`, e 5; binding in the front five):
+
+| Camera az | 0 | 45 | 90 | 270 | 315 | 135 | 180 | 225 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Wood % (<= 30) | 16.7 | 17.0 | 20.9 | 23.7 | 20.8 | 33.6 | 32.6 | 30.0 |
+| Edge-on leaf % (<= 10) | 3.2 | 2.9 | 9.3 | 7.9 | 8.3 | 11.0 | 12.4 | 5.0 |
+| Rims, % of leaf pixels | 11.0 | 11.4 | 15.1 | 14.4 | 13.6 | 17.7 | 16.1 | 13.8 |
+| Rope bins with wood | 20/20 | 18/20 | 18/20 | 18/20 | 18/20 | 20/20 | 20/20 | 20/20 |
+
+**Renders.** `M063_spin.png` and the mid-azimuth shots (az -65, -25, +25, +65 at e 10; scratch) show every cluster as
+two or three distinct fanned leaves. There are no combs of slivers. The front views read as a leafy twisted rope. The
+rear views (wall side, content only) still show a few edge-on leaves: about one per cluster from behind, at az 180 near
+z 5-6 and 3-4.
+
+**Shares on the new `front_sheet` / `side_sheet`.** I measured these with my own scratch `meas.py`, which reimplements
+the study's masks with the pad class limited to the top 27 % window. It is not the round-1 `meas.py`, so the verifier
+should re-measure.
+
+| | front (sheet) | side (sheet) |
+| --- | --- | --- |
+| W : H | 0.323 (0.306) | 0.273 (0.269) |
+| G / B / P | 72.6 / 13.7 / 13.7 (72.3 / 18.9 / 8.8) | 60.2 / 14.6 / 25.2 (67.5 / 19.8 / 12.7) |
+| quarters G/B/P | 54/7/39, 80/18/2, 80/20/0, 88/12/0 | 29/7/64, 85/15/1, 68/32/0, 86/14/0 |
+| width per tenth | .62 .82 .88 .54 .92 .57 .81 .91 .83 .69 | .89 1.0 .92 .72 .69 .52 .43 .71 .67 .69 |
+| tones D/M/Br/L | 40 / 45 / 11 / 4 (37 / 41 / 20 / 3) | 60 / 38 / 2 / 0 |
+
+Front G is now on the sheet (64 -> 73). B fell from 22.6 to 13.7: the fanned leaves cover more of the rope. That is why
+every hero cluster leaf is scaled by `FAN_K = 0.94`, which also brings the width from 2.48 to 2.40. Front tenths 4 and 6
+are still narrow (gaps between clusters at z ≈ 4.4-5.1 and 2.9-3.7).
+
+### Blocker 2: the LeafCluster part
+
+`part_cluster` is relaid out like the cell (checked from (-15, 15) beside the cell):
+- the stalk rises from the hub to the pivot on top;
+- the cross-stalk at the hub holds the two side leaves, which spread out and a little up (`fan_frames`, sides +-22 deg,
+  so they are not coplanar);
+- the centre leaf (x1.25 long, aspect 0.70) hangs below the hub (notch 0.32 under it, 0.20 in front) and overlaps only
+  the side leaves' inner lower lobes, about 10-15 % of their area by eye. No star outline.
+
+Size 1.37 × 0.50 × 1.44, W : H 0.95 (render 1.02; cell 0.97); 188 tris; 5 shells; 0 floating; 0 clashes.
+
+### Other changes
+
+- **S3 (single leaf) dropped.** It found no place clear of the strands at z 2.45-3.3 among the fanned clusters. **27
+  leaves** (study floor 26): 26 in clusters + S1.
+- **Stalks:** 3-sided `[root, hub, centre notch]` plus a 3-sided cross-stalk shell per cluster. The stub seat is now
+  0.012 under the stub surface (was 0.018): the deepest stalk root is 0.032 (limit 0.035).
+- The tendril bury seen on the paused state (T2 0.053) is gone; the worst tendril is now 0.030.
+
+### Final numbers (`build()`: `problems: []`)
+
+| Object | Tris | Size | Shells |
+| --- | --- | --- | --- |
+| TwistedVine | **2446** / 2500 (pad 140, stub 56, strands 476, spur 32, 19 stalks 206, 27 leaves 1404, 3 tendrils 132) | 2.40 × 1.94 × 7.34 | 54 |
+| TwistedVinePad | 140 | 1.49 × 0.98 × 1.75 | 1 |
+| TwistedVineSegment | 80 | 0.55 × 0.31 × 1.82 | 1 |
+| TwistedVineFork | 284 | 1.44 × 0.31 × 1.72 | 1 |
+| TwistedVineLeafCluster | 188 | 1.37 × 0.50 × 1.44 | 5 |
+
+**Topology and UVs (all five objects):**
+- 0 non-manifold edges / verts (bowties), 0 boundary, 0 wire, 0 loose, 0 zero-area, 0 n-gons, 0 duplicate verts;
+- normals outward; 0 winding errors; 0 self-intersections in every shell;
+- UV: 0 overlaps, 0 flipped, min gap 0.016.
+
+**Contact:** 0 floating, 0 unchained (hero and parts); clash: 0 bad pairs.
+
+**Bury** (deepest per kind, ray parity): stub 0.025, strand 0.044, spur 0.049, stalk 0.032, tendril 0.030, leaves 0 —
+none over its limit.
+
+**Wall:** pad back on y = 0 (4 verts, dev 0); largest y of anything else is -0.179 (a leaf).
+
+**Attach:** `m063_attach` hero (0.161, 0.968, 6.4137) is the same build point (0.24, 0, 6.57); the origin moved with the
+new bbox. Offset (0.079, -0.968, 0.156). `K.check` ok on all five.
+
+**Colour (no key changed):**
+- front G median `#639418` (sheet `#67A416`; round 1 `#6DA020`): a little darker, from the extra shaded crease facets;
+- B `#593A1B`; P `#B19E91`;
+- part cluster G `#7BB218`.
+
+### Left over for the verifier
+
+- **Ruling needed on the sweep measure** (above). The plane-band count can't go under ~17 % at every step for any leaf
+  set. It peaks at 25.7 % (6 leaves, all from different clusters) at az -85. The whole-leaf and sliver counts meet ≤ 10 %
+  at every step, and no step shows a comb.
+- Front B 13.7 vs 18.9 and P 13.7 vs 8.8 on my masks; width tenths 4 / 6 narrow; side G 60 / P 25 (the pad's +X face in
+  studio shade, as round 1).
+- Rear views: wood 30-34 %, edge-on 11-12 % at az 135 / 180 (content only).
+- Not touched (round-1 minors): the pad's crack-2 slivers under 3 deg, the Fork union-seam slivers, the 0.11 strand gap
+  at z 1.75-2.0, and only one pad crack reading on the Pad part.
+
+## Ruling (main session, 2026-11-01): which edge-on measure binds
+
+The STAGES.md sweep rule counts whole leaves. For this model the binding measures over the front half (az −90…90, 5°
+steps) are: whole leaves with at least 75 % of their lobe facets within 15° of edge-on, and sliver leaves (projected
+area under 0.26 of face-on), each at most about 10 % of the leaf area at any step, with no two leaves of one cluster
+edge-on together. The share of leaves whose plane is within 15° of edge-on is reported, not a limit: flat leaves pass
+through that band for 30° of every 180°, so it averages about 1/6 of the leaf area whatever their facings. STAGES.md now
+says this. The round-2 verifier should still look at the ±25° and ±65° views by eye for combs of slivers.
+
+## Stage 7 verification (round 2)
+
+Fresh verifier, read-only: background Blender on `art/blender/assets/kit/wip/M063v.blend` (the kit file right after the
+main session's 063 build), nothing rebuilt or saved, `m063.build()` not called. My own scripts and renders are in
+`<temp>\...\scratchpad\v063\` (`va.py` audit / shells / winding / self-hits / slivers / UV; `vb.py` contact, chain,
+bury, wall, attach, leaf-to-stalk, cluster grouping; `vc.py` leaf edge-on sweep; `vd.py` ray grid; `ve.py` renders;
+`img.py` / `vf.py` the study's masks, shares and montages). Shells, clusters and leaf planes were taken from the mesh
+itself (connected shells, kind by material, clusters by leaf–stalk contact), not from the builder's records.
+
+**Verdict: FAIL (7/10).** Round 1's two blockers are fixed: no comb of slivers at any front-half azimuth (measured and by
+eye at ±25 / ±65), every cluster on three planes, and the LeafCluster part now has the cell's layout. Geometry, contact,
+wall, attach, UVs and the twisted rope all pass. But the fix made the leaves themselves read as **crumpled spiky stars**
+(top facets folded about 25° each way, 12 sharp outline points), where the sheet draws broad, smooth lobed leaves. They
+are about 70 % of the silhouette, so the difference shows in every view. Decision 6 says "no stars", and spec §9.4 and
+WorldModeling §18 warn against foliage that looks like crystals.
+
+### Measured (all re-measured here)
+
+| Check | Result |
+| --- | --- |
+| Tris | hero **2446** / 2500 (pad 140, wood 564 in 4 shells, 22 stalk / tendril shells 338, 27 leaves 1404); Pad 140, Segment 80, Fork 284, LeafCluster 188 |
+| Sizes | hero 2.399 × 1.936 × 7.344 (2.3 ± 0.2 / 2.0 ± 0.2 / 7.5 ± 0.3: in); Pad 1.488 × 0.981 × 1.750; Segment 0.555 × 0.312 × 1.819; Fork 1.435 × 0.312 × 1.724; LeafCluster 1.366 × 0.496 × 1.438 (W : H 0.95) |
+| Origin / transforms | bbox bottom centre (0, 0, 0) local on all five; rotation 0, scale 1; no modifiers, children or sockets; no custom normals |
+| Topology | every object: 0 non-manifold edges, 0 bowtie verts, 0 boundary / wire / loose, 0 zero-area, 0 n-gons, 0 dup verts, normals outward; per shell (54 hero shells) 0 winding errors, 0 self-intersections, every volume positive |
+| Slivers (corner < 3°) | hero / Pad 8 (worst 0.43°, the pad's crack strip), Fork 21 (worst 0.31°, union seams); Segment, LeafCluster 0 |
+| UV | one layer each; 0 overlaps, 0 flipped, min gap 0.016, border 0.008, density 1.0; conformal p95 1.0 (Fork 1.055) |
+| Materials | 29 slots on the hero (12 keys plus blend steps), matte; no emission |
+| Wall | pad back face: 4 verts on build y = 0 (deviation 0.0000); largest build y of anything else: leaf −0.179, stalk −0.524, wood −0.708; 0 verts past y 0.005 |
+| Attach | the pad back-face centre is build (0.24, 6.57) = `m063_attach_build`; `m063_attach` = build − `m063_offset` exactly |
+| Floating / chain | 0 floating, 0 unchained (chain ≤ 0.03 from the pad) in the hero and the LeafCluster part |
+| Buried | deepest: strand in stub 0.044, stalk in wood 0.032, stalk through its leaf 0.026, stalk in stalk 0.013; none over 0.05; no leaf touches another leaf, the pad or the wood |
+| Leaves on stalks | all 27 hero leaves and 3 part leaves touch a stalk (distance 0.000); the contact groups give 9 clusters (3,3,3,2,3,3,3,3,3) + the single S1 |
+| Leaf planes per cluster | closest pair 29.7–47.5° (none share a plane) |
+
+**Edge-on sweep** (72 azimuths, 5° steps; my leaf plane is the principal axis of each leaf's area vectors; binding front
+half |az| ≤ 90):
+
+| Measure | e 5 | e 0 | e 10 | e 20 |
+| --- | --- | --- | --- | --- |
+| whole leaves (≥ 75 % of top lobe facets within 15° of edge-on), worst step | 0 % (0 leaves) | 0 % | 0 % | 4.0 % (1) |
+| sliver leaves (projected < 0.26 of face-on), worst step | **9.0 %** (2 leaves, az 45) | 5.2 % (1) | 9.2 % (2, az −90) | 9.2 % (2) |
+| two of one cluster edge-on together (any measure) | never | never | never | never |
+| plane band (reported only, per the ruling) | 25.7 % at az −85 (6 leaves); mean 16.6 % | 25.7 % | 25.7 % | 29.7 % |
+| whole, counting top and bottom facets (my extra) | 16.2 % at az −75 (5 leaves) | 17.7 % | 18.2 % | 23.2 % |
+
+The binding measures pass, with the sliver count just under the limit (9.0 % against about 10 %). The whole-leaf count
+is 0 only because each leaf's top is pleated into facets tilted about 25° from its plane (mean tilt 19.5–25°, max 29–35°,
+on every leaf). The flat underside still turns edge-on (last row), so the pleat is what keeps the count at zero.
+
+**Ray grid** (e 5, step 0.025): wood % / edge-on leaf % / rims %: az 0 16.8 / 3.1 / 11.1; 45 17.0 / 3.0 / 11.1; 90
+20.8 / 9.1 / 15.0; 270 23.4 / 7.6 / 14.9; 315 20.8 / 8.2 / 13.4 (front five: in, 90 close at 9.1); −25 17.9 / 6.8; −65
+22.5 / 5.2; +25 17.4 / 5.0; +65 18.3 / 5.8. Rear (content only): 135 33.3 / 10.5; 180 32.6 / 12.5; 225 30.1 / 5.1.
+
+**Shares on my renders** (360 × 600, floor hidden, the study's masks; my sheet numbers reproduce the study's to ≤ 0.5):
+
+| View | W : H | G / B / P | Quarters G/B/P | Width per tenth | Tones D/M/Br/L |
+| --- | --- | --- | --- | --- | --- |
+| front ours (sheet) | 0.323 (0.306) | 70.1 / **13.4** / 16.5 (71.8 / 18.9 / 9.2) | 56/7/37, 76/18/7, 75/19/6, 81/12/7 (57/14/29, 77/23/0, 75/25/0, 88/12/0) | **.61** .82 .88 **.55** .93 **.58** .82 .92 .85 .71 (.87 .92 .81 .73 .88 .88 .65 .83 .69 .61) | 44 / 40 / 12 / 4 (37 / 39 / 19 / 4) |
+| side ours (sheet) | 0.273 (0.269) | **58.3** / 14.4 / **27.2** (67.1 / 19.8 / 13.1) | 30/7/63 … | | 64 / 35 / 2 / 0 (52 / 29 / 12 / 7) |
+
+The P in our lower quarters (6–7 %) is antialiased leaf edges against the plain background, so the true pad share is
+about 6 points lower than shown.
+
+**Colour (sheet → ours, medians):**
+- front green `#67A416` → `#629418` (h 84, not olive; a little darker), lit `#9AC812` → `#95BF1E`;
+- front wood `#744D1C` → `#57381A` (ΔR 29, darker than round 1's `#65411D`), lit `#CA852D` → `#9B662F`;
+- front pad `#AFA092` → `#B2A092` (match), side pad `#C8B09A` → `#867973` (the studio shade on the +X face, warm, R > G > B);
+- parts: sticks `#945C2D` / `#905A2C` → `#9A622C` / `#9B622C` (in); cluster `#6AA821` → `#7DB318` (ΔR 19); pad `#C8AF97` → `#AE9B8E`.
+
+### Views against the sheet (`C_orthos.png`, `C_spin_neg.png`, `C_spin_pos.png`, `C_obl.png`, `C_parts1/2.png`, `C_leaves.png`)
+
+- **Rope, pad, stub, tendrils:** pass. Two faceted strands twist down the whole length in every view. The pad sits at
+  the top, behind and to the right, with the tan cut end of the stub in its socket. Tendril curls and the tip cluster
+  are there.
+- **Between the eight views (−90, −65, −45, −25, +25, +45, +65, +90 at e 10; ±35, ±75 at e 20):** no comb of slivers.
+  Each cluster shows two or three fanned leaves, and at most one thin edge-on leaf shows per view (a junction leaf at
+  −90, the C3 side leaf at +65). Round 1's blocker 1 is fixed.
+- **Leaves: FAIL.** On the sheet (front cell, close-ups 1 and 2, the cluster cell) each leaf is a broad, smooth five-lobed
+  slab with a midrib fold and one lit and one shaded facet per lobe. Ours fold every top facet about 25° in alternating
+  directions and have 12 sharp outline points with two-point side-lobe ends, so each leaf reads as a crumpled origami
+  star. At sheet scale a cluster reads as a jagged starburst. This shows in `front_sheet`, every spin frame,
+  `cluster_cu.png` and `leafpart_cu.png`, and in `C_leaves.png` (sheet close-up 2 and the front crop beside ours).
+  Round 1's leaves (gentle folds only, `verify/big_front_sheet.png`) were smoother; the fix round's `CREASE = 0.12`
+  caused this.
+- **LeafCluster part:** the cell's layout now (stalk on top, side leaves out and up, centre leaf hanging below, W : H
+  0.90 rendered / 0.95 bbox against 0.97). Round 1's blocker 2 is fixed. Two differences remain: the side leaves are
+  spiky stars like the hero's, and the short cross-stalk shows as a green T-bar above the centre leaf.
+- **Pad / Segment / Fork parts:** the Fork matches. The Segment's bend is gentler than the cell's (W : H 0.29 against
+  0.48). The Pad part is taller than wide from (−15, 15) (0.82 against the cell's near-cube 1.16) and shows one lichen
+  crack against the cell's crack network.
+
+### Blockers (for a targeted round 3)
+
+1. **The leaves read as crumpled stars** (`leaf_pts` / `LEAF_UV` / `PLEAT` / `CREASE`; every hero leaf and the part).
+   - **Measured:** top facets tilted 19.5–25° on average from the leaf plane (up to 35°), with alternating
+     light and dark facets on every leaf; 12 outline points.
+   - **Target:** the sheet's leaf. That is a midrib fold plus one vein fold per side lobe: about 2 facets per lobe,
+     lit / shaded, broad and smooth. The outline should have 5 lobes with blunt tips, 8–10 points, and the side lobes
+     ending in one point each.
+   - **Where it shows:** `front_sheet` and every spin frame, `cluster_cu`, `leafpart_cu`, `C_leaves.png`.
+   - **Fix:**
+     - Replace the per-triangle pleat with folds along the veins only: each lobe is two planar facets meeting on its
+       vein, and the lobes are tilted out of plane by a cup of 10–15° rather than crumpled.
+     - Merge each blunt two-point side-lobe end into one point.
+     - Re-run `edge_sweep`. If the sliver count then goes over about 10 % at some front-half step, spread the leaf
+       facings (pitch as well as yaw) before adding crumple back. If that still can't meet the limit, report it to the
+       main session for a ruling: a smooth sheet-like leaf with a few edge-on slivers at some azimuths, or crumpled
+       leaves that pass the count. Don't trade the leaf read for the number.
+
+### Minors
+
+- **Front shares** (shows against the sheet, slightly):
+  - B is 13.4 against 18.9 (−5.5, tolerance ±5): the fanned leaves cover more of the rope;
+  - width tenths 1, 4 and 6 are narrow (0.61, 0.55, 0.58 against 0.87, 0.73, 0.88): there are gaps between clusters
+    at z ≈ 4.4–5.1 and 2.9–3.7.
+- **Side shares:** G 58.3 against 67.1, P about 21 against 13 (the pad's +X face in studio shade, as in round 1).
+  Accepted Studio note; it shows only as a darker pad face.
+- **Wood:** the front median `#57381A` against the sheet's `#744D1C` (ΔR 29). The lit quartile is Δ ≈ 47. The rope
+  reads a deeper brown than the sheet's (shows a little; still warm, not red).
+- **Part colour:** the cluster green `#7DB318` against `#6AA821` (ΔR 19; numeric only).
+- **Slivers under 3°:**
+  - Pad: 8, on the crack strip;
+  - Fork: 21, on the union seams;
+  - numeric only.
+- **LeafCluster part:** the cross-stalk shows as a T-bar above the centre leaf (shows against the cell).
+- **Segment part:** its bend is gentler than the cell's (W : H 0.29 against 0.48; shows a little).
+- **Pad part:** one crack against the cell's network (shows a little); the round-1 minor is unchanged.
+- **Ray grid at az 90:** edge-on 9.1 %, at the limit (in).
+- **Sweep at az 45:** sliver 9.0 % (2 leaves), at the limit (in).
+- **Rear views (content only):** wood 30–33 %, edge-on up to 12.5 % at az 180, with a few edge-on leaves from behind.
+  The wall hides these views.
+
+## Ruling (main session, 2026-11-01): targeted round 3
+
+Round 2 failed on one blocker: the leaves read as crumpled spiky stars, where the sheet draws broad, smooth five-lobed
+leaves. Leaves are about 70 % of the silhouette, so this is the model's defining feature reading unlike the sheet, and a
+targeted third round fixes only that blocker (plus the LeafCluster T-bar minor if it is cheap).
+
+- **Smooth leaves come first.** Fold along the veins only: one lit and one shaded planar facet per lobe, a midrib fold and
+  a 10–15° cup; 8–10 outline points with one point per side lobe. No pleats between veins.
+- **Keep the sweep honest by spreading facings, not by crumpling:** vary each leaf's pitch as well as its yaw.
+- **Sweep limits for this round:** whole-leaf edge-on stays at most about 10 %. Sliver leaves may reach 15 % of the leaf
+  area at the worst front-half step, but never two leaves of one cluster together, and the ±25° / ±65° views must show
+  no combs of slivers by eye.
+
+## Paused (fix round 3, 2026-11-01)
+
+Paused on request, mid-round. Work file `art/blender/assets/kit/wip/M063.blend` saved after the last good build
+(`build()`: `problems: []`). Scratch scripts (leaf harness, facing search `fopt.py`) in `<temp>\...\scratchpad\r3\`.
+
+**Done (in `m063.py`):**
+- **Leaf rebuilt** (blocker 1): the pleat (`PLEAT`, `CREASE`, raised vein verts, 12 points) is gone. New leaf: 10 outline
+  points (`LEAF_RIGHT`, `LEAF_HEART`): main tip about 83 deg, side lobes one point each about 67 deg, small basal lobes,
+  shallow notches. Top and bottom are fans from one hub on the midrib, so each lobe is two planar facets meeting on its
+  vein (lit / shaded), the midrib a fold. A shallow dome `DOME = 12` deg plus notch drop `DROP = 0.03` x L (veins ridges,
+  notch spokes valleys). Slab 0.055 thick, 40 tris per leaf (was 52). Tones one per lobe, half a band apart.
+- **Facet tilt** (new `facet_tilt` in `edge_sweep`): mean 14.0 deg from the leaf plane on every leaf (round 2: 19.5-25),
+  max facet 19.6. Outline points 10.
+- **Facings re-searched** (`CLUSTERS` naz / fan / croll / pitch): pitch now -10 ... 16 per cluster (leaf normals
+  -10 ... 25 deg), yaw 187 ... 358, none toward the wall (max normal y -0.034).
+- **Sweep limits** per the round-3 ruling (`SWEEP_LIMITS`: whole <= 10 %, sliver <= 15 %, `comb_edge`: never two of one
+  cluster). Front half, e 5: whole worst **9.6 %** (3 leaves, az -35); sliver worst **0 %**; comb_edge 1; plane band
+  (reported) 23.0 % worst, mean 16.7 %. Rear (content only): whole 14.7 %.
+- **Ray grid** (wood % / edge-on %): 0: 20.9 / 6.0; 45: 20.1 / 3.0; 90: 26.7 / 6.7; 270: 21.4 / 5.4; 315: 22.1 / 4.4;
+  rear 135: 32.2 / 10.0, 180: 32.3 / 6.5, 225: 27.6 / 6.3.
+- **LeafCluster T-bar minor**: the straight cross-stalk is now a short V-stalk (hub -> each side-leaf notch,
+  `CLUS_JOIN = 0.10` under the hub) hidden by the centre leaf (`CLUS_DROP = 0.14`, `CLUS_TOP = 0.65`). Part 1.50 x 0.37 x
+  1.52 (W : H 0.99), 160 tris.
+- **Checks**: hero 2122 tris (27 leaves 1080), 2.40 x 1.82 x 7.29; parts 140 / 80 / 284 / 160. All objects: 0
+  non-manifold / bowtie / boundary / wire / loose / zero-area / n-gon, normals outward, 0 winding, 0 self-hits; 0 floating,
+  0 unchained, 0 clash; bury worst spur 0.049, strand 0.044, tendril 0.031, stalk 0.030; wall: leaf max y -0.0109, pad
+  back on y = 0; UV 0 overlaps. Renders in `art/blender/renders/models/M063/` are from this build; mid views +-25 / +-65
+  (scratch) show no combs of slivers.
+
+**Half done / open:**
+- Leaf look: smooth and five-lobed now, but with one point per lobe it reads somewhat like an ivy leaf (pointed lobes)
+  rather than the sheet's rounded fig lobes. Blunter outlines tried (scratch `v5` / `v7`) lost the lobes; kept the current.
+  Needs a side-by-side look against close-up 2 and the cluster cell.
+- Colour not re-measured with the study's masks: on a simple green mask the front median moved from `#6EA121` (committed
+  render) to `#5D8B19` (darker: the dome's shaded facets and the per-lobe tones). Hero height 7.29 (floor 7.2).
+
+**Next:** compare `cluster_cu` / `leafpart_cu` / spin with the sheet; if the leaves read too dark, raise the lobe tones
+(`leaf_keys` positions) and re-measure front G with the study's masks; then a fresh verifier (round 3).
