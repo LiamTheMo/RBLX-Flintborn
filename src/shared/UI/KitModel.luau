@@ -212,11 +212,12 @@ KitModel.ROLES = {
 	["ring.fill"] = { sprite = "lk_ring_full", material = "fill", fill = "xp", edge = false },
 	["toggle.off"] = { sprite = "lk_toggle_off", material = "paper" },
 	["toggle.on"] = { sprite = "lk_toggle_on", material = "fill", fill = "toggleOn" },
+	-- Every slider has one look (Kit.Slider): the dark track, the yellow fill
+	-- and the square parchment knob with leather corners, drawn whole at its
+	-- own aspect (not 9-sliced: its rim and corners never squash).
 	["slider.track"] = { sprite = "lk_bar_track", material = "track" },
-	["slider.trackPaper"] = { sprite = "lk_slider_track", material = "paper" },
 	["slider.fill"] = { sprite = "lk_bar_fill_yellow", material = "fill", fill = "xp" },
-	["slider.knob"] = { sprite = "lk_button_paper_small_normal", material = "paper" },
-	["slider.knobRound"] = { sprite = "lk_slider_knob", material = "dot", fill = "gold" },
+	["slider.knob"] = { sprite = "lk_button_square_paper", material = "paper" },
 	["field.value"] = { sprite = "lk_button_paper_small_normal", material = "paper" },
 	["dropdown.field"] = { sprite = "lk_dropdown", material = "paper" },
 	["dropdown.list"] = { sprite = "lk_tooltip", material = "paper" },

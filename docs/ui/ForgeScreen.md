@@ -285,3 +285,11 @@ sourceId?, nonce)`. Counts come from the vault only (`ForgeRules.Owned`).
 - **Errors** (L8): whatever fails after a request, the window leaves its busy
   state.
 - QUANTITY: see the table (D4, server-validated batch).
+
+## Owner feedback round (header icon)
+
+- The header shows the Forge tile's anvil (`lk_icon_anvil`, the lobby HUD's
+  Forge button), fitted in the icon box (about 107 × 94), instead of the
+  sheet-17 anvil with a hammer, so the window and the button that opens it
+  show one icon. The Journal's Crafting mastery and Craft quest illustration
+  use the same anvil.

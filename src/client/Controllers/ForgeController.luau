@@ -122,7 +122,9 @@ local function build()
 		name = "FlintbornForge",
 		title = "Ancestral Forge",
 		subtitle = "Turn raw materials into tools for the island.",
-		icon = "anvil_hammer",
+		-- The Forge tile's anvil (LobbyHudModel.TILES), so the window and the
+		-- button that opens it show one icon.
+		icon = "anvil",
 		categories = categories,
 		parent = player:WaitForChild("PlayerGui"),
 		onForge = onForge,

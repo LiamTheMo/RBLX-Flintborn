@@ -483,7 +483,8 @@ size or a screen passes one (`Core.TextFloor`); a smaller size is raised to it.
 
 Screens use these defaults unless their spec measured something else (the
 built grids: Inventory slots 91 × 99 at a 99.6 × 107.3 pitch; HUD tiles
-88 × 84 at 102 × 94; HUD hotbar pitch 96.4; Play slots 71 × 77 at 82).
+88 × 84 at 102 × 94; HUD hotbar slots 89 × 89 at a 96.4 pitch; Play slots
+77 × 77 at 85). Hotbar and loadout slots are always square.
 
 ### 5.5 Panels and insets
 
@@ -593,7 +594,7 @@ pressed > open > focused > hover > empty > normal. Force any state with the
 | Ring | Circular progress (sheet 19) | — | value | [§11](KIT.md#11-polish-round) |
 | Checkbox | On/off with a label and description | `box`, `gold`, `tile`, `ring` | + checked | [Checkbox](KIT.md#checkbox) |
 | Toggle | A bare on/off switch | — | + on | [Toggle](KIT.md#toggle) |
-| Slider | A number in a range | knob `plate` / `round`; track `dark` / `paper`; value box | + dragging | [Slider](KIT.md#slider) |
+| Slider | A number in a range | one look everywhere: dark track, yellow fill, parchment knob with leather corners (drawn at its own aspect); value box | + dragging | [Slider](KIT.md#slider) |
 | Dropdown | One choice of a short list | `openUp` | + open | [Dropdown](KIT.md#dropdown) |
 | SearchBox / TextField | Filtering lists / typing a code | with or without clear ✕ | normal, focused, disabled | [SearchBox](KIT.md#searchbox) |
 | Stepper | Quantities | paper or leather buttons; `allLabel` | − / + disable at limits | [Stepper](KIT.md#stepper) |
