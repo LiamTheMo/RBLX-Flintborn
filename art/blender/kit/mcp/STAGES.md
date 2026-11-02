@@ -25,7 +25,8 @@ running session holds; check with `Get-CimInstance Win32_Process -Filter "Name='
 same tris, sizes and renders as the GUI, mean pixel difference 0.02/255.
 
 ```bash
-PY=C:/Users/Orang/.local/bin/python3.14.exe
+PY=C:/Users/Orang/.local/bin/python3.14.exe   # or Blender's own: "<blender dir>/5.2/python/bin/python.exe"
+export BLENDER_PATH=...                         # if blender.exe is not at D:/Steam/steamapps/common/Blender/
 $PY art/blender/kit/mcp/bgmcp.py start <port> art/blender/assets/kit/wip/MNNN.blend   # once, at the start
 $PY art/blender/kit/mcp/bgmcp.py run <port> <code.py>       # or `run <port> -` with a heredoc; prints the JSON response
 $PY art/blender/kit/mcp/bgmcp.py stop <port>                # when your stages are done
@@ -51,7 +52,7 @@ session (the GUI or a background one) is driven by only one agent at a time.
     `import importlib, kit_models, mNNN; importlib.reload(kit_models); importlib.reload(mNNN); mNNN.build()`.
   - Never hand-edit meshes that the builder would overwrite.
   - Load the helpers once if `NS` is empty:
-    `import sys; sys.path.insert(0, "D:/Projects/Roblox/RBLX-Flintborn/art/blender/kit/mcp"); import kit_mcp; kit_mcp.install()`.
+    `import sys; sys.path.insert(0, "<repo>/art/blender/kit/mcp"); import kit_mcp; kit_mcp.install()`, where `<repo>` is this checkout's root.
 - **Shared tools** live in `kit_models.py` (M) and `kit_mcp.py` (K). Read them before writing new code.
   - M: `mk`, `union_loose`, `carve`, `merge_in`, `finish`, `audit`, `views`, `display`, `sample`, `raw_sample`, `drop_specks`.
   - K: `hull_rock`, `blend`, `mix_key`, `noise_field`, `texture`, `refine`, `set_colour`, `calibrate`, `socket`, `check`.
@@ -64,6 +65,12 @@ session (the GUI or a background one) is driven by only one agent at a time.
     - bare core at most about 15–30 % of the visible foliage;
     - edge-on **flat** cards at most 10 % (domed puffs and lumps always have an edge-on rim, so judge those by eye: no flaps, fins or slivers);
     - the skeleton showing where the sheet shows it.
+  - **Check between the eight views too.** Leaves can be aimed at the gaps between the eight test angles and still turn edge-on there; 063's clusters faced exactly between them and showed combs of slivers at ±25° and ±65°.
+    - Sweep the azimuth in 5° steps and count whole leaves within 15° of edge-on: at most about 10 % of the leaf area at any step.
+      - A **whole leaf** is edge-on when at least 75 % of its lobe facets are within 15° of edge-on, or when its projected area falls under about 0.26 of its face-on area (a sliver). Both counts bind.
+      - The share of leaves whose mean plane is within 15° of edge-on is reported only, not a limit: for flat leaves at any facings it averages about 1/6 of the leaf area (ruling on 063, 2026-11-01).
+    - Pixel shares hide edge-on leaves, because they cover few pixels.
+    - Leaves in one cluster must not share a plane. Give each its own facing.
   - Clump and rosette **parts** must match their cells' proportions (W : H). They must not be flat tiered tents or single cones.
 - **Booleans.** Exact booleans can crash Blender (a 2026-10-28 crash was in `meshintersect::find_patches`). Feed them clean manifold inputs with no coplanar or coincident faces, add pieces one at a time, and save between risky steps. Run unions with the object at the origin, not at its display slot (x ≈ 500+): float32 matrix error there gave 030 hundreds of self-intersections. `M.union_loose` welds within 0.01, so use a merge-0 union for fine parts (`m021._union_fine`).
 - **Look at the renders.** `build()` writes `art/blender/renders/models/MNNN/` (single views plus `MNNN_views.png`). Open them with the Read tool and compare them with the reference, view by view.
