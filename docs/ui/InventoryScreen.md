@@ -116,7 +116,7 @@ the window's top-left.
 | Category.All (active) | CategoryList | 267, 386, 219, 54 (body to x 475, arrow tip at 486, 412) | 24, 236 | Parchment.Active, 1–2 px outline, rivets, 3 px lighter inner rim | grid icon 283, 397, 33, 33; label "All" x 340, cap 406–420 | **kit 10** category arrow tab (1283, 261, 328 × 97, grid icon baked) ; kit 02 arrow plaque (653, 547, 278 × 67) and kit 14 parchment arrow tab (698, 848, 252 × 98) are alternatives |
 | Category.Tools | CategoryList | row centre y 472 | — | no fill | hammer icon 283, 456, 35, 36; label x 340, cap 465–479 | icon: kit 10 detail-card hammer glyph (≈ 815–855, 555–590) |
 | Category.Materials | CategoryList | centre y 537 | — | — | rocks icon 281, 520, 37, 36; label cap 531–544 | icon not in kit (stone-pile glyph) |
-| Category.Food | CategoryList | centre y 601 | — | — | apple icon 283, 583, 33, 37; label cap 593–609 | icon not in kit |
+| Category.Consumables (mockup "Food") | CategoryList | centre y 601 | — | — | apple icon 283, 583, 33, 37; label cap 593–609 | icon not in kit |
 | Category.Plants | CategoryList | centre y 666 | — | — | leaf icon 286, 648, 29, 37; label cap 658–673 | icon not in kit |
 | Category.Misc | CategoryList | centre y 730 | — | — | sack icon 282, 711, 35, 38; label cap 723–737 | icon not in kit |
 | Category rules | CategoryList | x 270–472, y 504, 569, 633, 697; 2 px | — | Rule.Soft; under Tools, Materials, Food, Plants (none under All or Misc) | — | native Frame (or kit 14 plain divider) |
@@ -318,8 +318,9 @@ Each has the default that will be used if unanswered.
 
 - Merriweather's lowercase is ~10 % taller than the mockup's at equal cap
   height; titles may be lighter if only Bold is used.
-- Kit slots are square; the mockup's are 92 × 99, so the slot art is 9-sliced
-  (rivets stay in the corners).
+- Slots are square (owner feedback round): 91 × 91 at a 99.6 pitch both ways,
+  like the hotbar's, where the mockup's are 92 × 99. The count sits at the
+  slot's bottom right as on the hotbar slots.
 - The mockup's gentle ground shadow under the detail icon is part of the item art
   (or a separate soft ellipse image); no native equivalent.
 
@@ -334,3 +335,39 @@ Each has the default that will be used if unanswered.
   gamepad, selection moves to the first slot rather than staying on ✕.
 - Items without kit art (bows, swords, daggers, armour) show the Kit's neutral
   kind glyph; their names are in the tooltip and detail card (ITEM_ART.md).
+
+## Owner feedback round: everything under All, square slots, Consumables
+
+- **Everything under All** (`src/shared/UI/InventoryModel.luau`, specs in
+  `tests/luau/inventory_model.spec.luau`). The first tab shows everything the
+  player has, so its All category lists every item of every kind:
+  - lobby, Backpack tab: BACKPACK n/50, then VAULT ITEMS n/cap and VAULT
+    MATERIALS (each cell keeps its own id, so STORE and TAKE act as before);
+    the Vault tab shows the vault alone (ITEMS n/cap, MATERIALS);
+  - run, Backpack tab: BACKPACK n/50, then HOTBAR (keys) and ARMOUR (worn,
+    captioned); the Equipped tab shows the hotbar and armour alone.
+  Items come first and empty slots only fill out the last row (a whole empty
+  row when the items end one, never past the capacity), so no section hides
+  below a wall of empty slots (the vault's materials used to sit under 21
+  empty item slots). While a category or search filters, sections with no
+  match are left out and one "Nothing here matches." line says when nothing
+  does.
+- **Square slots**: `InventoryWindow.CELL` 91 × 91, `PITCH` 99.6 × 99.6. The
+  `inventory_phone` scene checks every slot rect is square; measured in
+  `inventory_vault.png` the visible outline is 92 × 92 screen px (w/h 1.000).
+- **Consumables**: the category once called Food reads Consumables
+  (`ItemInfo.CATEGORIES`; the id is the label and is never saved). It holds
+  food, medicine and draughts. The hunger stat keeps its name (the Food bar and
+  the "Food +n%" stat row).
+- **Phones and touch tablets** (`Kit.Scale.IsSmallTouch`; rebuilt when the form
+  factor changes): the category rows draw a 30 px icon at x 8 and the label
+  from x 46 to 22 px before the arrow tip, so "Consumables" stays whole at the
+  phone text floor; the detail card draws a 120 × 120 picture at (89, 16), the
+  name at y 140 and a description box from y 178 down to the rule, and its stat
+  rows drop their icons so "Harvest Power" stays whole. Desktop keeps the
+  mockup's places.
+- Scene `inventory_phone` (844 × 390 and 667 × 375, touch only, top bar 58 px):
+  1 the Backpack tab (everything owned), 2 the Vault tab with a material
+  chosen, 3 Consumables on the smaller phone; prints the scale and smallest
+  text and checks square slots and whole category labels. `inventory_world`
+  page 1 is now the Backpack tab with the hotbar and armour under the backpack.

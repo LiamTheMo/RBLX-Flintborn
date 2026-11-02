@@ -1,7 +1,9 @@
 -- Lobby vault and lobby backpack (GDD §10.3, §25.2, §53) in the Inventory window
 -- (Hud/Screens/InventoryWindow, docs/ui/InventoryScreen.md). The Backpack tile,
 -- the Backpack key (B by default, Y on a gamepad, GDD §46) or Open(tab) opens
--- it on the Backpack or the Vault tab. Choose a slot to see it in the detail
+-- it on the Backpack tab (everything the player owns: the lobby backpack, then
+-- the vault's items and materials) or the Vault tab (the vault alone;
+-- InventoryModel.LobbySections). Choose a slot to see it in the detail
 -- card: STORE puts a backpack item in the vault, TAKE brings a vault entry out
 -- (a vault material in the amount picked with the stepper) and it deploys with
 -- the backpack on the next Play. STORE ALL vaults the whole backpack; SORT cycles
@@ -12,6 +14,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local ItemCatalog = require(ReplicatedStorage.Shared.Items.ItemCatalog)
+local InventoryModel = require(ReplicatedStorage.Shared.UI.InventoryModel)
 local ItemInfo = require(ReplicatedStorage.Shared.Items.ItemInfo)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
@@ -100,28 +103,7 @@ local function sorted(cells)
 end
 
 local function cellsOf(list, prefix: string)
-	local cells = {}
-	for index, entry in list do
-		table.insert(cells, {
-			id = prefix .. (if prefix == "m" then entry.catalogId else index),
-			name = nameOf(entry),
-			item = {
-				catalogId = entry.catalogId,
-				quantity = entry.quantity,
-				permanent = entry.permanent,
-				qualityRoll = entry.qualityRoll,
-			},
-		})
-	end
-	return sorted(cells)
-end
-
--- Empty slots up to `capacity` after the filled ones.
-local function padded(cells, capacity: number, prefix: string)
-	for index = #cells + 1, capacity do
-		table.insert(cells, { id = prefix .. index })
-	end
-	return cells
+	return sorted(InventoryModel.LobbyCells(list, prefix))
 end
 
 local function vaultFull(): boolean
@@ -135,7 +117,9 @@ local function firstId(): string?
 	end
 	if tab == "Backpack" then
 		local cells = cellsOf(view.backpack, "b")
-		return cells[1] and cells[1].id
+		if cells[1] then
+			return cells[1].id
+		end
 	end
 	local cells = cellsOf(view.items, "i")
 	if cells[1] == nil then
@@ -152,7 +136,7 @@ local function showDetail()
 	if choice == nil then
 		window:SetDetail({
 			hint = if tab == "Backpack"
-				then "Your lobby backpack goes with you on Play. Choose an item to store it in your vault."
+				then "Everything you own. Choose an item to store it in your vault or take it out."
 				else "Your vault keeps items safe. Choose one to take it into your backpack.",
 		})
 		return
@@ -186,31 +170,13 @@ function render()
 	window:SelectTab(tab)
 	window:SetTabLabel("Vault", ("Vault %d/%d"):format(#view.items, view.itemCapacity))
 	if tab == "Backpack" then
-		window:SetSections({
-			{
-				id = "backpack",
-				cells = padded(cellsOf(view.backpack, "b"), view.backpackCapacity, "be"),
-				emptyText = "Your lobby backpack is empty.",
-			},
-		})
+		window:SetSections(InventoryModel.LobbySections(view, tab, sorted))
 		window:SetToolbar({
 			{ id = "sort", label = "Sort: " .. VaultController.SORTS[sortIndex] },
 			{ id = "storeAll", label = "Store All", enabled = #view.backpack > 0 },
 		})
 	else
-		window:SetSections({
-			{
-				id = "items",
-				title = ("Items %d/%d"):format(#view.items, view.itemCapacity),
-				cells = padded(cellsOf(view.items, "i"), view.itemCapacity, "ie"),
-			},
-			{
-				id = "materials",
-				title = "Materials",
-				cells = cellsOf(view.materials, "m"),
-				emptyText = "No materials stored yet.",
-			},
-		})
+		window:SetSections(InventoryModel.LobbySections(view, tab, sorted))
 		local tools = { { id = "sort", label = "Sort: " .. VaultController.SORTS[sortIndex] } }
 		if vaultFull() then
 			-- Vault upgrades are sold in the Market's Offers tab.

@@ -16,7 +16,7 @@
 -- tab, else the first enabled button (SetDefaultSelection overrides it).
 --
 --   local window = ListWindow.new(playerGui, { name = "FlintbornMarket", title = "Market", icon = "market",
---       tabs = { { id = "Shop", label = "Shop", icon = "market" } }, onTab = show, onClose = close })
+--       tabs = { { id = "Buy", label = "Buy", icon = "market" } }, onTab = show, onClose = close })
 --   window:Begin()
 --   window:Section("Tools")
 --   window:Row({ key = "Axe", title = "Stone Axe", icon = "StoneAxe", value = "40", valueIcon = "coin",
@@ -24,7 +24,9 @@
 --   window:Finish()
 
 local GuiService = game:GetService("GuiService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+local HudModel = require(ReplicatedStorage.Shared.UI.HudModel)
 local Kit = require(script.Parent.Kit)
 
 local ListWindow = {}
@@ -793,6 +795,162 @@ function ListWindow:Confirm(text: string, yes: string, delay: number, onYes, opt
 			end)
 		end,
 	})
+	self.confirm = handle
+	return handle
+end
+
+ListWindow.QUANTITY_SIZE = { 620, 480 }
+
+-- The quantity body's layout, design px in the dialog body (ConfirmDialog's
+-- body box: 44 in from the sides, 104 down). The stepper's and the slider's
+-- touch pads (44 screen px each at a phone's dialog scale) must not overlap,
+-- hence the gap between them.
+local QTY = { icon = 64, stepperY = 74, stepperW = 330, stepperH = 48, sliderY = 174, sliderH = 34, totalY = 222 }
+
+-- Asks how many before a purchase or a sale: the item's picture and name, a
+-- line under it (the price each, what is owned), a stepper (− value + Max) and
+-- a slider kept in step, and the live total with its coin, over Cancel and the
+-- confirm button. opts: title, itemId? (catalogId: its art) / glyph? (icon id),
+-- name, detail?, min (1), max, value (1), each (price per one), currency
+-- ("coins" | "gems"), confirmLabel, onConfirm(quantity). The quantity is
+-- clamped to min..max here; the server checks it again. Returns the handle.
+function ListWindow:Quantity(opts)
+	self:HideConfirm()
+	local min = opts.min or 1
+	local max = math.max(min, math.floor(opts.max or min))
+	local quantity = math.clamp(math.floor(opts.value or min), min, max)
+	local each = opts.each or 0
+	local handle
+	local stepper, slider, totalLabel, totalIcon, totalText
+	local bodyW = 0
+	local function layoutTotal()
+		local value = HudModel.Thousands(each * quantity)
+		totalText:SetText(value)
+		local tw = Kit.Text.Width("Total", "rowTitle", 20)
+		local vw = Kit.Text.Width(value, "value", 22)
+		local group = tw + 14 + 30 + 6 + vw
+		local x = math.max(0, (bodyW - group) / 2)
+		totalLabel.root.Position = UDim2.fromOffset(x, QTY.totalY)
+		totalLabel.root.Size = UDim2.fromOffset(tw + 4, 40)
+		totalIcon.root.Position = UDim2.fromOffset(x + tw + 14, QTY.totalY + 5)
+		totalText.root.Position = UDim2.fromOffset(x + tw + 14 + 36, QTY.totalY)
+		totalText.root.Size = UDim2.fromOffset(math.max(40, vw + 8), 40)
+	end
+	local function set(value: number, from: string?)
+		quantity = math.clamp(math.floor(value + 0.5), min, max)
+		if from ~= "stepper" then
+			stepper:SetValue(quantity)
+		end
+		if from ~= "slider" then
+			slider:SetValue(quantity)
+		end
+		layoutTotal()
+	end
+	local function build(body: Frame, bw: number, _bh: number)
+		bodyW = bw
+		local iconRect = { 0, 0, QTY.icon, QTY.icon }
+		if opts.itemId then
+			Kit.ItemIcon.new(
+				body,
+				{ name = "Icon", rect = iconRect, itemId = opts.itemId, icon = opts.glyph, zIndex = Z + 20 }
+			)
+		elseif opts.glyph then
+			Kit.Icon.new(body, { name = "Icon", rect = iconRect, icon = opts.glyph, zIndex = Z + 20 })
+		end
+		local textX = QTY.icon + 16
+		Kit.Text.new(body, {
+			name = "Name",
+			rect = { textX, 2, bw - textX, 30 },
+			text = opts.name or "",
+			role = "rowTitle",
+			textSize = 20,
+			scaled = true,
+			zIndex = Z + 20,
+		})
+		if opts.detail then
+			Kit.Text.new(body, {
+				name = "Detail",
+				rect = { textX, 34, bw - textX, 28 },
+				text = opts.detail,
+				role = "bodySoft",
+				textSize = 16,
+				scaled = true,
+				zIndex = Z + 20,
+			})
+		end
+		stepper = Kit.Stepper.new(body, {
+			name = "Quantity",
+			rect = { (bw - QTY.stepperW) / 2, QTY.stepperY, QTY.stepperW, QTY.stepperH },
+			min = min,
+			max = max,
+			value = quantity,
+			allLabel = "Max",
+			zIndex = Z + 20,
+			onChange = function(value)
+				set(value, "stepper")
+			end,
+		})
+		slider = Kit.Slider.new(body, {
+			name = "Slider",
+			rect = { 12, QTY.sliderY, bw - 24, QTY.sliderH },
+			min = min,
+			max = max,
+			step = 1,
+			value = quantity,
+			valueBox = false,
+			zIndex = Z + 20,
+			onChange = function(value)
+				set(value, "slider")
+			end,
+		})
+		-- One to choose from: nothing to drag.
+		slider:SetEnabled(max > min)
+		totalLabel = Kit.Text.new(body, {
+			name = "TotalLabel",
+			rect = { 0, QTY.totalY, 80, 40 },
+			text = "Total",
+			role = "rowTitle",
+			textSize = 20,
+			zIndex = Z + 20,
+		})
+		totalIcon = Kit.Icon.new(body, {
+			name = "TotalIcon",
+			rect = { 0, QTY.totalY + 5, 30, 30 },
+			icon = if opts.currency == "gems" then "gem" else "coin",
+			zIndex = Z + 20,
+		})
+		totalText = Kit.Text.new(body, {
+			name = "Total",
+			rect = { 0, QTY.totalY, 80, 40 },
+			text = "",
+			role = "value",
+			textSize = 22,
+			zIndex = Z + 20,
+		})
+		layoutTotal()
+	end
+	handle = Kit.ConfirmDialog.Show({
+		title = opts.title or opts.confirmLabel or "",
+		build = build,
+		size = ListWindow.QUANTITY_SIZE,
+		confirmLabel = opts.confirmLabel or "Confirm",
+		onConfirm = function(dialog)
+			dialog:SetBusy(true)
+			local chosen = quantity
+			task.spawn(function()
+				opts.onConfirm(chosen)
+				handle.Close()
+			end)
+		end,
+	})
+	handle.Quantity = function(): number
+		return quantity
+	end
+	handle.SetQuantity = function(value: number)
+		set(value)
+	end
+	handle.stepper = stepper
+	handle.slider = slider
 	self.confirm = handle
 	return handle
 end

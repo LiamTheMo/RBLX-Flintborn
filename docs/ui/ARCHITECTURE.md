@@ -615,7 +615,7 @@ calls `__dump`, once per state page.
 |---|---|---|
 | `kit_gallery.luau` | Kit builder | one page per family: buttons and icon buttons × every state; tabs; slots (all states, counts, badges, lock); bars (every fill at 0/50/100, stat frames); controls (checkbox, toggle, slider, dropdown open, search, stepper, keycaps); rows, player rows, badges, pills; toast, dialog, tooltip; window header variants; page 9 the sheet-21 Play art (D26); plus fallback pages (`--uploaded-only`) and `kit_gallery_failed` |
 | `lobby_hud`, `lobby_hud_phone` (844 × 390), `lobby_hud_wide` (2560 × 1080) | S1 | invites present; maintenance |
-| `inventory_backpack`, `inventory_vault`, `inventory_world`, `inventory_flow` | S2 | each category; selected item; material stepper; full vault |
+| `inventory_backpack`, `inventory_vault`, `inventory_world`, `inventory_flow`, `inventory_phone` | S2 | each category; selected item; material stepper; full vault |
 | `settings` (each tab), `settings_flow` | S3 | dirty state; capturing key |
 | `party`, `party_states`, `party_phone`, `party_flow` | S4 | Invited; member view (no Ready since D24) |
 | `play`, `play_states`, `play_phone` (844 × 390 and 2000 × 924), `play_flow` | S5 | busy; nil preview; member; deploy check |
@@ -749,7 +749,7 @@ earlier section or a screen spec, this section wins.
 | D8 | Dim overlay | Measured by three analysts: near-black at about 68 % opacity. Veil color `#050403`, `BackgroundTransparency 0.30` (fits 0.29–0.32 across all seven mockups; replaces 0.42 in §1.3). The HUD behind a window stays where it is in 01_hud; the shifted hotbar in the window mockups is ignored. |
 | D9 | Blur | On for Medium and High graphics, Size 8; never in captures. |
 | D10 | Item descriptions | Short authored descriptions live in the UI layer (`ItemInfo`, owned by S2), not in gameplay modules; items without one show their derived line. |
-| D11 | Inventory categories | All, Tools, Materials, Food, Plants (only if `ItemInfo` can classify plant items reliably from catalog data, otherwise dropped), Misc. |
+| D11 | Inventory categories | All, Tools, Materials, Consumables (renamed from Food by the owner; food, medicine and draughts), Plants (only if `ItemInfo` can classify plant items reliably from catalog data, otherwise dropped), Misc. All on the first tab (Backpack) shows everything the player has: in the lobby the backpack and the whole vault, in a run the backpack, hotbar and worn armour (`InventoryModel`). |
 | D12 | Journal side tabs | Book = quests; trophy = progression (the Progress content, read-only view); map pin = the island map; party = opens the Party window. |
 | D13 | Fonts | Merriweather Heavy for titles (Bold fallback), Merriweather Bold for labels and headings, Merriweather Regular for row labels and descriptions; Patrick Hand for the Forge subtitle and other handwritten notes. Forge title uses fake small caps via size steps. |
 | D14 | UI sounds | Silent unless the repo already has UI sound ids; the Kit keeps the hook. |

@@ -160,7 +160,7 @@ the specs and every other section. Full text:
 | D8 | Dim overlay | Veil `#050403` at transparency 0.30; the HUD stays where M01 has it | §5.6 |
 | D9 | Blur | On for Medium and High graphics, size 8; never in captures | §7 |
 | D10 | Item descriptions | Short authored lines live in `ItemInfo` (UI layer); otherwise the derived line | [InventoryScreen](InventoryScreen.md) |
-| D11 | Inventory categories | All, Tools, Materials, Food, Plants (only if classifiable from catalog data), Misc | [InventoryScreen](InventoryScreen.md) |
+| D11 | Inventory categories | All, Tools, Materials, Consumables (once "Food"), Plants (only if classifiable from catalog data), Misc; All on the first tab shows everything the player has | [InventoryScreen](InventoryScreen.md) |
 | D12 | Journal side tabs | Book quests, trophy progression, map pin island map, party opens Party | [JournalScreen](JournalScreen.md) |
 | D13 | Fonts | Merriweather Heavy titles (Bold fallback), Bold labels, Regular body; Patrick Hand for handwriting; Forge title in fake small caps | §4 |
 | D14 | UI sounds | Silent until the owner supplies ids; the Kit keeps the hook | §7 |
@@ -482,7 +482,7 @@ banner header.
 size or a screen passes one (`Core.TextFloor`); a smaller size is raised to it.
 
 Screens use these defaults unless their spec measured something else (the
-built grids: Inventory slots 91 × 99 at a 99.6 × 107.3 pitch; HUD tiles
+built grids: Inventory slots 91 × 91 (square) at a 99.6 pitch; HUD tiles
 88 × 84 at 102 × 94; HUD hotbar slots 89 × 89 at a 96.4 pitch; Play slots
 77 × 77 at 85). Hotbar and loadout slots are always square.
 
@@ -950,7 +950,7 @@ Captures are written to `art/ui/captures/` (not committed; rebuild with
 | Screen | File | Controller | Spec | Capture scenes | Capture |
 |---|---|---|---|---|---|
 | Lobby HUD (M01) | `src/client/Hud/Screens/LobbyHud.luau` | `LobbyHudController` | [LobbyScreen](LobbyScreen.md) | `lobby_hud`, `lobby_hud_states`, `lobby_hud_phone`, `lobby_hud_wide`, `lobby_hud_flow`, `lobby_hud_failed` | `art/ui/captures/lobby_hud.png` |
-| Inventory and Vault (M02) | `Screens/InventoryWindow.luau` | `VaultController` (lobby), `InventoryController` (run) | [InventoryScreen](InventoryScreen.md) | `inventory_backpack`, `inventory_vault`, `inventory_states`, `inventory_world`, `inventory_flow` | `art/ui/captures/inventory_backpack.png` |
+| Inventory and Vault (M02) | `Screens/InventoryWindow.luau` | `VaultController` (lobby), `InventoryController` (run) | [InventoryScreen](InventoryScreen.md) | `inventory_backpack`, `inventory_vault`, `inventory_states`, `inventory_world`, `inventory_flow`, `inventory_phone` | `art/ui/captures/inventory_backpack.png` |
 | Settings (M03) | `Screens/SettingsWindow.luau` | `SettingsController` | [SettingsScreen](SettingsScreen.md) | `settings`, `settings_phone`, `settings_phone_small`, `settings_flow` | `art/ui/captures/settings.png` |
 | Party (M04) | `Screens/PartyWindow.luau` | `PartyController` | [PartyScreen](PartyScreen.md) | `party`, `party_states`, `party_phone`, `party_flow` | `art/ui/captures/party.png` |
 | Play (M05) | `Screens/PlayWindow.luau` | `PlayController` | [PlayScreen](PlayScreen.md) | `play`, `play_states`, `play_phone` (844 × 390, 2000 × 924), `play_flow` | `art/ui/captures/play.png`, `play_phone.png`, `play_phone_2.png` |
@@ -990,7 +990,7 @@ python3 art/ui/capture/capture.py journal --out x.png --bg none
 
 - `--compare` writes `<name>_compare.png` (side by side) and `<name>_overlay.png`
   (50 % blend) and prints the mean colour difference.
-- **Phone pages**: `lobby_hud_phone`, `play_phone`, `party_phone`,
+- **Phone pages**: `lobby_hud_phone`, `play_phone`, `party_phone`, `inventory_phone`,
   `journal_phone`, `forge_phone`, `settings_phone`, `world_hud_phone`,
   `world_overlays_phone` (844 × 390, touch only, the top bar 58 px down; `play_phone`
   page 2 is a 2000 × 924 phone), `settings_phone_small` and `forge_phone_small`

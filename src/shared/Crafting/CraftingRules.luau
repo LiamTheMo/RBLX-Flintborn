@@ -133,7 +133,7 @@ CraftingRules.CATEGORIES = {
 	{ id = "Tools", label = "Tools" },
 	{ id = "Armor", label = "Armor" },
 	{ id = "Bars", label = "Smelting" },
-	{ id = "Consumables", label = "Food & potions" },
+	{ id = "Consumables", label = "Consumables" },
 	{ id = "Other", label = "Siege & stations" },
 }
 
