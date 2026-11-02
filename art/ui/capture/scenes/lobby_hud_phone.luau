@@ -6,10 +6,10 @@
 -- does) and the mockup's sample data; page 2 is the same screen in a party of
 -- three with an invite waiting, the game-update notice and XP pop-ups stacked
 -- above it; pages 3 and 4 are a 667 × 375 phone without a notch (Settings
--- above the thumbstick ring, the tiles moved up for its touch pad) and a
--- 2000 × 924 touch screen. The layout checks (hud_checks.luau, ARCHITECTURE
--- D28, D29: the pills and the Party panel at the right edge by the edge rule,
--- Settings in the bottom-left corner left of the thumbstick) run on each.
+-- above the thumbstick ring, which reaches the corner there) and a 2000 × 924
+-- touch screen. The layout checks (hud_checks.luau, ARCHITECTURE D30: the
+-- HUD grid, the pills and the Party panel one right-hand column, the run's
+-- tile grid, Settings in the grid's corner) run on each.
 local Hud = game:GetService("StarterPlayer").StarterPlayerScripts.Client.Hud
 -- Members' replicated level and progress (PlayerRow levelBar reads them).
 for userId, level in { [1] = { 12, 0.6 }, [2] = { 15, 0.35 }, [3] = { 8, 0.8 }, [4] = { 21, 0.15 }, [5] = { 3, 0.5 } } do
@@ -74,7 +74,7 @@ local function page(W, H, view, notice, insets)
 	Kit.Scale.Hud(gui, root)
 	local scale = root:FindFirstChildWhichIsA("UIScale").Scale
 	local chrome = __robloxChrome(gui, W, H, { touch = true, bar = TOP_BAR, insets = insets })
-	local lift = __placeLobbyHud(hud, W, H, scale, chrome, true)
+	__placeLobbyHud(hud, W, H, scale, chrome, true)
 	hud:SetProgress({ level = 12, xp = 450, xpToNext = 750 }, true)
 	hud:SetCurrency(2450, 125, true)
 	hud:SetParty(LobbyHudModel.Party(view, ME))
@@ -88,13 +88,14 @@ local function page(W, H, view, notice, insets)
 		xpPopups(hud)
 	end
 	print(
-		("lobby_hud_phone %dx%d: scale %.3f, root %d x %d design px, tiles lifted %d design px"):format(
+		("lobby_hud_phone %dx%d: scale %.3f, root %d x %d design px, column edges right %d / left %d design px"):format(
 			W,
 			H,
 			scale,
 			W / scale,
 			H / scale,
-			lift
+			hud.placed.right,
+			hud.placed.left
 		)
 	)
 	__checkLobbyHud({

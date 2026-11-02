@@ -119,32 +119,41 @@ local function viewport(gui: GuiBase2d): Vector2
 	return size
 end
 
+-- The HUD's scale (its root's UIScale) on `gui`'s screen: HudModel.HudScale
+-- of the canvas (opts.refW/refH override it) with the player's UI scale, and
+-- on phones and touch tablets × phoneHud, never below the HUD phone floor.
+-- Both HUDs, the ⚙ and the boost list (which lines up with the ⚙) use it.
+function Scale.HudScaleOf(gui: GuiBase2d, opts): number
+	opts = opts or {}
+	local ref = Tokens.Data.reference
+	local size = viewport(gui)
+	local k = HudModel.HudScale(
+		size.X,
+		size.Y,
+		opts.refW or ref.width,
+		opts.refH or ref.height,
+		Tokens.Scale("hudMin"),
+		Tokens.Scale("hudMax"),
+		Players.LocalPlayer:GetAttribute("UiScale")
+	)
+	if Scale.IsSmallTouch(size.Y, size.X) then
+		-- Phones and touch tablets: never below the HUD phone floor, so HUD
+		-- text stays readable; the regions are pinned to the screen edges.
+		k = math.max(k * Tokens.Scale("phoneHud"), Scale.PhoneFloor("hud"))
+	end
+	return k
+end
+
 -- The HUD root's scale for a screen, and keeps it current. `root` is a frame
 -- holding the HUD regions; it is sized to 1/scale of the screen so regions
 -- pinned by Scale keep to the edges. opts.refW/refH override the canvas.
 -- Returns a function that stops watching.
 function Scale.Hud(gui: GuiBase2d, root: GuiObject, opts): () -> ()
-	opts = opts or {}
-	local ref = Tokens.Data.reference
 	local uiScale = root:FindFirstChildWhichIsA("UIScale") or Instance.new("UIScale")
 	uiScale.Parent = root
 	local player = Players.LocalPlayer
 	local function apply()
-		local size = viewport(gui)
-		local k = HudModel.HudScale(
-			size.X,
-			size.Y,
-			opts.refW or ref.width,
-			opts.refH or ref.height,
-			Tokens.Scale("hudMin"),
-			Tokens.Scale("hudMax"),
-			player:GetAttribute("UiScale")
-		)
-		if Scale.IsSmallTouch(size.Y, size.X) then
-			-- Phones and touch tablets: never below the HUD phone floor, so HUD
-			-- text stays readable; the regions are pinned to the screen edges.
-			k = math.max(k * Tokens.Scale("phoneHud"), Scale.PhoneFloor("hud"))
-		end
+		local k = Scale.HudScaleOf(gui, opts)
 		uiScale.Scale = k
 		root.Size = UDim2.fromScale(1 / k, 1 / k)
 	end
@@ -166,8 +175,9 @@ end
 
 -- Makes a HUD ScreenGui draw on the whole screen (ScreenInsets None, not
 -- clipped to the device safe area), so its corner regions can reach the
--- screen's edges; the regions keep out of notches themselves (Scale.PinToEdge,
--- HudModel.EdgeGap). Windows keep DeviceSafeInsets (Kit.Screen).
+-- screen's edges; the regions keep out of notches themselves (the grid's edge
+-- rule: Hud/Layout.PlaceColumns, HudModel.EdgeGap). Windows keep
+-- DeviceSafeInsets (Kit.Screen).
 function Scale.FullScreen(gui: ScreenGui)
 	gui.IgnoreGuiInset = true
 	pcall(function()
@@ -250,7 +260,7 @@ end
 
 -- The screen a HUD gui (Scale.FullScreen) draws on at HUD scale `k`: {width,
 -- height (screen px), scale, touch, insets (Scale.SafeInsets)}; the input
--- HudModel.EdgeGap, HudModel.GearCorner and Scale.PinToEdge take.
+-- HudModel.EdgeGap, HudModel.GearCorner and Hud/Layout.PlaceColumns take.
 function Scale.HudScreen(gui: GuiBase2d, k: number)
 	local size = viewport(gui)
 	return {
@@ -260,28 +270,6 @@ function Scale.HudScreen(gui: GuiBase2d, k: number)
 		touch = UserInputService.TouchEnabled,
 		insets = Scale.SafeInsets(),
 	}
-end
-
--- Pins `object` (a region on a HUD root at the screen's scale) to the `side`
--- ("left" or "right") edge by the edge rule (HudModel.EdgeGap): the corner
--- margin while it lies in a corner band, else at least the safe inset. Only
--- its X changes; returns the gap in design px.
-function Scale.PinToEdge(object: GuiObject, side: string, screen): number
-	local k = math.max(screen.scale or 1, 0.01)
-	local rootH = screen.height / k
-	local pos, size, anchor = object.Position, object.Size, object.AnchorPoint
-	local h = size.Y.Scale * rootH + size.Y.Offset
-	local top = pos.Y.Scale * rootH + pos.Y.Offset - anchor.Y * h
-	local insets = screen.insets or HudModel.NO_INSETS
-	local gap =
-		HudModel.EdgeGap(top * k, (top + h) * k, screen.height, if side == "left" then insets.left else insets.right, k)
-	local w = size.X.Offset
-	if side == "left" then
-		object.Position = UDim2.new(0, gap + anchor.X * w, pos.Y.Scale, pos.Y.Offset)
-	else
-		object.Position = UDim2.new(1, -gap - (1 - anchor.X) * w, pos.Y.Scale, pos.Y.Offset)
-	end
-	return gap
 end
 
 -- The scale and centre of a window w × h on a screen W × H whose top `top` px

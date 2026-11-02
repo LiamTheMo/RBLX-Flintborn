@@ -228,10 +228,10 @@ check(state(view.keycaps.Interact[2]) == "disabled", "no keyboard: caps disabled
 check(view.notes.Controls.root.Text:find("Connect a keyboard") ~= nil, "no keyboard: the note says why")
 UserInputService.KeyboardEnabled = true
 
--- The world ⚙ sits in the bottom-left corner on a HUD-scaled root that covers
--- the whole screen (ARCHITECTURE D29); on touch screens it goes left of
--- Roblox's thumbstick ring, centred on its height, or above the ring where the
--- screen has no room beside it (no side inset).
+-- The world ⚙ sits in the HUD grid's bottom-left corner on a HUD-scaled root
+-- that covers the whole screen (ARCHITECTURE D30): M from the left and the
+-- bottom, on touch screens too, or above Roblox's thumbstick ring where the
+-- ring reaches the corner (a phone without a side inset).
 local gear = SettingsController.gear
 local gearRoot = gear.root.Parent
 local gearGui = gearRoot.Parent
@@ -251,26 +251,33 @@ check(
 )
 do
 	local HudModel = require(game:GetService("ReplicatedStorage").Shared.UI.HudModel)
-	local g = SettingsController.GEAR
+	local Layout = require(Client.Hud.Layout)
+	local grid, spec = Layout.Grid(), Layout.Gear()
+	local g = { w = spec.size[1], h = spec.size[2], gap = spec.ringGap, pad = spec.pad }
+	-- The grid's corner (D30): M from the left and the bottom wherever the
+	-- thumbstick ring leaves it free; above the ring where it reaches the corner.
 	for _, screen in
 		{
-			{ 844, 390, 0.5, __NOTCHED_PHONE, "beside" },
+			{ 844, 390, 0.5, __NOTCHED_PHONE, "corner" },
 			{ 667, 375, 0.5, __NO_INSETS, "above" },
-			{ 2000, 924, 0.884, __NO_INSETS, "above" },
+			{ 2000, 924, 0.884, __NO_INSETS, "corner" },
 		}
 	do
 		local w, h, k, insets, want = screen[1], screen[2], screen[3], screen[4], screen[5]
 		local at = SettingsController.GearPosition(__hudScreen(w, h, k, true, insets))
-		local _, _, where = HudModel.GearCorner(__hudScreen(w, h, k, true, insets), g)
+		local _, _, where = HudModel.GearCorner(grid, spec, __hudScreen(w, h, k, true, insets))
 		local stick = HudModel.Thumbstick(w, h, insets)
 		local left, foot = at.X.Offset * k, h + at.Y.Offset * k
 		local right, top = left + g.w * k, foot - g.h * k
 		local half = math.max(0, g.pad - g.w * k) / 2
 		local ok
-		if want == "beside" then
-			ok = right + half + g.gap <= stick.x + 0.01
-				and math.abs((top + foot) / 2 - (stick.y + stick.size / 2)) <= 0.5
-				and left >= 12 - 0.01
+		if want == "corner" then
+			ok = math.abs(left - grid.margin * k) <= 1
+				and math.abs(h - foot - grid.margin * k) <= 1
+				and (
+					right + half + g.gap <= stick.x + 0.01
+					or top - math.max(0, g.pad - g.h * k) / 2 >= stick.y + stick.size + g.gap - 0.01
+				)
 		else
 			ok = foot + g.gap <= stick.y + 0.01 and left - half >= -0.01
 		end
@@ -285,7 +292,7 @@ do
 				right,
 				top,
 				foot,
-				if want == "beside" then "left of" else "above",
+				if want == "corner" then "in the corner, clear of" else "above",
 				stick.x,
 				stick.y
 			)

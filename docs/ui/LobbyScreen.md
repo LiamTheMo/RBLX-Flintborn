@@ -16,7 +16,7 @@ The lobby place's always-on, non-modal HUD. Top left in the mockup: the player
 card (portrait, name, level, XP bar, leaf emblem); **the game leaves it out**
 (owner decision: each Party panel row shows the member's level and XP bar
 instead). Top right: Coins pill, Gems pill, settings button (**the game moves
-the settings button to the bottom-left corner**, D27, D28 and D29). Left: a 2 × 3 grid of square menu tiles (icons only, no labels). Right:
+the settings button to the bottom-left corner**, D27–D30). Left: a 2 × 3 grid of square menu tiles (icons only, no labels). Right:
 the Party panel (title with count, member rows, empty-slot rows, scrollbar).
 Bottom centre: the level/XP bar and the six-slot hotbar.
 
@@ -107,35 +107,39 @@ XP bar instead. The table below records the mockup only.
 
 Gaps: Coins → Gems 17 px, Gems → Settings 16 px; right margin 53 px; top margin 70 px.
 
-As built (D27, D28, D29): the Settings button is not in this row. Coins and
-Gems sit alone in the top-right corner (D29; `LobbyHud.TOP_RIGHT`,
-`LobbyHud.PILLS`: 234 wide, Coins then Gems; phones 286 wide), level with
-Roblox's top-bar buttons' top (design y 12 under a 58 px bar, 12 screen px on
-every screen; below the bar only when its right-hand area reaches over them,
-`LobbyHudController.BarReachesRight`), 24 design px from the screen's edge
-(the corner margin: they lie in the top band). The HUD draws on the whole
-screen (`Kit.Scale.FullScreen`) and `LobbyHud:SetScreen` keeps every edge
-region to the edge rule (STYLE_GUIDE §5.7: the margin in the top 30 % and the
-bottom 25 % of the screen, at least the device safe inset where a region
-reaches the middle band). The Settings button sits in the bottom-left corner
-(D29; `LobbyHud.GEAR`, 52 × 46, `HudModel.GearCorner`, as the world's):
-without touch 24 px from the left and the bottom (desktop x 24–76, y 871–917);
-on touch screens left of Roblox's thumbstick ring, centred on the ring's height
-and in the room between the screen's edge and the ring, its 44 px touch pad
-12 screen px clear of the ring (a notched 844 × 390 iPhone: x 23–49,
-y 323–347, the ring from x 72); where there is no room beside the ring (a
-phone without a notch, a large touch screen) its foot stands 12 screen px
-above the ring at the edge rule's gap, and the tiles move up just enough that
-their touch pads keep 2 screen px from the button's (667 × 375: x 12–38,
-y 250–273, tiles lifted 21). Gamepad: Settings is under the Forge tile
-(Forge's down) and left of the first hotbar slot; Trade's down goes to the XP
-bar; the PARTY title's up goes to Gems, and nothing is right of Gems.
+As built (D30, the HUD grid shared with the run's HUD, STYLE_GUIDE §5.6):
+the Settings button is not in this row. Coins and Gems are the right-hand
+column's first piece: one row the column's width (315: Coins 165, Gems 138,
+G 12 between; `LobbyHud.PILLS`), M (24 design px) from the screen's top and,
+while the column stays in the corner bands, from its right edge (desktop
+x 1333–1648, y 24–70; below the bar only when its right-hand area reaches
+over them, `LobbyHudController.BarReachesRight`); the same top, right edge
+and width as the run's vitals. The HUD draws on the whole screen
+(`Kit.Scale.FullScreen`) and `LobbyHud:_place` (SetTopInset, SetScreen)
+places every region with the run's placement (`Hud/Layout.PlaceColumns`, the
+edge rule applied to the whole column, STYLE_GUIDE §5.7). The Settings button
+sits in the bottom-left corner, the run's ⚙ (HudLayout `gear`, 52 × 46,
+`HudModel.GearCorner`): M from the left and the bottom (desktop x 24–76,
+y 871–917; a notched 844 × 390 iPhone x 12–38, y 355–378, the thumbstick ring
+from x 72); only where Roblox's thumbstick ring reaches the corner (a phone
+without a side inset) its foot stands 12 screen px above the ring (667 × 375:
+x 12–38, y 250–273). Gamepad: Settings is under the tiles' bottom-left tile
+(Forge; on phones Shop) and left of the first hotbar slot; the other bottom
+tiles' down goes to the XP bar; the PARTY title's up goes to Gems, and
+nothing is right of Gems.
 
 ### Left: menu grid (anchor: left, vertically centred group)
 
 Tiles are 88 × 84 (±1), columns at x 68 and 170 (pitch 102, gap 14), rows at
 y 312, 406, 500 (pitch 94, gap 10). Group bounds 68,312,190,273; group centre
 y 448.5 (screen centre 470.5).
+
+As built (D30): the run's tile grid (HudLayout `tiles`, `Layout.TileGrid`):
+the mockup's 88 × 84 tiles at its 102 × 94 pitch, 2 × 3, centred at 0.476 of
+the screen's height, at the left-hand column's edge (M: desktop x 24–214,
+y 312–584; on a notched phone the 47 pt inset). On phones the run's 3 × 2
+(80 × 80 at 88 × 86), G under Roblox's top-bar buttons (844 × 390: y 62–145),
+so the lobby and the run put the same tiles in the same place.
 
 | Element | Bounds | Icon (approx. bounds, ±4) | Opens | Kit part (tile / icon) |
 |---|---|---|---|---|
@@ -155,12 +159,14 @@ one frame for all six, slice an empty frame from 01 slot frames
 
 ### Right: Party panel (anchor: right, top-aligned at y 258)
 
-As built (D29): the panel sits 16 design px under Coins and Gems (y 74 under
-a 58 px bar; phones 43–165 screen px) at the right edge by the edge rule
-(`LobbyHud.PARTY`): it reaches the middle band, so on a notched phone its
-right edge stands at the device safe inset (844 × 390: x 650–797, 47 pt from
-the edge, while the pills above reach x 832); without insets 24 design px from
-the edge (desktop x 1354–1648, y 74–318). The bounds below are the mockup's.
+As built (D30): the right-hand column's second piece, G (12 design px) under
+Coins and Gems, the column's width (315 × 244; its rows, rules, list and
+add-player button widen with it, `LobbyHud.PartyParts`), on the column's one
+edge: desktop x 1333–1648, y 82–326, the run's objective's edge and width.
+The column reaches the middle band, so on a notched 844 × 390 iPhone the
+pills and the panel both stand at the 47 pt safe inset (x 640–797, y 12–35
+and 41–163; D29 had the pills at 832 and the panel at 797), without a notch
+M from the edge (x 674–832). The bounds below are the mockup's.
 
 | Element | Parent | Bounds | Appearance | Content / data | Kit part |
 |---|---|---|---|---|---|
@@ -331,15 +337,15 @@ Component boxes for every sheet: `art/ui/kit/analysis/lobby/kit_components/`.
 
 ## Deviations from reference
 
-- Owner decisions (D27, D28, D29): Coins and Gems move up into the top-right
-  corner level with Roblox's top-bar buttons and the Party panel up under
-  them, both at the right edge (D29); the Settings button moves from the
-  top-right row to the bottom-left corner (D29: 24 px from the edges, on touch
-  left of Roblox's thumbstick ring). Before D29: the bottom left of the
-  screen (39 px in, its foot level with the
-  hotbar's; on touch screens above Roblox's thumbstick ring; D28 replaced
-  D27's bottom-right place beside the jump button); Coins and Gems close up to the right
-  margin.
+- Owner decisions (D27–D30): the lobby HUD shares the run's grid (D30): Coins
+  and Gems (one 315 px row) and the Party panel (315 wide) are the right-hand
+  column, M from the top and on one edge, G apart; the tiles are the run's
+  grid at the left-hand column's edge (phones: the run's 3 × 2 under the top
+  bar); the Settings button moves from the top-right row to the bottom-left
+  corner, M from the left and the bottom; the level/XP bar and hotbar stand
+  M above the bottom edge with the XP bar centred over the hotbar. Before
+  D30 the Settings button stood left of the thumbstick ring on touch (D29),
+  above it 39 px in (D28) and beside the jump button (D27).
 - Owner decision: party count shows the real cap, **"1/8"**, not "1/10".
 - Owner decision: the Play tile opens the Play window.
 - Owner decision (D26): the Play tile's icon is the stone-framed crystal play
@@ -399,10 +405,12 @@ Component boxes for every sheet: `art/ui/kit/analysis/lobby/kit_components/`.
 
 - The hotbar slots are square: 89 × 89 (the mockup's 89 × 93 less 4 px of
   height), at the mockup's x and pitch, their foot on the bottom region's
-  edge (y 35 in the 124 px region; `LobbyHud.SLOT`). The run's HUD hotbar
+  edge (y 35 in the 124 px region; HudLayout `bottom.hotbar`, D30). The run's HUD hotbar
   matches (`HudLayout.json` `bottom.hotbar`).
 
 ## Owner edges round (D29)
+
+(Its placements are superseded by D30, "Owner grid round" below.)
 
 From the owner's second annotated phone screenshot
 (`art/ui/verify/owner/lobby_move_request_2.jpg`, the D28 build on a notched
@@ -414,3 +422,19 @@ From the owner's second annotated phone screenshot
 | Party panel, arrow up and right, box at the right edge under the pills | Right under the pills (y 43–165; D28: 159–281). It reaches the middle band of the screen, where the notch can be, so its right edge keeps the 47 pt safe inset (x 650–797; D28: 623–770) rather than reaching the very edge the box shows; it would take the margin only if it fitted wholly in the top 30 %. Desktop x 1354–1648, y 74–318 |
 | Settings, arrow down, box left of the thumbstick ring near the bottom | Left of the ring, centred on its height: x 23–49, y 323–347 (D28: x 55–81, y 265–288); desktop 24 px from the left and the bottom |
 | Tiles, hotbar, XP bar (not marked) | Unchanged (the tiles 68 design px inside the safe area) |
+
+## Owner grid round (D30)
+
+The owner on the live D29 HUD: both HUDs should put their shared pieces in the
+same place, everything as close to the screen's edges as possible and lined
+up, Settings exactly in the corner. Built on the HUD grid (STYLE_GUIDE §5.6,
+ARCHITECTURE D30); 844 × 390 notched iPhone / desktop 1672 × 941:
+
+| Piece | Built |
+|---|---|
+| Coins and Gems | the right-hand column's first piece, 315 wide: x 640–797, y 12–35 / x 1333–1648, y 24–70 (the run's vitals: the same top, edge and width) |
+| Party panel | G under them, 315 × 244, the same edge: x 640–797, y 41–163 / x 1333–1648, y 82–326 (the run's objective: the same edge and width) |
+| Menu tiles | the run's grid: phones 3 × 2 under the top bar, x 47–175, y 62–145 (D29: 2 × 3, x 81–169, 68 px inside the safe area); desktop 2 × 3 centred, x 24–214, y 312–584 (D29: x 68) |
+| Settings | the corner, M from the left and the bottom: x 12–38, y 355–378 / x 24–76, y 871–917 |
+| Level/XP bar and hotbar | the run's group, M above the bottom edge (D29: 49), the XP bar centred over the hotbar: hotbar y 334–378 / 828–917; the update notice centred, G above the bar |
+
