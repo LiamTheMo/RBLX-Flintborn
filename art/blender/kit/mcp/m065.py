@@ -229,7 +229,7 @@ def hub(a):
 # The widest station sits at half the length, where the fan has spread apart (wider low down, five leaves round a
 # 0.2-radius hub cut through each other)
 LEAF_ST = (0.0, 0.50, 0.79)
-LEAF_HW = (0.15, 0.50, 0.35)
+LEAF_HW = (0.22, 0.50, 0.35)                # fix round 1: broad from low down (0.15 read as shard wedges)
 PET_ST, PET_HW = (0.0, 0.42, 0.76), (0.14, 0.50, 0.36)   # spreading leaves: blade stations after the petiole
 PET_LEN, PET_HWABS = 0.20, 0.055             # petiole stub length, its half-width (a 0.11-wide stub)
 RIM_ST, RIM_HW = (0.0, 0.52), (0.24, 0.50)
@@ -238,6 +238,7 @@ EDGE = {"fan": 0.03, "spread": 0.03, "droop": 0.03, "rim": 0.05}   # half the ed
 RIDGE = {"fan": 19.0, "spread": 18.0, "droop": 17.0, "rim": 15.0}  # each half rises this much to the ridge
 KEEL = 0.025
 FAN_Z, RING_Z, BASE_R = 0.13, 0.08, 0.11     # leaf base points on the hub (inside it)
+FAN_BR = 0.19                                # fan leaf base radius (per leaf "br"): the fan rises from the hub's rim
 # name -> tier, azimuth (growth direction: its face turns up and out along it), tip, W, spine: pitch (Bezier control
 # along az / pitch at half the chord) or ctrl, or spine (drooping leaves: the blade's upper end and its widest point);
 # roll (a fixed growth twist, deg); tone per band (base, body, tip) on LADDER; base (rim leaves: on the ground)
@@ -245,29 +246,35 @@ LEAVES = {
     # leaf base: the five-leaf upright fan behind the stems
     # (the top faces turn up and in toward the axis, as a rosette leaf's upper side does; the fixed growth rolls tip
     # neighbours' planes apart: no two leaves of a tier within 20 deg of one plane)
-    "F1": dict(tier="fan", az=154, tip=(-0.88, 0.40, 1.02), W=0.66, pitch=58, roll=24, tone=(0.25, 1.0, 1.75)),
-    "F2": dict(tier="fan", az=128, tip=(-0.44, 0.56, 1.25), W=0.66, pitch=74, roll=20, tone=(0.25, 1.0, 1.75)),
-    "F3": dict(tier="fan", az=84, tip=(0.08, 0.70, 1.04), W=0.56, pitch=64, roll=28, tone=(0.5, 0.75, 1.25)),
-    "F4": dict(tier="fan", az=54, tip=(0.49, 0.67, 1.27), W=0.70, pitch=66, roll=22, tone=(0.75, 1.0, 1.75)),
-    "F5": dict(tier="fan", az=28, tip=(0.90, 0.46, 1.02), W=0.66, pitch=58, roll=-20, tone=(1.0, 1.5, 2.0)),
+    # Fix round 1: the fan rises from the hub's rim (FAN_BR 0.19), clear of the stems that leave its centre, spaced
+    # 36-40 deg apart (160 / 128 / 92 / 52 / 22) and 10 % narrower, the outer pair leaning out lower (pitch 50): the
+    # star stem rises in the gap between F3 and F4, F2 is off the bell stem, no leaf is more than 13 % inside another
+    "F1": dict(tier="fan", az=160, tip=(-0.908, 0.331, 1.02), W=0.594, pitch=50, roll=24, tone=(0.25, 1.0, 1.75)),
+    "F2": dict(tier="fan", az=128, tip=(-0.438, 0.561, 1.25), W=0.594, pitch=64, roll=20, tone=(0.25, 1.0, 1.75)),
+    "F3": dict(tier="fan", az=92, tip=(-0.025, 0.704, 1.04), W=0.504, pitch=64, roll=28, tone=(0.5, 0.75, 1.25)),
+    "F4": dict(tier="fan", az=52, tip=(0.511, 0.654, 1.27), W=0.63, pitch=60, roll=22, tone=(0.75, 1.0, 1.75)),
+    "F5": dict(tier="fan", az=22, tip=(0.937, 0.379, 1.02), W=0.594, pitch=50, roll=-20, tone=(1.0, 1.5, 2.0)),
     # spreading leaves on petiole stubs (the exploded's "Leaf (Reusable)")
-    "S1": dict(tier="spread", az=178, tip=(-1.57, 0.06, 0.70), W=0.78, ctrl=(-0.90, 0.03, 0.80), roll=-18,
-               tone=(0.25, 0.75, 1.25)),
+    # (fix round 1: the raised pair S1 / S3 twist along their length, the base half turned to the front and the outer
+    # half to the rear, so neither the front nor the rear sees a narrow underside spike)
+    "S1": dict(tier="spread", az=178, tip=(-1.57, 0.06, 0.70), W=0.78, ctrl=(-0.90, 0.03, 0.80), roll=-30,
+               roll_tip=30, tone=(0.25, 0.75, 1.25)),
     "S2": dict(tier="spread", az=206, tip=(-1.36, -0.52, 0.17), W=0.70, ctrl=(-0.84, -0.34, 0.50), roll=24,
                tone=(0.25, 1.0, 1.0)),
-    "S3": dict(tier="spread", az=4, tip=(1.59, 0.10, 0.64), W=0.78, ctrl=(0.92, 0.07, 0.76), roll=18,
-               tone=(1.0, 1.75, 2.0)),
+    "S3": dict(tier="spread", az=4, tip=(1.59, 0.10, 0.64), W=0.78, ctrl=(0.92, 0.07, 0.76), roll=30,
+               roll_tip=-30, tone=(1.0, 1.75, 2.0)),
     "S4": dict(tier="spread", az=334, tip=(1.40, -0.60, 0.17), W=0.70, ctrl=(0.86, -0.36, 0.50), roll=0,
                tone=(0.25, 1.0, 1.25)),
     # big drooping lime leaves, front and back: rise off the hub, then lay their tips on the ground
-    "N1": dict(tier="droop", az=250, tip=(-0.40, -1.06, 0.035), W=0.82, roll=14, tone=(1.25, 2.0, 2.0),
+    "N1": dict(tier="droop", az=250, tip=(-0.40, -1.06, 0.02), W=0.82, roll=14, tone=(1.25, 2.0, 2.0),
                spine=((-0.10, -0.30, 0.46), (-0.24, -0.66, 0.36))),
-    "N2": dict(tier="droop", az=286, tip=(0.44, -1.07, 0.035), W=0.86, roll=-12, tone=(1.25, 2.0, 2.0),
-               spine=((0.08, -0.31, 0.62), (0.25, -0.67, 0.44))),
-    "N3": dict(tier="droop", az=76, tip=(0.24, 1.07, 0.035), W=0.82, roll=-14, tone=(1.25, 2.0, 2.0),
-               spine=((0.10, 0.40, 0.50), (0.18, 0.74, 0.36))),   # under F3: a gentler rise (55 deg) than the fan
-    "N4": dict(tier="droop", az=124, tip=(-0.55, 0.92, 0.035), W=0.72, roll=-16, tone=(1.0, 1.75, 2.0),
-               spine=((-0.16, 0.27, 0.44), (-0.34, 0.57, 0.32))),
+    "N2": dict(tier="droop", az=282, tip=(0.364, -1.098, 0.02), W=0.86, roll=-12, tone=(1.25, 2.0, 2.0),
+               spine=((0.058, -0.315, 0.62), (0.203, -0.686, 0.44))),   # fix round 1: 4 deg off the bloom stem
+    # (fix round 1: the back pair rise lower, under the fan, N3 turned to az 68 between F3 and F4)
+    "N3": dict(tier="droop", az=68, tip=(0.40, 1.08, 0.02), W=0.82, roll=-28, tone=(1.25, 2.0, 2.0),
+               spine=((0.155, 0.382, 0.36), (0.281, 0.708, 0.276))),
+    "N4": dict(tier="droop", az=124, tip=(-0.55, 0.92, 0.02), W=0.72, roll=4, tone=(1.0, 1.75, 2.0),
+               spine=((-0.16, 0.27, 0.30), (-0.34, 0.57, 0.236))),
     # rim: short chunky kites lying low round the hub, their bases on the ground against the hub (r RIM_R)
     # (the rolls tip their faces toward az 136 / 226 / 62 / 298: four different planes)
     "B1": dict(tier="rim", az=226, tip=(-0.80, -0.64, 0.06), W=0.50, roll=24, arch=0.34, tone=(0.0, 0.25)),
@@ -302,7 +309,8 @@ def _leaf_spine(name):
         pts = [(_bez(base, ctrl, tip, t), _bezd(base, ctrl, tip, t).normalized()) for t in RIM_ST]
         return pts, tip, [f * s["W"] for f in RIM_HW], [_bez(base, ctrl, tip, i / 20) for i in range(21)]
     z0 = FAN_Z if tier == "fan" else RING_Z + 0.04
-    base = Vector((math.cos(az) * BASE_R, math.sin(az) * BASE_R, z0))
+    br = s.get("br", FAN_BR if tier == "fan" else BASE_R)
+    base = Vector((math.cos(az) * br, math.sin(az) * br, z0))
     if tier == "spread":
         d = Vector((math.cos(az), math.sin(az), 0.18)).normalized()
         b1 = base + d * PET_LEN                         # petiole end: the blade starts here
@@ -335,11 +343,16 @@ def leaf(a, name):
     def sections():
         st, tp, hw_, pl = _leaf_spine(name)
         rr = []
-        for (p, T), hw in zip(st, hw_):
+        for i, ((p, T), hw) in enumerate(zip(st, hw_)):
             w = (w0 - T * T.dot(w0)).normalized()
             n = T.cross(w).normalized()
-            if s.get("roll"):               # a fixed growth twist about the leaf's own axis (never per camera)
-                q = Matrix.Rotation(math.radians(s["roll"]), 3, T)
+            # a fixed growth twist about the leaf's own axis (never per camera); with "roll_tip" the twist runs from
+            # `roll` at the base to `roll_tip` at the last station (a leaf twisting along its length)
+            rl = s.get("roll", 0.0)
+            if "roll_tip" in s:
+                rl += (s["roll_tip"] - rl) * i / max(1, len(st) - 1)
+            if rl:
+                q = Matrix.Rotation(math.radians(rl), 3, T)
                 w, n = q @ w, q @ n
             e = min(E, 0.45 * hw)
             rf = e + hw * math.tan(RD)
@@ -588,12 +601,23 @@ BELL_TILT, BELL_TILT_AZ = 15.0, 222.0       # the bell's axis: down, tilted towa
 BELL_L = 0.76
 # outer (fraction of L, radius): seat, dome shoulder, flank, mouth (the lobes' notches and tips follow). The sheet's
 # bell is about as wide as long (front 62 x 60 px, parts row 76 x 73): a round dome, full flanks, a flared mouth.
-BELL_OUT = ((0.0, 0.09), (0.06, 0.17), (0.18, 0.235), (0.52, 0.28), (0.78, 0.34))   # a rounded dome
-BELL_NOTCH = (0.86, 0.37)                   # between the lobes (mid-panel), higher
-BELL_TIP = (0.98, 0.45, 0.07)               # lobe tips on the ribs: L fraction, radius, curl up (studs): flared ~45 deg
+# Fix round 1: the mouth was a flat flared brim (lobe tips 0.021 below the notches). Now a rounded dome (Ø 0.41 across
+# the flats at 0.15 L), convex flanks to the lobe bases at 0.645 L, and six pointed petal lobes from notches at 0.68 L
+# (r 0.30, mid-panel) to tips at 1.0 L (r 0.46 on the ribs): each lobe about 0.33 L long, pointing down and out about
+# 25 deg off the axis, curled up only 0.02.
+BELL_OUT = ((0.0, 0.09), (0.05, 0.178), (0.15, 0.238), (0.34, 0.296), (0.50, 0.323), (0.645, 0.335))
+BELL_NOTCH = (0.68, 0.30)                   # between the lobes (mid-panel, just outside the flat, just below the
+                                            # last ring so the rim never cuts back through the flank): the notches
+BELL_TIP = (1.0, 0.46, 0.02)                # lobe tips on the ribs: L fraction, radius, curl up (studs)
 BELL_WALL = 0.05
-BELL_IN = ((0.60, 0.20), (0.33, 0.0))       # inner flank ring, the inner dome apex (its mid-panel chords stay
-                                            # inside the outer mouth ring's chords: no wall crossing)
+BELL_TIP_IN = (0.965, 0.06)                 # the inner tip: L fraction, inset (the lobe's thickness at its point)
+BELL_NOTCH_IN = (0.66, 0.065)               # the inner notch: L fraction, inset
+# each lobe's two shoulders (L fraction, radius, deg off its rib): the lobe edges bulge out into a broad rounded-pointed
+# petal (the sheet's f34 and parts row), leaving a narrow V notch between neighbours, never a spike
+BELL_SHOULDER = (0.85, 0.415, 19.0)
+BELL_SHOULDER_IN = (0.83, 0.06)
+BELL_IN = ((0.52, 0.235), (0.26, 0.0))      # inner flank ring (on the ribs), the inner dome apex: the inner wall
+                                            # follows the outer about 0.05-0.07 inside
 CAP = ((-0.03, 0.165), (0.10, 0.075))       # cap rings: (height above the seat along -axis, radius): a flared collar
 BELL_PHASE = 15.0
 
@@ -611,11 +635,11 @@ def _bell_frame(flat=False):
 
 
 def bell(a, flat=False, sh=None):
-    """The bell: outer rings seat -> dome shoulder -> flank -> mouth, a 12-vert zigzag mouth (six pointed lobe tips on
-    the ribs, flared out and curled a little up, six notches between them), a rim band, an inner zigzag 0.05 inside,
-    an inner flank ring and an inner dome apex: one closed shell with a real inside. 106 tris. Outer shell `bell`, its
-    dome band a step lighter toward the swatch by height in the bell's frame; the inner wall and the rim `bell_deep`
-    (a region: the sheet's deep violet under the lobes and in the mouth)."""
+    """The bell: outer rings seat -> dome shoulder -> flank -> mouth, a 24-vert hem (six pointed lobe tips on the
+    ribs pointing down and out, two bulging shoulders per lobe, six notches between them), a rim band, an inner hem
+    0.06 inside, an inner flank ring and an inner dome apex: one closed shell with a real inside. 178 tris. Outer
+    shell `bell`, its dome band a step lighter toward the swatch by height in the bell's frame; the inner wall and
+    the rim `bell_deep` (a region: the sheet's deep violet under the lobes and in the mouth)."""
     seat, ax, e1, e2 = _bell_frame(flat)
     sh = sh if sh is not None else _shift(Vector((-0.30, -0.20, 0.90)))
     bm = a.bm
@@ -627,37 +651,47 @@ def bell(a, flat=False, sh=None):
 
     outer = [[bm.verts.new(at(fr, r, ph + k * math.pi / 3) + sh) for k in range(6)] for fr, r in BELL_OUT]
     zig_o, zig_i = [], []
-    for k in range(6):
+    sa = math.radians(BELL_SHOULDER[2])
+    for k in range(6):                      # per lobe step: tip, right shoulder, notch, next lobe's left shoulder
         a0 = ph + k * math.pi / 3
         zig_o.append(bm.verts.new(at(BELL_TIP[0], BELL_TIP[1], a0, BELL_TIP[2]) + sh))
+        zig_o.append(bm.verts.new(at(BELL_SHOULDER[0], BELL_SHOULDER[1], a0 + sa) + sh))
         zig_o.append(bm.verts.new(at(BELL_NOTCH[0], BELL_NOTCH[1], a0 + math.pi / 6) + sh))
-        zig_i.append(bm.verts.new(at(BELL_TIP[0] - 0.035, BELL_TIP[1] - BELL_WALL * 1.3, a0, BELL_TIP[2]) + sh))
-        zig_i.append(bm.verts.new(at(BELL_NOTCH[0] - 0.02, BELL_NOTCH[1] - BELL_WALL * 1.4, a0 + math.pi / 6) + sh))
+        zig_o.append(bm.verts.new(at(BELL_SHOULDER[0], BELL_SHOULDER[1], a0 + math.pi / 3 - sa) + sh))
+        zig_i.append(bm.verts.new(at(BELL_TIP_IN[0], BELL_TIP[1] - BELL_TIP_IN[1], a0, BELL_TIP[2]) + sh))
+        zig_i.append(bm.verts.new(at(BELL_SHOULDER_IN[0], BELL_SHOULDER[1] - BELL_SHOULDER_IN[1], a0 + sa) + sh))
+        zig_i.append(bm.verts.new(at(BELL_NOTCH_IN[0], BELL_NOTCH[1] - BELL_NOTCH_IN[1], a0 + math.pi / 6) + sh))
+        zig_i.append(bm.verts.new(at(BELL_SHOULDER_IN[0], BELL_SHOULDER[1] - BELL_SHOULDER_IN[1],
+                                     a0 + math.pi / 3 - sa) + sh))
     inner = [bm.verts.new(at(BELL_IN[0][0], BELL_IN[0][1], ph + k * math.pi / 3) + sh) for k in range(6)]
     apex = bm.verts.new(seat + ax * (BELL_IN[1][0] * L) + sh)
     seat_cap = bm.faces.new(list(reversed(outer[0])))
     dome = _band(bm, outer[0], outer[1]) + _band(bm, outer[1], outer[2])
-    flank = _band(bm, outer[2], outer[3]) + _band(bm, outer[3], outer[4])
+    flank = []
+    for i in range(2, len(outer) - 1):
+        flank += _band(bm, outer[i], outer[i + 1])
     mouth = []
     m = outer[-1]
-    for k in range(6):
+    for k in range(6):                      # each panel: half of lobe k, the notch, half of lobe k + 1
         j = (k + 1) % 6
-        t0, nt, t1 = zig_o[2 * k], zig_o[2 * k + 1], zig_o[(2 * k + 2) % 12]
-        mouth += [bm.faces.new((m[k], t0, nt)), bm.faces.new((m[k], nt, m[j])), bm.faces.new((m[j], nt, t1))]
+        t0, s0, nt, s1, t1 = [zig_o[(4 * k + i) % 24] for i in range(5)]
+        mouth += [bm.faces.new((m[k], t0, s0)), bm.faces.new((m[k], s0, nt)), bm.faces.new((m[k], nt, m[j])),
+                  bm.faces.new((m[j], nt, s1)), bm.faces.new((m[j], s1, t1))]
     rim = _band(bm, zig_o, zig_i)
     inside = []
     for k in range(6):
         j = (k + 1) % 6
-        t0, nt, t1 = zig_i[2 * k], zig_i[2 * k + 1], zig_i[(2 * k + 2) % 12]
-        inside += [bm.faces.new((inner[k], nt, t0)), bm.faces.new((inner[k], inner[j], nt)),
-                   bm.faces.new((inner[j], t1, nt))]
+        t0, s0, nt, s1, t1 = [zig_i[(4 * k + i) % 24] for i in range(5)]
+        inside += [bm.faces.new((inner[k], s0, t0)), bm.faces.new((inner[k], nt, s0)),
+                   bm.faces.new((inner[k], inner[j], nt)), bm.faces.new((inner[j], s1, nt)),
+                   bm.faces.new((inner[j], t1, s1))]
     inside += [bm.faces.new((inner[(k + 1) % 6], inner[k], apex)) for k in range(6)]
     vs = [v for r in outer for v in r] + zig_o + zig_i + inner + [apex]
     _close(a, vs, [seat_cap] + dome + flank + mouth + rim + inside, BELL, tint=1.0 + _rng("bell").uniform(-0.02, 0.02))
     _paint(a, dome + [seat_cap], _mix(BELL, BELL_DEEP, 0.0))
     _paint(a, rim + inside, BELL_DEEP)
     for k in range(6):                      # broad tint per lobe panel (never per triangle)
-        _tint(a, mouth[3 * k:3 * k + 3] + [flank[k], flank[6 + k]], 1.0 + _rng("bell", k).uniform(-0.03, 0.03))
+        _tint(a, mouth[5 * k:5 * k + 5] + flank[k::6], 1.0 + _rng("bell", k).uniform(-0.03, 0.03))
     _reg("bell", "bell", vs)
     return vs
 
@@ -749,16 +783,18 @@ def stem(a, name):
 
 # ---- stones (spec 2.5: squat faceted nuggets, flat base) ---------------------------------------------------------------
 # name -> centre (x, y), W, D, H, yaw (deg), sides, key
-# (a little under the study's sizes: the sheet's stones peep out at the foot, about 2.5 % of the front, 4 % of the rear)
+# (fix round 1: 0.82 of the round-1 sizes, a 0.3 slide at most: the sheet's stones peep out at the foot, about
+# 2.5 % of the front, 4 % of the rear, none from the side)
 ROCKS = {
-    "R1": dict(c=(-1.02, -0.60), W=0.46, D=0.38, H=0.24, yaw=20, n=6, key=ROCK_G),
-    "R2": dict(c=(1.02, -0.52), W=0.34, D=0.28, H=0.20, yaw=-30, n=5, key=ROCK_B),
-    "R3": dict(c=(0.66, 0.64), W=0.32, D=0.26, H=0.18, yaw=45, n=5, key=ROCK_B),
-    "R4": dict(c=(-0.74, 0.64), W=0.40, D=0.32, H=0.22, yaw=-15, n=6, key=ROCK_G),
-    "R5": dict(c=(-1.12, 0.34), W=0.24, D=0.20, H=0.13, yaw=70, n=5, key=ROCK_B),
+    "R1": dict(c=(-1.02, -0.60), W=0.377, D=0.312, H=0.197, yaw=20, n=6, key=ROCK_G),
+    "R2": dict(c=(1.02, -0.52), W=0.279, D=0.23, H=0.164, yaw=-30, n=5, key=ROCK_B),
+    "R3": dict(c=(0.66, 0.64), W=0.262, D=0.213, H=0.148, yaw=45, n=5, key=ROCK_B),
+    "R4": dict(c=(-0.74, 0.64), W=0.328, D=0.262, H=0.18, yaw=-15, n=6, key=ROCK_G),
+    "R5": dict(c=(-1.12, 0.34), W=0.197, D=0.164, H=0.107, yaw=70, n=5, key=ROCK_B),
 }
 ROCK_INFO = {}
-ROCK_FIT = {}                                # name -> (cx, cy, height factor) from the last hero build
+SLIDE_N = 20                                 # slide steps of 0.015 toward the hub at most
+ROCK_FIT = {}                              # name -> (cx, cy, height factor) from the last hero build
 
 
 def rock(a, name, fit=None):
@@ -800,13 +836,14 @@ def rock(a, name, fit=None):
     if fit is not None:
         u = Vector((cx, cy, 0)).normalized()
         slid = 0.0
-        for _ in range(30):
+        for _ in range(SLIDE_N):
             d = min(fit.find_nearest(p)[3] for r in rows for p in r)
             if d <= 0.02:
                 break
             slid += 0.015
             cx, cy = cx0 - u.x * slid, cy0 - u.y * slid
             rows = make(cx, cy)
+        touch = min(fit.find_nearest(p)[3] for r in rows for p in r) <= 0.02
         ROCK_INFO[name] = {"slid": round(slid, 3), "c": [round(cx, 3), round(cy, 3)]}
         gaps, fv = [], []
         up, dn = Vector((0, 0, 1)), Vector((0, 0, -1))
@@ -826,7 +863,9 @@ def rock(a, name, fit=None):
                 fv.append((p.z + g + 0.008) / p.z)
         if fv:
             g = min(gaps)
-            f = max(0.6, min(1.0, min(fv)))       # only ever lowered: contact comes from the slide
+            # only ever lowered when the slide found contact; a stone that slid its full run without touching is
+            # raised (at most 1.3) until the leaf above it just rests on its top
+            f = max(0.6, min(1.0 if touch else 1.3, min(fv)))
             for r in rows[1:]:
                 for p in r:
                     p.z *= f
@@ -905,8 +944,12 @@ def bell_part(a):
 NECK = 0.22                                  # the head parts' neck stub below the calyx
 
 
-def _neck(a, name, rings_hr):
-    C, e1, e2, n = _hframe(name, (270, 30))
+BLOOM_PART_FLAT = (270, 12)                  # fix round 1: the part stands nearly upright, read from the parts row's
+                                             # low camera as a deep cup (it was tilted 34 deg and read as a flat rose)
+
+
+def _neck(a, name, rings_hr, flat=(270, 30)):
+    C, e1, e2, n = _hframe(name, flat)
     cb = C + n * rings_hr[0][0]
     vs, bands, c0, c1 = square_tube(a, [cb - n * NECK, cb + n * STEM_IN], (0.125, 0.12), STEM, name + "_neck")
     _paint(a, [c0], _mix(STEM, DARK, 0.5))
@@ -921,8 +964,8 @@ def star_part(a):
 
 def bloom_part(a):
     PIECES.clear()
-    bloom_head(a, flat=(270, 34), sh=Vector())
-    _neck(a, "bloom", BL_CALYX)
+    bloom_head(a, flat=BLOOM_PART_FLAT, sh=Vector())
+    _neck(a, "bloom", BL_CALYX, BLOOM_PART_FLAT)
 
 
 def stem_part(a):
@@ -935,8 +978,18 @@ def stem_part(a):
 
 
 def leaf_part(a):
+    """'Leaf (Example)': the reusable petiole leaf as a flat kite (S1's shape with a plain roll, not the hero's
+    along-the-length twist, which reads as a twisted strap on its own)."""
     PIECES.clear()
-    leaf(a, "S1")
+    s = LEAVES["S1"]
+    keep = {k: s[k] for k in ("roll", "roll_tip") if k in s}
+    s.pop("roll_tip", None)
+    s["roll"] = -18
+    try:
+        leaf(a, "S1")
+    finally:
+        s.pop("roll", None)
+        s.update(keep)
 
 
 def rock_grey_part(a):
@@ -1313,6 +1366,106 @@ def bury_report(o):
     return res
 
 
+# ---- volume overlap (fix round 1: the round-1 verifier's volumetric sample-point test) ----------------------------------
+VOL_N = 1500                                 # sample points inside each leaf / stem shell
+LEAF_IN_LEAF = 0.25                          # spec 2.4: no leaf more than 25 % inside another (its whole volume)
+STEM_CUT = 0.03                              # spec 2.4: no leaf cuts a stem by more than 0.03 outside the junction
+
+
+def _vol_points(tree, lo, hi, n, seed, cap=200000):
+    """Uniform random points inside a closed shell (rejection in its bbox, ray parity), so a straight stem run with no
+    vertex inside a leaf still counts (the round-1 vertex test missed exactly that)."""
+    rng = random.Random(seed)
+    pts, tries = [], 0
+    while len(pts) < n and tries < cap:
+        tries += 1
+        p = Vector((rng.uniform(lo.x, hi.x), rng.uniform(lo.y, hi.y), rng.uniform(lo.z, hi.z)))
+        if m047._parity_in(tree, p):
+            pts.append(p)
+    return pts
+
+
+def volume_report(o, n=VOL_N):
+    """Leaf-in-leaf and leaf-through-stem by volume (build frame): per leaf, the share of its sample points inside each
+    other leaf (whole leaf, and outside the hub junction r > 0.26); per stem, the share of its points inside each leaf
+    outside the junction (r > JUNCTION_R or z > JUNCTION_Z), the worst 0.1-tall slice of its cross-section, and the
+    cut depth (the deepest such point's distance to the stem's surface). Feeds `problems` through build()."""
+    bm, ids, nsh, groups, labels = _shells(o)
+    off = Vector(o[OFF]) if OFF in o else Vector()
+    sh = {}
+    for k in range(nsh):
+        kind, nm = labels[k]
+        if kind not in ("leaf", "rim", "stem"):
+            continue
+        cos, polys = _solid(groups, k)
+        cos = [c + off for c in cos]
+        lo = Vector((min(c.x for c in cos), min(c.y for c in cos), min(c.z for c in cos)))
+        hi = Vector((max(c.x for c in cos), max(c.y for c in cos), max(c.z for c in cos)))
+        t = BVHTree.FromPolygons(cos, polys)
+        sh[nm] = dict(kind=kind, tree=t, lo=lo, hi=hi, pts=_vol_points(t, lo, hi, n, sum(map(ord, nm))))
+    bm.free()
+
+    def inside(p, s):
+        lo, hi = s["lo"], s["hi"]
+        return (lo.x <= p.x <= hi.x and lo.y <= p.y <= hi.y and lo.z <= p.z <= hi.z) and m047._parity_in(s["tree"], p)
+
+    def boxes(a_, b_):
+        return all(a_["lo"][i] <= b_["hi"][i] and b_["lo"][i] <= a_["hi"][i] for i in range(3))
+    leaves = [k for k, s in sh.items() if s["kind"] in ("leaf", "rim")]
+    stems = [k for k, s in sh.items() if s["kind"] == "stem"]
+    res = {"leaf_in_leaf": {}, "stem_in_leaf": {}, "pairs": []}
+    problems = []
+    for a_ in leaves:
+        A = sh[a_]
+        P = A["pts"]
+        outer = [p for p in P if math.hypot(p.x, p.y) > 0.26]
+        best = (0.0, 0.0, None)
+        for b_ in leaves:
+            if b_ == a_ or not boxes(A, sh[b_]):
+                continue
+            hit = [p for p in P if inside(p, sh[b_])]
+            if not hit:
+                continue
+            w = len(hit) / max(1, len(P))
+            wo = sum(1 for p in hit if math.hypot(p.x, p.y) > 0.26) / max(1, len(outer))
+            if w >= 0.05:
+                res["pairs"].append((a_, b_, round(w, 3), round(wo, 3)))
+            if w > best[0]:
+                best = (w, wo, b_)
+        res["leaf_in_leaf"][a_] = {"share": round(best[0], 3), "outside_junction": round(best[1], 3), "of": best[2],
+                                   "pts": len(P)}
+        if best[0] > LEAF_IN_LEAF:
+            problems.append(f"{o.name}: leaf {a_} {100 * best[0]:.0f} % inside {best[2]} by volume (<= 25)")
+    for s_ in stems:
+        S = sh[s_]
+        P = [p for p in S["pts"] if math.hypot(p.x, p.y) > JUNCTION_R or p.z > JUNCTION_Z]
+        worst = {"share": 0.0, "slice": 0.0, "slice_z": None, "cut": 0.0, "by": None}
+        for lf in leaves:
+            if not boxes(S, sh[lf]):
+                continue
+            hit = [p for p in P if inside(p, sh[lf])]
+            if not hit:
+                continue
+            cut = max(S["tree"].find_nearest(p)[3] for p in hit)
+            sl = {}
+            for p in P:
+                b = int(p.z / 0.1)
+                sl.setdefault(b, [0, 0])[1] += 1
+            for p in hit:
+                sl[int(p.z / 0.1)][0] += 1
+            bz, (hn, tn) = max(sl.items(), key=lambda kv: kv[1][0] / max(1, kv[1][1]))
+            share = len(hit) / max(1, len(P))
+            if cut > worst["cut"]:
+                worst = {"share": round(share, 3), "slice": round(hn / max(1, tn), 3),
+                         "slice_z": round(bz * 0.1, 1), "cut": round(cut, 3), "by": lf}
+        res["stem_in_leaf"][s_] = worst
+        if worst["cut"] > STEM_CUT:
+            problems.append(f"{o.name}: leaf {worst['by']} cuts {s_} by {worst['cut']} outside the junction "
+                            f"({100 * worst['slice']:.0f} % of its section at z {worst['slice_z']}; <= {STEM_CUT})")
+    res["pairs"].sort(key=lambda x: -x[2])
+    return res, problems
+
+
 # ---- foliage visibility (STAGES "Foliage reads from every azimuth" and "Check between the eight views too") ------------
 SPIN = tuple(range(0, 360, 45))
 # The flower stalks above the rosette (z >= 1.0, the fan's tip height) are what the sheet draws in every view: the
@@ -1579,6 +1732,11 @@ def build(render=True, parts=True, close=True):
                 problems.append(f"{n_}: leaf {lf} cuts a stem by {d['stem_cut']} (<= 0.03)")
         if b.get("bell_beyond_cap", 0) > BURY:
             problems.append(f"{n_}: bell {b['bell_beyond_cap']} inside its cap beyond the seat")
+    # fix round 1: leaf-in-leaf and leaf-through-stem by volume (sample points inside each shell), binding
+    volume = {}
+    for o in [h] + [objs[n_] for n_ in (BASE_P,) if n_ in objs]:
+        volume[o.name], vp = volume_report(o)
+        problems += vp
     for k, lf in leaves.items():
         if lf["min_z"] < -SINK - 0.011:
             problems.append(f"{HERO}: leaf {k} dips to z {lf['min_z']}")
@@ -1617,7 +1775,8 @@ def build(render=True, parts=True, close=True):
     out = {"audit": [{k: au[k] for k in ("name", "tris", "size", "shells", "nonmanifold_edges", "nonmanifold_verts",
                                          "boundary_edges", "wire_edges", "loose_verts", "zero_area_faces", "normals",
                                          "ngons", "dup_verts", "origin_offset", "transforms_applied")} for au in audits],
-           "hero_shells": kinds, "contact": contact, "bury": bury, "winding": winding, "bowties": bowties,
+           "hero_shells": kinds, "contact": contact, "bury": bury, "volume": volume, "winding": winding,
+           "bowties": bowties,
            "leaves": leaves, "heads": heads, "rocks": rocks, "thin": thin, "log": log, "problems": problems, "uv": uv,
            "sweep": sweep, "vis": vis,
            "offsets": {o.name: [round(x, 3) for x in o[OFF]] for o in order},

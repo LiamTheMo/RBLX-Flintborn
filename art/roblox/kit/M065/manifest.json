@@ -1,0 +1,664 @@
+{
+ "version": 1,
+ "source": "art/blender/assets/kit/FlintbornWorldKit.blend",
+ "sheet": "M065",
+ "module": null,
+ "units": "1 stud = 1 Blender unit. Sizes and offsets are in studs; set each MeshPart's Size from 'size'.",
+ "axes": "Roblox axes (Y up). Blender (x, y, z) -> Roblox (x, z, -y); an asset's front (Blender -Y) faces Roblox +Z. The asset origin is the bottom centre of its footprint: a piece's MeshPart sits at origin CFrame * CFrame.new(offset); VFX positions are relative to the same origin.",
+ "palette": {
+  "file": "palette.png",
+  "width": 512,
+  "height": 512,
+  "cell": 16,
+  "columns": 32,
+  "uv": "row i, level j: u = (j + 0.5) / columns, v = 1 - (i + 0.5) * cell / height (v up from the bottom of the image); a row's spare cells repeat its last level",
+  "rows": [
+   {
+    "key": "m065_bell",
+    "hex": "#7B57D0",
+    "levels": [
+     0.96225,
+     0.96576,
+     0.97541,
+     0.9798,
+     0.98476,
+     0.99859,
+     1.01094
+    ],
+    "used": true
+   },
+   {
+    "key": "m065_bell_deep",
+    "hex": "#5A3FB8",
+    "levels": [
+     0.98476
+    ],
+    "used": true
+   },
+   {
+    "key": "m065_bloom_bead",
+    "hex": "#B49400",
+    "levels": [
+     1.0199
+    ],
+    "used": true
+   },
+   {
+    "key": "m065_leaf_dark",
+    "hex": "#3A6A1E",
+    "levels": [
+     0.95744,
+     1.001,
+     1.00397,
+     1.01013,
+     1.02017,
+     1.04609
+    ],
+    "used": true
+   },
+   {
+    "key": "m065_leaf_dark_x_leaf_mid_25",
+    "hex": "#406E1C",
+    "levels": [
+     0.96848,
+     0.99651,
+     1.01183,
+     1.0227,
+     1.03286,
+     1.05445
+    ],
+    "used": true
+   },
+   {
+    "key": "m065_leaf_dark_x_leaf_mid_50",
+    "hex": "#46731A",
+    "levels": [
+     0.98899
+    ],
+    "used": true
+   },
+   {
+    "key": "m065_leaf_dark_x_leaf_mid_75",
+    "hex": "#4D7818",
+    "levels": [
+     0.96977,
+     0.99274,
+     1.00909,
+     1.02846
+    ],
+    "used": true
+   },
+   {
+    "key": "m065_leaf_dark_x_stem_50",
+    "hex": "#46781E",
+    "levels": [
+     1.00397,
+     1.01013
+    ],
+    "used": true
+   },
+   {
+    "key": "m065_leaf_light",
+    "hex": "#7DA428",
+    "levels": [
+     0.98298,
+     0.98797,
+     0.99095,
+     0.99456,
+     1.01041,
+     1.01512,
+     1.01772,
+     1.04455,
+     1.04832
+    ],
+    "used": true
+   },
+   {
+    "key": "m065_leaf_mid",
+    "hex": "#537C16",
+    "levels": [
+     0.9478,
+     0.9642,
+     0.96889,
+     0.99493,
+     1.00665,
+     1.01031,
+     1.01443,
+     1.02047
+    ],
+    "used": true
+   },
+   {
+    "key": "m065_leaf_mid_x_leaf_light_25",
+    "hex": "#5E861A",
+    "levels": [
+     0.99293,
+     1.00043,
+     1.01543,
+     1.02718,
+     1.03732
+    ],
+    "used": true
+   },
+   {
+    "key": "m065_leaf_mid_x_leaf_light_50",
+    "hex": "#68901F",
+    "levels": [
+     0.96849
+    ],
+    "used": true
+   },
+   {
+    "key": "m065_leaf_mid_x_leaf_light_75",
+    "hex": "#729A24",
+    "levels": [
+     0.96302,
+     0.99664,
+     1.00177,
+     1.02616,
+     1.05013
+    ],
+    "used": true
+   },
+   {
+    "key": "m065_pink",
+    "hex": "#EC6F96",
+    "levels": [
+     0.97976,
+     0.98697,
+     0.99032,
+     1.00506,
+     1.00794,
+     1.01886
+    ],
+    "used": true
+   },
+   {
+    "key": "m065_pink_deep_x_pink_25",
+    "hex": "#CD4B75",
+    "levels": [
+     0.9857,
+     1.00506,
+     1.00794,
+     1.01972
+    ],
+    "used": true
+   },
+   {
+    "key": "m065_pink_deep_x_pink_75",
+    "hex": "#E2638B",
+    "levels": [
+     0.97976,
+     0.98739,
+     0.99032,
+     1.01858
+    ],
+    "used": true
+   },
+   {
+    "key": "m065_rock_brown",
+    "hex": "#8E5F3F",
+    "levels": [
+     0.85919,
+     0.87312,
+     0.90561,
+     0.96172,
+     0.96698,
+     0.97991,
+     0.98378,
+     1.0146,
+     1.0258
+    ],
+    "used": true
+   },
+   {
+    "key": "m065_rock_grey",
+    "hex": "#817673",
+    "levels": [
+     0.88337,
+     0.91893,
+     1.01291,
+     1.02442,
+     1.03223,
+     1.05275
+    ],
+    "used": true
+   },
+   {
+    "key": "m065_star",
+    "hex": "#7084F2",
+    "levels": [
+     0.9794,
+     0.98914,
+     0.99191,
+     1.01309
+    ],
+    "used": true
+   },
+   {
+    "key": "m065_star_bead",
+    "hex": "#ECC862",
+    "levels": [
+     0.98618
+    ],
+    "used": true
+   },
+   {
+    "key": "m065_star_deep_x_star_50",
+    "hex": "#6072E0",
+    "levels": [
+     0.9794,
+     0.98914,
+     0.99191,
+     1.01309
+    ],
+    "used": true
+   },
+   {
+    "key": "m065_stem",
+    "hex": "#52871F",
+    "levels": [
+     0.98166,
+     0.98735,
+     1.00022,
+     1.00504,
+     1.01645
+    ],
+    "used": true
+   },
+   {
+    "key": "m065_stem_x_leaf_dark_50",
+    "hex": "#46781E",
+    "levels": [
+     0.98166,
+     0.98735,
+     1.00012,
+     1.00504,
+     1.01645
+    ],
+    "used": true
+   },
+   {
+    "key": "m065_stem_x_leaf_mid_50",
+    "hex": "#52821A",
+    "levels": [
+     1.00043
+    ],
+    "used": true
+   }
+  ]
+ },
+ "water": {
+  "keys": {},
+  "material": "SmoothPlastic",
+  "tile_studs": 16.0,
+  "uv": "Water pieces carry their own UVs (not palette cells): a box projection in studs from the asset origin, one texture tile per tile_studs. Up-facing faces: u = X / tile, v = Z / tile (mod 1, Roblox axes); faces toward +-Z use (X, -Y), toward +-X use (-Z, -Y). Set MeshPart.TextureID to the uploaded texture (it wraps), Transparency from the piece, Material SmoothPlastic, CastShadow false. Assets placed on a tile_studs grid continue the pattern seamlessly.",
+  "flow": "Pieces of an asset with a water_flow socket carry flow = {direction (unit, Roblox X/Z), speed (studs/s), socket}. To animate, use a Texture (Face Top, StudsPerTileU/V = tile_studs) on the piece instead of TextureID and move OffsetStudsU/V along direction * speed each frame."
+ },
+ "assets": [
+  {
+   "name": "ForestBlooms",
+   "sheet": "M065",
+   "subject": "Forest Wildflowers",
+   "role": "hero",
+   "size": [
+    3.16,
+    2.4099,
+    2.178
+   ],
+   "tris": 1560,
+   "budget": 1600,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/ForestBlooms.glb",
+     "kind": "solid",
+     "tris": 1560,
+     "offset": [
+      0.0,
+      1.205,
+      0.0
+     ],
+     "size": [
+      3.16,
+      2.4099,
+      2.178
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Forest wildflowers: a purple six-lobed bell hanging from a square crook stem, a blue five-petal star with a pale-lemon bead, a pink cupped two-ring bloom with a golden bead, on thick square stems over a rosette of 17 thick faceted kite leaves round a hidden hexagonal hub, five faceted stones at the foot. Walk-through forest-floor cover (collision none). Sheet header 63/132."
+  },
+  {
+   "name": "ForestBloomsBlueStar",
+   "sheet": "M065",
+   "subject": "Forest Wildflowers",
+   "role": "part",
+   "size": [
+    1.0285,
+    0.7673,
+    0.8755
+   ],
+   "tris": 208,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/ForestBloomsBlueStar.glb",
+     "kind": "solid",
+     "tris": 208,
+     "offset": [
+      0.0,
+      0.3836,
+      0.0
+     ],
+     "size": [
+      1.0285,
+      0.7673,
+      0.8755
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Blue Star Head: five broad pointed periwinkle lozenge petals round a pale-lemon octagonal bead, green five-sided calyx and a square neck stub"
+  },
+  {
+   "name": "ForestBloomsLeaf",
+   "sheet": "M065",
+   "subject": "Forest Wildflowers",
+   "role": "part",
+   "size": [
+    1.4688,
+    0.7462,
+    0.7568
+   ],
+   "tris": 46,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/ForestBloomsLeaf.glb",
+     "kind": "solid",
+     "tris": 46,
+     "offset": [
+      0.0,
+      0.3731,
+      0.0
+     ],
+     "size": [
+      1.4688,
+      0.7462,
+      0.7568
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Leaf (Reusable): broad thick faceted kite with a ridge, keel and a square petiole stub"
+  },
+  {
+   "name": "ForestBloomsLeafBase",
+   "sheet": "M065",
+   "subject": "Forest Wildflowers",
+   "role": "part",
+   "size": [
+    1.897,
+    1.29,
+    1.504
+   ],
+   "tris": 290,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/ForestBloomsLeafBase.glb",
+     "kind": "solid",
+     "tris": 290,
+     "offset": [
+      0.0,
+      0.645,
+      0.0
+     ],
+     "size": [
+      1.897,
+      1.29,
+      1.504
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Leaf Cluster Base: hexagonal hub with the five-leaf upright fan and four chunky rim leaves"
+  },
+  {
+   "name": "ForestBloomsPinkBloom",
+   "sheet": "M065",
+   "subject": "Forest Wildflowers",
+   "role": "part",
+   "size": [
+    0.8236,
+    0.7957,
+    0.8214
+   ],
+   "tris": 310,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/ForestBloomsPinkBloom.glb",
+     "kind": "solid",
+     "tris": 310,
+     "offset": [
+      0.0,
+      0.3979,
+      0.0
+     ],
+     "size": [
+      0.8236,
+      0.7957,
+      0.8214
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Pink Bloom Head: five outer and five inner cupped pink petals round a golden bead, a dark calyx with pointed sepals and a square neck stub"
+  },
+  {
+   "name": "ForestBloomsPurpleBell",
+   "sheet": "M065",
+   "subject": "Forest Wildflowers",
+   "role": "part",
+   "size": [
+    0.8887,
+    0.84,
+    0.8887
+   ],
+   "tris": 198,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/ForestBloomsPurpleBell.glb",
+     "kind": "solid",
+     "tris": 198,
+     "offset": [
+      0.0,
+      0.42,
+      0.0
+     ],
+     "size": [
+      0.8887,
+      0.84,
+      0.8887
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Purple Bell Head: six-sided faceted bell with six flared pointed lobes and a dark-violet inside, green cap"
+  },
+  {
+   "name": "ForestBloomsRockBrown",
+   "sheet": "M065",
+   "subject": "Forest Wildflowers",
+   "role": "part",
+   "size": [
+    0.2752,
+    0.2066,
+    0.2126
+   ],
+   "tris": 26,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/ForestBloomsRockBrown.glb",
+     "kind": "solid",
+     "tris": 26,
+     "offset": [
+      0.0,
+      0.1033,
+      0.0
+     ],
+     "size": [
+      0.2752,
+      0.2066,
+      0.2126
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Rock (Brown): squat faceted warm-brown stone"
+  },
+  {
+   "name": "ForestBloomsRockGrey",
+   "sheet": "M065",
+   "subject": "Forest Wildflowers",
+   "role": "part",
+   "size": [
+    0.3669,
+    0.2431,
+    0.2989
+   ],
+   "tris": 32,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/ForestBloomsRockGrey.glb",
+     "kind": "solid",
+     "tris": 32,
+     "offset": [
+      0.0,
+      0.1216,
+      0.0
+     ],
+     "size": [
+      0.3669,
+      0.2431,
+      0.2989
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Rock (Gray): squat faceted warm-grey stone"
+  },
+  {
+   "name": "ForestBloomsStem",
+   "sheet": "M065",
+   "subject": "Forest Wildflowers",
+   "role": "part",
+   "size": [
+    0.1666,
+    0.7781,
+    0.1666
+   ],
+   "tris": 20,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/ForestBloomsStem.glb",
+     "kind": "solid",
+     "tris": 20,
+     "offset": [
+      0.0,
+      0.3891,
+      0.0
+     ],
+     "size": [
+      0.1666,
+      0.7781,
+      0.1666
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Stem (Example): straight square green stem prism with a slanted top cut"
+  }
+ ],
+ "stats": {
+  "assets": 9,
+  "pieces": 9,
+  "solid": 9,
+  "water": 0,
+  "glow": 0,
+  "tris": 2690,
+  "vfxSockets": 0,
+  "paletteColours": 24,
+  "paletteLevels": 105,
+  "meshBytes": 268572
+ },
+ "problems": []
+}

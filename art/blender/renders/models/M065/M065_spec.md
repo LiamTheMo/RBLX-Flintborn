@@ -1309,3 +1309,218 @@ grid, the study's HSV masks on the sheet and on fresh renders). Renders and scri
     - the rear is dark: light tone 1–2 % against 23–30 %; rear pink `#DB5C81`, bell `#7851D4`;
     - from +X the bloom hides the bell: U 4.2 % against 13.4 %;
     - with the bloom facing az 295, the top view puts it far front-right.
+
+## Fix round 1 (modeller, 2026-11-02)
+
+Background Blender on port 9878 (`art/blender/assets/kit/wip/M065.blend`), every change made in `m065.py` and rebuilt
+with `m065.build()`; renders regenerated. `build()` returns **`problems: []`**.
+
+**Blocker 1: the bell mouth (fixed).** `bell()` was rebuilt round the sheet's f34 and parts-row bells, where each lobe is
+a broad rounded-pointed petal folded on a rib, with a narrow V notch between neighbours.
+- Outer profile (fraction of L 0.76, rib radius): seat 0.09, 0.05 L 0.178, 0.15 L 0.238 (Ø 0.41 across the flats),
+  0.34 L 0.296, 0.50 L 0.323, 0.645 L 0.335. The slopes fall from 1.8 to 0.09, so the dome and flanks are convex.
+- Six notches sit mid-panel at **0.68 L, r 0.30**, just below the last ring (when the ring sat below the notch, the
+  rim band cut back through the flank: 12 self-hits). The six lobe tips sit on the ribs at **1.0 L, r 0.46**, curled up
+  0.02. Each lobe has two shoulders (0.85 L, r 0.415, ±19° off its rib), so its edges bulge into a petal instead of a
+  spike. The hem has 24 verts.
+- Measured on `ForestBloomsPurpleBell`: the lobe tips hang **0.223 below the notches (29 % of L; round 1: 0.021,
+  2.7 %)**. Each lobe points down and out about **27° off the axis** (rib ring to tip).
+- The inner wall follows the lobes: an inner hem 0.06 inside (tips 0.965 L, shoulders 0.83 L, notches 0.66 L), an inner
+  flank ring (0.52 L, r 0.235) and the inner dome apex (0.26 L). The violet inside reads from below in `bell_under`.
+- Bell 178 tris (round 1: 130). 0 self-hits, 0 winding errors. Part 0.89 × 0.89 × 0.84 with the cap.
+
+**Blocker 2: fan leaves through each other and the stems (fixed).**
+- **New check `volume_report()`, binding in `build()` on the hero and `LeafBase`.** It samples 1500 random points inside
+  each leaf and stem shell (rejection in the bbox, ray parity `m047._parity_in`).
+  - Leaf in leaf: the share of a leaf's points inside another leaf (limit 25 %, whole leaf).
+  - Leaf through stem: stem points outside the junction (r > 0.32 or z > 0.50) that lie inside a leaf. It reports the
+    share, the worst 0.1-tall slice, and the cut depth (the deepest such point's distance to the stem surface; limit 0.03).
+  - On the round-1 build it reproduced the verifier's numbers: F3 31.4 % in F4, F5 22.6 % in F4, F3 21.9 % in F2; the
+    star stem cut 0.062 by F4 (66 % of its section at z 0.5); the bell stem cut 0.035 by F2.
+  - The vertex-based leaf checks in `bury_report()` still run beside it.
+- **Cause.** All five fan leaves started at r 0.11, on top of the three stem feet, and fanned 26–44° apart at W 0.56–0.70.
+- **Fan leaves:**
+  - bases moved out to the hub's rim (`FAN_BR` 0.19), so the fan rises outside the stems;
+  - re-spaced to az **160 / 128 / 92 / 52 / 22** (36–40° apart), so the star stem (leaning to az 64) rises in the gap
+    between F3 and F4;
+  - 10 % narrower: W 0.594 / 0.594 / 0.504 / 0.63 / 0.594, L : W about 2.1, inside the spec's 2.0–2.5;
+  - layered pitches: F2 / F3 64, F4 60, F1 / F5 50.
+- **Back drooping pair:** N3 and N4 rise lower under the fan (spine z −0.14 / −0.08). N3 turned to az 68, its tip out to
+  (0.40, 1.08). Rolls N3 −28 and N4 +4 keep the droop tier's planes 22.8° apart.
+- **N2** turned 4° (az 282) off the bloom stem; it cut the stem by 0.028 before.
+- **Result (hero, by volume):**
+  - worst leaf-in-leaf **16.4 % (N1 in N2)**; fan worst **14.9 % (F5 in F4)**, then F3 in F2 14.2 %, F4 in F5 11.0 %;
+    `LeafBase` the same;
+  - stems: star cut **0.006** (0.4 % of its volume, by F4), bloom **0.006** (F5), bell **0**.
+  - In `rear_sheet` and `r34_sheet` the back fan now reads as separate tall leaves.
+
+**Minors**
+- **S1 / S3 spikes from the rear (fixed differently from the suggestion).**
+  - Rolling them straight inward (normal az ±90°) left both the front and the rear at 0.33–0.34 of face-on: edge-on from
+    both sides.
+  - Instead each twists along its length (`roll` −30 → `roll_tip` +30, mirrored for S3): the base half turns to the
+    front and the outer half to the rear.
+  - Projected / face-on area, round 1 → now: S1 front 0.50 → 0.40, rear 0.39 → 0.47, r34 0.33 → 0.58; S3 front 0.51 →
+    0.39, rear 0.40 → 0.47, r34 0.37 → 0.50.
+  - The `Leaf` part keeps S1's plain kite (roll −18, no twist).
+- **Stones (fixed).**
+  - Sizes are 0.82 of round 1. The slide toward the hub is capped at 0.30 (`SLIDE_N` 20). A stone that slid the whole
+    way without touching is raised (at most ×1.3) until the leaf above rests on it.
+  - Ray-grid rock share at e 10: front **3.3 %**, rear **3.1 %**, +X side **1.5 %**, at most 4.3 % (round 1:
+    4.6 / 6.1 / 2.9 by the same ruler; the verifier's 4.9 / 7.1 / 3.8).
+  - Every stone is 0.000–0.021 from a leaf, and the deepest leaf point inside a stone is 0.003.
+- **`LeafBase` fan wedges (fixed):** the fan's base half-width rose from 0.15 W to 0.22 W, so the leaves are broad from
+  low down.
+- **`PinkBloom` part (fixed):** it now stands nearly upright (`BLOOM_PART_FLAT` az 270, tilt 12; it was 34). From the
+  parts-row camera it reads as a deep cup on its neck; the neck now follows the part's facing. The hero bloom is
+  unchanged.
+- **Drooping tips (fixed):** they rest at z 0.02 (round 1: 0.035).
+- **Left as they were:**
+  - front fill and footprint: W × D 3.16 × 2.18, inside the bands;
+  - front pink redness, and the part-shot colours (no palette change this round);
+  - the exploded spacing;
+  - the settled rulings.
+
+**Numbers after the fix**
+- **Tris:** hero **1560 / 1600**. PurpleBell 198, BlueStar 208, PinkBloom 310, Stem 20, Leaf 46, RockGrey 32,
+  RockBrown 26, LeafBase 290.
+- **Hero size:** 3.16 × 2.18 × 2.41.
+- **Topology, every object:** 0 non-manifold edges, 0 bowties, 0 boundary / wire / loose, 0 zero-area, 0 n-gons; 0
+  winding errors and 0 self-hits per shell; minimum corner 4.2°.
+- **UV:** hero 599 islands, 0 overlaps, minimum gap 0.016, border 0.008.
+- **Contact:** 0 floating, 0 unchained on every object; all seats touch. Stem feet 0.07 in the hub, tops 0.065 in their
+  calyx / cap, bell seat 0.03 in the cap. Nothing buried.
+- **5° sweep:**
+  - worst whole-leaf step **6.6 / 8.3 / 8.3 %** at e 5 / 10 / 20;
+  - slivers 0;
+  - closest planes per tier: fan 24.2°, spread 21.0°, droop 22.8°, rim 23.6°.
+- **Ray grid, e 10:**
+  - core below the stalks 1.9–16.0 %;
+  - leaf pixels within 12° of edge-on 1.5–9.2 % (the worst is +X);
+  - heads: the star is at least 0.39 of face-on, the bloom at least 0.71.
+
+Scratch scripts (`it065.py`, `bellp.py`, `build.py`) are in `<temp>\...\scratchpad\`, not in the repo.
+
+## Rulings (main session, 2026-11-02, after fix round 1)
+
+4. **S1 / S3 twist along their length** (base half toward the front, outer half toward the rear) replaces round 1's
+   "roll straight inward", which measured 0.33–0.34 of face-on from both sides. The twist raises the rear to 0.47 and
+   r34 to 0.50–0.58 at the cost of the front (0.50 → 0.40). The Leaf part keeps the untwisted kite.
+5. **Hero 1560 tris** (bell lobe shoulders) is inside the 1600 ceiling.
+
+## Stage 7 verification (round 2)
+
+**PASS, 8 / 10.** Read-only, in a background Blender on a copy of the kit file taken after the main session built fix
+round 1 (`build()` not called; nothing saved). Every number below was re-measured with the verifier's own scripts: bmesh
+audit, per-shell BVH contact, volumetric sample points (3000 per shell, two-direction ray parity), max-projection leaf
+normals, the 5° sweep, an orthographic ray grid, and the study's HSV masks on the sheet and on fresh renders (sheet
+views at 640 × 480 with the long lens and the floor hidden). Renders and scripts are in `<temp>\...\v065r2\`.
+
+**Round-1 blockers: both fixed**
+1. **The bell has six deep lobes.**
+   - **Geometry** (hero and `ForestBloomsPurpleBell` part are the same):
+     - six lobe tips at 0.74 along the axis from the seat, at r 0.46;
+     - notches at 0.517 (vertex), so the lobes are **0.22 deep, 30 % of the length** (round 1: 2.7 %). Sampling in 5°
+       bins gives 0.18–0.20 (24–27 %).
+     - The outer rib-to-tip line runs **27° off the axis** (the inner wall 16°), so the lobes point down and out.
+     - The hero bell's axis hangs 15° toward the front-left (az 222 from +X).
+   - **Renders:** the lobes read as a zigzag hem pointing down and out in front, f34, rear, r34, the ±45° views and az 270,
+     in the part shot and from below (violet inside).
+   - **From +X** the bloom covers the bell (settled ruling).
+2. **The back fan is clean.**
+   - **Leaf in leaf, by volume:**
+     - worst **18.1 % (N1 in N2)**;
+     - fan: F3 in F2 14.7 %, F5 in F4 14.6 %, F4 in F5 13.1 %, **F3 in F4 11.5 %** (round 1: 31 %);
+     - every leaf is at most 25 %.
+   - **Stems outside the junction** (r > 0.30 or z > 0.45; the builder's 0.32 / 0.50 gives the same):
+     - star stem cut **0.012** by F4 (0.6 % of its points, z 0.46–0.58);
+     - bloom stem **0.018** by F5 (z 0.33–0.47);
+     - bell stem **0**.
+   - In the rear and r34 the fan reads as separate tall leaves, with no interlocking block and no stepped intersection
+     edges.
+
+**Technical (every object): passes**
+- **Tris:** hero **1560** (ceiling 1600). Parts: PurpleBell 198, BlueStar 208, PinkBloom 310, Stem 20, Leaf 46, RockGrey 32,
+  RockBrown 26, LeafBase 290.
+- **Topology:** all triangles, so 0 quads and 0 n-gons. 0 non-manifold edges, 0 bowties, 0 boundary, wire or loose
+  elements, 0 zero-area faces. 0 winding errors, 0 inward shells, 0 self-hits per shell. Minimum corner 4.2°.
+- **Transforms and origin:** rotation 0 and scale 1, no modifiers, no custom normals, flat shading. The origin is at the
+  bbox bottom centre on all nine objects. The hero origin is 0.013 off the hub axis.
+- **UV:** one `UVMap`; 0 overlapping pixels at 1024², 0 flipped faces, everything inside 0–1. No unused or empty
+  material slots. Collision `none`.
+- **Size:** hero **3.16 × 2.18 × 2.41** (targets 3.0 ± 0.2 × 2.3 ± 0.2 × 2.4 ± 0.08). Leaf part L : W 1.94 (sheet
+  1.91). Stones W : H 1.51 and 1.33 (sheet 1.6 and 1.4).
+- **Contact:**
+  - The hero has 47 shells: 0 floating, 0 unchained. LeafBase, BlueStar, PinkBloom and PurpleBell are the same.
+  - Every stem touches the hub and its calyx or cap. All 15 petals touch their calyx and bead. The bell sits in its cap
+    (gap 0.001).
+  - Stones: 0.000–0.021 from a leaf, bases at −0.02. The deepest leaf point inside a stone is 0.003.
+  - Leaf tips: drooping tips at z 0.02, rim leaves at −0.016.
+- **5° sweep** (72 azimuths; whole = at least 75 % of the top facets within 15° of edge-on; sliver = under 0.26 of
+  face-on):
+  - worst whole-leaf step **6.8 / 3.0 / 5.8 %** of the leaf area at e 5 / 10 / 20 (N1 at az 35, B3 at 0, F1 at 200);
+  - **slivers 0**; no step over 10 %;
+  - plane band (reported only) 53–66 %.
+- **Ray grid** (8 azimuths, e 10 and e 20):
+  - core below z 1.0: **2.1–16.6 %** of the leaf pixels (ruling 2); whole core with the stalks 19.7–36.9 %;
+  - leaf pixels within 12° of edge-on 1.5–8.8 %;
+  - rocks 0.5–4.6 % of the silhouette.
+- **±25° / ±65° / ±115° / ±155°** by eye: no combs of slivers. The star turns edge-on near az −65, and it is the only head
+  that does.
+- **Colour by facing: none.** Correlation of face colour with normal z / front:
+  - leaves 0.10 / −0.03, rim leaves 0.04 / 0.01, petals 0.20 / 0.17, stems 0.18 / 0.02, rocks 0.01 / −0.01;
+  - the bell's 0.89 against z is its `bell_deep` inner wall, a region: every outer face is `bell`.
+
+**Sheet views (front governs; bud-free targets)**
+- **front_sheet:**
+  - W : H 1.237 (1.335; band 1.20–1.38). G 65.0, U 11.2, B 8.0, P 9.5, Y 1.0 (63.3 / 9.1 / 9.7 / 10.5 / 1.0).
+  - Green fifths 32 / 42 / 17 / 5 / 4 (33 / 46 / 14 / 4 / 2). Tones 22 / 44 / 34 (27 / 43 / 30).
+  - Head centroids: bell (0.19, 0.66) against (0.21, 0.62); star (0.63, 0.84) against (0.63, 0.84).
+  - The top profile is within ±0.08 except at f .4: 0.51 against 0.70, the deeper gap between the crook and the star.
+  - Medians: G `#528517` (`#5D8F18`), U `#905FEC` (`#9160F1`), B `#6E81F9` (`#7C8EFC`), Y `#FFE26A`.
+  - Green tones: light `#9ECB2E`, mid `#5F8E18`, dark `#30500C` (`#97C728` / `#5F9117` / `#29540C`).
+- **f34:** G 66.1, U 10.7, B 8.0, P 9.3; tones 27 / 48 / 26 (28 / 45 / 27); W : H 1.16 (soft check).
+- **r34 / rear:** W : H 1.20 / 1.25. Y 0.0. The positions match: rear bell (0.79, 0.66) against (0.83, 0.61), star
+  (0.37, 0.85) against (0.42, 0.82), bloom (0.15, 0.67) against (0.14, 0.59).
+- **Parts against the parts row:**
+  - The star, the grey and brown stones and the square stem with its slanted top (a 0.056 drop) match.
+  - The bell reads as a six-lobed bell under a green cap.
+  - Colours: grey stone `#A69388` (`#A89488`), brown stone `#9B6039` (`#A7653B`), pink `#FF759E` (`#FC76A5`), star `#788CFF`
+    (`#6F83FB`), star bead `#FFFB75` (`#FAF080`).
+
+**Blockers:** none.
+
+**Minors** (whether each shows against the sheet)
+1. **The spreading leaves read as narrow blades in the front and f34 (shows).**
+   - S1 and S3 are at 0.37 / 0.38 of face-on from az 0, and S2 and S4 lie low. The sheet draws broad leaves to both sides.
+   - Front fill is **0.50**, outside the 0.59 ± 0.05 band.
+   - This is the cost of ruling 4's twist; rear and r34 are now 0.48–0.56.
+   - Fix if wanted: lower the base-half roll of S1 / S3 (−30 → about −15) and lift S2 / S4's face about 15° toward
+     the front-up.
+2. **The rosette and parts read angular and pointed where the sheet draws rounded ovals (shows a little).**
+   - The LeafBase fan against the exploded cell.
+   - The `Leaf` part is arched, so its part shot reads as a hump, not the parts row's flat ridged kite.
+3. **The bell (shows a little).**
+   - Its lobes are narrower, pointed teeth where the sheet has broad petal lobes, and its dome is more conical.
+   - In the front and f34 the crook's rising stem touches the bell's right flank. The gap is 0.13–0.19 in 3D, but the
+     two overlap by about 0.04 in the front projection; the sheet shows a small gap.
+4. **Front pink is still redder (shows a little):** `#FF6990` against `#FB77A3` (blue −19). The bloom bead reads small
+   inside the inner ring.
+5. **Part and region colours (show a little):**
+   - bell part `#9563F4` against `#AA70FA`;
+   - stem part `#497E1A` against `#58941E`;
+   - LeafBase `#56891A` against `#69A417`;
+   - Leaf part `#71A21A` against `#5B9728`;
+   - front star `#6E81F9` against `#7C8EFC`;
+   - front brown stone `#643C24` against `#8A522C` (it sits in the shade under S4).
+6. **`PinkBloom` part (shows a little):** still an open, flared rose next to the parts row's deep cup. The hero bloom
+   reads fine.
+7. **Rocks from +X: 1.7 % (shows slightly).** The sheet's side cell has none. Front 3.6 % and rear 3.5 % are in band.
+8. **Near-parallel planes (does not show):**
+   - rim B1 / B3 11.3° and droop N1 / N3 18.3° by max-projection normal (both pairs lie flat; the sweep passes);
+   - fan 26.1°, spread 19.9° (S2 / S3, on opposite sides).
+9. **Top view W : D 1.52 against 1.09.** The top is judged for content only, and the content is there.
+10. **The exploded shot spacing** (presentation only).
+11. **Settled rulings, where they show:**
+    - the rear is dark (light tone 2 % against 23–30 %; rear bell `#7851D5`, pink `#DB5C81`);
+    - from +X the bloom hides the bell (U 4.4 % against 13.4 %), and the star shows.
