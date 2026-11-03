@@ -13,7 +13,6 @@ local RunService = game:GetService("RunService")
 local CrashRecoveryRules = require(ReplicatedStorage.Shared.Recovery.CrashRecoveryRules)
 local DeathRules = require(ReplicatedStorage.Shared.Admission.DeathRules)
 local InventoryRules = require(ReplicatedStorage.Shared.Inventory.InventoryRules)
-local ItemCatalog = require(ReplicatedStorage.Shared.Items.ItemCatalog)
 local ListingKeys = require(ReplicatedStorage.Shared.Net.ListingKeys)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local ProfileSchema = require(ReplicatedStorage.Shared.Data.ProfileSchema)
@@ -31,23 +30,6 @@ DepartureService.LOOT_RANGE = 12
 local bodies = {}
 local lastPositions = {}
 local handled = {}
-
-local function view(contents)
-	local entries = {}
-	for index, item in contents do
-		table.insert(entries, {
-			index = index,
-			key = ListingKeys.KeyOf(item),
-			catalogId = item.catalogId,
-			name = ItemCatalog.NameOf(item.catalogId),
-			rarity = ItemCatalog.RarityOf(item.catalogId),
-			quantity = item.quantity,
-			qualityRoll = item.qualityRoll,
-			permanent = item.permanent,
-		})
-	end
-	return entries
-end
 
 local function canLoot(player: Player, body): boolean
 	local root = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
@@ -77,7 +59,7 @@ local function createBody(position: Vector3, contents, ownerName: string)
 	bodies[id] = body
 	prompt.Triggered:Connect(function(looter)
 		if bodies[id] and canLoot(looter, body) then
-			Remotes.Get("CorpseOpened"):FireClient(looter, id, view(body.contents))
+			Remotes.Get("CorpseOpened"):FireClient(looter, id, ListingKeys.View(body.contents, true))
 		end
 	end)
 	-- The body and anything left in it disappear exactly 600 s after creation.
@@ -124,7 +106,7 @@ local function take(looter: Player, bodyId: any, index: any, key: any)
 	else
 		DeathRules.Take(body.contents, index)
 	end
-	Remotes.Get("CorpseOpened"):FireClient(looter, bodyId, view(body.contents))
+	Remotes.Get("CorpseOpened"):FireClient(looter, bodyId, ListingKeys.View(body.contents, true))
 	return true, nil
 end
 
