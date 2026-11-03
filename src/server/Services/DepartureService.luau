@@ -118,12 +118,11 @@ local function take(looter: Player, bodyId: any, index: any, key: any)
 		copy.ownerId = looter.UserId
 	end
 	local remaining, carried = InventoryService.Add(looter, copy)
-	if copy.instanceId then
-		if remaining > 0 then
-			return false, "NoRoom"
-		end
-		DeathRules.Take(body.contents, index)
-	elseif remaining > 0 then
+	-- Nothing taken (no room for the item, or for a single unit of the stack).
+	if remaining > 0 and (copy.instanceId or remaining == entry.quantity) then
+		return false, "NoRoom"
+	end
+	if remaining > 0 then
 		-- What stays on the body keeps its share of the carried units.
 		entry.quantity = remaining
 		InventoryRules.SetCarried(entry, carried)
