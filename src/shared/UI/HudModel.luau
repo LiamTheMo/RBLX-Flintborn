@@ -93,12 +93,6 @@ function HudModel.Compact(value: number?): string
 	return HudModel.Thousands(n)
 end
 
--- The lobby party header's count beside "PARTY": "1/8" (alone counts as a party
--- of one).
-function HudModel.PartyCount(members: number?, maxSize: number): string
-	return ("%d/%d"):format(math.clamp(math.floor(members or 1), 1, maxSize), maxSize)
-end
-
 -- Seconds as m:ss, or h:mm:ss from an hour up. Negative time reads 0:00.
 function HudModel.FormatTimer(seconds: number?): string
 	local total = math.max(0, math.floor(seconds or 0))

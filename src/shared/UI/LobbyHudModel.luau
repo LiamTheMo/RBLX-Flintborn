@@ -6,6 +6,7 @@
 local GameConstants = require(script.Parent.Parent.GameConstants)
 local InventoryRules = require(script.Parent.Parent.Inventory.InventoryRules)
 local HudModel = require(script.Parent.HudModel)
+local PartyModel = require(script.Parent.PartyModel)
 
 local LobbyHudModel = {}
 
@@ -82,7 +83,7 @@ function LobbyHudModel.Party(view, me: { userId: number, name: string }, busy: {
 		table.insert(invites, entry)
 	end
 	return {
-		count = HudModel.PartyCount(#members, maxSize),
+		count = PartyModel.CountText(#members, maxSize),
 		members = members,
 		free = math.max(0, maxSize - #members),
 		invites = invites,
