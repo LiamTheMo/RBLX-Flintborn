@@ -7,11 +7,12 @@
 --   { party = nil | {id, leader, createdAt, members = {{userId, name}},
 --     invited = {userId}}, invites = {{partyId, from, fromUserId}}, maxSize }
 
+local GameConstants = require(script.Parent.Parent.GameConstants)
 local ReasonText = require(script.Parent.ReasonText)
 
 local PartyModel = {}
 
-PartyModel.MAX_SIZE = 8
+PartyModel.MAX_SIZE = GameConstants.MAX_TRIBE_SIZE
 PartyModel.JOIN_TYPE = "Invite Only"
 PartyModel.NO_TIME = "—"
 

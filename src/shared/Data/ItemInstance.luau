@@ -19,7 +19,10 @@ ItemInstance.Locations = {
 	Consumed = "Consumed",
 }
 
--- Quality rolls are at most ±5% of catalog stats (GDD Q138).
+-- Quality rolls are at most ±5% of catalog stats (GDD Q138). This bounds saved
+-- items, so it stays its own value: crafts roll within
+-- GameConstants.CRAFT_QUALITY_ROLL (QualityRoll.MAX), and lowering that must not
+-- reject items already saved.
 ItemInstance.MAX_QUALITY_ROLL = 0.05
 
 export type Record = {

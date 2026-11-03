@@ -3,12 +3,13 @@
 -- and the objective/event text. No Instances here, so the headless specs and the
 -- HUD share one definition. The HUD only displays; the server owns every value.
 
+local GameConstants = require(script.Parent.Parent.GameConstants)
 local Keybinds = require(script.Parent.Parent.Settings.Keybinds)
 
 local HudModel = {}
 
 -- Roblox studs to metres for player-facing distances.
-HudModel.METRES_PER_STUD = 0.28
+HudModel.METRES_PER_STUD = GameConstants.METRES_PER_STUD
 
 -- Headings clockwise from north. -Z is north and +X is east on the island, the
 -- same convention as MapController and EventFeedController.
