@@ -5,6 +5,7 @@
 local BoostRules = require(script.Parent.Parent.Survival.BoostRules)
 local GameConstants = require(script.Parent.Parent.GameConstants)
 local InventoryRules = require(script.Parent.Parent.Inventory.InventoryRules)
+local SettingsRules = require(script.Parent.Parent.Settings.SettingsRules)
 
 local ProfileSchema = {}
 
@@ -32,7 +33,7 @@ end
 
 -- A brand-new profile. Groups filled by later phases start empty.
 function ProfileSchema.Default(now: number?)
-	return {
+	local profile = {
 		schemaVersion = ProfileSchema.CURRENT_VERSION,
 		profileRevision = 0,
 		sessionLease = nil,
@@ -77,23 +78,15 @@ function ProfileSchema.Default(now: number?)
 			hotbarBindings = {},
 			-- Keyboard rebinds that differ from the defaults (Keybinds, GDD §46).
 			keybinds = {},
-			uiScale = 1,
-			colourBlindMode = false,
-			reducedMotion = false,
-			subtitles = true,
-			-- Settings screen choices (SettingsRules holds their ranges).
-			musicVolume = 75,
-			effectsVolume = 80,
-			cameraSensitivity = 50,
-			invertCamera = false,
-			showDamage = true,
-			showNames = true,
-			showHealthBars = true,
-			graphicsQuality = "High",
 		},
 		tutorial = { step = 1, skipped = false, everSkipped = false, completedAt = nil, rewardsGranted = {} },
 		metrics = { runs = 0, extractions = 0, deaths = 0 },
 	}
+	-- The Settings screen's choices: SettingsRules holds their defaults and ranges.
+	for _, setting in SettingsRules.Settings do
+		profile.choices[setting.key] = setting.default
+	end
+	return profile
 end
 
 -- Fills keys missing from `data` with defaults without overwriting saved values.
