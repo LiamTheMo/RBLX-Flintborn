@@ -8,8 +8,8 @@
 
 - Each phase is one **version branch** named after it (`v0.01`, `v0.02`, …). A version branch is kept permanently once complete.
 - All work happens on short-lived minor branches cut from the active version branch, merged back into it, then merged into `main`.
-- Only `main` publishes to Roblox (`.github/workflows/deploy.yml`). Version and minor branches only validate.
-- A phase is finished when its **Exit criteria** pass, its automated checks are green on `main`, and its Studio checks have been run on the published place.
+- Only `main` is released: synced with Rojo into each place in Studio and published from Studio ([DEPLOYMENT.md](../ops/DEPLOYMENT.md)). Nothing publishes from GitHub.
+- A phase is finished when its **Exit criteria** pass, its local checks pass on `main`, and its Studio checks have been run on the published place.
 
 ## Phase map
 

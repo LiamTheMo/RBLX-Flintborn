@@ -295,7 +295,7 @@ Inspect unapplied transforms before export. Resolve nonuniform scale and negativ
 
 Keep runtime collision separate from visual detail. Use simple body collision proxies; thin fur tips, antlers and tusks should not automatically become movement blockers or damage regions. Rig size, collision, navigation and attack checks need validation in the actual game.
 
-The current character `.glb` files and joint manifest are produced by the character pipeline and consumed by `scripts/roblox_character.py`. Reuse it for that character. The existing lobby exporter is a static environment workflow, not a general animal skinning exporter. Verify bones, weights, materials, scale, orientation and animations through an actual Studio import before claiming a creature export is supported.
+The current character `.glb` files and joint manifest are produced by the character pipeline and imported into the places in Studio. Reuse it for that character. The existing lobby exporter is a static environment workflow, not a general animal skinning exporter. Verify bones, weights, materials, scale, orientation and animations through an actual Studio import before claiming a creature export is supported.
 
 The Blender README's prop/building targets do not establish tested character or animal budgets. Count triangles, bones, materials, textures and objects per creature and across a representative populated scene. Keep small wildlife especially economical; event size alone does not justify excessive geometry. LODs should preserve the species silhouette and identifying features while reducing fur groups, internal mouth detail and small appendages.
 

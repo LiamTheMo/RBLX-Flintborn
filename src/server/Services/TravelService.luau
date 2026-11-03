@@ -38,7 +38,7 @@ end
 function TravelService.ReserveWorld()
 	local placeIds = PlaceConfig.PlaceIds()
 	if placeIds == nil then
-		return nil, "Place IDs are unavailable outside a deployed universe"
+		return nil, "Teleports are unavailable in Studio"
 	end
 	local ok, accessCode, privateServerId = pcall(function()
 		return TeleportService:ReserveServer(placeIds.world)
@@ -55,7 +55,7 @@ end
 function TravelService.ToWorld(players: { Player }, accessCode: string, teleportData)
 	local placeIds = PlaceConfig.PlaceIds()
 	if placeIds == nil then
-		return false, "Place IDs are unavailable outside a deployed universe"
+		return false, "Teleports are unavailable in Studio"
 	end
 	local options = Instance.new("TeleportOptions")
 	options.ReservedServerAccessCode = accessCode
@@ -66,7 +66,7 @@ end
 function TravelService.ToLobby(players: { Player })
 	local placeIds = PlaceConfig.PlaceIds()
 	if placeIds == nil then
-		return false, "Place IDs are unavailable outside a deployed universe"
+		return false, "Teleports are unavailable in Studio"
 	end
 	return teleport(placeIds.lobby, players, Instance.new("TeleportOptions"))
 end

@@ -1,15 +1,12 @@
 -- Gives the default character's clothing its full materials (colour, normal and
--- roughness maps). Open Cloud scripts may not set SurfaceAppearance maps, so the
--- install workflow (scripts/roblox_character.py) falls back to plain textures;
--- Studio's command bar may set them.
+-- roughness maps) through Studio's command bar.
 --
 -- How to use, once per place (lobby, then world):
 --   1. Open the place in Roblox Studio.
 --   2. View > Command Bar, paste this whole file, press Enter.
 --   3. File > Publish to Roblox.
--- Re-running the install workflow puts the plain textures back; run this again after.
--- The ids below come from art/roblox/character/asset_ids.json (regenerate with
--- python scripts/roblox_character.py --studio-script after an upload).
+-- The ids below come from art/roblox/character/asset_ids.json; after uploading
+-- new character textures, update them by hand.
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local StarterPlayer = game:GetService("StarterPlayer")
@@ -18,7 +15,7 @@ local function id(number)
 	return "rbxassetid://" .. number
 end
 
--- BEGIN IDS (written by scripts/roblox_character.py --studio-script)
+-- BEGIN IDS
 local SHIRT = { color = id(111714179640418), normal = id(76197550313894), roughness = id(125328202465608) }
 local PANTS_NORMAL = id(71058309238043)
 local PANTS_ROUGHNESS = id(85723223336235)

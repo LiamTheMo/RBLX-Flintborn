@@ -1,6 +1,6 @@
 -- Dresses every character in its tribe's shorts colour. Everyone spawns as the
--- default R6 character (StarterPlayer.StarterCharacter, installed by
--- scripts/roblox_character.py); its shorts are three pieces (PantsWaist,
+-- default R6 character (StarterPlayer.StarterCharacter, installed in each
+-- place in Studio); its shorts are three pieces (PantsWaist,
 -- PantsLeftLeg, PantsRightLeg). Each takes the look named "Pants_<Colour>" from
 -- ReplicatedStorage.CharacterOutfits: a SurfaceAppearance to clone in, or a
 -- texture id attribute. The colour follows the TribeId attribute (CharacterLook),
