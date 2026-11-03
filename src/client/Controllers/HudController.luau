@@ -303,20 +303,16 @@ function HudController.PlaceTop(regions, bar, screen)
 	return placed
 end
 
--- GuiService.TopbarInset (the top bar's free area), or nil on an engine
--- without it.
-local function topbarInset(): Rect?
-	local ok, value = pcall(function()
-		return GuiService.TopbarInset
-	end)
-	return if ok and typeof(value) == "Rect" then value else nil
-end
-
 local function applyTop()
 	scale = uiScale.Scale
 	local screen = Kit.Scale.HudScreen(gui, scale)
-	local bar =
-		HudController.TopBar(Kit.Scale.TopInset(gui), screen.width, scale, topbarInset(), gui.AbsolutePosition.X)
+	local bar = HudController.TopBar(
+		Kit.Scale.TopInset(gui),
+		screen.width,
+		scale,
+		Kit.Scale.TopbarInset(),
+		gui.AbsolutePosition.X
+	)
 	local placed = HudController.PlaceTop(tops, bar, screen)
 	-- While the HUD shows, banners in the shared top column start below the
 	-- compass and its waypoints; otherwise they keep their usual place.
@@ -621,23 +617,6 @@ end
 
 -- Build ------------------------------------------------------------------------
 
-local function newGui(name: string, order: number): (ScreenGui, Frame)
-	local screen = Instance.new("ScreenGui")
-	screen.Name = name
-	screen.ResetOnSpawn = false
-	screen.DisplayOrder = order
-	screen.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-	-- The layout uses full-screen design px on the whole screen and keeps clear
-	-- of the top bar and of notches itself (applyTop, the HUD grid: D30).
-	Kit.Scale.FullScreen(screen)
-	local frame = Instance.new("Frame")
-	frame.Name = "Root"
-	frame.BackgroundTransparency = 1
-	frame.Size = UDim2.fromScale(1, 1)
-	frame.Parent = screen
-	return screen, frame
-end
-
 -- The gamepad button bound to a menu tile's action (a KeyCode name), if any.
 function HudController.GamepadKey(action: string): string?
 	local bind = Keybinds.Get(action)
@@ -724,7 +703,9 @@ local function openTile(entry)
 end
 
 local function build()
-	gui, root = newGui("FlintbornHud", Kit.Tokens.Order("hud"))
+	-- Both guis use full-screen design px on the whole screen and keep clear of
+	-- the top bar and of notches themselves (applyTop, the HUD grid: D30).
+	gui, root = Kit.Scale.HudGui("FlintbornHud", Kit.Tokens.Order("hud"))
 	gui.Enabled = false
 	widgets = HudController.Mount(root, layout, openTile)
 	tops = HudController.TopRegions(widgets)
@@ -735,7 +716,7 @@ local function build()
 	-- XP pop-ups live in their own always-enabled gui, laid out like the bottom
 	-- group, so pop-ups outside a run (protected extraction, tutorial) still show.
 	local overlayRoot
-	overlay, overlayRoot = newGui("FlintbornHudOverlay", Kit.Tokens.Order("hud") + 1)
+	overlay, overlayRoot = Kit.Scale.HudGui("FlintbornHudOverlay", Kit.Tokens.Order("hud") + 1)
 	local group = Instance.new("Frame")
 	group.Name = "BottomGroup"
 	group.BackgroundTransparency = 1
