@@ -104,38 +104,10 @@ local function hotbarLabels(count: number): { string }
 	return labels
 end
 
--- The status plaques for the survival state: medicine lock (hourglass), pending
--- food healing (heart) and the hunger slow (warning), each in words.
-function HudController.StatusChips(medicineLockLeft: number?, foodHealing: number?, slowed: boolean?)
-	local chips = {}
-	if (medicineLockLeft or 0) > 0 then
-		table.insert(chips, { icon = "hourglass", text = ("Medicine ready in %.1f s"):format(medicineLockLeft) })
-	end
-	if (foodHealing or 0) > 0 then
-		table.insert(chips, { icon = "heart", text = ("Food healing +%d"):format(foodHealing) })
-	end
-	if slowed then
-		table.insert(chips, { icon = "warning", text = "Hungry: slowed" })
-	end
-	return chips
-end
-
--- The hotbar's items from an inventory snapshot ({slots, equipped}):
--- index -> {itemId, quantity, permanent}, or nil for an empty slot.
-function HudController.HotbarItems(snapshot, count: number)
-	local items = {}
-	for _, slot in (snapshot and snapshot.slots) or {} do
-		local index = slot.index
-		if slot.area == "hotbar" and type(index) == "number" and index >= 1 and index <= count then
-			items[index] = {
-				itemId = slot.catalogId,
-				quantity = slot.quantity,
-				permanent = slot.permanent == true,
-			}
-		end
-	end
-	return items
-end
+-- The status plaques and the hotbar's items (pure rules in HudModel; the
+-- capture scenes call them here).
+HudController.StatusChips = HudModel.StatusChips
+HudController.HotbarItems = HudModel.HotbarItems
 
 local player = Players.LocalPlayer
 local layout = nil

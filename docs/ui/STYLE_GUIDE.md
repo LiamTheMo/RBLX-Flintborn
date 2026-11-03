@@ -592,7 +592,7 @@ objective at the inset), and the lobby's pills with the Party panel. Corner
 pieces that stand alone (Settings, the hotbar group) are in a corner band and
 keep M. Desktop and wide screens have no insets, so every edge region sits at
 M there. Roblox's own buttons and touch controls sit inside the safe area
-(`HudModel.Thumbstick` / `JumpButton` / `ThumbstickZone` take the insets).
+(`HudModel.Thumbstick` takes the insets).
 
 **Touch hit pads.** Every interactive component's invisible hit button grows
 until it covers at least 44 screen px at the component's real scale (the art

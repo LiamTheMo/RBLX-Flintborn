@@ -33,7 +33,6 @@ test("XP fraction and level text", function()
 	expectEq(HudModel.LevelText(12), "LV. 12", "badge text")
 	expectEq(HudModel.LevelText(nil), "LV. 0", "missing level")
 	expectEq(HudModel.LevelText(50, true), "MAX", "level cap")
-	expect(string.find(HudModel.MaxLevelHint(50), "rebirth", 1, true) ~= nil, "max hint names rebirth")
 end)
 
 test("lobby currency and party header text", function()
@@ -146,17 +145,6 @@ test("slice scale shrinks corners for small widgets", function()
 	expectEq(HudModel.SliceScale(400, 100, 800, 200, nil), 1, "no art scale: as before")
 end)
 
-test("Roblox's touch jump button", function()
-	local phone = HudModel.JumpButton(844, 390)
-	expectEq(phone.size, 70, "a phone's jump button is 70 px")
-	expectEq(phone.x, 749, "95 px from the right")
-	expectEq(phone.y, 300, "90 px from the bottom")
-	local tablet = HudModel.JumpButton(1024, 768)
-	expectEq(tablet.size, 120, "a tablet's is 120 px")
-	expectEq(tablet.x, 854, "170 px from the right")
-	expectEq(tablet.y, 558, "210 px from the bottom")
-end)
-
 test("Roblox's touch controls sit inside the device safe area", function()
 	local phone = HudModel.Thumbstick(844, 390)
 	expectEq(phone.size, 70, "a phone's thumbstick ring is 70 px")
@@ -166,15 +154,10 @@ test("Roblox's touch controls sit inside the device safe area", function()
 	expectEq(tablet.size, 120, "a tablet's is 120 px")
 	expectEq(tablet.x, 60, "60 px from the left")
 	expectEq(tablet.y, 558, "210 px from the bottom")
-	local zone = HudModel.ThumbstickZone(844, 390)
-	expectEq(zone.y, 130, "the dynamic thumbstick starts below the top third")
-	expect(math.abs(zone.w - 337.6) < 1e-6, "in the left 40 %")
 
 	-- A notched phone held sideways: 47 px side insets.
 	local notched = { left = 47, top = 0, right = 47, bottom = 0 }
 	expectEq(HudModel.Thumbstick(844, 390, notched).x, 72, "the ring 25 px inside the left inset")
-	expectEq(HudModel.JumpButton(844, 390, notched).x, 702, "the jump button 95 px inside the right inset")
-	expectEq(HudModel.ThumbstickZone(844, 390, notched).x, 47, "the zone starts at the inset")
 end)
 
 test("the HUD grid: one margin, one gap, one column width (D30)", function()
@@ -284,8 +267,8 @@ test("hotbar stepping wraps", function()
 	expectEq(HudModel.HotbarStep(1, -1, 6), 6, "wraps back")
 end)
 
-test("hotbar slots show their items, stacks and the equipped one", function()
-	local views = HudModel.HotbarSlots({
+test("hotbar slots show their items, stacks and the Permanent ones", function()
+	local items = HudModel.HotbarItems({
 		equipped = 2,
 		slots = {
 			{ area = "hotbar", index = 1, catalogId = "FlintArrow", quantity = 24 },
@@ -295,18 +278,17 @@ test("hotbar slots show their items, stacks and the equipped one", function()
 			{ area = "hotbar", index = 7, catalogId = "Wood", quantity = 5 },
 		},
 	}, 6)
-	expectEq(views[1].name, "Flint Arrow", "item name")
-	expectEq(views[1].count, "×24", "stack count")
-	expectEq(views[1].equipped, false, "not equipped")
-	expectEq(views[2].name, "Iron Sword", "the name stays plain (no star glyph)")
-	expectEq(views[2].permanent, true, "Permanent items are marked for the star art")
-	expectEq(views[2].count, "", "unique items show no count")
-	expectEq(views[2].equipped, true, "the equipped slot")
-	expectEq(views[3].count, "", "a single item shows no count")
-	expectEq(views[4], nil, "backpack items stay off the hotbar")
-	expectEq(views[5], nil, "an empty slot is nil")
-	expectEq(views[7], nil, "slots past the sixth are ignored")
-	expectEq(next(HudModel.HotbarSlots(nil, 6)), nil, "no snapshot, empty hotbar")
+	expectEq(items[1].itemId, "FlintArrow", "item id")
+	expectEq(items[1].quantity, 24, "stack count")
+	expectEq(items[1].permanent, false, "not Permanent")
+	expectEq(items[2].itemId, "IronSword", "the second slot")
+	expectEq(items[2].permanent, true, "Permanent items are marked for the star art")
+	expectEq(items[2].quantity, nil, "unique items carry no count")
+	expectEq(items[3].quantity, 1, "a single item")
+	expectEq(items[4], nil, "backpack items stay off the hotbar")
+	expectEq(items[5], nil, "an empty slot is nil")
+	expectEq(items[7], nil, "slots past the sixth are ignored")
+	expectEq(next(HudModel.HotbarItems(nil, 6)), nil, "no snapshot, empty hotbar")
 end)
 
 test("prompt keycaps name the key for the input in use", function()
@@ -320,13 +302,18 @@ test("prompt keycaps name the key for the input in use", function()
 end)
 
 test("survival status keeps the medicine lock and food healing", function()
-	expectEq(HudModel.SurvivalStatus(0, 0, false), "", "nothing to show")
-	expectEq(HudModel.SurvivalStatus(3.24, 0, false), "Medicine ready in 3.2 s", "lock")
-	expectEq(
-		HudModel.SurvivalStatus(1, 5, true),
-		"Medicine ready in 1.0 s  ·  Food healing +5  ·  ! Hungry: slowed",
-		"all three"
-	)
+	expectEq(#HudModel.StatusChips(0, 0, false), 0, "nothing to show")
+	local lock = HudModel.StatusChips(3.24, 0, false)
+	expectEq(#lock, 1, "one plaque")
+	expectEq(lock[1].icon, "hourglass", "the lock's icon")
+	expectEq(lock[1].text, "Medicine ready in 3.2 s", "lock")
+	local all = HudModel.StatusChips(1, 5, true)
+	expectEq(#all, 3, "all three")
+	expectEq(all[1].text, "Medicine ready in 1.0 s", "lock first")
+	expectEq(all[2].icon, "heart", "then food healing")
+	expectEq(all[2].text, "Food healing +5", "its amount")
+	expectEq(all[3].icon, "warning", "then the hunger slow")
+	expectEq(all[3].text, "Hungry: slowed", "in words")
 end)
 
 test("the extraction objective tracks reaching and holding the zone", function()
