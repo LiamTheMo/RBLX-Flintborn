@@ -694,11 +694,18 @@ function Art.Icon(parent: Instance, id: string, rect, opts): GuiObject
 	return glyphLabel(parent, sprite, id, rect, opts, z)
 end
 
--- The sprite (and optional Color3 tint) ItemInfo.Icon / ItemInfo.Sprite give a
--- catalog item, when the kit can draw it; nil otherwise.
+-- The sprite (and optional Color3 tint) a catalog item draws: its own icon
+-- (ItemInfo.ItemSprite, lk_item_<id>) once that icon's atlas is uploaded (or
+-- previewed in a capture), else the kit art ItemInfo.Icon / ItemInfo.Sprite
+-- give it, so an item keeps its older art until its new atlas has an id; nil
+-- when the kit can draw neither.
 function Art.ItemIcon(catalogId: string?): (string?, Color3?)
 	if catalogId == nil then
 		return nil, nil
+	end
+	local okOwn, own = pcall(ItemInfo.ItemSprite, catalogId)
+	if okOwn and type(own) == "string" and Widgets.HasBaseArt(own) then
+		return own, nil
 	end
 	local ok, icon, tint = pcall(ItemInfo.Icon, catalogId)
 	if not ok or type(icon) ~= "string" then
@@ -718,7 +725,7 @@ function Art.ItemSprite(catalogId: string?): string?
 		return nil
 	end
 	for _, name in { "lk_item_" .. catalogId, "item_" .. catalogId } do
-		if Widgets.HasArt(name) then
+		if Widgets.HasBaseArt(name) then
 			return name
 		end
 	end

@@ -8506,5 +8506,3185 @@
     "w": 1024,
     "h": 1024,
     "slice": null
+  },
+  "lk_item_AbyssalShard": {
+    "file": "lk_item_AbyssalShard.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_AbyssalShard__hi",
+    "atlas": "atlas_lk_items2_1",
+    "rect": [
+      0,
+      0,
+      110,
+      110
+    ]
+  },
+  "lk_item_AbyssalShard__hi": {
+    "file": "lk_item_AbyssalShard__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_AbyssalShard"
+  },
+  "lk_item_AdamantineAxe": {
+    "file": "lk_item_AdamantineAxe.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_AdamantineAxe__hi",
+    "atlas": "atlas_lk_items2_2",
+    "rect": [
+      0,
+      0,
+      110,
+      110
+    ]
+  },
+  "lk_item_AdamantineAxe__hi": {
+    "file": "lk_item_AdamantineAxe__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_AdamantineAxe"
+  },
+  "lk_item_AdamantineBar": {
+    "file": "lk_item_AdamantineBar.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_AdamantineBar__hi",
+    "atlas": "atlas_lk_items2_1",
+    "rect": [
+      114,
+      0,
+      110,
+      110
+    ]
+  },
+  "lk_item_AdamantineBar__hi": {
+    "file": "lk_item_AdamantineBar__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_AdamantineBar"
+  },
+  "lk_item_AdamantineBow": {
+    "file": "lk_item_AdamantineBow.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_AdamantineBow__hi",
+    "atlas": "atlas_lk_items2_2",
+    "rect": [
+      114,
+      0,
+      110,
+      110
+    ]
+  },
+  "lk_item_AdamantineBow__hi": {
+    "file": "lk_item_AdamantineBow__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_AdamantineBow"
+  },
+  "lk_item_AdamantineChest": {
+    "file": "lk_item_AdamantineChest.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_AdamantineChest__hi",
+    "atlas": "atlas_lk_items2_2",
+    "rect": [
+      228,
+      0,
+      110,
+      110
+    ]
+  },
+  "lk_item_AdamantineChest__hi": {
+    "file": "lk_item_AdamantineChest__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_AdamantineChest"
+  },
+  "lk_item_AdamantineDagger": {
+    "file": "lk_item_AdamantineDagger.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_AdamantineDagger__hi",
+    "atlas": "atlas_lk_items2_2",
+    "rect": [
+      342,
+      0,
+      110,
+      110
+    ]
+  },
+  "lk_item_AdamantineDagger__hi": {
+    "file": "lk_item_AdamantineDagger__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_AdamantineDagger"
+  },
+  "lk_item_AdamantineHead": {
+    "file": "lk_item_AdamantineHead.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_AdamantineHead__hi",
+    "atlas": "atlas_lk_items2_2",
+    "rect": [
+      456,
+      0,
+      110,
+      110
+    ]
+  },
+  "lk_item_AdamantineHead__hi": {
+    "file": "lk_item_AdamantineHead__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_AdamantineHead"
+  },
+  "lk_item_AdamantineLegs": {
+    "file": "lk_item_AdamantineLegs.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_AdamantineLegs__hi",
+    "atlas": "atlas_lk_items2_2",
+    "rect": [
+      570,
+      0,
+      110,
+      110
+    ]
+  },
+  "lk_item_AdamantineLegs__hi": {
+    "file": "lk_item_AdamantineLegs__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_AdamantineLegs"
+  },
+  "lk_item_AdamantineOre": {
+    "file": "lk_item_AdamantineOre.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_AdamantineOre__hi",
+    "atlas": "atlas_lk_items2_1",
+    "rect": [
+      228,
+      0,
+      110,
+      110
+    ]
+  },
+  "lk_item_AdamantineOre__hi": {
+    "file": "lk_item_AdamantineOre__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_AdamantineOre"
+  },
+  "lk_item_AdamantinePickaxe": {
+    "file": "lk_item_AdamantinePickaxe.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_AdamantinePickaxe__hi",
+    "atlas": "atlas_lk_items2_2",
+    "rect": [
+      684,
+      0,
+      110,
+      110
+    ]
+  },
+  "lk_item_AdamantinePickaxe__hi": {
+    "file": "lk_item_AdamantinePickaxe__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_AdamantinePickaxe"
+  },
+  "lk_item_AdamantineSpear": {
+    "file": "lk_item_AdamantineSpear.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_AdamantineSpear__hi",
+    "atlas": "atlas_lk_items2_2",
+    "rect": [
+      798,
+      0,
+      110,
+      110
+    ]
+  },
+  "lk_item_AdamantineSpear__hi": {
+    "file": "lk_item_AdamantineSpear__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_AdamantineSpear"
+  },
+  "lk_item_AdamantineSword": {
+    "file": "lk_item_AdamantineSword.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_AdamantineSword__hi",
+    "atlas": "atlas_lk_items2_2",
+    "rect": [
+      912,
+      0,
+      110,
+      110
+    ]
+  },
+  "lk_item_AdamantineSword__hi": {
+    "file": "lk_item_AdamantineSword__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_AdamantineSword"
+  },
+  "lk_item_AdvancedMedicine": {
+    "file": "lk_item_AdvancedMedicine.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_AdvancedMedicine__hi",
+    "atlas": "atlas_lk_items2_1",
+    "rect": [
+      342,
+      0,
+      110,
+      110
+    ]
+  },
+  "lk_item_AdvancedMedicine__hi": {
+    "file": "lk_item_AdvancedMedicine__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_AdvancedMedicine"
+  },
+  "lk_item_Amethyst": {
+    "file": "lk_item_Amethyst.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_Amethyst__hi",
+    "atlas": "atlas_lk_items2_1",
+    "rect": [
+      456,
+      0,
+      110,
+      110
+    ]
+  },
+  "lk_item_Amethyst__hi": {
+    "file": "lk_item_Amethyst__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_Amethyst"
+  },
+  "lk_item_AncientEmber": {
+    "file": "lk_item_AncientEmber.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_AncientEmber__hi",
+    "atlas": "atlas_lk_items2_1",
+    "rect": [
+      570,
+      0,
+      110,
+      110
+    ]
+  },
+  "lk_item_AncientEmber__hi": {
+    "file": "lk_item_AncientEmber__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_AncientEmber"
+  },
+  "lk_item_AshenOil": {
+    "file": "lk_item_AshenOil.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_AshenOil__hi",
+    "atlas": "atlas_lk_items2_1",
+    "rect": [
+      684,
+      0,
+      110,
+      110
+    ]
+  },
+  "lk_item_AshenOil__hi": {
+    "file": "lk_item_AshenOil__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_AshenOil"
+  },
+  "lk_item_BasicMedicine": {
+    "file": "lk_item_BasicMedicine.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_BasicMedicine__hi",
+    "atlas": "atlas_lk_items2_1",
+    "rect": [
+      798,
+      0,
+      110,
+      110
+    ]
+  },
+  "lk_item_BasicMedicine__hi": {
+    "file": "lk_item_BasicMedicine__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_BasicMedicine"
+  },
+  "lk_item_Bloodroot": {
+    "file": "lk_item_Bloodroot.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_Bloodroot__hi",
+    "atlas": "atlas_lk_items2_1",
+    "rect": [
+      912,
+      0,
+      110,
+      110
+    ]
+  },
+  "lk_item_Bloodroot__hi": {
+    "file": "lk_item_Bloodroot__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_Bloodroot"
+  },
+  "lk_item_Bone": {
+    "file": "lk_item_Bone.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_Bone__hi",
+    "atlas": "atlas_lk_items2_1",
+    "rect": [
+      0,
+      114,
+      110,
+      110
+    ]
+  },
+  "lk_item_BoneChest": {
+    "file": "lk_item_BoneChest.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_BoneChest__hi",
+    "atlas": "atlas_lk_items2_1",
+    "rect": [
+      114,
+      114,
+      110,
+      110
+    ]
+  },
+  "lk_item_BoneChest__hi": {
+    "file": "lk_item_BoneChest__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_BoneChest"
+  },
+  "lk_item_BoneDagger": {
+    "file": "lk_item_BoneDagger.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_BoneDagger__hi",
+    "atlas": "atlas_lk_items2_1",
+    "rect": [
+      228,
+      114,
+      110,
+      110
+    ]
+  },
+  "lk_item_BoneDagger__hi": {
+    "file": "lk_item_BoneDagger__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_BoneDagger"
+  },
+  "lk_item_BoneHead": {
+    "file": "lk_item_BoneHead.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_BoneHead__hi",
+    "atlas": "atlas_lk_items2_2",
+    "rect": [
+      0,
+      114,
+      110,
+      110
+    ]
+  },
+  "lk_item_BoneHead__hi": {
+    "file": "lk_item_BoneHead__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_BoneHead"
+  },
+  "lk_item_BoneLegs": {
+    "file": "lk_item_BoneLegs.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_BoneLegs__hi",
+    "atlas": "atlas_lk_items2_2",
+    "rect": [
+      114,
+      114,
+      110,
+      110
+    ]
+  },
+  "lk_item_BoneLegs__hi": {
+    "file": "lk_item_BoneLegs__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_BoneLegs"
+  },
+  "lk_item_BoneSpear": {
+    "file": "lk_item_BoneSpear.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_BoneSpear__hi",
+    "atlas": "atlas_lk_items2_2",
+    "rect": [
+      228,
+      114,
+      110,
+      110
+    ]
+  },
+  "lk_item_BoneSpear__hi": {
+    "file": "lk_item_BoneSpear__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_BoneSpear"
+  },
+  "lk_item_Bone__hi": {
+    "file": "lk_item_Bone__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_Bone"
+  },
+  "lk_item_BreachingCharge": {
+    "file": "lk_item_BreachingCharge.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_BreachingCharge__hi",
+    "atlas": "atlas_lk_items2_1",
+    "rect": [
+      342,
+      114,
+      110,
+      110
+    ]
+  },
+  "lk_item_BreachingCharge__hi": {
+    "file": "lk_item_BreachingCharge__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_BreachingCharge"
+  },
+  "lk_item_CaveMushroom": {
+    "file": "lk_item_CaveMushroom.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_CaveMushroom__hi",
+    "atlas": "atlas_lk_items2_1",
+    "rect": [
+      456,
+      114,
+      110,
+      110
+    ]
+  },
+  "lk_item_CaveMushroom__hi": {
+    "file": "lk_item_CaveMushroom__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_CaveMushroom"
+  },
+  "lk_item_ChargedCore": {
+    "file": "lk_item_ChargedCore.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_ChargedCore__hi",
+    "atlas": "atlas_lk_items2_1",
+    "rect": [
+      570,
+      114,
+      110,
+      110
+    ]
+  },
+  "lk_item_ChargedCore__hi": {
+    "file": "lk_item_ChargedCore__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_ChargedCore"
+  },
+  "lk_item_ChestnutMushroom": {
+    "file": "lk_item_ChestnutMushroom.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_ChestnutMushroom__hi",
+    "atlas": "atlas_lk_items2_1",
+    "rect": [
+      684,
+      114,
+      110,
+      110
+    ]
+  },
+  "lk_item_ChestnutMushroom__hi": {
+    "file": "lk_item_ChestnutMushroom__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_ChestnutMushroom"
+  },
+  "lk_item_Clay": {
+    "file": "lk_item_Clay.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_Clay__hi",
+    "atlas": "atlas_lk_items2_1",
+    "rect": [
+      798,
+      114,
+      110,
+      110
+    ]
+  },
+  "lk_item_Clay__hi": {
+    "file": "lk_item_Clay__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_Clay"
+  },
+  "lk_item_CobaltAxe": {
+    "file": "lk_item_CobaltAxe.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_CobaltAxe__hi",
+    "atlas": "atlas_lk_items2_2",
+    "rect": [
+      342,
+      114,
+      110,
+      110
+    ]
+  },
+  "lk_item_CobaltAxe__hi": {
+    "file": "lk_item_CobaltAxe__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_CobaltAxe"
+  },
+  "lk_item_CobaltBar": {
+    "file": "lk_item_CobaltBar.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_CobaltBar__hi",
+    "atlas": "atlas_lk_items2_1",
+    "rect": [
+      912,
+      114,
+      110,
+      110
+    ]
+  },
+  "lk_item_CobaltBar__hi": {
+    "file": "lk_item_CobaltBar__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_CobaltBar"
+  },
+  "lk_item_CobaltBow": {
+    "file": "lk_item_CobaltBow.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_CobaltBow__hi",
+    "atlas": "atlas_lk_items2_2",
+    "rect": [
+      456,
+      114,
+      110,
+      110
+    ]
+  },
+  "lk_item_CobaltBow__hi": {
+    "file": "lk_item_CobaltBow__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_CobaltBow"
+  },
+  "lk_item_CobaltChest": {
+    "file": "lk_item_CobaltChest.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_CobaltChest__hi",
+    "atlas": "atlas_lk_items2_2",
+    "rect": [
+      570,
+      114,
+      110,
+      110
+    ]
+  },
+  "lk_item_CobaltChest__hi": {
+    "file": "lk_item_CobaltChest__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_CobaltChest"
+  },
+  "lk_item_CobaltDagger": {
+    "file": "lk_item_CobaltDagger.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_CobaltDagger__hi",
+    "atlas": "atlas_lk_items2_2",
+    "rect": [
+      684,
+      114,
+      110,
+      110
+    ]
+  },
+  "lk_item_CobaltDagger__hi": {
+    "file": "lk_item_CobaltDagger__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_CobaltDagger"
+  },
+  "lk_item_CobaltHead": {
+    "file": "lk_item_CobaltHead.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_CobaltHead__hi",
+    "atlas": "atlas_lk_items2_2",
+    "rect": [
+      798,
+      114,
+      110,
+      110
+    ]
+  },
+  "lk_item_CobaltHead__hi": {
+    "file": "lk_item_CobaltHead__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_CobaltHead"
+  },
+  "lk_item_CobaltLegs": {
+    "file": "lk_item_CobaltLegs.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_CobaltLegs__hi",
+    "atlas": "atlas_lk_items2_2",
+    "rect": [
+      912,
+      114,
+      110,
+      110
+    ]
+  },
+  "lk_item_CobaltLegs__hi": {
+    "file": "lk_item_CobaltLegs__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_CobaltLegs"
+  },
+  "lk_item_CobaltOre": {
+    "file": "lk_item_CobaltOre.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_CobaltOre__hi",
+    "atlas": "atlas_lk_items2_1",
+    "rect": [
+      0,
+      228,
+      110,
+      110
+    ]
+  },
+  "lk_item_CobaltOre__hi": {
+    "file": "lk_item_CobaltOre__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_CobaltOre"
+  },
+  "lk_item_CobaltPickaxe": {
+    "file": "lk_item_CobaltPickaxe.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_CobaltPickaxe__hi",
+    "atlas": "atlas_lk_items2_2",
+    "rect": [
+      0,
+      228,
+      110,
+      110
+    ]
+  },
+  "lk_item_CobaltPickaxe__hi": {
+    "file": "lk_item_CobaltPickaxe__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_CobaltPickaxe"
+  },
+  "lk_item_CobaltSpear": {
+    "file": "lk_item_CobaltSpear.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_CobaltSpear__hi",
+    "atlas": "atlas_lk_items2_2",
+    "rect": [
+      114,
+      228,
+      110,
+      110
+    ]
+  },
+  "lk_item_CobaltSpear__hi": {
+    "file": "lk_item_CobaltSpear__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_CobaltSpear"
+  },
+  "lk_item_CobaltSword": {
+    "file": "lk_item_CobaltSword.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_CobaltSword__hi",
+    "atlas": "atlas_lk_items2_2",
+    "rect": [
+      228,
+      228,
+      110,
+      110
+    ]
+  },
+  "lk_item_CobaltSword__hi": {
+    "file": "lk_item_CobaltSword__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_CobaltSword"
+  },
+  "lk_item_CookedMeat": {
+    "file": "lk_item_CookedMeat.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_CookedMeat__hi",
+    "atlas": "atlas_lk_items2_1",
+    "rect": [
+      114,
+      228,
+      110,
+      110
+    ]
+  },
+  "lk_item_CookedMeat__hi": {
+    "file": "lk_item_CookedMeat__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_CookedMeat"
+  },
+  "lk_item_CopperAxe": {
+    "file": "lk_item_CopperAxe.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_CopperAxe__hi",
+    "atlas": "atlas_lk_items2_2",
+    "rect": [
+      342,
+      228,
+      110,
+      110
+    ]
+  },
+  "lk_item_CopperAxe__hi": {
+    "file": "lk_item_CopperAxe__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_CopperAxe"
+  },
+  "lk_item_CopperBar": {
+    "file": "lk_item_CopperBar.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_CopperBar__hi",
+    "atlas": "atlas_lk_items2_1",
+    "rect": [
+      228,
+      228,
+      110,
+      110
+    ]
+  },
+  "lk_item_CopperBar__hi": {
+    "file": "lk_item_CopperBar__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_CopperBar"
+  },
+  "lk_item_CopperBow": {
+    "file": "lk_item_CopperBow.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_CopperBow__hi",
+    "atlas": "atlas_lk_items2_2",
+    "rect": [
+      456,
+      228,
+      110,
+      110
+    ]
+  },
+  "lk_item_CopperBow__hi": {
+    "file": "lk_item_CopperBow__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_CopperBow"
+  },
+  "lk_item_CopperChest": {
+    "file": "lk_item_CopperChest.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_CopperChest__hi",
+    "atlas": "atlas_lk_items2_2",
+    "rect": [
+      570,
+      228,
+      110,
+      110
+    ]
+  },
+  "lk_item_CopperChest__hi": {
+    "file": "lk_item_CopperChest__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_CopperChest"
+  },
+  "lk_item_CopperDagger": {
+    "file": "lk_item_CopperDagger.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_CopperDagger__hi",
+    "atlas": "atlas_lk_items2_2",
+    "rect": [
+      684,
+      228,
+      110,
+      110
+    ]
+  },
+  "lk_item_CopperDagger__hi": {
+    "file": "lk_item_CopperDagger__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_CopperDagger"
+  },
+  "lk_item_CopperHead": {
+    "file": "lk_item_CopperHead.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_CopperHead__hi",
+    "atlas": "atlas_lk_items2_2",
+    "rect": [
+      798,
+      228,
+      110,
+      110
+    ]
+  },
+  "lk_item_CopperHead__hi": {
+    "file": "lk_item_CopperHead__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_CopperHead"
+  },
+  "lk_item_CopperLegs": {
+    "file": "lk_item_CopperLegs.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_CopperLegs__hi",
+    "atlas": "atlas_lk_items2_2",
+    "rect": [
+      912,
+      228,
+      110,
+      110
+    ]
+  },
+  "lk_item_CopperLegs__hi": {
+    "file": "lk_item_CopperLegs__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_CopperLegs"
+  },
+  "lk_item_CopperOre": {
+    "file": "lk_item_CopperOre.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_CopperOre__hi",
+    "atlas": "atlas_lk_items2_1",
+    "rect": [
+      342,
+      228,
+      110,
+      110
+    ]
+  },
+  "lk_item_CopperOre__hi": {
+    "file": "lk_item_CopperOre__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_CopperOre"
+  },
+  "lk_item_CopperPickaxe": {
+    "file": "lk_item_CopperPickaxe.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_CopperPickaxe__hi",
+    "atlas": "atlas_lk_items2_2",
+    "rect": [
+      0,
+      342,
+      110,
+      110
+    ]
+  },
+  "lk_item_CopperPickaxe__hi": {
+    "file": "lk_item_CopperPickaxe__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_CopperPickaxe"
+  },
+  "lk_item_CopperSpear": {
+    "file": "lk_item_CopperSpear.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_CopperSpear__hi",
+    "atlas": "atlas_lk_items2_2",
+    "rect": [
+      114,
+      342,
+      110,
+      110
+    ]
+  },
+  "lk_item_CopperSpear__hi": {
+    "file": "lk_item_CopperSpear__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_CopperSpear"
+  },
+  "lk_item_CopperSword": {
+    "file": "lk_item_CopperSword.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_CopperSword__hi",
+    "atlas": "atlas_lk_items2_2",
+    "rect": [
+      228,
+      342,
+      110,
+      110
+    ]
+  },
+  "lk_item_CopperSword__hi": {
+    "file": "lk_item_CopperSword__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_CopperSword"
+  },
+  "lk_item_DireHide": {
+    "file": "lk_item_DireHide.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_DireHide__hi",
+    "atlas": "atlas_lk_items2_1",
+    "rect": [
+      456,
+      228,
+      110,
+      110
+    ]
+  },
+  "lk_item_DireHide__hi": {
+    "file": "lk_item_DireHide__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_DireHide"
+  },
+  "lk_item_Elderberry": {
+    "file": "lk_item_Elderberry.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_Elderberry__hi",
+    "atlas": "atlas_lk_items2_1",
+    "rect": [
+      570,
+      228,
+      110,
+      110
+    ]
+  },
+  "lk_item_Elderberry__hi": {
+    "file": "lk_item_Elderberry__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_Elderberry"
+  },
+  "lk_item_Emberglass": {
+    "file": "lk_item_Emberglass.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_Emberglass__hi",
+    "atlas": "atlas_lk_items2_1",
+    "rect": [
+      684,
+      228,
+      110,
+      110
+    ]
+  },
+  "lk_item_Emberglass__hi": {
+    "file": "lk_item_Emberglass__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_Emberglass"
+  },
+  "lk_item_ExtractionRune": {
+    "file": "lk_item_ExtractionRune.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_ExtractionRune__hi",
+    "atlas": "atlas_lk_items2_1",
+    "rect": [
+      798,
+      228,
+      110,
+      110
+    ]
+  },
+  "lk_item_ExtractionRune__hi": {
+    "file": "lk_item_ExtractionRune__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_ExtractionRune"
+  },
+  "lk_item_Fiber": {
+    "file": "lk_item_Fiber.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_Fiber__hi",
+    "atlas": "atlas_lk_items2_1",
+    "rect": [
+      912,
+      228,
+      110,
+      110
+    ]
+  },
+  "lk_item_Fiber__hi": {
+    "file": "lk_item_Fiber__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_Fiber"
+  },
+  "lk_item_FireBomb": {
+    "file": "lk_item_FireBomb.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_FireBomb__hi",
+    "atlas": "atlas_lk_items2_1",
+    "rect": [
+      0,
+      342,
+      110,
+      110
+    ]
+  },
+  "lk_item_FireBomb__hi": {
+    "file": "lk_item_FireBomb__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_FireBomb"
+  },
+  "lk_item_Flint": {
+    "file": "lk_item_Flint.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_Flint__hi",
+    "atlas": "atlas_lk_items2_1",
+    "rect": [
+      114,
+      342,
+      110,
+      110
+    ]
+  },
+  "lk_item_FlintArrow": {
+    "file": "lk_item_FlintArrow.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_FlintArrow__hi",
+    "atlas": "atlas_lk_items2_1",
+    "rect": [
+      228,
+      342,
+      110,
+      110
+    ]
+  },
+  "lk_item_FlintArrow__hi": {
+    "file": "lk_item_FlintArrow__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_FlintArrow"
+  },
+  "lk_item_FlintDagger": {
+    "file": "lk_item_FlintDagger.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_FlintDagger__hi",
+    "atlas": "atlas_lk_items2_2",
+    "rect": [
+      342,
+      342,
+      110,
+      110
+    ]
+  },
+  "lk_item_FlintDagger__hi": {
+    "file": "lk_item_FlintDagger__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_FlintDagger"
+  },
+  "lk_item_FlintSpear": {
+    "file": "lk_item_FlintSpear.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_FlintSpear__hi",
+    "atlas": "atlas_lk_items2_2",
+    "rect": [
+      456,
+      342,
+      110,
+      110
+    ]
+  },
+  "lk_item_FlintSpear__hi": {
+    "file": "lk_item_FlintSpear__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_FlintSpear"
+  },
+  "lk_item_Flint__hi": {
+    "file": "lk_item_Flint__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_Flint"
+  },
+  "lk_item_Frostleaf": {
+    "file": "lk_item_Frostleaf.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_Frostleaf__hi",
+    "atlas": "atlas_lk_items2_1",
+    "rect": [
+      342,
+      342,
+      110,
+      110
+    ]
+  },
+  "lk_item_Frostleaf__hi": {
+    "file": "lk_item_Frostleaf__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_Frostleaf"
+  },
+  "lk_item_GlimmerDraught": {
+    "file": "lk_item_GlimmerDraught.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_GlimmerDraught__hi",
+    "atlas": "atlas_lk_items2_1",
+    "rect": [
+      456,
+      342,
+      110,
+      110
+    ]
+  },
+  "lk_item_GlimmerDraught__hi": {
+    "file": "lk_item_GlimmerDraught__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_GlimmerDraught"
+  },
+  "lk_item_Glimmerberry": {
+    "file": "lk_item_Glimmerberry.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_Glimmerberry__hi",
+    "atlas": "atlas_lk_items2_1",
+    "rect": [
+      570,
+      342,
+      110,
+      110
+    ]
+  },
+  "lk_item_Glimmerberry__hi": {
+    "file": "lk_item_Glimmerberry__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_Glimmerberry"
+  },
+  "lk_item_GlowFur": {
+    "file": "lk_item_GlowFur.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_GlowFur__hi",
+    "atlas": "atlas_lk_items2_1",
+    "rect": [
+      684,
+      342,
+      110,
+      110
+    ]
+  },
+  "lk_item_GlowFur__hi": {
+    "file": "lk_item_GlowFur__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_GlowFur"
+  },
+  "lk_item_GreaterPotion": {
+    "file": "lk_item_GreaterPotion.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_GreaterPotion__hi",
+    "atlas": "atlas_lk_items2_1",
+    "rect": [
+      798,
+      342,
+      110,
+      110
+    ]
+  },
+  "lk_item_GreaterPotion__hi": {
+    "file": "lk_item_GreaterPotion__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_GreaterPotion"
+  },
+  "lk_item_GuardianFang": {
+    "file": "lk_item_GuardianFang.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_GuardianFang__hi",
+    "atlas": "atlas_lk_items2_1",
+    "rect": [
+      912,
+      342,
+      110,
+      110
+    ]
+  },
+  "lk_item_GuardianFang__hi": {
+    "file": "lk_item_GuardianFang__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_GuardianFang"
+  },
+  "lk_item_GuardianHeart": {
+    "file": "lk_item_GuardianHeart.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_GuardianHeart__hi",
+    "atlas": "atlas_lk_items2_1",
+    "rect": [
+      0,
+      456,
+      110,
+      110
+    ]
+  },
+  "lk_item_GuardianHeart__hi": {
+    "file": "lk_item_GuardianHeart__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_GuardianHeart"
+  },
+  "lk_item_Hazelnut": {
+    "file": "lk_item_Hazelnut.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_Hazelnut__hi",
+    "atlas": "atlas_lk_items2_1",
+    "rect": [
+      114,
+      456,
+      110,
+      110
+    ]
+  },
+  "lk_item_Hazelnut__hi": {
+    "file": "lk_item_Hazelnut__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_Hazelnut"
+  },
+  "lk_item_HeartyTonic": {
+    "file": "lk_item_HeartyTonic.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_HeartyTonic__hi",
+    "atlas": "atlas_lk_items2_1",
+    "rect": [
+      228,
+      456,
+      110,
+      110
+    ]
+  },
+  "lk_item_HeartyTonic__hi": {
+    "file": "lk_item_HeartyTonic__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_HeartyTonic"
+  },
+  "lk_item_Herbs": {
+    "file": "lk_item_Herbs.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_Herbs__hi",
+    "atlas": "atlas_lk_items2_1",
+    "rect": [
+      342,
+      456,
+      110,
+      110
+    ]
+  },
+  "lk_item_Herbs__hi": {
+    "file": "lk_item_Herbs__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_Herbs"
+  },
+  "lk_item_Hide": {
+    "file": "lk_item_Hide.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_Hide__hi",
+    "atlas": "atlas_lk_items2_1",
+    "rect": [
+      456,
+      456,
+      110,
+      110
+    ]
+  },
+  "lk_item_HideChest": {
+    "file": "lk_item_HideChest.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_HideChest__hi",
+    "atlas": "atlas_lk_items2_1",
+    "rect": [
+      570,
+      456,
+      110,
+      110
+    ]
+  },
+  "lk_item_HideChest__hi": {
+    "file": "lk_item_HideChest__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_HideChest"
+  },
+  "lk_item_HideHead": {
+    "file": "lk_item_HideHead.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_HideHead__hi",
+    "atlas": "atlas_lk_items2_1",
+    "rect": [
+      684,
+      456,
+      110,
+      110
+    ]
+  },
+  "lk_item_HideHead__hi": {
+    "file": "lk_item_HideHead__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_HideHead"
+  },
+  "lk_item_HideLegs": {
+    "file": "lk_item_HideLegs.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_HideLegs__hi",
+    "atlas": "atlas_lk_items2_1",
+    "rect": [
+      798,
+      456,
+      110,
+      110
+    ]
+  },
+  "lk_item_HideLegs__hi": {
+    "file": "lk_item_HideLegs__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_HideLegs"
+  },
+  "lk_item_Hide__hi": {
+    "file": "lk_item_Hide__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_Hide"
+  },
+  "lk_item_IronAxe": {
+    "file": "lk_item_IronAxe.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_IronAxe__hi",
+    "atlas": "atlas_lk_items2_2",
+    "rect": [
+      570,
+      342,
+      110,
+      110
+    ]
+  },
+  "lk_item_IronAxe__hi": {
+    "file": "lk_item_IronAxe__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_IronAxe"
+  },
+  "lk_item_IronBar": {
+    "file": "lk_item_IronBar.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_IronBar__hi",
+    "atlas": "atlas_lk_items2_1",
+    "rect": [
+      912,
+      456,
+      110,
+      110
+    ]
+  },
+  "lk_item_IronBar__hi": {
+    "file": "lk_item_IronBar__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_IronBar"
+  },
+  "lk_item_IronBow": {
+    "file": "lk_item_IronBow.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_IronBow__hi",
+    "atlas": "atlas_lk_items2_2",
+    "rect": [
+      684,
+      342,
+      110,
+      110
+    ]
+  },
+  "lk_item_IronBow__hi": {
+    "file": "lk_item_IronBow__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_IronBow"
+  },
+  "lk_item_IronChest": {
+    "file": "lk_item_IronChest.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_IronChest__hi",
+    "atlas": "atlas_lk_items2_2",
+    "rect": [
+      798,
+      342,
+      110,
+      110
+    ]
+  },
+  "lk_item_IronChest__hi": {
+    "file": "lk_item_IronChest__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_IronChest"
+  },
+  "lk_item_IronDagger": {
+    "file": "lk_item_IronDagger.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_IronDagger__hi",
+    "atlas": "atlas_lk_items2_2",
+    "rect": [
+      912,
+      342,
+      110,
+      110
+    ]
+  },
+  "lk_item_IronDagger__hi": {
+    "file": "lk_item_IronDagger__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_IronDagger"
+  },
+  "lk_item_IronHead": {
+    "file": "lk_item_IronHead.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_IronHead__hi",
+    "atlas": "atlas_lk_items2_2",
+    "rect": [
+      0,
+      456,
+      110,
+      110
+    ]
+  },
+  "lk_item_IronHead__hi": {
+    "file": "lk_item_IronHead__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_IronHead"
+  },
+  "lk_item_IronLegs": {
+    "file": "lk_item_IronLegs.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_IronLegs__hi",
+    "atlas": "atlas_lk_items2_2",
+    "rect": [
+      114,
+      456,
+      110,
+      110
+    ]
+  },
+  "lk_item_IronLegs__hi": {
+    "file": "lk_item_IronLegs__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_IronLegs"
+  },
+  "lk_item_IronOre": {
+    "file": "lk_item_IronOre.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_IronOre__hi",
+    "atlas": "atlas_lk_items2_1",
+    "rect": [
+      0,
+      570,
+      110,
+      110
+    ]
+  },
+  "lk_item_IronOre__hi": {
+    "file": "lk_item_IronOre__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_IronOre"
+  },
+  "lk_item_IronPickaxe": {
+    "file": "lk_item_IronPickaxe.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_IronPickaxe__hi",
+    "atlas": "atlas_lk_items2_2",
+    "rect": [
+      228,
+      456,
+      110,
+      110
+    ]
+  },
+  "lk_item_IronPickaxe__hi": {
+    "file": "lk_item_IronPickaxe__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_IronPickaxe"
+  },
+  "lk_item_IronSpear": {
+    "file": "lk_item_IronSpear.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_IronSpear__hi",
+    "atlas": "atlas_lk_items2_2",
+    "rect": [
+      342,
+      456,
+      110,
+      110
+    ]
+  },
+  "lk_item_IronSpear__hi": {
+    "file": "lk_item_IronSpear__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_IronSpear"
+  },
+  "lk_item_IronSword": {
+    "file": "lk_item_IronSword.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_IronSword__hi",
+    "atlas": "atlas_lk_items2_2",
+    "rect": [
+      456,
+      456,
+      110,
+      110
+    ]
+  },
+  "lk_item_IronSword__hi": {
+    "file": "lk_item_IronSword__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_IronSword"
+  },
+  "lk_item_Jade": {
+    "file": "lk_item_Jade.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_Jade__hi",
+    "atlas": "atlas_lk_items2_1",
+    "rect": [
+      114,
+      570,
+      110,
+      110
+    ]
+  },
+  "lk_item_JadeDagger": {
+    "file": "lk_item_JadeDagger.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_JadeDagger__hi",
+    "atlas": "atlas_lk_items2_2",
+    "rect": [
+      570,
+      456,
+      110,
+      110
+    ]
+  },
+  "lk_item_JadeDagger__hi": {
+    "file": "lk_item_JadeDagger__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_JadeDagger"
+  },
+  "lk_item_JadeSpear": {
+    "file": "lk_item_JadeSpear.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_JadeSpear__hi",
+    "atlas": "atlas_lk_items2_2",
+    "rect": [
+      684,
+      456,
+      110,
+      110
+    ]
+  },
+  "lk_item_JadeSpear__hi": {
+    "file": "lk_item_JadeSpear__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_JadeSpear"
+  },
+  "lk_item_Jade__hi": {
+    "file": "lk_item_Jade__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_Jade"
+  },
+  "lk_item_JuniperBerry": {
+    "file": "lk_item_JuniperBerry.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_JuniperBerry__hi",
+    "atlas": "atlas_lk_items2_1",
+    "rect": [
+      228,
+      570,
+      110,
+      110
+    ]
+  },
+  "lk_item_JuniperBerry__hi": {
+    "file": "lk_item_JuniperBerry__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_JuniperBerry"
+  },
+  "lk_item_MithrilAxe": {
+    "file": "lk_item_MithrilAxe.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_MithrilAxe__hi",
+    "atlas": "atlas_lk_items2_2",
+    "rect": [
+      798,
+      456,
+      110,
+      110
+    ]
+  },
+  "lk_item_MithrilAxe__hi": {
+    "file": "lk_item_MithrilAxe__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_MithrilAxe"
+  },
+  "lk_item_MithrilBar": {
+    "file": "lk_item_MithrilBar.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_MithrilBar__hi",
+    "atlas": "atlas_lk_items2_1",
+    "rect": [
+      342,
+      570,
+      110,
+      110
+    ]
+  },
+  "lk_item_MithrilBar__hi": {
+    "file": "lk_item_MithrilBar__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_MithrilBar"
+  },
+  "lk_item_MithrilBow": {
+    "file": "lk_item_MithrilBow.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_MithrilBow__hi",
+    "atlas": "atlas_lk_items2_2",
+    "rect": [
+      912,
+      456,
+      110,
+      110
+    ]
+  },
+  "lk_item_MithrilBow__hi": {
+    "file": "lk_item_MithrilBow__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_MithrilBow"
+  },
+  "lk_item_MithrilChest": {
+    "file": "lk_item_MithrilChest.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_MithrilChest__hi",
+    "atlas": "atlas_lk_items2_2",
+    "rect": [
+      0,
+      570,
+      110,
+      110
+    ]
+  },
+  "lk_item_MithrilChest__hi": {
+    "file": "lk_item_MithrilChest__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_MithrilChest"
+  },
+  "lk_item_MithrilDagger": {
+    "file": "lk_item_MithrilDagger.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_MithrilDagger__hi",
+    "atlas": "atlas_lk_items2_2",
+    "rect": [
+      114,
+      570,
+      110,
+      110
+    ]
+  },
+  "lk_item_MithrilDagger__hi": {
+    "file": "lk_item_MithrilDagger__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_MithrilDagger"
+  },
+  "lk_item_MithrilHead": {
+    "file": "lk_item_MithrilHead.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_MithrilHead__hi",
+    "atlas": "atlas_lk_items2_2",
+    "rect": [
+      228,
+      570,
+      110,
+      110
+    ]
+  },
+  "lk_item_MithrilHead__hi": {
+    "file": "lk_item_MithrilHead__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_MithrilHead"
+  },
+  "lk_item_MithrilLegs": {
+    "file": "lk_item_MithrilLegs.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_MithrilLegs__hi",
+    "atlas": "atlas_lk_items2_2",
+    "rect": [
+      342,
+      570,
+      110,
+      110
+    ]
+  },
+  "lk_item_MithrilLegs__hi": {
+    "file": "lk_item_MithrilLegs__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_MithrilLegs"
+  },
+  "lk_item_MithrilOre": {
+    "file": "lk_item_MithrilOre.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_MithrilOre__hi",
+    "atlas": "atlas_lk_items2_1",
+    "rect": [
+      456,
+      570,
+      110,
+      110
+    ]
+  },
+  "lk_item_MithrilOre__hi": {
+    "file": "lk_item_MithrilOre__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_MithrilOre"
+  },
+  "lk_item_MithrilPickaxe": {
+    "file": "lk_item_MithrilPickaxe.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_MithrilPickaxe__hi",
+    "atlas": "atlas_lk_items2_2",
+    "rect": [
+      456,
+      570,
+      110,
+      110
+    ]
+  },
+  "lk_item_MithrilPickaxe__hi": {
+    "file": "lk_item_MithrilPickaxe__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_MithrilPickaxe"
+  },
+  "lk_item_MithrilSpear": {
+    "file": "lk_item_MithrilSpear.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_MithrilSpear__hi",
+    "atlas": "atlas_lk_items2_2",
+    "rect": [
+      570,
+      570,
+      110,
+      110
+    ]
+  },
+  "lk_item_MithrilSpear__hi": {
+    "file": "lk_item_MithrilSpear__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_MithrilSpear"
+  },
+  "lk_item_MithrilSword": {
+    "file": "lk_item_MithrilSword.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_MithrilSword__hi",
+    "atlas": "atlas_lk_items2_2",
+    "rect": [
+      684,
+      570,
+      110,
+      110
+    ]
+  },
+  "lk_item_MithrilSword__hi": {
+    "file": "lk_item_MithrilSword__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_MithrilSword"
+  },
+  "lk_item_Moonpetal": {
+    "file": "lk_item_Moonpetal.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_Moonpetal__hi",
+    "atlas": "atlas_lk_items2_1",
+    "rect": [
+      570,
+      570,
+      110,
+      110
+    ]
+  },
+  "lk_item_Moonpetal__hi": {
+    "file": "lk_item_Moonpetal__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_Moonpetal"
+  },
+  "lk_item_Obsidian": {
+    "file": "lk_item_Obsidian.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_Obsidian__hi",
+    "atlas": "atlas_lk_items2_1",
+    "rect": [
+      684,
+      570,
+      110,
+      110
+    ]
+  },
+  "lk_item_ObsidianDagger": {
+    "file": "lk_item_ObsidianDagger.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_ObsidianDagger__hi",
+    "atlas": "atlas_lk_items2_2",
+    "rect": [
+      798,
+      570,
+      110,
+      110
+    ]
+  },
+  "lk_item_ObsidianDagger__hi": {
+    "file": "lk_item_ObsidianDagger__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_ObsidianDagger"
+  },
+  "lk_item_ObsidianSpear": {
+    "file": "lk_item_ObsidianSpear.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_ObsidianSpear__hi",
+    "atlas": "atlas_lk_items2_2",
+    "rect": [
+      912,
+      570,
+      110,
+      110
+    ]
+  },
+  "lk_item_ObsidianSpear__hi": {
+    "file": "lk_item_ObsidianSpear__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_ObsidianSpear"
+  },
+  "lk_item_Obsidian__hi": {
+    "file": "lk_item_Obsidian__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_Obsidian"
+  },
+  "lk_item_Potion": {
+    "file": "lk_item_Potion.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_Potion__hi",
+    "atlas": "atlas_lk_items2_1",
+    "rect": [
+      798,
+      570,
+      110,
+      110
+    ]
+  },
+  "lk_item_Potion__hi": {
+    "file": "lk_item_Potion__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_Potion"
+  },
+  "lk_item_Raspberry": {
+    "file": "lk_item_Raspberry.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_Raspberry__hi",
+    "atlas": "atlas_lk_items2_1",
+    "rect": [
+      912,
+      570,
+      110,
+      110
+    ]
+  },
+  "lk_item_Raspberry__hi": {
+    "file": "lk_item_Raspberry__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_Raspberry"
+  },
+  "lk_item_RawMeat": {
+    "file": "lk_item_RawMeat.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_RawMeat__hi",
+    "atlas": "atlas_lk_items2_1",
+    "rect": [
+      0,
+      684,
+      110,
+      110
+    ]
+  },
+  "lk_item_RawMeat__hi": {
+    "file": "lk_item_RawMeat__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_RawMeat"
+  },
+  "lk_item_Redberry": {
+    "file": "lk_item_Redberry.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_Redberry__hi",
+    "atlas": "atlas_lk_items2_1",
+    "rect": [
+      114,
+      684,
+      110,
+      110
+    ]
+  },
+  "lk_item_Redberry__hi": {
+    "file": "lk_item_Redberry__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_Redberry"
+  },
+  "lk_item_RedcapMushroom": {
+    "file": "lk_item_RedcapMushroom.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_RedcapMushroom__hi",
+    "atlas": "atlas_lk_items2_1",
+    "rect": [
+      228,
+      684,
+      110,
+      110
+    ]
+  },
+  "lk_item_RedcapMushroom__hi": {
+    "file": "lk_item_RedcapMushroom__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_RedcapMushroom"
+  },
+  "lk_item_Resin": {
+    "file": "lk_item_Resin.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_Resin__hi",
+    "atlas": "atlas_lk_items2_1",
+    "rect": [
+      342,
+      684,
+      110,
+      110
+    ]
+  },
+  "lk_item_Resin__hi": {
+    "file": "lk_item_Resin__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_Resin"
+  },
+  "lk_item_SiegeResin": {
+    "file": "lk_item_SiegeResin.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_SiegeResin__hi",
+    "atlas": "atlas_lk_items2_1",
+    "rect": [
+      456,
+      684,
+      110,
+      110
+    ]
+  },
+  "lk_item_SiegeResin__hi": {
+    "file": "lk_item_SiegeResin__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_SiegeResin"
+  },
+  "lk_item_SilverAxe": {
+    "file": "lk_item_SilverAxe.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_SilverAxe__hi",
+    "atlas": "atlas_lk_items2_2",
+    "rect": [
+      0,
+      684,
+      110,
+      110
+    ]
+  },
+  "lk_item_SilverAxe__hi": {
+    "file": "lk_item_SilverAxe__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_SilverAxe"
+  },
+  "lk_item_SilverBar": {
+    "file": "lk_item_SilverBar.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_SilverBar__hi",
+    "atlas": "atlas_lk_items2_1",
+    "rect": [
+      570,
+      684,
+      110,
+      110
+    ]
+  },
+  "lk_item_SilverBar__hi": {
+    "file": "lk_item_SilverBar__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_SilverBar"
+  },
+  "lk_item_SilverBow": {
+    "file": "lk_item_SilverBow.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_SilverBow__hi",
+    "atlas": "atlas_lk_items2_2",
+    "rect": [
+      114,
+      684,
+      110,
+      110
+    ]
+  },
+  "lk_item_SilverBow__hi": {
+    "file": "lk_item_SilverBow__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_SilverBow"
+  },
+  "lk_item_SilverChest": {
+    "file": "lk_item_SilverChest.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_SilverChest__hi",
+    "atlas": "atlas_lk_items2_2",
+    "rect": [
+      228,
+      684,
+      110,
+      110
+    ]
+  },
+  "lk_item_SilverChest__hi": {
+    "file": "lk_item_SilverChest__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_SilverChest"
+  },
+  "lk_item_SilverDagger": {
+    "file": "lk_item_SilverDagger.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_SilverDagger__hi",
+    "atlas": "atlas_lk_items2_2",
+    "rect": [
+      342,
+      684,
+      110,
+      110
+    ]
+  },
+  "lk_item_SilverDagger__hi": {
+    "file": "lk_item_SilverDagger__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_SilverDagger"
+  },
+  "lk_item_SilverHead": {
+    "file": "lk_item_SilverHead.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_SilverHead__hi",
+    "atlas": "atlas_lk_items2_2",
+    "rect": [
+      456,
+      684,
+      110,
+      110
+    ]
+  },
+  "lk_item_SilverHead__hi": {
+    "file": "lk_item_SilverHead__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_SilverHead"
+  },
+  "lk_item_SilverLegs": {
+    "file": "lk_item_SilverLegs.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_SilverLegs__hi",
+    "atlas": "atlas_lk_items2_2",
+    "rect": [
+      570,
+      684,
+      110,
+      110
+    ]
+  },
+  "lk_item_SilverLegs__hi": {
+    "file": "lk_item_SilverLegs__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_SilverLegs"
+  },
+  "lk_item_SilverOre": {
+    "file": "lk_item_SilverOre.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_SilverOre__hi",
+    "atlas": "atlas_lk_items2_1",
+    "rect": [
+      684,
+      684,
+      110,
+      110
+    ]
+  },
+  "lk_item_SilverOre__hi": {
+    "file": "lk_item_SilverOre__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_SilverOre"
+  },
+  "lk_item_SilverPickaxe": {
+    "file": "lk_item_SilverPickaxe.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_SilverPickaxe__hi",
+    "atlas": "atlas_lk_items2_2",
+    "rect": [
+      684,
+      684,
+      110,
+      110
+    ]
+  },
+  "lk_item_SilverPickaxe__hi": {
+    "file": "lk_item_SilverPickaxe__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_SilverPickaxe"
+  },
+  "lk_item_SilverSpear": {
+    "file": "lk_item_SilverSpear.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_SilverSpear__hi",
+    "atlas": "atlas_lk_items2_2",
+    "rect": [
+      798,
+      684,
+      110,
+      110
+    ]
+  },
+  "lk_item_SilverSpear__hi": {
+    "file": "lk_item_SilverSpear__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_SilverSpear"
+  },
+  "lk_item_SilverSword": {
+    "file": "lk_item_SilverSword.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_SilverSword__hi",
+    "atlas": "atlas_lk_items2_2",
+    "rect": [
+      912,
+      684,
+      110,
+      110
+    ]
+  },
+  "lk_item_SilverSword__hi": {
+    "file": "lk_item_SilverSword__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_SilverSword"
+  },
+  "lk_item_Starstone": {
+    "file": "lk_item_Starstone.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_Starstone__hi",
+    "atlas": "atlas_lk_items2_1",
+    "rect": [
+      798,
+      684,
+      110,
+      110
+    ]
+  },
+  "lk_item_Starstone__hi": {
+    "file": "lk_item_Starstone__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_Starstone"
+  },
+  "lk_item_Stone": {
+    "file": "lk_item_Stone.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_Stone__hi",
+    "atlas": "atlas_lk_items2_1",
+    "rect": [
+      912,
+      684,
+      110,
+      110
+    ]
+  },
+  "lk_item_StoneAxe": {
+    "file": "lk_item_StoneAxe.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_StoneAxe__hi",
+    "atlas": "atlas_lk_items2_1",
+    "rect": [
+      0,
+      798,
+      110,
+      110
+    ]
+  },
+  "lk_item_StoneAxe__hi": {
+    "file": "lk_item_StoneAxe__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_StoneAxe"
+  },
+  "lk_item_StoneDagger": {
+    "file": "lk_item_StoneDagger.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_StoneDagger__hi",
+    "atlas": "atlas_lk_items2_1",
+    "rect": [
+      114,
+      798,
+      110,
+      110
+    ]
+  },
+  "lk_item_StoneDagger__hi": {
+    "file": "lk_item_StoneDagger__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_StoneDagger"
+  },
+  "lk_item_StonePickaxe": {
+    "file": "lk_item_StonePickaxe.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_StonePickaxe__hi",
+    "atlas": "atlas_lk_items2_1",
+    "rect": [
+      228,
+      798,
+      110,
+      110
+    ]
+  },
+  "lk_item_StonePickaxe__hi": {
+    "file": "lk_item_StonePickaxe__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_StonePickaxe"
+  },
+  "lk_item_StoneSpear": {
+    "file": "lk_item_StoneSpear.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_StoneSpear__hi",
+    "atlas": "atlas_lk_items2_1",
+    "rect": [
+      342,
+      798,
+      110,
+      110
+    ]
+  },
+  "lk_item_StoneSpear__hi": {
+    "file": "lk_item_StoneSpear__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_StoneSpear"
+  },
+  "lk_item_StoneSword": {
+    "file": "lk_item_StoneSword.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_StoneSword__hi",
+    "atlas": "atlas_lk_items2_1",
+    "rect": [
+      456,
+      798,
+      110,
+      110
+    ]
+  },
+  "lk_item_StoneSword__hi": {
+    "file": "lk_item_StoneSword__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_StoneSword"
+  },
+  "lk_item_Stone__hi": {
+    "file": "lk_item_Stone__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_Stone"
+  },
+  "lk_item_Stormglass": {
+    "file": "lk_item_Stormglass.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_Stormglass__hi",
+    "atlas": "atlas_lk_items2_1",
+    "rect": [
+      570,
+      798,
+      110,
+      110
+    ]
+  },
+  "lk_item_Stormglass__hi": {
+    "file": "lk_item_Stormglass__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_Stormglass"
+  },
+  "lk_item_StrongGlimmerDraught": {
+    "file": "lk_item_StrongGlimmerDraught.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_StrongGlimmerDraught__hi",
+    "atlas": "atlas_lk_items2_1",
+    "rect": [
+      684,
+      798,
+      110,
+      110
+    ]
+  },
+  "lk_item_StrongGlimmerDraught__hi": {
+    "file": "lk_item_StrongGlimmerDraught__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_StrongGlimmerDraught"
+  },
+  "lk_item_StrongSunberryDraught": {
+    "file": "lk_item_StrongSunberryDraught.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_StrongSunberryDraught__hi",
+    "atlas": "atlas_lk_items2_1",
+    "rect": [
+      798,
+      798,
+      110,
+      110
+    ]
+  },
+  "lk_item_StrongSunberryDraught__hi": {
+    "file": "lk_item_StrongSunberryDraught__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_StrongSunberryDraught"
+  },
+  "lk_item_Sunberry": {
+    "file": "lk_item_Sunberry.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_Sunberry__hi",
+    "atlas": "atlas_lk_items2_1",
+    "rect": [
+      912,
+      798,
+      110,
+      110
+    ]
+  },
+  "lk_item_SunberryDraught": {
+    "file": "lk_item_SunberryDraught.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_SunberryDraught__hi",
+    "atlas": "atlas_lk_items2_1",
+    "rect": [
+      0,
+      912,
+      110,
+      110
+    ]
+  },
+  "lk_item_SunberryDraught__hi": {
+    "file": "lk_item_SunberryDraught__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_SunberryDraught"
+  },
+  "lk_item_Sunberry__hi": {
+    "file": "lk_item_Sunberry__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_Sunberry"
+  },
+  "lk_item_Sweetberry": {
+    "file": "lk_item_Sweetberry.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_Sweetberry__hi",
+    "atlas": "atlas_lk_items2_1",
+    "rect": [
+      114,
+      912,
+      110,
+      110
+    ]
+  },
+  "lk_item_Sweetberry__hi": {
+    "file": "lk_item_Sweetberry__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_Sweetberry"
+  },
+  "lk_item_Thornvine": {
+    "file": "lk_item_Thornvine.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_Thornvine__hi",
+    "atlas": "atlas_lk_items2_1",
+    "rect": [
+      228,
+      912,
+      110,
+      110
+    ]
+  },
+  "lk_item_Thornvine__hi": {
+    "file": "lk_item_Thornvine__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_Thornvine"
+  },
+  "lk_item_Wood": {
+    "file": "lk_item_Wood.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_Wood__hi",
+    "atlas": "atlas_lk_items2_1",
+    "rect": [
+      342,
+      912,
+      110,
+      110
+    ]
+  },
+  "lk_item_Wood__hi": {
+    "file": "lk_item_Wood__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_Wood"
+  },
+  "lk_item_WoodenAxe": {
+    "file": "lk_item_WoodenAxe.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_WoodenAxe__hi",
+    "atlas": "atlas_lk_items2_1",
+    "rect": [
+      456,
+      912,
+      110,
+      110
+    ]
+  },
+  "lk_item_WoodenAxe__hi": {
+    "file": "lk_item_WoodenAxe__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_WoodenAxe"
+  },
+  "lk_item_WoodenBow": {
+    "file": "lk_item_WoodenBow.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_WoodenBow__hi",
+    "atlas": "atlas_lk_items2_1",
+    "rect": [
+      570,
+      912,
+      110,
+      110
+    ]
+  },
+  "lk_item_WoodenBow__hi": {
+    "file": "lk_item_WoodenBow__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_WoodenBow"
+  },
+  "lk_item_WoodenPickaxe": {
+    "file": "lk_item_WoodenPickaxe.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_WoodenPickaxe__hi",
+    "atlas": "atlas_lk_items2_1",
+    "rect": [
+      684,
+      912,
+      110,
+      110
+    ]
+  },
+  "lk_item_WoodenPickaxe__hi": {
+    "file": "lk_item_WoodenPickaxe__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_WoodenPickaxe"
+  },
+  "lk_item_WoodenSpear": {
+    "file": "lk_item_WoodenSpear.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_WoodenSpear__hi",
+    "atlas": "atlas_lk_items2_1",
+    "rect": [
+      798,
+      912,
+      110,
+      110
+    ]
+  },
+  "lk_item_WoodenSpear__hi": {
+    "file": "lk_item_WoodenSpear__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_WoodenSpear"
+  },
+  "lk_item_Workbench": {
+    "file": "lk_item_Workbench.png",
+    "w": 110,
+    "h": 110,
+    "slice": null,
+    "hi": "lk_item_Workbench__hi",
+    "atlas": "atlas_lk_items2_1",
+    "rect": [
+      912,
+      912,
+      110,
+      110
+    ]
+  },
+  "lk_item_Workbench__hi": {
+    "file": "lk_item_Workbench__hi.png",
+    "w": 356,
+    "h": 356,
+    "slice": null,
+    "scale": 3.2364,
+    "of": "lk_item_Workbench"
+  },
+  "atlas_lk_items2_1": {
+    "file": "atlas_lk_items2_1.png",
+    "w": 1024,
+    "h": 1024,
+    "slice": null
+  },
+  "atlas_lk_items2_2": {
+    "file": "atlas_lk_items2_2.png",
+    "w": 1024,
+    "h": 1024,
+    "slice": null
   }
 }
