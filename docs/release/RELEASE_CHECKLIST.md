@@ -1,10 +1,10 @@
 # Flintborn v1.00 release checklist
 
-Phase v0.18 (release candidate) ships the automated part: the complete CI suite on `main` (Luau specs including the GDD §24 security suite and profile migrations, publish-safety tests and the Rojo build) passes, and both places are deployed and verified. Promotion to the permanent `v1.00` branch waits for the manual items below. Mark each one when it passes.
+Phase v0.18 (release candidate) ships the automated part: the complete CI suite on `main` (Luau specs including the GDD §24 security suite and profile migrations, publish-safety tests and the Rojo build) passes, and both places are deployed and verified. v0.19, the first fully playable build (GDD §58), is in progress on top of it. Promotion to the permanent `v1.00` branch waits for the manual items below. Mark each one when it passes.
 
 ## 1. Regression lists on the published place
 
-Run every Studio and live check in `docs/release/MANUAL_VALIDATION.md` (v0.01–v0.17) on the published places. These cover the GDD regression lists in §27.1, §31.7, §34.4, §35.4, §36.6, §37.4, §38.4, §39.6, §41.3 and §42.3.
+Run every Studio and live check in `docs/release/MANUAL_VALIDATION.md` (v0.01–v0.18 and the post-release hardening) on the published places. These cover the GDD regression lists in §27.1, §31.7, §34.4, §35.4, §36.6, §37.4, §38.4, §39.6, §41.3 and §42.3.
 
 - [ ] All manual checks pass on the published lobby and world places.
 - [ ] The post-release hardening checks in [`MANUAL_VALIDATION.md`](MANUAL_VALIDATION.md#post-release-hardening-after-v018) pass, especially movement rubber-banding on a real network.
@@ -50,5 +50,5 @@ Run every Studio and live check in `docs/release/MANUAL_VALIDATION.md` (v0.01–
 ## 8. Promotion
 
 - [ ] GDD §13.2 documentation checklist ticked.
-- [ ] `v0.18` merged to `main`, deployed and verified (done by CI on every release).
+- [ ] The last version branch (`v0.19` today) merged to `main`, deployed and verified (done by CI on every release).
 - [ ] Create the permanent `v1.00` branch from that `main` commit and add the launch entry to the GDD change log (§43).

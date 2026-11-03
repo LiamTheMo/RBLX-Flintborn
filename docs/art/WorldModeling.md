@@ -18,7 +18,7 @@ The current production pipeline already establishes:
 - **Builds:** run existing sheet scripts through `art/blender/run.sh`, for example `art/blender/run.sh scripts/build_05_trees_plants.py`. The wrapper checks Python errors and whether expected outputs were actually rewritten. Do not replace it with bare Blender commands or pipe its output through an error filter. Rebuild a changed library sheet before rebuilding the lobby that links it. Only the main session controls the open Blender GUI through MCP.
 - **Effects and export:** follow the existing VFX socket system in `art/blender/lib/vfx.py`. Lobby export uses the current `.glb`/palette texture/placement-manifest pipeline described in the Blender README. An FBX or loose multi-object export is not a drop-in substitute. Character export has its own separate contract.
 
-The current release candidate is `v0.18`; remaining launch work is tracked in [docs/release/RELEASE_CHECKLIST.md](../release/RELEASE_CHECKLIST.md). This document does not mark those manual checks complete. Publishing this guide does not regenerate or upload art, replace existing Blender libraries, or change the live world layout.
+Phases `v0.01`–`v0.18` are shipped and `v0.19` (the first fully playable build) is in progress; remaining launch work is tracked in [docs/release/RELEASE_CHECKLIST.md](../release/RELEASE_CHECKLIST.md). This document does not mark those manual checks complete. Publishing this guide does not regenerate or upload art, replace existing Blender libraries, or change the live world layout.
 
 ## 1. Read this before touching the scene
 
