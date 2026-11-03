@@ -27,7 +27,7 @@ end
 -- Runs `apply(profile) -> (ok, resultOrReason)` once for `prefix .. nonce`.
 -- Returns (ok, resultOrReason) and publishes the wallet.
 function CurrencyService.Run(player: Player, prefix: string, nonce: any, kind: string, apply)
-	if not Validation.IsId(nonce) or #nonce > 50 then
+	if not Validation.IsNonce(nonce) then
 		return false, "BadRequest"
 	end
 	local before = ProfileService.GetProfile(player)

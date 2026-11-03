@@ -113,7 +113,7 @@ local function snapshot(player: Player)
 end
 
 local function craft(player: Player, recipeId: any, sourceId: any, nonce: any, count: any)
-	if ForgeRecipes.Get(recipeId) == nil or not Validation.IsId(nonce) or #nonce > 50 then
+	if ForgeRecipes.Get(recipeId) == nil or not Validation.IsNonce(nonce) then
 		return false, "BadRequest"
 	end
 	if sourceId ~= nil and not Validation.IsId(sourceId) then
