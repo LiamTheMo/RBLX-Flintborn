@@ -38,6 +38,15 @@ for name, entry in UiAssets.Sprites do
 		end
 	end
 end
+-- The item icon atlases (atlas_lk_items2_*) are new uploads too: an item draws
+-- its new icon only once that atlas has loaded on this client, and its older
+-- art until then (Art.ItemIcon asks HasBaseArt), so a slow or not-yet-served
+-- upload never leaves a slot on a stand-in.
+for _, entry in UiAssets.Sprites do
+	if type(entry) == "table" and type(entry.atlas) == "string" and string.find(entry.atlas, "^atlas_lk_items2_") then
+		HI_ATLASES[entry.atlas] = true
+	end
+end
 local warming: { [string]: () -> () } = {}
 
 local function readyImage(name: string): string?
