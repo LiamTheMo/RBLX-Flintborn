@@ -28,8 +28,8 @@ local handlers = {
 		snapshots += 1
 		return view
 	end,
-	VaultDeposit = function(index, confirmId, loss)
-		table.insert(calls, { "VaultDeposit", index, confirmId, loss })
+	VaultDeposit = function(index, confirmId, loss, quantity)
+		table.insert(calls, { "VaultDeposit", index, confirmId, loss, quantity })
 		local item = view.backpack[index]
 		if item and item.catalogId == "Wood" and confirmId == nil then
 			return false, "VaultWouldOverflow", 40
@@ -95,11 +95,17 @@ end
 -- STORE the axe.
 press(window:ActionButton("store"))
 check(calls[1] and calls[1][1] == "VaultDeposit" and calls[1][2] == 1, "STORE deposits the chosen slot")
+check(calls[1] and calls[1][5] == 1, "a single item stores one")
 check(not window.busy and window:ActionButton("store") ~= nil, "the action is live again after the reply")
 -- Wood overflows: asks first, then deposits with the confirmation.
 press(window:SlotFor("b1"))
 check(window.detailName.root.Text == "Wood", "pressing a slot shows it in the card")
+check(window.amount ~= nil, "a backpack stack shows the amount stepper, as TAKE does")
+window.amount:SetValue(40)
+window.amount.plus.control.hit.Activated:Fire()
+check(window.amount.value == 41, "+ raises the amount to store")
 window:ActionButton("store").control:Activate()
+check(calls[#calls][1] == "VaultDeposit" and calls[#calls][5] == 41, "STORE sends the amount picked")
 local dialogGui = player.PlayerGui:FindFirstChild("KitDialog")
 check(dialogGui ~= nil and dialogGui.Enabled, "an overflow asks first")
 local before = #calls
@@ -112,6 +118,7 @@ end
 confirm.Hit.Activated:Fire()
 local last = calls[#calls]
 check(#calls == before + 1 and last[3] == "Wood" and last[4] == 40, "deposit anyway names the stack and loss")
+check(last[5] == 41, "deposit anyway keeps the amount picked")
 
 -- Search and categories filter the grid.
 window:SetQuery("fib")
@@ -134,8 +141,9 @@ check(
 )
 press(window:SlotFor("mStone"))
 check(window.amount ~= nil, "a material shows the amount stepper")
+local start = window.amount.value
 window.amount.plus.control.hit.Activated:Fire()
-check(window.amount.value == 11, "+ raises the amount")
+check(window.amount.value == start + 1, "+ raises the amount")
 window.amount.all.control.hit.Activated:Fire()
 press(window:ActionButton("take"))
 last = calls[#calls]
