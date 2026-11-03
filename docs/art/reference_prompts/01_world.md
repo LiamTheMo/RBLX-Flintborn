@@ -1,6 +1,8 @@
 # Prompt 1: world elements (sheets 173–212)
 
-Resource nodes, depleted nodes, event set-pieces, building pieces, extraction sites, landmarks and lobby stations. Open a new chat, paste everything in the box, and type `next` after each sheet.
+Resource nodes, depleted nodes, event set-pieces, crops and terrain pieces. Open a new chat, paste everything in the box, and type `next` after each sheet.
+
+Building pieces, totems, extraction sites, landmarks, lobby stations, the fence and the wayfinding post (191–197, 199–207, 211, 212) moved to [06_buildings.md](06_buildings.md); this prompt skips those numbers.
 
 ```text
 You are the concept artist for Flintborn, a Roblox survival game. You will make
@@ -167,54 +169,14 @@ colour as solid accents only.
     stone studs), Gilded (gold bands, gem lock), Elder (dark wood, purple
     runes). Add an OPEN state close-up with the lid up and the lock gem dark.
 
-BUILDING PIECES. Player-built, so they must be modular and tile edge to edge.
-Sizes: wall 8x8x1, floor 8x1x8, door 4x8x1, roof 8x8 pitched. The player is
-5 studs tall, so add the scale figure.
-191 TIMBER BUILDING SET (Wood tier): wall of lashed horizontal logs between
-    corner posts, plank floor, plank door with a rope handle, pitched
-    log-and-thatch roof. Show the 4 pieces snapped into a small hut.
-192 STONE BUILDING SET (Stone tier): fitted pale-grey block wall with a timber
-    top beam, flagstone floor, heavy plank door in a stone frame, slate-tile
-    roof. Show the 4 pieces snapped into a small hut.
-193 METAL-PLATE BUILDING SET: a timber frame clad in riveted metal plates; the
-    same 4 pieces. Add a "TIER TINTS" strip showing the wall in Copper, Iron,
-    Silver, Cobalt, Mithril and Adamantine colours.
-194 BED: a low timber frame with a hide mattress, a fur blanket and a rolled
-    cloth pillow (4 x 2 x 7).
-195 CAULDRON: a squat dark-iron pot on 3 stub legs over a ring of stones and
-    logs, with a ladle. Liquid is a solid colour.
-196 SPIKE TRAP: a 4x4 low timber frame bristling with sharpened stakes and
-    bone tips, lashed with rope.
-197 PLANTER: a raised 4x4 timber box of dark soil with a rope trim.
+BUILDINGS ARE NOT IN THIS PROMPT. Sheets 191–197, 199–207, 211 and 212
+(building pieces, totems, extraction sites, landmarks, lobby stations, fence,
+wayfinding post) are made with a separate buildings prompt. Skip those
+numbers: after 190 comes 198, and after 198 comes 208.
+
+CROPS
 198 PLANTER CROPS: a grid of 5 crops (Redberry, Sweetberry, Herbs, Sapling,
     Fiber), each in 3 stages: SPROUT, GROWING, RIPE (ripe shows fruit clearly).
-199 TRIBE TOTEM, LEVELS 1–3: three totems side by side in the Elder's totem
-    style: L1 a short carved post with one face; L2 taller with wings and a
-    banner; L3 tall with wings, a banner, horns and a glowing amber eye gem.
-
-EXTRACTION
-200 EXTRACTION PORTAL SITE: a 12-stud ring of low faceted rune stones with 4
-    carved totem posts and a flat glowing teal-white rune disc in the centre.
-201 CRATER HEART PORTAL: the central bonus exit: a larger ring of tall dark
-    basalt monoliths with orange ember runes around a molten-orange rune disc;
-    must clearly outrank 200.
-202 PORTABLE EXTRACTION RUNE (Legendary): a hand-sized carved stone tablet with
-    a gold (#F0AA28) rune. Show it HELD (a small item) and PLACED: planted
-    upright in the ground on a small stone stand with 3 rune pebbles around it.
-
-LANDMARKS
-203 OLD LIGHTHOUSE: a weathered stone tower on a sea rock with a timber top
-    room, a brazier light cage and a rope-and-plank stair outside.
-204 THE MONOLITHS: a circle of 7 tall faceted standing stones with carved rune
-    bands and moss caps, one fallen.
-
-LOBBY STATIONS (in the style of the lobby set and Elder's totem)
-205 REBIRTH SHRINE: a stone dais with a carved spiral rune stone, two braziers
-    and a woven hide canopy.
-206 RAREWORK TABLE: a heavy timber workbench with a jewel vice, a small anvil,
-    gem trays and a hanging lamp.
-207 RECENT EXTRACTIONS BOARD: a wide timber notice board under a small shingle
-    roof with pinned hide notes and a carved portal symbol.
 
 OLD GROUP-SHEET ITEMS (redo as single sheets)
 208 RIVERBANK CHUNK: a tiling bank section: earth cliff edge, sand strip,
@@ -222,10 +184,6 @@ OLD GROUP-SHEET ITEMS (redo as single sheets)
 209 STONE PATH: chunky faceted paving stones with grass between, a 3-tile
     straight module.
 210 STONE STAIR: 4 chunky stone treads between low side walls with moss.
-211 TIMBER FENCE: a split-rail fence: posts, 2 rails, rope lashings; a straight
-    section and a corner.
-212 WAYFINDING POST: a thick carved post with 3 arrow boards and a small lantern
-    hook.
 
 Start with sheet 173.
 ```
