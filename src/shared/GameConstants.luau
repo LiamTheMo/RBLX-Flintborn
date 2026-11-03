@@ -29,9 +29,11 @@ GameConstants.MEDICINE = {
 GameConstants.FOOD_HEAL_SECONDS = 10
 -- Natural regeneration (owner decision 2026-11-03, starting target): this share
 -- of max HP back each step while alive and not downed, on top of food and
--- medicine. 1% every second fills an empty bar in 100 s.
+-- medicine. 1% every second fills an empty bar in 100 s. Any damage pauses it
+-- for HEALTH_REGEN_DELAY_SECONDS, so it never helps mid-fight.
 GameConstants.HEALTH_REGEN_PER_STEP = 0.01
 GameConstants.HEALTH_REGEN_STEP_SECONDS = 1
+GameConstants.HEALTH_REGEN_DELAY_SECONDS = 5
 -- How long eating food and drinking a boost draught take from the hand (§59,
 -- launch starting values): the item is used when the animation ends.
 GameConstants.CONSUME_SECONDS = { Food = 1.2, Boost = 1.2 }
