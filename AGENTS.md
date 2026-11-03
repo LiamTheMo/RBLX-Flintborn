@@ -3,9 +3,9 @@
 **Game UI** (screens, the Kit, UI art): start with [`docs/ui/STYLE_GUIDE.md`](docs/ui/STYLE_GUIDE.md). Every other document is listed in [`docs/README.md`](docs/README.md).
 
 ## Code changes
-- Run the checks in [README → Checks](README.md#checks) before committing; CI runs the same list.
-- **Deleting or moving a Luau module:** add its old instance path to `RETIRED` in `scripts/roblox_live_publish.py`. The release never deletes scripts on its own, so the old copy would keep running in the places (the Loader runs everything in `Services/` and `Controllers/`). See [`docs/ops/DEPLOYMENT.md`](docs/ops/DEPLOYMENT.md#deleting-or-moving-a-script-retired).
-- Never run `roblox_live_publish.py --deploy` or the upload scripts with real credentials locally; only the workflows deploy or upload.
+- Run the checks in [README → Checks](README.md#checks) before committing; no CI runs them.
+- **Releasing is VS Code → Rojo → Studio → publish**, by the owner, for each place (lobby and play world). Nothing publishes from GitHub, and the repository has no workflows; don't add any that push to Roblox. Rojo comes from Aftman (`aftman.toml`). See [`docs/ops/DEPLOYMENT.md`](docs/ops/DEPLOYMENT.md).
+- Place IDs live in `src/shared/Config/PlaceIds.luau`.
 
 ## Shell commands (Bash tool)
 - **Never run a command that reads stdin without input.** A bare `cat > file`, `read`, or a tool that waits for input blocks forever: the shell's stdin stays open, so the command hits the timeout and is killed. Write files with the Write/Edit tools or a heredoc (`cat > file <<'EOF' ... EOF`). Add `< /dev/null` to anything that might prompt.

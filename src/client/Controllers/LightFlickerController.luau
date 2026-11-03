@@ -1,6 +1,5 @@
 -- Flickers fire and torch PointLights tagged "FlickerLight" (the lobby map's VFX
--- sockets, placed by scripts/roblox_lobby_map.py with a BaseBrightness
--- attribute). Runs on each client, so nothing replicates. Only lights near the
+-- sockets, each with a BaseBrightness attribute). Runs on each client, so nothing replicates. Only lights near the
 -- camera animate, and every light holds steady with Reduced Motion.
 
 local CollectionService = game:GetService("CollectionService")

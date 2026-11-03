@@ -78,7 +78,7 @@ TINT_EPS = 0.002      # tints closer than this share a level (8-bit sRGB step is
 GLOW_EMISSION = 1.0   # emission at or above this renders as a Neon part (fire, lava)
 WATER = {"water", "water_deep", "water_shallow"}
 WATER_KEY = re.compile(r"[a-z]\d+_water(_[a-z0-9_]+)?")  # sheet-prefixed module water keys
-WATER_TRANSPARENCY = 0.25  # the lobby's flat water (roblox_lobby_map.py); kit water uses flintkit.water_transparency
+WATER_TRANSPARENCY = 0.25  # the lobby's flat water; kit water uses flintkit.water_transparency
 WATER_TILE = kitwater.TILE_STUDS  # studs per water texture tile (16)
 # SmoothPlastic, not Glass: Glass tints and reflects the sky, so the stylised
 # texture colours wash out; it hides transparent things behind it (beams,

@@ -705,8 +705,8 @@ seen working in game.
 | The older item art: `ItemInfo.Icon` / `ICONS` / `TINTS` / `EXACT` / `TIER_TINTS` / `ART_SPRITES` / `Sprite` / `ArtStatus`, `ItemInfo.Stats` (the older stat chips), `Widgets.HasBaseArt` and the item-atlas load gate, the kit item art's hero copies (`lk_icon_*__hi`, `atlas_lk_items_hi_*`, `lk_glyph_ink_backpack__hi`; slicer `HERO`) | every catalog item draws its own `lk_item_<id>` (STYLE_GUIDE §6.5) |
 
 **Status: all done.** Everything in the table is removed; `NavController` and
-`SurvivalHudController` are listed in `RETIRED` (`scripts/roblox_live_publish.py`)
-so the deploy deletes them from the places. Kept on purpose: `pm_map_island`
+`SurvivalHudController` were deleted from the places by the old deploy's
+`RETIRED` list (Rojo now removes deleted modules on sync). Kept on purpose: `pm_map_island`
 with `atlas_island` and the `atlas_island_hi_*` tiles (the island painting), and
 the uploaded `atlas_lk_items` (its `lk_icon_*` sprites are menu, stat and event
 icons). Uploaded decals stay on Roblox and in `art/ui/uploaded_decals.json`;

@@ -2,8 +2,8 @@
 -- the colours its shorts come in. Players outside a tribe (and everyone in the
 -- lobby) wear Earth, the brown of the reference; each tribe wears one of the
 -- other colours, picked from its public TribeId so every server agrees.
--- scripts/roblox_character.py installs one pants look per colour, named
--- "Pants_<Name>", in ReplicatedStorage.CharacterOutfits.
+-- Each place holds one pants look per colour, named "Pants_<Name>", in
+-- ReplicatedStorage.CharacterOutfits.
 
 local CharacterLook = {}
 

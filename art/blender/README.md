@@ -36,7 +36,7 @@ Rendering uses Eevee headless (Blender 5.2). A 16-asset sheet renders in well un
   - `palette.png`, a single texture carrying every palette colour at 32 `Tint` levels;
   - `manifest.json`, with placements, collision profiles, VFX sockets, the arrival spawn and NPC spots.
 
-  Fire colours become Neon parts and water becomes see-through parts. The **Upload and place the lobby map** workflow (`scripts/roblox_lobby_map.py`) uploads the export and builds `Workspace.LobbyMap` in the lobby place.
+  Fire colours become Neon parts and water becomes see-through parts. The export is imported into the lobby place in Studio, where it is `Workspace.LobbyMap`. (The Open Cloud workflow that used to upload and place it was removed on 2026-11-03; it is in the Git history.)
 
 ## World kit (`art/reference/kit`)
 
