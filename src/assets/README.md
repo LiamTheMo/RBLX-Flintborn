@@ -13,9 +13,9 @@ have their own manual upload workflows instead
 ## Models
 
 3D assets (primitive tools, weapons, armor, structures, creatures) live under
-`Models/`, grouped by category. `Models/2D` holds flat art used by models and
-`Models/3D` holds meshes. Item icon source art is not here: it lives in
-`art/ui/items/source/` (docs/ui/ITEM_ART.md).
+`Models/`, grouped by category: `Models/3D` holds meshes, and `Models/2D` is
+kept empty for flat art used by models. Item icon source art is not here: it
+lives in `art/ui/items/source/` (docs/ui/ITEM_ART.md).
 
 ## Images
 
