@@ -375,7 +375,10 @@ group:Select("Gameplay")
 `:SetHotkey(text | nil)`, `:SetState("normal" | "locked" | "disabled")`,
 `:SetSelected`, `:SetEnabled`. Count bottom-right (hidden for 1), Permanent star
 top-right, leather number badge top-left. `icon` shows an icon id when the item
-has no art of its own yet.
+has no art of its own yet. `Kit.Slot.WatchHotkeys(slots, label?)` shows a row's
+badges (`label(index)`, default the slot's number) only while
+`Kit.Input.ShowsKeys()` and returns a stop function; `Kit.Slot.ShowHotkeys`
+applies them once.
 ```lua
 local slot = Kit.Slot.new(grid, { size = { 92, 99 }, layoutOrder = i, onPress = function(s) select(s.item) end })
 slot:SetItem({ catalogId = item.catalogId, quantity = item.quantity, permanent = item.permanent })
@@ -828,7 +831,7 @@ items read "(Permanent)" and a rebind note reads "Sprint is now LeftShift".
   window's title band and below `Kit.Toast.Avoid(guiObject)` (the notice card).
   `Kit.Modal.OnChanged(fn)` tells listeners when layers open or close.
 - **Input** (`Kit.Input`): `Type()` ("mouse" | "keyboard" | "touch" |
-  "gamepad"), `IsGamepad()`, `IsTouch()`, `Hint(keyboardText, gamepadKey)`
+  "gamepad"), `IsGamepad()`, `IsTouch()`, `ShowsKeys()` (keyboard or mouse), `Hint(keyboardText, gamepadKey)`
   (nil on touch), `Watch(fn)`, `GAMEPAD_NAMES`, `SetHudDefault(guiObject)` (registers the HUD's navigation target; never selects on its own), `EnterHud()` (selects it on an explicit menu action)
   (selection lands there when a gamepad is picked up with nothing selected).
   KeyCap `gamepadKey` / `hideOnTouch` switch by themselves.

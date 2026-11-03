@@ -380,10 +380,7 @@ function LobbyHud.new(parent: Instance, actions)
 	self:SetParty(LobbyHudModel.Party(nil, { userId = 0, name = "" }))
 	self:SetHotbar(LobbyHudModel.Hotbar(nil))
 	-- Hotkey badges (1–6) are keyboard keys: shown only while one is in use.
-	self.stopInput = Kit.Input.Watch(function()
-		self:_hotkeys()
-	end)
-	self:_hotkeys()
+	self.stopInput = Kit.Slot.WatchHotkeys(self.slots)
 	-- Phone and desktop sizes follow the screen and the input devices.
 	self.stopForm = Kit.Scale.OnFormFactorChanged(function()
 		self:_formChanged()
@@ -518,15 +515,6 @@ function LobbyHud:_placePopups()
 		bottom = self.noticeRegion.Position.Y.Offset - gap
 	end
 	self.popups.Position = UDim2.fromOffset(lane[1], bottom - lane[4])
-end
-
--- The hotbar's 1–6 badges while a keyboard or mouse is the input.
-function LobbyHud:_hotkeys()
-	local kind = Kit.Input.Type()
-	local keys = kind == "mouse" or kind == "keyboard"
-	for index, slot in self.slots do
-		slot:SetHotkey(if keys then tostring(index) else nil)
-	end
 end
 
 function LobbyHud:_formChanged()

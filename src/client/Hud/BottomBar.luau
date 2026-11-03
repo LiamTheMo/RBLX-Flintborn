@@ -80,31 +80,19 @@ function BottomBar.new(parent: Instance, layout)
 		hit.NextSelectionLeft = left and left.control.hit
 		hit.NextSelectionRight = right and right.control.hit
 	end
-	self:SetSlotLabels({})
+	-- A slot's badge: its label (SetSlotLabels), else its number.
+	self.label = function(index: number): string
+		return self.labels[index] or tostring(index)
+	end
 	-- The badges follow the input in use.
-	self.stopWatching = Kit.Input.Watch(function()
-		self:_showLabels()
-	end)
+	self.stopWatching = Kit.Slot.WatchHotkeys(self.slots, self.label)
 	return self
-end
-
--- True while key badges mean something: a keyboard or mouse is in use.
-function BottomBar.ShowsKeys(): boolean
-	local kind = Kit.Input.Type()
-	return kind == "keyboard" or kind == "mouse"
 end
 
 -- labels[index]: the key that selects each slot ("1", or a rebound key).
 function BottomBar:SetSlotLabels(labels: { string })
 	self.labels = labels
-	self:_showLabels()
-end
-
-function BottomBar:_showLabels()
-	local show = BottomBar.ShowsKeys()
-	for index, slot in self.slots do
-		slot:SetHotkey(if show then self.labels[index] or tostring(index) else nil)
-	end
+	Kit.Slot.ShowHotkeys(self.slots, self.label)
 end
 
 -- items[index]: {itemId, quantity, permanent} or nil/false for an empty slot.

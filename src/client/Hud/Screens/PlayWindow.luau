@@ -323,10 +323,7 @@ function PlayWindow.new(props: Props)
 	screen:SetDefaultSelection(self.play.control.hit)
 	self:SetLoadout({}, 0)
 	-- The slots' 1–6 badges are keyboard keys: shown only while one is in use.
-	self.maid:Give(Kit.Input.Watch(function()
-		self:_hotkeys()
-	end))
-	self:_hotkeys()
+	self.maid:Give(Kit.Slot.WatchHotkeys(self.slots))
 	-- Phone and desktop text sizes follow the screen and the input devices.
 	self.maid:Give(Kit.Scale.OnFormFactorChanged(function()
 		local phone = Kit.Scale.IsSmallTouch()
@@ -338,14 +335,6 @@ function PlayWindow.new(props: Props)
 		end
 	end))
 	return self
-end
-
-function PlayWindow:_hotkeys()
-	local kind = Kit.Input.Type()
-	local keys = kind == "mouse" or kind == "keyboard"
-	for index, slot in self.slots do
-		slot:SetHotkey(if keys then tostring(index) else nil)
-	end
 end
 
 -- The "+n more" line (rebuilt when the form factor changes its size).
