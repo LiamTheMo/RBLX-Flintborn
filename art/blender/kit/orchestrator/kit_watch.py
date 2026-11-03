@@ -16,7 +16,7 @@ import re
 import sys
 import time
 
-REPO = "D:/Projects/Roblox/RBLX-Flintborn"
+REPO = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "..", "..")).replace("\\", "/")
 # workflow journals from every orchestrator session of this project (history carries across sessions)
 WF = os.environ.get("KIT_WORKFLOW_JOURNALS", "")
 REF = f"{REPO}/art/reference/kit"

@@ -31,11 +31,11 @@ import numpy as np
 from mathutils import Matrix, Vector
 from mathutils.geometry import delaunay_2d_cdt
 
-sys.path.insert(0, r"D:/Projects/Roblox/RBLX-Flintborn/art/blender/lib")
+ROOT = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
+sys.path.insert(0, os.path.join(ROOT, "lib"))
 import flintkit as fk  # noqa: E402
 import vfx  # noqa: E402
 
-ROOT = r"D:/Projects/Roblox/RBLX-Flintborn/art/blender"
 PI = math.pi
 GRASS = "grass_ground"         # the sheet's yellow-green tops
 GRASS_T = 1.0

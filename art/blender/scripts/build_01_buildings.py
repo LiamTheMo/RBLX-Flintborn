@@ -12,7 +12,8 @@ import math
 import os
 import sys
 
-sys.path.insert(0, "D:/Projects/Roblox/RBLX-Flintborn/art/blender/lib")
+ROOT = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
+sys.path.insert(0, os.path.join(ROOT, "lib"))
 
 import bmesh  # noqa: E402
 import bpy  # noqa: E402
@@ -22,7 +23,6 @@ from mathutils import Euler, Matrix, Vector  # noqa: E402
 import flintkit as fk  # noqa: E402
 import vfx  # noqa: E402
 
-ROOT = "D:/Projects/Roblox/RBLX-Flintborn/art/blender"
 PI = math.pi
 DOWN = Vector((0, 0, -1))
 

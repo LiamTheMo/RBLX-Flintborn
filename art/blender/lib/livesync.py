@@ -5,7 +5,7 @@ script. Each sheet owns one collection ("Sheet_01_buildings", ...) in the
 "Flintborn Assets" scene and only ever replaces its own objects, so several
 builders can sync safely one after another.
 
-    import sys; sys.path.insert(0, r"D:/Projects/Roblox/RBLX-Flintborn/art/blender/lib")
+    import sys; sys.path.insert(0, r"<repo>/art/blender/lib")
     import importlib, livesync; importlib.reload(livesync)
     result = livesync.sync("01_buildings")
 """
