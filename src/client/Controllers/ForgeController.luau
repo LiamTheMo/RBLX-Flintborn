@@ -25,14 +25,6 @@ local window = nil
 local busy = false
 local loaded = false
 
-local function invoke(name: string, ...)
-	local ok, success, result = pcall(Remotes.Get(name).InvokeServer, Remotes.Get(name), ...)
-	if not ok then
-		return false, "Request failed"
-	end
-	return success, result
-end
-
 -- Player-facing text for a refusal code, as a sentence.
 local function reasonText(code: any): string
 	local text = if not Reasons.Has(code) and RecipeModel.REASONS[code]
@@ -63,9 +55,9 @@ ForgeController.Refresh = refresh
 -- reuses it so the server never charges twice.
 local function send(entry, count: number, sourceId: string?)
 	local nonce = HttpService:GenerateGUID(false)
-	local ok, result = invoke("ForgeCraft", entry.id, sourceId, nonce, count)
+	local ok, result = Remotes.Invoke("ForgeCraft", entry.id, sourceId, nonce, count)
 	if not ok and result == "Request failed" then
-		ok, result = invoke("ForgeCraft", entry.id, sourceId, nonce, count)
+		ok, result = Remotes.Invoke("ForgeCraft", entry.id, sourceId, nonce, count)
 	end
 	if ok then
 		local title, text = RecipeModel.ForgeReceipt(entry, result, count)

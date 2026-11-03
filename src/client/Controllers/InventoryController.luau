@@ -76,14 +76,6 @@ local function toast(message: string, kind: string?)
 	})
 end
 
-local function invoke(name: string, ...)
-	local ok, success, reason = pcall(Remotes.Get(name).InvokeServer, Remotes.Get(name), ...)
-	if not ok then
-		return false, "Request failed"
-	end
-	return success, reason
-end
-
 local function slotAt(area: string, index: number)
 	for _, slot in InventoryController.Snapshot.slots do
 		if slot.area == area and slot.index == index then
@@ -117,12 +109,12 @@ end
 -- set on the targeted wall or door at once. The server checks everything.
 local function activateSiege(index: number, kind: string)
 	if kind == "Placed" then
-		local ok, reason = invoke("PlaceCharge", index, aimDirection())
+		local ok, reason = Remotes.Invoke("PlaceCharge", index, aimDirection())
 		if ok then
 			toast(SiegeRules.Message("ChargeSet"))
 		elseif reason == "NoTarget" and InventoryController.Snapshot.equipped ~= index then
 			-- Nothing in reach: hold it, so the attack input (or Attack button) sets it.
-			invoke("EquipSlot", index)
+			Remotes.Invoke("EquipSlot", index)
 			toast(SiegeRules.Message("ChargeReady"))
 		else
 			toast(SiegeRules.Message(reason))
@@ -130,7 +122,7 @@ local function activateSiege(index: number, kind: string)
 		return
 	end
 	local equipping = InventoryController.Snapshot.equipped ~= index
-	local ok, reason = invoke("EquipSlot", index)
+	local ok, reason = Remotes.Invoke("EquipSlot", index)
 	if not ok then
 		toast("Can't equip that (" .. Reasons.Text(reason) .. ")")
 	elseif equipping then
@@ -143,21 +135,21 @@ end
 local function activateHotbar(index: number)
 	local slot = slotAt("hotbar", index)
 	if slot == nil then
-		invoke("EquipSlot", nil)
+		Remotes.Invoke("EquipSlot", nil)
 		return
 	end
 	local def = ItemCatalog.Get(slot.catalogId)
 	if def and def.siege then
 		activateSiege(index, def.siege.kind)
 	elseif def and def.placeable == "ExtractionRune" then
-		local ok, reason = invoke("PlaceRune", index)
+		local ok, reason = Remotes.Invoke("PlaceRune", index)
 		toast(ok and "Rune placed: 30 s to extract." or ("Can't place a rune here (" .. Reasons.Text(reason) .. ")"))
 	elseif def and def.placeable then
-		local ok, reason = invoke("PlaceItem", index)
+		local ok, reason = Remotes.Invoke("PlaceItem", index)
 		toast(ok and (def.name .. " placed.") or ("Can't place that here (" .. Reasons.Text(reason) .. ")"))
 	else
 		local equipping = InventoryController.Snapshot.equipped ~= index
-		local ok = invoke("EquipSlot", index)
+		local ok = Remotes.Invoke("EquipSlot", index)
 		if ok and equipping and def and def.family == ItemCatalog.Families.Consumable then
 			ConsumeController.Hint(slot.catalogId)
 		end
@@ -172,7 +164,7 @@ local function consumeHotbar(index: number)
 		return
 	end
 	if InventoryController.Snapshot.equipped ~= index then
-		local ok, reason = invoke("EquipSlot", index)
+		local ok, reason = Remotes.Invoke("EquipSlot", index)
 		if not ok then
 			toast("Can't hold that (" .. Reasons.Text(reason) .. ")", "warn")
 			return
@@ -196,21 +188,21 @@ local function firstEmpty(area: string, count: number): number?
 end
 
 local function move(from, area: string, index: number)
-	local ok, reason = invoke("MoveItem", from.area, from.index, area, index)
+	local ok, reason = Remotes.Invoke("MoveItem", from.area, from.index, area, index)
 	if not ok then
 		toast("Can't move that (" .. Reasons.Text(reason) .. ")", "warn")
 	end
 end
 
 local function wear(from)
-	local ok, reason = invoke("EquipArmor", from.area, from.index)
+	local ok, reason = Remotes.Invoke("EquipArmor", from.area, from.index)
 	if not ok then
 		toast("Can't wear that (" .. Reasons.Text(reason) .. ")", "warn")
 	end
 end
 
 local function takeOff(index: number)
-	local ok, reason = invoke("UnequipArmor", ARMOR_SLOTS[index])
+	local ok, reason = Remotes.Invoke("UnequipArmor", ARMOR_SLOTS[index])
 	if not ok then
 		toast("No room to take that off (" .. Reasons.Text(reason) .. ")", "warn")
 	end
@@ -440,7 +432,7 @@ function dropSelected()
 		)
 	selected = nil
 	if target then
-		local ok, reason = invoke("DropItem", target.area, target.index)
+		local ok, reason = Remotes.Invoke("DropItem", target.area, target.index)
 		if not ok then
 			toast("Can't drop that (" .. Reasons.Text(reason) .. ")", "warn")
 		end

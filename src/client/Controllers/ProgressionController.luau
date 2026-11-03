@@ -68,14 +68,6 @@ function ProgressionController.MountPopups(host: GuiObject)
 	placePopups()
 end
 
-local function invoke(name: string, ...)
-	local ok, success, reason = pcall(Remotes.Get(name).InvokeServer, Remotes.Get(name), ...)
-	if not ok then
-		return false, "Request failed"
-	end
-	return success, reason
-end
-
 local function updateBar()
 	if view == nil then
 		return
@@ -94,13 +86,13 @@ local renderPanel
 
 -- Shows the rebirth question with what it resets, keeps and gains, in plain words.
 local function confirmRebirth()
-	local preview = invoke("RebirthPreview")
+	local preview = Remotes.Invoke("RebirthPreview")
 	if type(preview) ~= "table" then
 		window:SetStatus("The rebirth preview could not load. Try again.", "warn")
 		return
 	end
 	window:Confirm("", "Rebirth", ProgressionController.CONFIRM_DELAY, function()
-		local ok, reason = invoke("Rebirth", HttpService:GenerateGUID(false))
+		local ok, reason = Remotes.Invoke("Rebirth", HttpService:GenerateGUID(false))
 		window:SetStatus(
 			if ok then "Reborn. Your tokens are ready to spend." else ("Not reborn: " .. Reasons.Text(reason)),
 			if ok then "good" else "warn"
@@ -233,7 +225,8 @@ local function drawPerks()
 								"Buy",
 								0,
 								function()
-									local ok, reason = invoke("BuyPerk", perkId, HttpService:GenerateGUID(false))
+									local ok, reason =
+										Remotes.Invoke("BuyPerk", perkId, HttpService:GenerateGUID(false))
 									window:SetStatus(
 										if ok
 											then perk.name .. " upgraded."
@@ -439,7 +432,7 @@ function ProgressionController.Start()
 	Remotes.Get("XpGained").OnClientEvent:Connect(popup)
 	Kit.Modal.OnChanged(liftPopups)
 	task.spawn(function()
-		local snapshot = invoke("ProgressionSnapshot")
+		local snapshot = Remotes.Invoke("ProgressionSnapshot")
 		if type(snapshot) == "table" then
 			view = snapshot
 			updateBar()

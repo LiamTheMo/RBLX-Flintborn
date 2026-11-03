@@ -22,14 +22,6 @@ local ui = {}
 local openChestId = nil
 local contents = {}
 
-local function invoke(name: string, ...)
-	local ok, success, reason = pcall(Remotes.Get(name).InvokeServer, Remotes.Get(name), ...)
-	if not ok then
-		return false, "Request failed"
-	end
-	return success, reason
-end
-
 local function clear(column)
 	for _, part in column.rows do
 		part:Destroy()
@@ -73,7 +65,7 @@ local function render()
 	end
 	local firstTake = fill(ui.chest, contents, "Take", function(entry)
 		-- The key names this exact entry, so a stale index takes nothing else.
-		local ok, reason = invoke("ChestTake", openChestId, entry.index, entry.key)
+		local ok, reason = Remotes.Invoke("ChestTake", openChestId, entry.index, entry.key)
 		if not ok then
 			ui.status:SetText("Could not take that: " .. LootController.RefusedText(reason) .. ".")
 		end
@@ -93,7 +85,7 @@ local function render()
 		end
 	end
 	local firstStore = fill(ui.mine, carried, "Store", function(entry)
-		local ok, reason = invoke("ChestPut", openChestId, entry.slot.area, entry.slot.index)
+		local ok, reason = Remotes.Invoke("ChestPut", openChestId, entry.slot.area, entry.slot.index)
 		if not ok then
 			ui.status:SetText("Could not store that: " .. LootController.RefusedText(reason) .. ".")
 		end
