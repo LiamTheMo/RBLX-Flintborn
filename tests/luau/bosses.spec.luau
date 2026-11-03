@@ -76,24 +76,22 @@ test("gear score rewards better weapons and armor", function()
 end)
 
 test("each boss source resets by its own rule", function()
-	expectEq(BossRules.ResetAction("Event", { idleSeconds = 999 }), nil, "event bosses ignore idling")
-	expectEq(
-		BossRules.ResetAction("Event", { idleSeconds = 0, eventExpired = true }),
-		"Despawn",
-		"until the event ends"
-	)
-	expectEq(BossRules.ResetAction("Structure", { idleSeconds = 31 }), "Heal", "structure bosses heal")
-	expectEq(
-		BossRules.ResetAction("Structure", { idleSeconds = 0, structureGone = true }),
-		"Despawn",
-		"with their hold"
-	)
-	expectEq(BossRules.ResetAction("Ritual", { idleSeconds = 61 }), "Despawn", "ritual bosses leave")
-	expectEq(BossRules.ResetAction("Guardian", { idleSeconds = 60 }), nil, "the Guardian waits longer")
-	expectEq(BossRules.ResetAction("Guardian", { idleSeconds = 121 }), "Despawn", "then leaves")
+	for _, case in
+		{
+			{ "Event", { idleSeconds = 999 }, nil, "event bosses ignore idling" },
+			{ "Event", { idleSeconds = 0, eventExpired = true }, "Despawn", "until the event ends" },
+			{ "Structure", { idleSeconds = 31 }, "Heal", "structure bosses heal" },
+			{ "Structure", { idleSeconds = 0, structureGone = true }, "Despawn", "with their hold" },
+			{ "Ritual", { idleSeconds = 61 }, "Despawn", "ritual bosses leave" },
+			{ "Guardian", { idleSeconds = 60 }, nil, "the Guardian waits longer" },
+			{ "Guardian", { idleSeconds = 121 }, "Despawn", "then leaves" },
+		}
+	do
+		expectEq(BossRules.ResetAction(case[1], case[2]), case[3], case[4])
+	end
 end)
 
-test("boss data is consistent", function()
+test("boss data is consistent and events name real bosses of the right source", function()
 	for id, boss in BossCatalog.Bosses do
 		expect(BossCatalog.Sources[boss.source] ~= nil, id .. " source")
 		for _, row in boss.loot do
@@ -103,9 +101,7 @@ test("boss data is consistent", function()
 	local legendary = ItemCatalog.Get(BossCatalog.Bosses.Guardian.legendary)
 	expectEq(legendary.rarity, "Legendary", "the Guardian drops a Legendary")
 	expectEq(BossCatalog.Bosses.Guardian.health, 25000, "baseline")
-end)
-
-test("event and structure bosses name real bosses of the right source", function()
+	-- Event and structure bosses name real bosses of the right source.
 	for _, entry in EventCatalog.ById do
 		if entry.boss then
 			local boss = BossCatalog.Get(entry.boss)
