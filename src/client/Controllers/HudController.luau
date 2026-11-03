@@ -152,10 +152,6 @@ local portals = {}
 local waypointPositions = {}
 local hotbarBound = false
 
-local function instantMotion(): boolean
-	return Kit.Motion.Reduced()
-end
-
 local function rootPart(): BasePart?
 	local character = player.Character
 	return character and character:FindFirstChild("HumanoidRootPart") :: BasePart?
@@ -372,14 +368,14 @@ local function updateHealth(instant: boolean?)
 	local maxHealth = humanoid and humanoid.MaxHealth or GameConstants.BASE_MAX_HEALTH
 	local fraction, shown = HudModel.Health(humanoid and humanoid.Health or 0, maxHealth)
 	local cap = math.ceil(if maxHealth > 0 then maxHealth else 100)
-	widgets.vitals:Set("health", fraction, ("%d/%d"):format(shown, cap), instant or instantMotion())
+	widgets.vitals:Set("health", fraction, ("%d/%d"):format(shown, cap), instant or Kit.Motion.Reduced())
 end
 
 -- Stamina and Food replicate as 0–1 fractions (SurvivalService); shown out of 100.
 local function updateFraction(key: string, attribute: string, instant: boolean?)
 	local value = player:GetAttribute(attribute)
 	local fraction = HudModel.Clamp01(if type(value) == "number" then value else 1)
-	widgets.vitals:Set(key, fraction, ("%d/100"):format(HudModel.Percent(fraction)), instant or instantMotion())
+	widgets.vitals:Set(key, fraction, ("%d/100"):format(HudModel.Percent(fraction)), instant or Kit.Motion.Reduced())
 end
 
 local function updateStatus()
@@ -769,10 +765,6 @@ local remounted = Signal.new()
 -- Fires after the regions are mounted again (the world ⚙ re-links to the hotbar).
 HudController.Remounted = remounted
 
--- Registers `object` as the HUD's navigation target (it is never selected here).
-local function registerHudDefault(object: GuiObject?)
-	Kit.Input.SetHudDefault(object)
-end
 -- The form factor ("phone", "tablet", "desktop") the regions were mounted for.
 local mountedForm = "desktop"
 local function bindRelease(active: boolean)
@@ -780,7 +772,8 @@ local function bindRelease(active: boolean)
 		return
 	end
 	releaseBound = active
-	registerHudDefault(if active then widgets.tiles[1].control.hit else nil)
+	-- The HUD's navigation target (it is never selected here).
+	Kit.Input.SetHudDefault(if active then widgets.tiles[1].control.hit else nil)
 	if not active then
 		ContextActionService:UnbindAction("FlintbornHudRelease")
 		local selected = GuiService.SelectedObject
@@ -829,7 +822,7 @@ local function remount()
 	tops = HudController.TopRegions(widgets)
 	watchRegions()
 	if releaseBound then
-		registerHudDefault(widgets.tiles[1].control.hit)
+		Kit.Input.SetHudDefault(widgets.tiles[1].control.hit)
 	end
 	remounted:Fire()
 	applyTop()
@@ -876,7 +869,7 @@ function HudController.Start()
 	-- Level and XP from the same snapshots ProgressionController receives; its XP
 	-- pop-ups appear just above the bar.
 	ProgressionController.Changed:Connect(function(view)
-		widgets.bottom:SetProgress(view, instantMotion())
+		widgets.bottom:SetProgress(view, Kit.Motion.Reduced())
 	end)
 	ProgressionController.MountPopups(widgets.popups)
 
@@ -962,7 +955,7 @@ function HudController.Start()
 			local now = workspace:GetServerTimeNow()
 			local views = EventFeedController.ActiveViews()
 			local members, total = partyMembers()
-			widgets.party:Set(members, instantMotion(), total)
+			widgets.party:Set(members, Kit.Motion.Reduced(), total)
 			widgets.objective:Set(HudModel.ExtractionObjective(nearestExtraction(position)))
 			local event = HudModel.WorldEvent(views, now, position and position.X, position and position.Z)
 			widgets.event:Set(event, event and eventCategory(views, event.id))

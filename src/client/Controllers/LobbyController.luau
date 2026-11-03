@@ -92,7 +92,7 @@ end
 
 -- Players in this lobby server you may invite: everyone outside your party, when
 -- you lead it or have none.
-local function invitable(): { Player }
+function LobbyController.Invitable(): { Player }
 	local party = partyView.party
 	if party ~= nil and party.leader ~= player.UserId then
 		return {}
@@ -116,7 +116,9 @@ local function refreshParty()
 	LobbyController.Changed:Fire("party")
 end
 
-local function deploy()
+-- Asks the server to deploy (the party leader takes the whole party). Yields.
+-- Progress and failures are reported through Status() and Changed("status").
+function LobbyController.Deploy()
 	if deploying then
 		return
 	end
@@ -132,12 +134,6 @@ local function deploy()
 		setStatus("Deploy failed: " .. Reasons.Text(reason or success) .. ". Nothing was lost.")
 		requestPreview()
 	end
-end
-
--- Asks the server to deploy (the party leader takes the whole party). Yields.
--- Progress and failures are reported through Status() and Changed("status").
-function LobbyController.Deploy()
-	deploy()
 end
 
 function LobbyController.IsDeploying(): boolean
@@ -176,10 +172,6 @@ end
 -- }
 function LobbyController.PartyView()
 	return partyView
-end
-
-function LobbyController.Invitable(): { Player }
-	return invitable()
 end
 
 -- The items that will enter the run ({catalogId, quantity, permanent}[]), or nil
