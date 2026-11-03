@@ -241,23 +241,39 @@ def make_script(specs, verify=False, validate=False, retired=None):
     return script
 
 
+def runs_on_its_own(path, kind):
+    """True for the scripts the engine or the Loader runs: the entry scripts and
+    every module under a Services or Controllers folder."""
+    return kind != "ModuleScript" or (len(path) >= 2 and path[-2] in ("Services", "Controllers"))
+
+
 def plan_batches(specs):
     """Splits the release into batches whose tasks each fit MAX_TASK_BYTES. Returns
     a list of {validate, publish, verify} scripts; RETIRED paths are removed by
-    the last batch only, once everything else is in place."""
+    the last batch only, once everything else is in place.
+
+    Every batch saves and publishes the place, so a server can start between two
+    batches. Libraries go first and the scripts that run on their own (entry
+    scripts, Services, Controllers) go last, starting a batch of their own: while
+    the release is part-way, the running code is still the old version, and new
+    library code only adds to what it uses."""
     retired = retired_paths(specs)
     overhead = max(len(make_script([], retired=retired).encode("utf-8")),
                    len(make_script([], verify=True).encode("utf-8")))
-    groups, current, size = [], [], overhead
-    for spec in specs:
-        cost = len(spec_record(*spec).encode("utf-8")) + 2
-        if current and size + cost > MAX_TASK_BYTES:
+    libraries = [spec for spec in specs if not runs_on_its_own(spec[0], spec[1])]
+    runners = [spec for spec in specs if runs_on_its_own(spec[0], spec[1])]
+    groups = []
+    for part in (libraries, runners):
+        current, size = [], overhead
+        for spec in part:
+            cost = len(spec_record(*spec).encode("utf-8")) + 2
+            if current and size + cost > MAX_TASK_BYTES:
+                groups.append(current)
+                current, size = [], overhead
+            current.append(spec)
+            size += cost
+        if current:
             groups.append(current)
-            current, size = [], overhead
-        current.append(spec)
-        size += cost
-    if current:
-        groups.append(current)
     plan = []
     for index, group in enumerate(groups):
         last = index == len(groups) - 1
