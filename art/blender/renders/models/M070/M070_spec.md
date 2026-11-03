@@ -3,7 +3,7 @@
 Reference: `art/blender/assets/references/070.png` (1024 × 1536 px). INDEX.md row 70: "Ruined lean-to model study".
 The sheet's header reads **"PAGE 68/132"** (top right), title **"RUINED LEAN-TO"**, subtitle "ENVIRONMENT PROP |
 INDIVIDUAL ASSET STUDY", footer "FLINTBORN — INDIVIDUAL MODEL STUDY" (our number is INDEX's 070, §3.1).
-Builder: `art/blender/kit/mcp/m070.py` → `build()` (not written yet). Procedure: `art/blender/kit/mcp/STAGES.md`. One
+Builder: `art/blender/kit/mcp/m070.py` → `build()` (stages 1–6 below). Procedure: `art/blender/kit/mcp/STAGES.md`. One
 modeller does stages 1–6 in a background Blender, then a fresh verifier does stage 7; the main session puts the model
 into the kit file, exports and commits.
 
@@ -994,3 +994,179 @@ Ruin, LeanTo, Shelter, Refuge, Rubble, Wall, Block, Camp and the candidates:
 7. **No grass in the hero;** ground scatter is placed in Studio.
 8. **Hero plus ten parts,** including a wall section with the exploded view's opening.
 9. **Name `RuinedLeanTo`.**
+
+## Stage 1 — Modelling (modeller, 2026-11-03)
+
+Built in a background Blender (port 9877, work file `art/blender/assets/kit/wip/M070.blend`) by `m070.build()`;
+every number below is its report. Each exploded part has its own function; the hero is assembled strictly from them
+(`hero_all`).
+
+- **Walls (`walls`, `block_shell`):** 55 chamfered blocks (0.16 chamfer on the vertical and top edges, square bottom
+  edges, a 0.03 crease on each long face), **2.4 deep, courses 1.65** (each upper block 0.015 over the one below, 0.05
+  joints), running bond chosen per course by `_layout` (joints kept away from the course below, the step ends above
+  and the peak's forced joint). Block lengths 1.8–2.75, mostly 2.3–2.7 (fewer, longer blocks than the study's
+  2.0–2.2, for the budget). Skyline by rays (`skyline_report`): 8.25 / 9.83 / 11.55 / **13.196** / 11.48 / 9.90 /
+  8.17 against 8.25 / 9.90 / 11.55 / 13.20 / 11.55 / 9.90 / 8.25 (the two low ones are chipped corners). Side wall
+  five courses, 8.25 (8.15–8.20 at its chipped front column). Corner pier bonded: the back wall owns it on even
+  courses, the side wall on odd ones. Damage by role: seven chipped blocks (the peak's two outer top blocks, the side
+  wall's front-end top block, the +X end's top block, three inner-face blocks), the side wall's missing top block
+  (y −2.4 … +0.3), the fallen block. Jitter: run 0.01, depth 0.02, yaw 0.5°.
+- **Rubble (`rubble`, `fallen_block`):** RB1–RB5 at the study's places except **RB3 moved to x −0.9** (at −1.6 it stood
+  in the front walk lane); chamfered 0.12, one or two chips each, flat bottoms. The **fallen block** is 1.6 × 1.0 ×
+  1.2 lying along the wall, tilted 12° about its long axis, 0.20 off the side wall (narrower than the study's 1.6
+  cube: the front cell's left extreme is −10.5 including a fern; ours −11.03).
+- **Footings, posts, crossbeam:** footings 1.40 (back 1.20) × 0.60; posts FL 0.86 / back 0.80 / FR 1.10 square (0.05
+  chamfer), tops **9.35 / 11.10 / 12.00**, standing 0.003 over the footings; crossbeam 0.60 square from the FL post's
+  −X face (0.005 off) to x −9.10, resting 0.005 over the side wall's front-end top block, a rope turn round it.
+- **Toggles, tabs, canvas:** 0.32 × 0.32 × 0.55 toggles on the posts' inner faces (FL +X, back −Y, FR −X) under the
+  lower lashing turns; a U-shaped 0.05 canvas tab folded over each toggle's outer end; the canvas (one closed 0.10
+  slab, 5 × 5 inset grid + hem strip, crease diagonals to the centre) leaves from each tab's outer edge. Corner
+  mid-surfaces **C1 8.00, C2 9.90, C3 9.20, C4 6.60**; sag 0.28 front edges / 0.50 back edges / 0.75 centre (a little
+  deeper than the study's 0.20 / 0.45 / 0.60 so the sheet reads as cloth; the lanes stay clear). C4's twisted rope
+  tail (0.45) ends in a dangling toggle, bottom **5.85**. Canvas underside lowest 6.55 (at C4).
+- **Lashings, collars:** each lashing = a lower turn sitting on the toggle, an upper turn (FL over the crossbeam, back
+  0.75 higher, FR at 10.35) and two twisted diagonals crossing on a post face (FL front, back post −X, FR front over
+  the crossarm's top and bottom edges), the second lifted 0.20 at the crossing. Turns are 5-sided spiral-strand tubes
+  (Ø 0.26, FR 0.30) sunk 0.02 into the timber: 4-sided turns read as flat straps (pitfall 9). Collars: FR two at
+  4.60 / 4.83 and one at the foot, FL one at the foot, the back post a thinner band at 3.55.
+- **Banner set:** 8-sided crossarm Ø 0.45 at z 9.60 resting 0.005 in front of the FR post, x 5.25 … **9.30**, knob
+  Ø 0.60 to 9.55; dark pole Ø 0.50 at (6.94, −4.80), its front flat 0.03 into a 6-sided iron sleeve round the arm
+  (x 6.72–7.15); banner **2.05 wide** (x 7.20–9.25: the sleeve needs 6.72–7.15), a 6-sided cloth hem round the arm,
+  slab top 9.29, **two-point swallowtail tips 3.00, notch 3.80**, emblem (diamond ring, inner diamond, two side
+  points) on both faces 0.015 proud. The pole stands behind the banner (0.24 clear), as the f34 draws it.
+- **Ivy (`ivy`) and moss (`moss`):** five runs, 54 leaves (R1 peak curtain 21, R2 rear curtain 15, R3 rear +X strand
+  6, R4 side-wall strands 7, R5 a short strand at the inner step x −6.5 that the front cell shows), 9 square stems
+  (branches leave their parent's side face, never its axis), 6 pads on the tops. Leaves: the m056 five-point
+  outline, 1.01 across, built as a **low tent** (top centre raised 0.22 × size, so its eight facets tilt about 25°)
+  with a slight tip curl; blade turned 15–62° off the hanging direction, tilted 16–40° out of the wall, rolled
+  16–34°; pushed clear of the stone (CLR 0.012), slid off the stems (≤ 0.03 inside one) and kept 0.10 off posts,
+  lashings and canvas. Lip leaves hang over the top edges (hero top 13.49). One station dropped (R1 branch B, crowded
+  by the back post). Nine flat moss patches (H : W ≤ 0.2, irregular longish outlines, draped on their top, base
+  0.015 in).
+- **Props (kit sizes, decision 1):** bedroll 4.40 × Ø 1.20 (8-sided, golden caps and ends, tan strap) at the back;
+  mat 2.17 × 5.04 × 0.16 (x −3.82 … −1.65 so its head corner clears the back footing) with two blue-teal stripes
+  0.01 proud, its head 0.002 under the bedroll; X-braced open crate 2.30 × 2.20 (dark floor 0.60 down); open-frame
+  side table 2.80 × 1.60, top 2.60; open hooped barrel Ø 2.20 × 2.72.
+- **Parts:** WallBlock 36 tris (2.0 × 2.4 × 1.63), **WallSection** 668 (6.01 × 3.02 × 8.58: two piers, a 1.9 × 3.3
+  opening under a 4.0 bridging block, stepped top, an 8-leaf ivy run, two moss patches), Rubble 62, Canopy 312
+  (canvas, four toggles and tabs, tail), Post 348 (FR post on its footing, lashing, toggle, collars), Banner 340,
+  Bedroll 128 (on its mat), Table 108, Crate 236, Barrel 204. Every part under 1000.
+- **Hero:** `RuinedLeanTo` **20.63 × 13.81 × 13.49**, 214 closed shells. Y includes the ivy standing up to 0.8 proud
+  of the outer face; Z the ivy pads and lip leaves over the 13.20 peak (the front cell's tallest is 13.2–13.6).
+- **Walk-in (`walk_report`; proxy body 2 × 1 from z 0.30 over the mat to 4.4, head 1.1 to 5.5):** front lane x −3.2,
+  y −9 → 0: min clearance **0.13** (a mat stripe under the feet); canvas underside over x −4.4 … −2.0 **≥ 7.09** (need
+  6.9). Side lane y −0.5, x 9 → 0: min clearance **0.41** (barrel); canvas underside **≥ 8.45** (need 8.0). The C4
+  tail (bottom 5.85) is 3.6 / 3.9 from the lanes.
+- **Renders looked at:** front / side / rear / f34 / r34 sheets, the mirrored top, spin, junctions (FR, FL),
+  underside, block, ruin, rear ivy, inside, walk, thumb, parts, exploded, scale. The overall read matches the sheet:
+  stepped pale block ruin, ivy curtain from the peak, three orange posts with golden X-lashings, cream canvas with the
+  low front corner, red banner, camp inside.
+
+## Stage 2 — Optimisation and cleanup
+
+- **Triangles:** hero **5926** (ceiling 6000; the 4800–5400 plan is exceeded by the masonry: 55 chamfered blocks are
+  1980 alone). By kind: blocks 1980, rubble 216, footings 108, posts 180, rope 644, beam 12, toggles 48, tabs 84, arm
+  + knob 56, pole 28, sleeve 48, banner + hem 72, emblems 136, canvas 160, bedroll 92, mat + stripes 36, crate +
+  braces 236, table 108, barrel 204, stems 308, pads 72, **leaves 864, moss 234** (the extra budget went to the ivy,
+  decision 2). Cuts on the way: posts 76 → 60 tris (two colour bands), canvas grid 6 × 6 → 5 × 5, sleeve 8 → 6 sides.
+- **Topology (every object):** 0 non-manifold edges, **0 bowties**, 0 boundary / wire / loose, 0 zero-area faces, 0
+  n-gons, 0 duplicate verts, normals outward; **0 winding errors** and 0 self-intersections in every shell. Thin
+  corners: hero 269 faces under 3°, smallest 0.59° (floor 0.3°: rope mitres, braces, chips).
+- **Contact (`contact_report`, which now also samples every larger triangle so long faces count):** **floating 0,
+  unchained 0** on the hero and every part. Seats (gap): post / footing 0.003–0.007, beam / post 0.005, beam / wall
+  0.005, toggles / posts 0.003, tabs / toggles 0.004, canvas / tabs 0.008, tail / canvas 0, crossarm / post 0.005,
+  sleeve / arm 0.010, pole / sleeve 0, hem / arm 0.009, bedroll / mat 0.002, lower turns / toggles 0.
+- **Buried (`bury_report`, ray parity, every pair):** **0 over the limit** on every object. Worst sinks: rope in rope
+  0.078 (limit 0.08), stem in stem 0.048, stem in leaf 0.040, leaf in stem 0.029, rope in timber 0.035, rope in
+  canvas 0.036, moss in stone 0.023. **Pierce** (edges crossing the thin canvas / tabs / banner twice): 0. Rope ends:
+  all touching.
+- **Origin** at the bbox bottom centre on every object, transforms applied; hero offset (build frame) (−0.761,
+  −0.874, −0.004) (the fallen block's low edge is 0.004 under z 0). Stored: `m070_offset`, `m070_centre`,
+  `m070_sleep`, `m070_corner`; WallBlock `m070_course` 1.65; Canopy `m070_ties`; Post `m070_top`; WallSection
+  `m070_opening`.
+
+## Stage 3 — UV
+
+`M.smart_uv` (angle 45, angle-based re-unwrap, margin 0.008) on every object, overlapping pairs cut free
+(`_uv_unfold`): **0 overlaps, 0 flipped**, min island gap 0.016, border 0.008, texel density 1.0 everywhere, conformal
+stretch p95 ≤ 1.065 (hero 1.0). The exporter writes its own palette UVs; this layer is clean.
+
+## Stage 4 — Materials, colour and texture
+
+- **Calibration:** `m070.calibrate()` (K.calibrate on the studio dome, the sheet targets of spec 5.4), then
+  re-measured on the hero renders with the spec's HSV masks (a scratch `measure.py` in `<temp>\m070\`) and adjusted
+  where the dome and the hero disagreed. Final palette (`PALETTE`): timber `#864A18`, timber_end `#B3741F`,
+  timber_deep `#4E2812`, canvas `#CCBDA5`, canvas_deep `#BAA58F`, stone `#9A8F8F`, stone_light `#CBBBBB`, stone_dark
+  `#66626A`, ivy_lime `#91AA08`, ivy `#5E7A12`, ivy_dark `#3B5616`, stem `#73522E`, rope `#E4AC54`, rope_deep
+  `#C38B34`, banner `#C11D23`, cloth_white `#E2DAD6`, pole `#46322E`, iron `#4A3A36` (metal 0.4, rough 0.55),
+  leather `#6B3C1F`, gold `#C18419`, mat `#A17737`, stripe `#3E606D`.
+  - Overrides of the dome: the canvas came back salmon (`#FAC2A8`, M064 ruling 1) and a key-lit canvas clipped to
+    `#FFFFD0` on the hero; `#CCBDA5` renders `#FFF3C9` against the front cell's `#FEF2C8`. White clipped on the dome:
+    set under it. ivy_dark one step over its dome value (near-black in shade on the rear). Stone, rope and banner
+    raised 10–18 % after the hero measurement (they sit in more shade than the dome).
+- **Re-measured on the final renders (sheet → ours, class medians, spec masks):**
+  - f34: wood `#7D431A` → `#7D4314`; stone `#9A8987` → `#A6948D`; canvas `#FEEFC9` → `#FFF1C7`; banner `#D61B1F` →
+    `#D8191D`; rope `#E79F38` → `#EDA13E`; ivy hue 75.0° → 74.9° (median `#5A730C` → `#738E11`: ours a little
+    lighter; the sheet's G includes its darker ground grass).
+  - front: FR post (direct sample) spec `#964914` → `#924814`; stone `#9A8A84` (spec `#958681`) → `#A19088`; canvas
+    (direct) `#FEF2C8` → `#FFF3C9`.
+  - rear: stone `#A79792` (spec `#A6958F`) → `#988C8A`, **15 under in R**: the back face sits in the studio's shade,
+    and lifting it would put the front and f34 stone 20 over. Recorded.
+  - R ≥ G ≥ B on every stone median (warm pink-grey, never lavender); timber hue 24–25°.
+  - Shares f34 (sheet → ours): S 43.8 → 51.3, W 25.4 → 24.6, C 11.5 → 10.7, G 10.6 → 4.8 (about 30 % of the sheet's G
+    is ground plants, none in the hero: decision 7), B 4.4 → 5.2, R 2.5 → 3.3, K 1.7 → 0.0.
+- **Blends (by position and role, never by facing):** post feet two steps toward timber_deep by height (50 %, 25 %);
+  the foot courses toward stone_dark by course (30 / 15 / 5 %); canvas hem rim 75 %, hem strip 50 %, border facets 20 %
+  toward canvas_deep, tabs 40 %; crate one step deeper, table 30 %; barrel inside and floor deep; banner hem band 10 %
+  toward iron; moss by height (dark base, green shoulder, 40 % lime crown); ivy tones by height rank (33 % lime, 39 %
+  green, 28 % dark). Hard edges: rope | wood, iron | wood, banner | emblem, stripe | mat, cap | leather, timber_end
+  on the cut ends (post tops, beam, arm, knob, toggle ends), chips stone_light 50 %.
+- **Texture:** per-block Tint ±0.05 and broad mottling 0.02; per-piece Tint 0.03–0.05 on timber; canvas mottling 0.03;
+  per-stave tint on the barrel.
+- **K.check:** clean on the hero. Single-piece parts flagged chip / interior colours as following the face direction;
+  `kit_shading_ok` set with the reason on WallBlock and Rubble (the paler facets are the broken corner, a role) and
+  Barrel (the dark inside of the open barrel and its iron hoops). Footing and rubble tops are not painted paler (that
+  followed the facing).
+
+## Stage 5 — Lighting
+
+Skipped and recorded: the sheet shows nothing emissive in any assembled view and its notes say no baked lighting. No
+emissive keys (export stats: no glow keys on any object). Studio notes (Requires Manual Validation): the stone reads
+warm pink-grey in daylight, the canvas cream; the interior's shade comes from the canvas.
+
+## Stage 6 — VFX
+
+Skipped and recorded (decision 6): no lantern, glow or socket. Export stats: **0 sockets** on the hero and every part.
+
+## Checks a verifier can rerun
+
+`m070.build()` returns `problems` (empty at hand-off), `audit`, `contact`, `bury`, `pierce`, `rope_ends`, `walk`,
+`skyline`, `placement`, `sweep`, `leaves`, `uv`, `export_stats`. Foliage sweep (`leaf_sweep`: azimuth 0–355 in 5°
+steps at e 0 / 5 / 10 / 20; a whole leaf is edge-on when ≥ 75 % of its front facets are within 15° of edge-on or its
+projected area is under 0.26 of face-on): **worst whole-edge-on share 0.0 % at every elevation** (hero 54 leaves,
+WallSection 8). Mean-plane edge-on share (reported only) 35–46 %: most leaves face out of the two big wall faces, but
+the tented facets never all turn edge-on together.
+
+## Recorded misses and open points
+
+- **Budget:** 5926 tris, over the 4800–5400 plan, under the 6000 ceiling (masonry 1980; ivy and moss 1478).
+- **W : H** (spec 1.2 masks): f34 1.347 (sheet 1.336 ✓), rear 1.404 (1.373 ✓), **front 1.493** (sheet 1.372 ± 0.08;
+  the sheet's bbox includes 12 px of grass and shadow under the ground line; ground to top it is 247 / 167 = 1.48),
+  **side 0.935** (sheet 1.174: the side cell draws the wall deeper, spec 3.7, and grass at both ends). The top is
+  content only (spec 3.4).
+- **Running bond:** worst joint offset between courses 0.35 (side wall course 2, back wall course 6), not the study's
+  0.6.
+- **Missing blocks:** only the side wall's top one. The study's course-8 gap would break the front cell's unbroken
+  peak (585–590 px across), and a course-6 gap at x +3.4 would contradict the 6-course step the front cell draws there.
+- **r34 (140, 15):** the back wall hides the interior from this height; the sheet's r34 shows it through the open +X
+  side. `r34_high_sheet` (125, 28) is added; the interior is still mostly behind the wall end.
+- **Ivy:** lighter green than the sheet's wall ivy and thinner than its curtains (54 leaves; the sheet's peak curtain
+  is denser). Rear stone 15 under in R (studio shade).
+- **Walk proxy feet at 0.30** (standing on the 0.16 mat and its 0.01 stripes); the Studio walk-in check Requires
+  Manual Validation (collision `precise`).
+
+**Renders** (`art/blender/renders/models/M070/`): `M070_views.png`, `front_sheet.png`, `side_sheet.png`,
+`rear_sheet.png`, `f34_sheet.png`, `r34_sheet.png`, `r34_high_sheet.png`, `top_sheet.png`, `top_mirror_sheet.png`,
+`M070_spin.png` (spin000–315), `junction_cu.png`, `junction_fl_cu.png`, `underside_cu.png`, `block_cu.png`,
+`ruin_cu.png`, `rear_ivy_cu.png`, `inside_cu.png`, `walk.png`, `thumb_sheet.png`, `scale.png`, `exploded.png`,
+`part_*.png`, and `front34`, `rear34`, `front`, `side`, `rear`, `top`.

@@ -62,18 +62,18 @@ BURY = 0.05
 # K.calibrate on the studio dome, then re-measured on the hero renders against the same regions of the sheet.
 PALETTE = {
     TIMBER: ("#9E5A2B", 0.85, 0.0, 0.0, True),
-    TIMBER_END: ("#E89A2A", 0.8, 0.0, 0.0, True),
-    TIMBER_DEEP: ("#703816", 0.9, 0.0, 0.0, True),
-    CANVAS: ("#FDECC6", 0.95, 0.0, 0.0, True),
-    CANVAS_DEEP: ("#E6C49C", 0.95, 0.0, 0.0, True),
-    STONE: ("#9A9597", 0.9, 0.0, 0.0, True),
-    STONE_LIGHT: ("#B8ABA7", 0.9, 0.0, 0.0, True),
-    STONE_DARK: ("#666264", 0.9, 0.0, 0.0, True),
+    TIMBER_END: ("#C08024", 0.8, 0.0, 0.0, True),
+    TIMBER_DEEP: ("#653516", 0.9, 0.0, 0.0, True),
+    CANVAS: ("#EADEBF", 0.95, 0.0, 0.0, True),
+    CANVAS_DEEP: ("#BAA58F", 0.95, 0.0, 0.0, True),
+    STONE: ("#969295", 0.9, 0.0, 0.0, True),
+    STONE_LIGHT: ("#A39A9A", 0.9, 0.0, 0.0, True),
+    STONE_DARK: ("#5E5C60", 0.9, 0.0, 0.0, True),
     SOOT: ("#2A2425", 1.0, 0.0, 0.0, True),
-    IRON: ("#524C4E", 0.55, 0.4, 0.0, False),
-    GLOW: ("#EAB00E", 0.5, 0.0, NEON, False),
-    ROPE: ("#DDBB5A", 0.95, 0.0, 0.0, True),
-    ROPE_DEEP: ("#A7842F", 0.95, 0.0, 0.0, True),
+    IRON: ("#534E52", 0.55, 0.4, 0.0, False),
+    GLOW: ("#EEB406", 0.5, 0.0, NEON, False),
+    ROPE: ("#F2C45E", 0.95, 0.0, 0.0, True),
+    ROPE_DEEP: ("#93712E", 0.95, 0.0, 0.0, True),
     BANNER: ("#C2191C", 0.9, 0.0, 0.0, True),
     WHITE: ("#F0EAE4", 0.9, 0.0, 0.0, True),
 }
@@ -293,21 +293,29 @@ def _earclip(P):
         return (p[0] - o[0]) * (q[1] - o[1]) - (p[1] - o[1]) * (q[0] - o[0])
 
     def inside(p, a_, b_, c_):
-        return cross(a_, b_, p) > 1e-12 and cross(b_, c_, p) > 1e-12 and cross(c_, a_, p) > 1e-12
+        if cross(a_, b_, p) > 1e-12 and cross(b_, c_, p) > 1e-12 and cross(c_, a_, p) > 1e-12:
+            return True
+        # a vertex lying on the new diagonal c_ -> a_ would leave a T-junction (and later a zero-area triangle)
+        if abs(cross(c_, a_, p)) <= 1e-9:
+            t = ((p[0] - c_[0]) * (a_[0] - c_[0]) + (p[1] - c_[1]) * (a_[1] - c_[1]))
+            L2 = (a_[0] - c_[0]) ** 2 + (a_[1] - c_[1]) ** 2
+            return 1e-9 < t < L2 - 1e-9
+        return False
     tris = []
     guard = 0
     while len(idx) > 3 and guard < 4 * n * n:
         guard += 1
         m = len(idx)
-        cut = None
-        for k in range(m):
+        cut, best = None, -1.0
+        for k in range(m):           # every valid ear; keep the one with the largest smallest corner (no slivers)
             i0, i1, i2 = idx[k - 1], idx[k], idx[(k + 1) % m]
             if cross(P[i0], P[i1], P[i2]) <= 1e-12:
                 continue
             if any(inside(P[j], P[i0], P[i1], P[i2]) for j in idx if j not in (i0, i1, i2)):
                 continue
-            cut = k
-            break
+            q = _min_angle([Vector((P[i][0], P[i][1], 0.0)) for i in (i0, i1, i2)])
+            if q > best:
+                cut, best = k, q
         if cut is None:          # only collinear corners left: drop one
             cut = 0
         k = cut
@@ -544,7 +552,12 @@ CTV = CT / COS                    # ... vertical
 EAVE = 7.45                       # canvas eave edge |x|: 0.25 past the plates' outer faces, at plate-top height
 CAN_Y = 9.247                     # canvas gable ends |y| (0.003 inside the bargeboards' inner faces)
 FLOOR_Z = 2.60
-PLATE = (6.30, 7.20, 10.40, 11.20, 10.20, 0.12)   # x0, x1, z0, z1, |y| end, chamfer
+# |y| end 10.80 (round-1 minor 3): the octagonal end, iron plate and peg stand clear of the bargeboard heel (10.15)
+PLATE = (6.30, 7.20, 10.40, 11.20, 10.80, 0.12)   # x0, x1, z0, z1, |y| end, chamfer
+OVL = 0.002                                      # closed joints (round-1 fix): neighbours sink this far into each
+                                                 # other, so no seam goes through and no verts coincide
+EAVE_BLK = (6.85, 7.08)                          # eave blocking on the plate top (x range; the canvas is unsagged
+                                                 # over it), closing the slit between plate and canvas
 WALL_IN_X, WALL_IN_Y = 6.60, 7.60                # long / end walls' inner faces
 WALL_T = 0.40
 ROW_PITCH, ROW_Z0, N_ROWS = 1.62, 2.30, 5
@@ -560,9 +573,14 @@ RAFTER_W, RAFTER_D = 0.50, 0.60
 RIDGE_W, RIDGE_END, RIDGE_Z0 = 1.00, 10.75, 14.536
 PURLIN_X, PURLIN_W, PURLIN_H = 4.10, 0.50, 0.50
 SINK_TOP = 0.015                                 # rafter / purlin tops under the canvas underside (its sag is 0.01 there)
-CHIMNEY = (2.20, -3.45)                          # chimney centre (f34, decision 4; y nudged 0.05 off the rafter)
+CHIMNEY = (2.20, -3.50)                          # chimney centre (f34, decision 4; y 0.10 back so its +Y face
+                                                 # clears the rafter at y -1.94 by 0.01)
 CH_W, CH_Z0, CH_JOINT, CH_Z1, CH_TOP = 2.60, 13.60, 16.60, 18.60, 19.40
-HOLE = (0.87, 3.53, -4.78, -2.12)                # canvas cut round the chimney (0.03 clear)
+# canvas cut round the chimney, OVL clear (round-1 fix: the 0.03 ring let light in; a flashing collar on the canvas
+# now covers the cut, chimney())
+HOLE = (CHIMNEY[0] - CH_W / 2 - OVL, CHIMNEY[0] + CH_W / 2 + OVL, CHIMNEY[1] - CH_W / 2 - OVL,
+        CHIMNEY[1] + CH_W / 2 + OVL)
+COLLAR = (0.12, 0.10)                            # flashing collar width past the stack, height over the canvas
 
 
 def zt(x):
@@ -576,9 +594,11 @@ def zu(x):
 
 
 def row_z(i):
-    """Wall plank row i (0..4): bottom, top (0.005 seams between rows, the bottom row 0.003 off the plinth)."""
-    z0 = ROW_Z0 + ROW_PITCH * i + (0.003 if i == 0 else 0.0)
-    return z0, ROW_Z0 + ROW_PITCH * (i + 1) - 0.005
+    """Wall plank row i (0..4): bottom, top. Neighbouring rows overlap 2 * OVL at the back (round-1 fix: no seam
+    goes through; the 0.10 outer chamfers still draw the dark V seam); the bottom row 0.003 off the plinth, the top
+    row OVL into the plate (end walls: under the gable boards)."""
+    z0 = ROW_Z0 + ROW_PITCH * i + (0.003 if i == 0 else -OVL)
+    return z0, ROW_Z0 + ROW_PITCH * (i + 1) + OVL
 
 
 def _jit_face(name):
@@ -691,44 +711,69 @@ FLOOR_W, FLOOR_GAP, FLOOR_N = 1.26, 0.06, 10
 THRESH = ((-1.78, -0.62), (-0.58, 0.58), (0.62, 1.78))
 
 
+UNDER = (5.40, WALL_IN_Y - 0.20 + OVL, 2.20)     # underlay half x, half y (into the end courses), bottom z
+
+
 def floor(a, feet=False):
-    """Ten deck planks along Y (1.26 wide, 0.06 seams) on the front and back courses and two hidden sleepers; the
-    three threshold planks run out through the doorway onto the threshold beam between the door posts. feet: the
-    Floor part's short dark feet (the exploded) instead of the sleepers."""
+    """Ten deck planks along Y (1.26 wide, 0.06 seams) on the front and back courses; the three threshold planks run
+    out through the doorway onto the threshold beam between the door posts. Round-1 fix (no ground seen from
+    inside): the planks run OVL into the walls' inner faces; the two outer planks are notched round the corner posts
+    and blocks (they cover the corners down to the posts' faces); a dark underlay board under the seams (into the
+    end courses' inner faces) shows in them as the dark gap and stops every ray; the threshold planks run OVL onto
+    the deck. The underlay rests on two hidden sleepers; feet: the Floor part's short dark feet (the exploded)
+    instead of the sleepers."""
     x0 = -(FLOOR_N * FLOOR_W + (FLOOR_N - 1) * FLOOR_GAP) / 2
+    ye = WALL_IN_Y + OVL
+    cx, cy = CORNER_BLOCK[0] + OVL, CORNER_BLOCK[2] + OVL       # notch corner (just over the block's inner faces)
     for i in range(FLOOR_N):
         xa = x0 + i * (FLOOR_W + FLOOR_GAP)
         xb = xa + FLOOR_W
-        y1 = 7.09 if max(abs(xa), abs(xb)) > CORNER_BLOCK[0] - 0.005 else WALL_IN_Y - 0.01
         nm = f"deck_{i}"
-        vs, _ = _box(a, (xa, -y1, 2.303), (xb, y1, FLOOR_Z), TIMBER, _rt(nm, 0.05))
+        if i in (0, FLOOR_N - 1):
+            s = -1 if i == 0 else 1
+            xi, xo = (xb, xa) if s < 0 else (xa, xb)
+            xo = s * (WALL_IN_X + OVL)
+            poly = [(xi, -ye), (s * cx, -ye), (s * cx, -cy), (xo, -cy), (xo, cy), (s * cx, cy), (s * cx, ye), (xi, ye)]
+            vs, _, _, _ = _ext(a, poly, lambda u, v, w: Vector((u, v, w)), 2.300 - OVL, FLOOR_Z, TIMBER,
+                               _rt(nm, 0.05))
+        else:            # bottoms OVL into the underlay and courses (seated, and the contact check sees it)
+            vs, _ = _box(a, (xa, -ye, 2.300 - OVL), (xb, ye, FLOOR_Z), TIMBER, _rt(nm, 0.05))
         _texture(a, vs, 0.03, _seed(nm), scale=0.35)
         _reg("plank", nm, vs)
     for i, (xa, xb) in enumerate(THRESH):
         nm = f"thresh_{i}"
-        vs, _ = _box(a, (xa, DPOST[2], 2.303), (xb, -WALL_IN_Y - 0.02, FLOOR_Z), TIMBER, _rt(nm, 0.05))
+        vs, _ = _box(a, (xa, DPOST[2], 2.303), (xb, -WALL_IN_Y + OVL, FLOOR_Z), TIMBER, _rt(nm, 0.05))
         _reg("plank", nm, vs)
-    vs, _ = _box(a, (-DOOR_X + 0.015, -9.48, 1.733), (DOOR_X - 0.015, -8.405, 2.297), TIMBER_DEEP, 0.97)
+    vs, _ = _box(a, (-DOOR_X + 0.015, -9.48, 1.70 if feet else 1.733), (DOOR_X - 0.015, -8.405, 2.297), TIMBER_DEEP,
+                 0.97)
     _reg("beam", "thresh_beam", vs)
-    if feet:
-        for i, (x, y) in enumerate(((-5.0, -6.0), (5.0, -6.0), (-5.0, 0.0), (5.0, 0.0), (-5.0, 6.0), (5.0, 6.0))):
-            vs, _ = _box(a, (x - 0.35, y - 0.35, 1.70), (x + 0.35, y + 0.35, 2.297), TIMBER_DEEP, _rt(f"ft{i}", 0.04))
-            _reg("beam", f"floor_foot{i}", vs)
+    ux, uy, uz = UNDER
+    vs, _ = _box(a, (-ux, -uy, uz), (ux, uy, 2.300), _mix(TIMBER_DEEP, SOOT, 0.4), 0.97)
+    _reg("board", "floor_under", vs)
+    if feet:                 # the Floor part: two short dark feet under every deck plank (the exploded's feet)
+        for i in range(FLOOR_N):
+            xc = x0 + i * (FLOOR_W + FLOOR_GAP) + FLOOR_W / 2
+            ztop = uz - 0.003 if abs(xc) + 0.30 < ux else 2.297
+            for k, y in enumerate((-5.0, 5.0)):
+                vs, _ = _box(a, (xc - 0.30, y - 0.30, 1.70), (xc + 0.30, y + 0.30, ztop), TIMBER_DEEP,
+                             _rt(f"ft{i}{k}", 0.04))
+                _reg("beam", f"floor_foot{i}_{k}", vs)
     else:
         for i, y in enumerate((-3.5, 3.5)):
-            vs, _ = _box(a, (-6.395, y - 0.5, 1.70), (6.395, y + 0.5, 2.297), TIMBER_DEEP, 0.95)
+            vs, _ = _box(a, (-6.395, y - 0.5, 1.70), (6.395, y + 0.5, uz - 0.003), TIMBER_DEEP, 0.95)
             _reg("beam", f"sleeper_{i}", vs)
 
 
 # ---- walls (spec 2.4) ----------------------------------------------------------------------------------------------------
-LONG_SEGS = {0: [(-7.10, -2.62), (-2.58, 7.10)], 1: [(-7.10, 3.38), (3.42, 7.10)],
-             2: [(-7.10, -2.62), (-2.58, -1.50), (1.50, 7.10)], 3: [(-7.10, -1.50), (1.50, 3.38), (3.42, 7.10)],
-             4: [(-7.10, -2.62), (-2.58, 7.10)]}
-BACK_SEGS = {0: [(-6.10, -2.02), (-1.98, 6.10)], 1: [(-6.10, 2.58), (2.62, 6.10)],
-             2: [(-6.10, -2.02), (-1.98, 6.10)], 3: [(-6.10, 2.58), (2.62, 6.10)],
-             4: [(-6.10, -2.02), (-1.98, 6.10)]}
+# butt joints (staggered y -2.60 / +3.40, back x -2.00 / +2.60): the two plank ends overlap 2 * OVL (round-1 fix)
+LONG_SEGS = {0: [(-7.10, -2.60 + OVL), (-2.60 - OVL, 7.10)], 1: [(-7.10, 3.40 + OVL), (3.40 - OVL, 7.10)],
+             2: [(-7.10, -2.60 + OVL), (-2.60 - OVL, -1.50), (1.50, 7.10)],
+             3: [(-7.10, -1.50), (1.50, 3.40 + OVL), (3.40 - OVL, 7.10)],
+             4: [(-7.10, -2.60 + OVL), (-2.60 - OVL, 7.10)]}
+BACK_SEGS = {i: ([(-6.10, -2.00 + OVL), (-2.00 - OVL, 6.10)] if i % 2 == 0 else
+                 [(-6.10, 2.60 + OVL), (2.60 - OVL, 6.10)]) for i in range(N_ROWS)}
 FRONT_SEGS = {i: [(-6.10, -DOOR_X), (DOOR_X, 6.10)] for i in range(N_ROWS)}
-PLANK_CH = 0.07
+PLANK_CH = 0.10                  # outer edge chamfers: the dark V seams between rows (sheet)
 
 
 def _wall_map(wall, s, z0):
@@ -739,7 +784,7 @@ def _wall_map(wall, s, z0):
 
 def plank(a, wall, s, t0, t1, z0, z1, name, band=True):
     """One wall plank (spec 2.4): a 6-sided section 0.37-0.40 thick with its outer top and bottom edges chamfered
-    0.07 (neighbouring rows touch at the back, so the chamfers make the dark V seams and nothing is see-through).
+    0.10 (neighbouring rows touch at the back, so the chamfers make the dark V seams and nothing is see-through).
     Planks over 2.0 long get a ring 30 % from a seeded end: that end band one step toward timber_deep (by position).
     20 tris (32 with the band)."""
     rng = random.Random(_seed(name))
@@ -813,6 +858,32 @@ def window(a, s):
         vs, _ = _box(a, (xc - 0.11, e * 0.50 - 0.11, row_z(1)[1] + 0.002), (xc + 0.11, e * 0.50 + 0.11, row_z(4)[0] - 0.002),
                      IRON, _rt(f"bar{tag}{e}", 0.03))
         _reg("bar", f"win_{tag}_bar{e}", vs)
+    shutter(a, s)
+
+
+SHUT = (0.20, 0.12, 0.14, 0.01)              # overlap round the opening, leaf thicknesses, second leaf set-back
+
+
+def shutter(a, s):
+    """Round-1 fix (minor 1): a closed inner shutter of two dark board leaves against the planks' inner face, 0.20
+    past the opening all round, so the window reads dark (the sheet's #201717) and square-on views no longer look
+    through the hut. The leaves overlap 2 * OVL where they meet; the second is set 0.01 back and is thicker, so no
+    two faces are coplanar."""
+    tag = "L" if s < 0 else "R"
+    hw, zb, ztp = WIN[0], WIN[1], WIN[2]
+    m, t_side, t_mid, back = SHUT
+    xo = WALL_IN_X - 0.003
+    y0, y1 = -hw - m, hw + m
+    w = (y1 - y0) / 2
+    key = _mix(TIMBER_DEEP, SOOT, 0.55)
+    for i in range(2):
+        ya, yb = y0 + i * w - (OVL if i else 0.0), y0 + (i + 1) * w + (OVL if i < 1 else 0.0)
+        xa, xb = (xo - back - t_mid, xo - back) if i == 1 else (xo - t_side, xo)
+        nm = f"shutter_{tag}{i}"
+        lo, hi = (min(s * xa, s * xb), ya, zb - m), (max(s * xa, s * xb), yb, ztp + m)
+        vs, _ = _box(a, lo, hi, key, _rt(nm, 0.05))
+        _texture(a, vs, 0.03, _seed(nm), scale=0.5)
+        _reg("board", nm, vs)
 
 
 def _oct_rect(x0, x1, y0, y1, ch):
@@ -836,7 +907,8 @@ def corner_post(a, sx, sy):
     x0, x1, y0, y1 = POST
     tag = f"{'L' if sx < 0 else 'R'}{'F' if sy < 0 else 'B'}"
     xs, ys = sorted((sx * x0, sx * x1)), sorted((sy * y0, sy * y1))
-    post(a, xs[0], xs[1], ys[0], ys[1], CORNER_BLOCK[5] + 0.003, PLATE[2] - 0.003, f"post_{tag}")
+    # OVL into the corner block and the plate (round-1 fix: no slit under the foot or over the top)
+    post(a, xs[0], xs[1], ys[0], ys[1], CORNER_BLOCK[5] - OVL, PLATE[2] + OVL, f"post_{tag}")
 
 
 # ---- roof frame (spec 2.6) ---------------------------------------------------------------------------------------------
@@ -866,7 +938,8 @@ def bracket_plate(a, sx, e):
         hi = (max(sx * xa, sx * xb), y1, z1)
         vs, _ = _box(a, lo, hi, key, _rt(nm, 0.04))
         _reg(kind, nm, vs)
-    bx(x0, x0 + 0.08, yc - 0.42, yc + 0.42, 10.47, 11.13, IRON, "iron", f"bplate_{tag}")
+    # z 10.53 .. 11.07: on the plate's flat outer face, inside its 0.12 chamfers (so the plate touches it face to face)
+    bx(x0, x0 + 0.08, yc - 0.42, yc + 0.42, 10.53, 11.07, IRON, "iron", f"bplate_{tag}")
     bx(x0 + 0.085, x0 + 0.44, yc - 0.18, yc + 0.18, 10.62, 10.98, TIMBER_END, "peg", f"bpeg_{tag}")
     for k, dy in enumerate((-0.31, 0.31)):
         bx(x0 + 0.085, x0 + 0.19, yc + dy - 0.06, yc + dy + 0.06, 10.74, 10.86, IRON, "iron", f"rivet_{tag}{k}")
@@ -879,7 +952,8 @@ def rafter(a, sx, y):
     rv = RAFTER_D / COS
     seat = PLATE[3] + 0.003
     xs = (zu(0.0) - SINK_TOP - rv - seat) / P
-    poly = [(RIDGE_W / 2 + 0.005, top(RIDGE_W / 2 + 0.005)), (PLATE[1], top(PLATE[1])), (PLATE[1], seat), (xs, seat),
+    xe = EAVE_BLK[0] - OVL          # the tail stops at the eave blocking (round-1 fix), still seated on the plate
+    poly = [(RIDGE_W / 2 + 0.005, top(RIDGE_W / 2 + 0.005)), (xe, top(xe)), (xe, seat), (xs, seat),
             (RIDGE_W / 2 + 0.005, top(RIDGE_W / 2 + 0.005) - rv)]
     nm = f"rafter_{'L' if sx < 0 else 'R'}{y:+.2f}"
     vs, fs, _, _ = _ext(a, poly, lambda u, v, w: Vector((sx * u, w, v)), y - RAFTER_W / 2, y + RAFTER_W / 2, TIMBER,
@@ -904,13 +978,36 @@ def purlins(a, sx):
         _reg("beam", nm, vs)
 
 
+def eave_block(a, s):
+    """Round-1 fix: eave blocking, one continuous timber on the plate top along the eave between the gable planes
+    (x 6.85-7.08, OVL into the plate and into the unsagged canvas there), closing the slit between plate and canvas
+    that let light into the roof space. The rafter tails stop against it."""
+    x0, x1 = EAVE_BLK
+    zb = PLATE[3] - OVL
+    poly = [(x0, zb), (x1, zb), (x1, zu(x1) + OVL), (x0, zu(x0) + OVL)]
+    yy = WALL_IN_Y + WALL_T - 0.015              # inside the gable boards' faces (no coplanar ends)
+    nm = f"eaveblk_{'L' if s < 0 else 'R'}"
+    vs, _, _, _ = _ext(a, poly, lambda u, v, w: Vector((s * u, w, v)), -yy, yy, TIMBER, _rt(nm, 0.04))
+    _texture(a, vs, 0.03, _seed(nm), scale=0.4)
+    _reg("beam", nm, vs)
+
+
+def _trim_top(x):
+    """Rafter / trimmer top line (0.015 under the canvas underside)."""
+    return zu(x) - SINK_TOP
+
+
 def trimmers(a):
-    """Two short timbers between the rafters at y -5.82 and -1.94 under the chimney (close-up C): its seat."""
+    """Two short timbers between the rafters at y -5.82 and -1.94, in the rafters' own band (tops 0.015 under the
+    canvas, 0.60 deep), under the chimney's two long edges (close-up C): the chimney's sloped foot sits on them."""
     cx, cy = CHIMNEY
-    for i, x in enumerate((cx - 1.0, cx + 1.0)):
+    h = CH_W / 2
+    rv = RAFTER_D / COS
+    for i, (x0, x1) in enumerate(((cx - h, cx - h + RAFTER_W), (cx + h - RAFTER_W, cx + h))):
         nm = f"trimmer_{i}"
-        vs, _ = _box(a, (x - 0.25, RAFTER_Y[0] + RAFTER_W / 2 + 0.002, CH_Z0 - 0.703),
-                     (x + 0.25, RAFTER_Y[1] - RAFTER_W / 2 - 0.002, CH_Z0 - 0.003), TIMBER, _rt(nm, 0.05))
+        poly = [(x0, _trim_top(x0) - rv), (x1, _trim_top(x1) - rv), (x1, _trim_top(x1)), (x0, _trim_top(x0))]
+        vs, _, _, _ = _ext(a, poly, lambda u, v, w: Vector((u, w, v)), RAFTER_Y[0] + RAFTER_W / 2 + 0.002,
+                           RAFTER_Y[1] - RAFTER_W / 2 - 0.002, TIMBER, _rt(nm, 0.05))
         _reg("beam", nm, vs)
 
 
@@ -918,9 +1015,12 @@ def ridge_section():
     """The ridge beam's 7-sided section (x, z): chamfered bottom corners, the top following both canvas slopes 0.01
     under the canvas underside."""
     h = RIDGE_W / 2
-    ztop = lambda x: zu(x) - 0.01
-    return [(-h + 0.08, RIDGE_Z0), (h - 0.08, RIDGE_Z0), (h, RIDGE_Z0 + 0.08), (h, ztop(h)), (0.0, ztop(0.0)),
-            (-h, ztop(h)), (-h, RIDGE_Z0 + 0.08)]
+    # 0.01 under the canvas at the apex; at its edges also under the panel sag there (the first grid column sags up
+    # to SAG * x / 2.05 in mid-bay), so its top edges never cross the canvas underside
+    ztop = lambda x: zu(x) - 0.01 - SAG * abs(x) / CXI[1] - 0.005 * (abs(x) > 0)
+    ch = 0.10
+    return [(-h + ch, RIDGE_Z0), (h - ch, RIDGE_Z0), (h, RIDGE_Z0 + ch), (h, ztop(h)), (0.0, ztop(0.0)),
+            (-h, ztop(h)), (-h, RIDGE_Z0 + ch)]
 
 
 RT_RB = 0.10
@@ -945,7 +1045,7 @@ def ridge_beam(a):
 
 
 # ---- gable frames (spec 2.5-2.6) ---------------------------------------------------------------------------------------
-BB_FOOT, BB_TIP, BB_HEEL = 8.20, 1.00, (6.40, 7.20)
+BB_FOOT, BB_TIP, BB_HEEL = 8.20, 1.60, (6.40, 7.20)   # tips 1.6 out: the sheet's big X
 DV = BB_D / COS
 
 
@@ -1010,6 +1110,31 @@ def bargeboards(a, e):
     vs, _, _, _ = _ext(a, poly, mp, y0 + 0.02, y1 - 0.02, TIMBER_END, _rt(f"saddle{tag}", 0.03))
     _reg("board", f"saddle_{tag}", vs)
     GEO.setdefault("bargeboard_tip_top", round(tt.y, 3))
+    cleats(a, e)
+
+
+CLEAT = (0.40, 0.30, 1.40)            # along the board, thick, across (spec 2.6)
+
+
+def cleats(a, e):
+    """Round-1 fix (minor 2): two cleats per bargeboard at 1/3 and 2/3 of the way from the foot to the apex, across
+    the board's top face (OVL into it), overhanging both faces by 0.25 so they cross the canvas edge (top cell,
+    f34). Light timber, one step toward the pale ends (by role)."""
+    tag = "F" if e < 0 else "B"
+    L, T, Wc = CLEAT
+    yc = e * (BB_Y[0] + BB_Y[1]) / 2
+    key = _mix(TIMBER, TIMBER_END, 0.25)
+    for sx in (-1, 1):
+        t = Vector((COS, 0.0, -sx * SIN))
+        n = Vector((sx * SIN, 0.0, COS))
+        for k, f in enumerate((1 / 3, 2 / 3)):
+            xc = sx * BB_FOOT * (1.0 - f)
+            c = Vector((xc, yc, _bb_bottom(sx, xc) + DV))
+            m = Matrix(((t.x, 0.0, n.x, c.x), (0.0, 1.0, 0.0, c.y), (t.z, 0.0, n.z, c.z), (0.0, 0.0, 0.0, 1.0)))
+            nm = f"cleat_{tag}{'L' if sx < 0 else 'R'}{k}"
+            vs, _ = _box(a, (-L / 2, -Wc / 2, -OVL), (L / 2, Wc / 2, T), key, _rt(nm, 0.04), m=m)
+            _texture(a, vs, 0.03, _seed(nm), scale=0.4)
+            _reg("board", nm, vs)
 
 
 def collar(a, e):
@@ -1037,28 +1162,67 @@ def back_frame_posts(a):
 
 
 def gable_infill(a, e):
-    """Vertical boards (0.94 wide, 0.03 seams) in the end-wall plane above the top plank row, their tops 0.10 under
-    the canvas line; the middle board stops under the ridge beam."""
+    """Vertical boards (0.97 wide) in the end-wall plane above the top plank row, closed for the round-1 fix:
+    - neighbouring boards overlap 2 * OVL edge to edge, every other board 0.01 thinner on both faces (no coplanar
+      faces; the steps still read as boards);
+    - the bottoms OVL * 2 into the top plank row and the posts' tops; the tops OVL into the canvas underside (the end
+      bays sag SAG_END, so the deepest sink stays under BURY);
+    - a board under the ridge beam (into its chamfered underside) and an apex block over it, from the ridge top into
+      the canvas, its peak in the slabs' apex seam;
+    - the outer boards wrap the plate's inner chamfers and face and run over the plate top onto the eave blocking."""
     tag = "F" if e < 0 else "B"
-    y0, y1 = sorted((e * (WALL_IN_Y + 0.01), e * (WALL_IN_Y + WALL_T - 0.01)))
-    zb = row_z(4)[1] + 0.003
-    mp = lambda u, v, w: Vector((u, w, v))
+    zb = row_z(4)[1] - 2 * OVL
     h = RIDGE_W / 2
-    boards = [(-h + 0.005, h - 0.005, None)]
-    w, gap, x = 0.9375, 0.03, h + 0.005
-    for k in range(6):
-        boards.append((x, x + w, k))
-        boards.append((-x - w, -x, k))
-        x += w + gap
-    for xa, xb, k in boards:
-        if k is None:
-            poly = [(xa, zb), (xb, zb), (xb, RIDGE_Z0 - 0.004), (xa, RIDGE_Z0 - 0.004)]
+    mp = lambda u, v, w: Vector((u, w, v))
+    yin, yout = WALL_IN_Y + 0.01, WALL_IN_Y + WALL_T - 0.01
+
+    def ys(odd):
+        d = 0.01 if odd else 0.0
+        return sorted((e * (yin + d), e * (yout - d)))
+
+    def put(poly, odd, nm, faces=None):
+        y0, y1 = ys(odd)
+        if faces is None:
+            vs, _, _, _ = _ext(a, poly, mp, y0, y1, TIMBER, _rt(nm, 0.05))
         else:
-            poly = [(xa, zb), (xb, zb), (xb, zu(xb) - 0.10), (xa, zu(xa) - 0.10)]
-        nm = f"gboard_{tag}{xa:+.2f}"
-        vs, _, _, _ = _ext(a, poly, mp, y0, y1, TIMBER, _rt(nm, 0.05))
+            n = len(poly)
+            pts = [mp(u, v, y0) for u, v in poly] + [mp(u, v, y1) for u, v in poly]
+            fl = [list(f) for f in faces] + [[n + f[2], n + f[1], n + f[0]] for f in faces]
+            fl += [[i, (i + 1) % n, n + (i + 1) % n, n + i] for i in range(n)]
+            vs, _ = _shell(a, pts, fl, TIMBER, _rt(nm, 0.05))
         _texture(a, vs, 0.03, _seed(nm), scale=0.5)
         _reg("plank", nm, vs)
+    # under the ridge beam: the top OVL into its flat underside and chamfers
+    rb, ch = RIDGE_Z0 + OVL, 0.10
+    zr = lambda x: RIDGE_Z0 + max(0.0, abs(x) - (h - ch)) + OVL        # ridge underside + OVL (vertical)
+    put([(-h - OVL, zb), (h + OVL, zb), (h + OVL, zr(h) + OVL), (h - ch - 0.001, rb), (-h + ch + 0.001, rb),
+         (-h - OVL, zr(h) + OVL)], False, f"gboard_{tag}_mid")
+    # apex block: the ridge's pitched top - OVL up to the canvas underside + OVL, its peak in the apex seam between
+    # the two slabs (explicit fan from the bottom middle, so no edge crosses a slab twice)
+    sec = ridge_section()
+    zt_h, zt_0 = sec[3][1], sec[4][1]
+    hb = h + OVL
+    poly = [(-hb, zt_h - OVL), (0.0, zt_0 - OVL), (hb, zt_h - OVL), (hb, zu(hb) + OVL), (0.0, zu(0.0) + 0.05),
+            (-hb, zu(hb) + OVL)]
+    put(poly, False, f"gboard_{tag}_apex", faces=[(0, 1, 5), (1, 4, 5), (1, 2, 3), (1, 3, 4)])
+    # six boards a side from the ridge's faces to the plates' inner faces
+    W = (PLATE[0] - h) / 6
+    x0p, z0p, z1p = PLATE[0], PLATE[2], PLATE[3]
+    pch = PLATE[5]
+    for sx in (-1, 1):
+        for k in range(6):
+            xa, xb = h + k * W - OVL, h + (k + 1) * W + OVL
+            if k < 5:
+                poly = [(xa, zb), (xb, zb), (xb, zu(xb) + OVL), (xa, zu(xa) + OVL)]
+            else:          # wrap the plate (chamfer lines moved 0.003 into it) and run over it to the eave block
+                lb = x0p + z0p + pch + 0.003                      # bottom inner chamfer: x + z = lb
+                lt = z1p - pch - x0p - 0.003                      # top inner chamfer: z - x = lt
+                xf = EAVE_BLK[0] + OVL
+                poly = [(xa, zb), (lb - zb, zb), (x0p + OVL, lb - x0p - OVL), (x0p + OVL, lt + x0p + OVL),
+                        (z1p - OVL - lt, z1p - OVL), (xf, z1p - OVL), (xf, zu(xf) + OVL), (xa, zu(xa) + OVL)]
+            if sx < 0:
+                poly = [(-u, v) for u, v in reversed(poly)]
+            put(poly, k % 2 == 0, f"gboard_{tag}{'L' if sx < 0 else 'R'}{k}")
 
 
 def gable_frame(a, e, part=False):
@@ -1128,7 +1292,8 @@ def doorframe(a, theta_deg=OPEN_DEG):
                   _rt("lintel", 0.04))
     _paint(a, [fs[4], fs[5]], TIMBER_END)
     _reg("beam", "lintel", vs)
-    plank(a, "end", -1, -DOOR_X + 0.005, DOOR_X - 0.005, DOOR_TOP + 0.003, row_z(4)[1], "header", band=False)
+    # the header's ends run OVL into the top rows' ends at the jambs (round-1 fix)
+    plank(a, "end", -1, -DOOR_X - OVL, DOOR_X + OVL, DOOR_TOP + 0.003, row_z(4)[1], "header", band=False)
     door_leaf(a, theta_deg)
 
 
@@ -1136,6 +1301,8 @@ def doorframe(a, theta_deg=OPEN_DEG):
 CXI = (0.001, 2.05, 4.10, 5.775, 6.85, EAVE)
 CYS = (-CAN_Y, -7.535, -5.82, -3.88, -1.94, 0.0, 1.94, 3.88, 5.82, 7.535, CAN_Y)
 SAG = 0.08
+SAG_END = 0.05                         # the two end bays (round-1 fix): the gable boards' straight tops run OVL into
+                                       # the canvas underside; at 0.08 the sag over the gable plane sank them past BURY
 SAG_XI = (2.05, 5.775)
 SAG_Y = (-7.535, -3.88, 0.0, 3.88, 7.535)
 HEM = ((6.85, 0.5), (5.775, 0.25))     # faces outside xi: canvas_deep share (hem blend, by position)
@@ -1150,7 +1317,9 @@ def roof_panel(a, s, hole=False):
     nx, ny = len(CXI), len(CYS)
 
     def sag(i, j):
-        return SAG if (CXI[i] in SAG_XI and CYS[j] in SAG_Y) else 0.0
+        if not (CXI[i] in SAG_XI and CYS[j] in SAG_Y):
+            return 0.0
+        return SAG_END if abs(CYS[j]) == SAG_Y[-1] else SAG
     top = {}
     for i in range(nx):
         for j in range(ny):
@@ -1197,6 +1366,20 @@ def roof_panel(a, s, hole=False):
         tkeys += [_mix(CANVAS, CANVAS_DEEP, 0.5)] * len(ring)
     faces = [list(t) for t in tris] + [[nt + t[2], nt + t[1], nt + t[0]] for t in tris]
     keys = tkeys + tkeys
+    if hole:                     # grid points inside the cut (the sagged (1, 3) node) would be loose verts
+        used = {i for t in tris for i in t}
+        loop_pts = ({idx[(i, 0)] for i in range(nx)} | {idx[(nx - 1, j)] for j in range(ny)} |
+                    {idx[(i, ny - 1)] for i in range(nx)} | {idx[(0, j)] for j in range(ny)})
+        drop = sorted(set(range(nt)) - used - loop_pts)
+        if drop:
+            keep = [i for i in range(nt) if i not in drop]
+            remap = {old: new for new, old in enumerate(keep)}
+            remap.update({nt + old: len(keep) + new for new, old in enumerate(keep)})
+            pts = [pts[i] for i in keep] + [pts[nt + i] for i in keep]
+            faces = [[remap[i] for i in f] for f in faces]
+            idx = {k: remap[v] for k, v in idx.items() if v in remap}
+            inner = [remap[i] for i in inner]
+            nt = len(keep)
     # rims: the outer boundary and the hole
     loop = ([idx[(i, 0)] for i in range(nx)] + [idx[(nx - 1, j)] for j in range(1, ny)] +
             [idx[(i, ny - 1)] for i in range(nx - 2, -1, -1)] + [idx[(0, j)] for j in range(ny - 2, 0, -1)])
@@ -1242,12 +1425,16 @@ def _offset_path(prof, d):
     return out
 
 
-def tie(a, s, y, name):
+def tie(a, s, y, name, short=False):
     """A golden U tie (spec 2.7): a flat strap 0.24 x 0.08 over the canvas top near the eave, round the canvas edge,
-    across to the plate and down its outer face, its end under the plate against the wall (both ends touch)."""
+    across to the plate and down its outer face, its end under the plate against the wall (both ends touch).
+    short (the RoofPanel part, which has no plate): a U clip round the canvas edge only."""
     x0, x1, z0, z1, _, ch = PLATE
-    prof = [(6.85, zt(6.85)), (EAVE, zt(EAVE)), (EAVE, zt(EAVE) - CTV), (x1, z1 - ch), (x1, z0 + ch), (x1 - ch, z0),
-            (WALL_IN_X + WALL_T + 0.03, z0)]
+    if short:
+        prof = [(6.85, zt(6.85)), (EAVE, zt(EAVE)), (EAVE, zt(EAVE) - CTV), (6.85, zt(6.85) - CTV)]
+    else:
+        prof = [(6.85, zt(6.85)), (EAVE, zt(EAVE)), (EAVE, zt(EAVE) - CTV), (x1, z1 - ch), (x1, z0 + ch),
+                (x1 - ch, z0), (WALL_IN_X + WALL_T + 0.03, z0)]
     mv = _offset_path(prof, 1.0)
     rings = []
     cl = []
@@ -1265,23 +1452,42 @@ def tie(a, s, y, name):
                   "rt": TIE_G + TIE_T / 2})
 
 
-def ties(a, s):
+def ties(a, s, short=False):
     for i, y in enumerate(RAFTER_Y):
-        tie(a, s, y, f"tie_{'L' if s < 0 else 'R'}{i}")
+        tie(a, s, y, f"tie_{'L' if s < 0 else 'R'}{i}", short=short)
 
 
 # ---- chimney (spec 2.8) --------------------------------------------------------------------------------------------------
 def chimney(a):
     """A square stone stack in two blocks (the upper set in 0.10: the notched joint), a 3.00 cap with a 1.40 flue
-    recess 0.60 deep (soot); the lower block one step toward stone_dark, the cap stone_light (by role)."""
+    recess 0.60 deep (soot). The sheet draws the whole stack a mid grey (f34 #887F84, darker than the plinth): the
+    lower block half way to stone_dark, the upper block and the cap a quarter of the way (by role)."""
     cx, cy = CHIMNEY
     h = CH_W / 2
-    vs, _ = _box(a, (cx - h, cy - h, CH_Z0), (cx + h, cy + h, CH_JOINT), _mix(STONE, STONE_DARK, 0.25),
-                 _rt("chim_lo", 0.03))
+    foot = lambda x: _trim_top(x) + 0.003          # the lower block's foot follows the roof pitch on the trimmers
+    pts = [Vector((x, y, foot(x))) for x, y in ((cx - h, cy - h), (cx + h, cy - h), (cx + h, cy + h), (cx - h, cy + h))]
+    pts += [Vector((p.x, p.y, CH_JOINT)) for p in pts]
+    vs, _ = _shell(a, pts, HEXA, _mix(STONE, STONE_DARK, 0.5), _rt("chim_lo", 0.03))
+    GEO["chimney_foot"] = [round(foot(cx - h), 3), round(foot(cx + h), 3)]
     _texture(a, vs, 0.04, 6820, scale=0.8)
     _reg("chimney", "chim_lo", vs)
+    # round-1 fix: a flashing collar on the canvas round the stack (OVL into the canvas top and the stack), over the
+    # cut's OVL clearance, so no light comes in round the chimney; the darker mortar grey of the stack's joint
+    fw, fh = COLLAR
+    ri, ro = h - OVL, h + fw
+    sq = ((-1, -1), (1, -1), (1, 1), (-1, 1))
+    ring = lambda r, dz: [Vector((cx + x * r, cy + y * r, zt(cx + x * r) + dz)) for x, y in sq]
+    pts = ring(ro, -OVL) + ring(ri, -OVL) + ring(ro, fh) + ring(ri, fh)
+    faces = []
+    for k in range(4):
+        k1 = (k + 1) % 4
+        faces += [[8 + k, 8 + k1, 12 + k1, 12 + k], [k1, k, 4 + k, 4 + k1], [k, k1, 8 + k1, 8 + k],
+                  [4 + k1, 4 + k, 12 + k, 12 + k1]]
+    vs, _ = _shell(a, pts, faces, _mix(STONE, STONE_DARK, 0.6), _rt("chim_collar", 0.03))
+    _reg("chimney", "chim_collar", vs)
     h2 = h - 0.10
-    vs, _ = _box(a, (cx - h2, cy - h2, CH_JOINT + 0.003), (cx + h2, cy + h2, CH_Z1), STONE, _rt("chim_up", 0.03))
+    cap = _mix(STONE, STONE_DARK, 0.25)
+    vs, _ = _box(a, (cx - h2, cy - h2, CH_JOINT + 0.003), (cx + h2, cy + h2, CH_Z1), cap, _rt("chim_up", 0.03))
     _texture(a, vs, 0.04, 6821, scale=0.8)
     _reg("chimney", "chim_up", vs)
     hc, hf, zc0, zf = 1.50, 0.70, CH_Z1 + 0.003, CH_TOP - 0.60
@@ -1291,20 +1497,20 @@ def chimney(a):
     i0 = [p - Vector((0, 0, CH_TOP - zf)) for p in i1]
     pts = o0 + o1 + i1 + i0
     faces = [[3, 2, 1, 0]]
-    keys = [STONE_LIGHT]
+    keys = [cap]
     for k in range(4):
         k1 = (k + 1) % 4
         faces.append([k, k1, 4 + k1, 4 + k])
-        keys.append(STONE_LIGHT)
+        keys.append(cap)
         faces.append([4 + k, 4 + k1, 8 + k1, 8 + k])
-        keys.append(STONE_LIGHT)
+        keys.append(cap)
         faces.append([8 + k, 8 + k1, 12 + k1, 12 + k])
         keys.append(SOOT)
     faces.append([12, 13, 14, 15])
     keys.append(SOOT)
-    vs, fs = _shell(a, pts, faces, STONE_LIGHT, _rt("chim_cap", 0.03))
+    vs, fs = _shell(a, pts, faces, cap, _rt("chim_cap", 0.03))
     for f, k in zip(fs, keys):
-        if k != STONE_LIGHT:
+        if k != cap:
             f.material_index = a._mi(k)
     _reg("chimney", "chim_cap", vs)
     GEO["flue"] = [cx, cy, CH_TOP - 0.10]
@@ -1461,10 +1667,20 @@ def banner_set(a):
                  _rt("poletop", 0.04))
     _reg("pole", "pole_top", vs)
     ex, ez = Vector((1, 0, 0)), Vector((0, 0, 1))
-    rings = [_ngon(Vector((px, y, ARM_ZC)), ex, ez, r, 6, math.pi / 6) for y, r in ARM_PROF]
+    # the crossarm "through" the pole in two pieces butting the pole's flat -Y / +Y faces (nothing buried): a short
+    # knobbed stub behind it and the long arm in front
+    pf = POLE_R * math.cos(math.pi / 8) + 0.003
+    stub = [p for p in ARM_PROF if p[0] < py] + [(py - pf, ARM_R)]
+    arm = [(py + pf, ARM_R)] + [p for p in ARM_PROF if p[0] > py]
+    rings = [_ngon(Vector((px, y, ARM_ZC)), ex, ez, r, 6, math.pi / 6) for y, r in stub]
+    vs, fs, bands = _prism(a, rings, TIMBER, _rt("armstub", 0.04))
+    _paint(a, [fs[-2]], TIMBER_END)
+    _reg("pole", "crossarm_stub", vs)
+    rings = [_ngon(Vector((px, y, ARM_ZC)), ex, ez, r, 6, math.pi / 6) for y, r in arm]
     vs, fs, bands = _prism(a, rings, TIMBER, _rt("arm", 0.04))
-    _paint(a, bands[3] + bands[4] + bands[5], IRON)
-    _paint(a, fs[-2:], TIMBER_END)
+    k0 = next(i for i, (y, r) in enumerate(arm) if r > ARM_R + 1e-6 and y < 12.0)   # the iron band's first ring
+    _paint(a, bands[k0 - 1] + bands[k0] + bands[k0 + 1], IRON)
+    _paint(a, [fs[-1]], TIMBER_END)
     _reg("pole", "crossarm", vs)
     # X lashing: hull loops round the pole and arm in the planes z - zc = -+(y - py)
     c = Vector((px, py, ARM_ZC))
@@ -1744,3 +1960,1471 @@ def stone(a, c, size, rot_deg, seed, tag):
             f.material_index = a._mi(_mix(STONE_LIGHT, STONE, 0.5))
     _texture(a, vs, 0.05, seed, scale=1.2)
     _reg("pstone", f"stone_{tag}", vs)
+
+
+# ---- hero assembly (spec 4.1 item 15) -------------------------------------------------------------------------------------
+def hero_all(a):
+    """TimberCabin: every part function placed by spec 2 (leaf open inward), one object of closed shells."""
+    _clear()
+    GEO.clear()
+    FX.clear()
+    for side in RUNS:
+        foundation_run(a, side)
+    for sx in (-1, 1):
+        for sy in (-1, 1):
+            corner_block(a, sx, sy)
+            corner_post(a, sx, sy)
+    floor(a)
+    for s in (-1, 1):
+        wall_long(a, s)
+        window(a, s)
+        plate(a, s)
+        for e in (-1, 1):
+            bracket_plate(a, s, e)
+        for y in RAFTER_Y:
+            rafter(a, s, y)
+        purlins(a, s)
+        eave_block(a, s)
+    wall_end(a, -1, door=True)
+    wall_end(a, 1)
+    back_frame_posts(a)
+    for e in (-1, 1):
+        gable_frame(a, e)
+        gable_infill(a, e)
+    doorframe(a, OPEN_DEG)
+    trimmers(a)
+    ridge_beam(a)
+    roof_panel(a, -1)
+    roof_panel(a, 1, hole=True)
+    ties(a, -1)
+    ties(a, 1)
+    chimney(a)
+    FX.append(("chimney_smoke", Vector(GEO["flue"]), SMOKE))
+    stairs(a)
+    gc, _ = lantern_set(a, "eave", L1, "L1")
+    FX.append(("heat_glow", gc, _fx_spec(10)))
+    for tag, base in zip(("L2", "L3"), L23):
+        gc, _ = lantern_set(a, "door", base, tag)
+        FX.append(("heat_glow", gc, _fx_spec(12)))
+    banner_set(a)
+    for tag, (c, rot) in BARRELS.items():
+        barrel(a, c, rot, tag)
+    crate(a)
+    for tag, (c, size, r, seed) in STONES.items():
+        stone(a, c, size, r, seed, tag)
+
+
+# ---- parts (spec 8; each from the same part functions, square to its axes) -------------------------------------------------
+def roof_part(a):
+    """TimberCabinRoofPanel: the +X canvas slab (uncut) with its four U ties clipped round the canvas edge (the hero's
+    ties run on round the plate, which is not in this part; the left slope is this mesh mirrored)."""
+    _clear()
+    roof_panel(a, 1)
+    ties(a, 1, short=True)
+
+
+def ridge_part(a):
+    _clear()
+    ridge_beam(a)
+
+
+def chimney_part(a):
+    _clear()
+    chimney(a)
+    PART_INFO["flue"] = Vector(GEO["flue"])
+
+
+def banner_part(a):
+    _clear()
+    banner_set(a)
+
+
+def lantern_part(a):
+    """TimberCabinLantern: one door lantern with its wall bracket (the strap's back face is the wall face)."""
+    _clear()
+    gc, rt = lantern_set(a, "door", (0.0, -9.10, 6.20), "L")
+    PART_INFO["glass"] = gc
+    PART_INFO["hang"] = rt
+    PART_INFO["mount"] = Vector((0.0, -(WALL_IN_Y + WALL_T + 0.003), (ARM_Z[0] - 0.10 + PLATE[2]) / 2))
+
+
+def wall_part(a):
+    """TimberCabinWallPanel: the back wall's five plank rows between its two corner posts."""
+    _clear()
+    wall_end(a, 1)
+    for sx in (-1, 1):
+        corner_post(a, sx, 1)
+
+
+def window_part(a):
+    """TimberCabinWindowWall: the +X long wall with its window between its two corner posts."""
+    _clear()
+    wall_long(a, 1)
+    window(a, 1)
+    for sy in (-1, 1):
+        corner_post(a, 1, sy)
+
+
+def door_part(a):
+    """TimberCabinDoorFrame: door posts with caps, lintel, header and the leaf closed (hinge stored)."""
+    _clear()
+    doorframe(a, 0.0)
+    PART_INFO["hinge"] = GEO["hinge"]
+
+
+def gable_part(a):
+    _clear()
+    gable_frame(a, -1, part=True)
+
+
+def floor_part(a):
+    _clear()
+    floor(a, feet=True)
+
+
+def stairs_part(a):
+    _clear()
+    stairs(a)
+
+
+def foundation_part(a):
+    """TimberCabinFoundation: the +X side's two-course run with its back corner block."""
+    _clear()
+    foundation_run(a, "R")
+    corner_block(a, 1, 1)
+
+
+NOTES = {
+    HERO: "Walk-in gable-roofed timber cabin (door 3.60 x 7.00 clear on a 2.60 floor, three 0.87 risers): two-course "
+          "stone plinth with white corner blocks, plank floor, five rows of planks between chamfered corner posts, "
+          "a barred window in each long wall, the door between tall posts with golden caps under a lintel and collar "
+          "(leaf open inward 95 deg), octagonal-ended eave beams with iron brackets, rafters, purlins and a ridge "
+          "beam under two closed cream canvas slabs with golden U ties, crossed bargeboards with golden saddles, a "
+          "stone chimney (thin pale chimney_smoke), two-tread stairs, three Neon lanterns (heat_glow halos), a red "
+          "banner on an X-lashed pole, two barrels, a crate and two stones. Collision precise: Requires Manual "
+          "Validation in Studio (walk in, turn round, walk out). Sheet header 67/132.",
+    ROOF_P: "Roof Panel (Left / Right): one closed 0.12 canvas slab, 5 x 2 sagging panels, four golden U ties "
+            "(mirror for the other slope)",
+    RIDGE_P: "Ridge Beam: 1.00 beam with a pitched top, pale octagonal ends and two golden rope turns at each end",
+    CHIMNEY_P: "Chimney: square stone stack in two blocks with a notched joint, a flued cap (chimney_smoke socket); "
+               "its foot is cut to the 32 deg roof pitch",
+    BANNER_P: "Banner Pole + Banner: 8-sided pole with a golden foot band and block top, crossarm with an X lashing, "
+              "red swallowtail banner with the white diamond emblem on both faces",
+    LANTERN_P: "Lantern (x2): square dark-iron lantern with Neon amber glass (heat_glow halo) on its iron wall bracket",
+    WALL_P: "Wall Panel (Left / Rear): five rows of 0.40 V-seamed planks with staggered joints between two corner "
+            "posts",
+    WINDOW_P: "Wall Panel with window: a long plank wall with the centred barred window frame and its corner posts",
+    DOOR_P: "Doorframe: two chamfered door posts on golden caps, lintel, header plank and the plank door (closed; "
+            "hinge stored as m068_hinge for a scripted door)",
+    GABLE_P: "Front Gable Frame: collar, crossed bargeboards (half-lap X) with a golden saddle, on the two plate ends",
+    FLOOR_P: "Floor: ten deck planks and the threshold on short dark feet (top 2.60)",
+    STAIRS_P: "Stairs: two two-plank treads on blocks (three equal 0.87 risers to a 2.60 floor)",
+    FOUND_P: "Stone Foundation (x4): one side's two-course run of bevelled blocks with a two-tier corner block",
+}
+COLLISION = {HERO: "precise", ROOF_P: "box", RIDGE_P: "box", CHIMNEY_P: "box", BANNER_P: "none", LANTERN_P: "none",
+             WALL_P: "box", WINDOW_P: "precise", DOOR_P: "precise", GABLE_P: "hull", FLOOR_P: "box",
+             STAIRS_P: "precise", FOUND_P: "box"}
+
+
+# ---- objects, stage 2-3 pass (m066) ------------------------------------------------------------------------------------------
+def _bottom_centre(o):
+    xs = [v.co.x for v in o.data.vertices]
+    ys = [v.co.y for v in o.data.vertices]
+    zs = [v.co.z for v in o.data.vertices]
+    return Vector(((min(xs) + max(xs)) / 2, (min(ys) + max(ys)) / 2, min(zs)))
+
+
+def _new(name, fn, role, budget, temp=False):
+    old = bpy.data.objects.get(name)
+    if old:
+        if old.get("kit_sheet") not in (None, SHEET) and not temp:
+            raise RuntimeError(f"{name} belongs to {old.get('kit_sheet')}")
+        for c in list(old.children_recursive):
+            bpy.data.objects.remove(c, do_unlink=True)
+        me = old.data
+        bpy.data.objects.remove(old, do_unlink=True)
+        if me.users == 0:
+            bpy.data.meshes.remove(me)
+    a = K.fk().Asset(name, f"{SHEET} {TITLE}", seed=7, tint_var=0.0)
+    _clear()
+    fn(a)
+    o = a.finish(collection=M.coll(NUM, TITLE), mark_asset=not temp, origin=None)
+    K.drop_unused_slots(o)
+    if not temp:
+        K.tag(o, SHEET, TITLE, role, COLLISION[name], budget, NOTES[name])
+    o[OFF] = [0.0, 0.0, 0.0]
+    o.location = (0, 0, 0)
+    o["m068_pieces"] = json.dumps([[k, n_, [round(x, 5) for x in c]] for k, n_, c in PIECES])
+    o["m068_ropes"] = json.dumps(ROPES)
+    bpy.context.view_layer.update()
+    return o
+
+
+def _recentre(o):
+    bc = _bottom_centre(o)
+    if bc.length > 1e-6:
+        for v in o.data.vertices:
+            v.co -= bc
+        for c in o.children:
+            c.location -= bc
+        o[OFF] = list(Vector(o[OFF]) + bc)
+    o.data.update()
+
+
+def _min_angle(pts):
+    out = math.pi
+    for k, p in enumerate(pts):
+        u, v = pts[k - 1] - p, pts[(k + 1) % len(pts)] - p
+        out = min(out, u.angle(v) if u.length > 1e-9 and v.length > 1e-9 else 0.0)
+    return out
+
+
+def _thin(o, lim=3.0):
+    """(m012) Faces with a corner under lim degrees, and the smallest corner angle on the mesh."""
+    bm = bmesh.new()
+    bm.from_mesh(o.data)
+    angs = [_min_angle([v.co for v in f.verts]) for f in bm.faces]
+    bm.free()
+    return {"under": sum(1 for x in angs if x < math.radians(lim)), "min_deg": round(math.degrees(min(angs)), 2)}
+
+
+def _uv_overlaps(o):
+    """(m012) Pairs of faces whose UV triangles overlap (as M.uv_stats counts them)."""
+    bm = bmesh.new()
+    bm.from_mesh(o.data)
+    uv = bm.loops.layers.uv.active
+    tris = [[(l[uv].uv.x, l[uv].uv.y) for l in f.loops] for f in bm.faces]
+    bm.free()
+    boxes = [(min(p[0] for p in t), min(p[1] for p in t), max(p[0] for p in t), max(p[1] for p in t)) for t in tris]
+    grid = {}
+    for k, b in enumerate(boxes):
+        for i in range(int(b[0] // 0.05), int(b[2] // 0.05) + 1):
+            for j in range(int(b[1] // 0.05), int(b[3] // 0.05) + 1):
+                grid.setdefault((i, j), []).append(k)
+    pairs = {(a_, b_) for lst in grid.values() for i, a_ in enumerate(lst) for b_ in lst[i + 1:]}
+    return [(a_, b_) for a_, b_ in pairs if M._tri_overlap(tris[a_], tris[b_])]
+
+
+def _uv_unfold(o, rounds=4):
+    """(m012) Cut the smaller face of each UV-overlapping pair free along seams and unwrap again."""
+    cut = 0
+    for _ in range(rounds):
+        bad = _uv_overlaps(o)
+        if not bad:
+            break
+        polys = o.data.polygons
+        free = {min((a_, b_), key=lambda i: polys[i].area) for a_, b_ in bad}
+        keys = {tuple(sorted(e)) for i in free for e in polys[i].edge_keys}
+        for e in o.data.edges:
+            if tuple(sorted(e.vertices)) in keys:
+                e.use_seam = True
+        cut += len(free)
+        with M._override(o):
+            bpy.ops.object.mode_set(mode="EDIT")
+            try:
+                bpy.ops.mesh.select_all(action="SELECT")
+                bpy.ops.uv.unwrap(method=UV["method"], fill_holes=False, correct_aspect=True,
+                                  margin_method="FRACTION", margin=UV["margin"])
+            finally:
+                bpy.ops.object.mode_set(mode="OBJECT")
+    return cut
+
+
+def _post(o):
+    """Stage 2-3 pass: every face a triangle, normals outward per shell, flat shading, origin at the bbox bottom centre,
+    UVs (angle-based islands, overlaps cut free), bowties split."""
+    bm = bmesh.new()
+    bm.from_mesh(o.data)
+    bmesh.ops.triangulate(bm, faces=[f for f in bm.faces if len(f.verts) > 3], quad_method="BEAUTY",
+                          ngon_method="BEAUTY")
+    bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
+    bm.to_mesh(o.data)
+    bm.free()
+    for p in o.data.polygons:
+        p.use_smooth = False
+    if o.data.has_custom_normals:
+        with M._override(o):
+            bpy.ops.mesh.customdata_custom_splitnormals_clear()
+    _recentre(o)
+    lg = {"bowties": M.fix_bowties(o)}
+    M.smart_uv(o, **UV)
+    lg["uv_cut"] = _uv_unfold(o)
+    K.drop_unused_slots(o)
+    return lg
+
+
+def _make(name, fn, role="part", budget=1000, temp=False):
+    t0 = time.time()
+    o = _new(name, fn, role, budget, temp=temp)
+    lg = _post(o)
+    lg["secs"] = round(time.time() - t0, 1)
+    return o, lg
+
+
+# ---- checks (m064 / m066) --------------------------------------------------------------------------------------------------
+CAT = {"plank": "wood", "beam": "wood", "frame": "wood", "post": "wood", "peg": "wood", "board": "wood",
+       "door": "wood", "pole": "wood", "barrel": "wood", "crate": "wood", "stone": "stone", "corner": "stone",
+       "chimney": "stone", "pstone": "stone", "bar": "metal", "iron": "metal", "lmetal": "metal", "bung": "metal",
+       "cplate": "metal", "canvas": "canvas", "rope": "rope", "glass": "glass", "banner": "banner",
+       "emblem": "banner"}
+SINK_LIMIT = {("rope", "rope"): 0.08}
+THIN_KINDS = ("canvas", "banner", "emblem")
+
+
+def _shells(o):
+    bm = bmesh.new()
+    bm.from_mesh(o.data)
+    bm.faces.ensure_lookup_table()
+    bm.verts.ensure_lookup_table()
+    ids, n = M._shell_ids(bm)
+    groups = [[] for _ in range(n)]
+    for f in bm.faces:
+        groups[ids[f.index]].append(f)
+    off = Vector(o[OFF]) if OFF in o else Vector()
+    reg = [(k, nm, Vector(c)) for k, nm, c in json.loads(o.get("m068_pieces", "[]"))]
+    labels, used = [], set()
+    for fs in groups:
+        vs = list({v for f in fs for v in f.verts})
+        c = sum((v.co for v in vs), Vector()) / len(vs) + off
+        best = min(((i, (rc - c).length) for i, (_, _, rc) in enumerate(reg) if i not in used),
+                   key=lambda x: x[1], default=(None, 0))
+        if best[0] is not None and best[1] < 0.06:
+            used.add(best[0])
+            labels.append(reg[best[0]][:2])
+        else:
+            labels.append(("?", "?"))
+    return bm, ids, n, groups, labels
+
+
+def shells_report(o):
+    """(m064) Per shell: kind, name, tris, non-manifold edges and verts, boundary edges, winding errors (manifold edges
+    whose two faces run the same way round), self-intersecting face pairs, signed volume."""
+    bm, ids, n, groups, labels = _shells(o)
+    out = []
+    for k in range(n):
+        fs = groups[k]
+        es = {e for f in fs for e in f.edges}
+        vs = list({v for f in fs for v in f.verts})
+        vi = {v: i for i, v in enumerate(vs)}
+        tree = BVHTree.FromPolygons([v.co for v in vs], [[vi[v] for v in f.verts] for f in fs])
+        hits = sum(1 for a_, b_ in tree.overlap(tree) if a_ < b_ and not set(fs[a_].verts) & set(fs[b_].verts))
+        vol = sum(f.calc_center_median().dot(f.normal) * f.calc_area() for f in fs) / 3.0
+        out.append({"kind": labels[k][0], "name": labels[k][1], "tris": len(fs),
+                    "nonmanifold_edges": sum(1 for e in es if not e.is_manifold),
+                    "nonmanifold_verts": sum(1 for v in vs if not v.is_manifold),
+                    "boundary_edges": sum(1 for e in es if e.is_boundary),
+                    "winding_errors": sum(1 for e in es if e.is_manifold and not e.is_contiguous),
+                    "self_hits": hits, "volume": round(vol, 5)})
+    bm.free()
+    return out
+
+
+def winding_parity(o):
+    """Spec 4.5: per shell, faces whose normal points inward by a ray-parity test (a point just off the face along
+    its normal must be outside the shell). Returns {shell name: count} for shells with any."""
+    bm, ids, n, groups, labels = _shells(o)
+    out = {}
+    for k in range(n):
+        fs = groups[k]
+        vs = list({v for f in fs for v in f.verts})
+        vi = {v: i for i, v in enumerate(vs)}
+        tree = BVHTree.FromPolygons([v.co for v in vs], [[vi[v] for v in f.verts] for f in fs])
+        bad = 0
+        for f in fs:
+            if f.calc_area() < 1e-5:
+                continue
+            p = f.calc_center_median() + f.normal * 1e-3
+            bad += _parity_in(tree, p)
+        if bad:
+            out[f"{labels[k][1]}#{k}"] = bad
+    bm.free()
+    return out
+
+
+def contact_report(o, tol=CONTACT, chain_tol=0.1, seats=()):
+    """(m064) No floating pieces (STAGES): per shell its nearest gap to another shell (0 where triangles intersect) or
+    the ground, and whether it chains by contact to the ground. seats = [(name, name)] pair gaps to report."""
+    bm, ids, n, groups, labels = _shells(o)
+    fsh = [ids[f.index] for f in bm.faces]
+    vsh = {}
+    for f in bm.faces:
+        for v in f.verts:
+            vsh[v.index] = fsh[f.index]
+    tree = BVHTree.FromBMesh(bm)
+    zmin = [1e9] * n
+    for v in bm.verts:
+        if v.index in vsh:
+            zmin[vsh[v.index]] = min(zmin[vsh[v.index]], v.co.z)
+    z0 = min(zmin)
+    pairs = set()
+    for i, j in tree.overlap(tree):
+        a_, b_ = fsh[i], fsh[j]
+        if a_ != b_:
+            pairs.add((min(a_, b_), max(a_, b_)))
+    near = {}
+    for v in bm.verts:
+        s = vsh.get(v.index)
+        if s is None:
+            continue
+        for loc, _, fi, d in tree.find_nearest_range(v.co, chain_tol):
+            t = fsh[fi]
+            if t != s:
+                kk = (min(s, t), max(s, t))
+                near[kk] = min(near.get(kk, 1e9), d)
+    for kk in pairs:
+        near[kk] = 0.0
+    gap = [1e9] * n
+    for (a_, b_), d in near.items():
+        gap[a_] = min(gap[a_], d)
+        gap[b_] = min(gap[b_], d)
+    ground = {k for k in range(n) if zmin[k] - z0 <= tol}
+    if n == 1:
+        gap = [0.0]
+    for k in ground:
+        gap[k] = 0.0
+
+    def chained(t):
+        adj = {k: set() for k in range(n)}
+        for (a_, b_), d in near.items():
+            if d <= t:
+                adj[a_].add(b_)
+                adj[b_].add(a_)
+        seen = set(ground) if n > 1 else {0}
+        stack = list(seen)
+        while stack:
+            k = stack.pop()
+            for m_ in adj[k]:
+                if m_ not in seen:
+                    seen.add(m_)
+                    stack.append(m_)
+        return [labels[k][1] for k in range(n) if k not in seen]
+    floating = [k for k in range(n) if gap[k] > tol]
+    idx = {labels[k][1]: k for k in range(n)}
+
+    def pair_gap(x, y):
+        if x not in idx or y not in idx:
+            return None
+        a_, b_ = idx[x], idx[y]
+        best = near.get((min(a_, b_), max(a_, b_)), 9.0)
+        trees = []
+        for k in (a_, b_):
+            vs = list({v for f in groups[k] for v in f.verts})
+            vi = {v: i for i, v in enumerate(vs)}
+            trees.append(BVHTree.FromPolygons([v.co for v in vs], [[vi[v] for v in f.verts] for f in groups[k]]))
+        for src, tr in ((groups[a_], trees[1]), (groups[b_], trees[0])):
+            for f in src:
+                cs = [v.co for v in f.verts]
+                if len(cs) != 3:
+                    continue
+                for i in range(13):
+                    for j in range(13 - i):
+                        w = (i / 12, j / 12, 1 - i / 12 - j / 12)
+                        p = cs[0] * w[0] + cs[1] * w[1] + cs[2] * w[2]
+                        hit = tr.find_nearest(p)
+                        if hit[0] is not None:
+                            best = min(best, hit[3])
+        return round(best, 3)
+    unch = chained(tol)
+    res = {"shells": n, "floating": len(floating), "floating_names": [labels[k][1] for k in floating],
+           "worst_gap": round(max([gap[k] for k in floating], default=0.0), 3),
+           "unchained": len(unch), "unchained_names": unch, "unchained_chain_tol": len(chained(chain_tol)),
+           "on_ground": sorted({labels[k][0] for k in ground}),
+           "sink": round(z0 + (o[OFF][2] if OFF in o else 0.0), 3),
+           "kinds": {k: [lb[0] for lb in labels].count(k) for k in sorted({lb[0] for lb in labels})},
+           "seats": {f"{x}|{y}": pair_gap(x, y) for x, y in seats}}
+    bm.free()
+    return res
+
+
+def bury_report(o):
+    """(m064) Nothing buried (STAGES): per shell pair, the deepest vert / face centre of one inside the other (ray
+    parity, depth to its surface), judged against BURY (SINK_LIMIT for rope joins); and shells wholly inside others."""
+    bm, ids, n, groups, labels = _shells(o)
+    info = []
+    for s in range(n):
+        fs = groups[s]
+        vs = list({v for f in fs for v in f.verts})
+        idx = {v: i for i, v in enumerate(vs)}
+        co = [v.co.copy() for v in vs]
+        lo = Vector((min(c.x for c in co), min(c.y for c in co), min(c.z for c in co)))
+        hi = Vector((max(c.x for c in co), max(c.y for c in co), max(c.z for c in co)))
+        tree = BVHTree.FromPolygons(co, [[idx[v] for v in f.verts] for f in fs])
+        info.append({"cat": CAT.get(labels[s][0], "?"), "name": labels[s][1], "lo": lo, "hi": hi, "tree": tree,
+                     "pts": co + [f.calc_center_median() for f in fs]})
+    worst, over, hidden = {}, [], []
+    for s, A in enumerate(info):
+        inside_any = [False] * len(A["pts"])
+        for t, B in enumerate(info):
+            if s == t or any(A["hi"][k] < B["lo"][k] - 1e-4 or A["lo"][k] > B["hi"][k] + 1e-4 for k in range(3)):
+                continue
+            dmax = 0.0
+            for j, p in enumerate(A["pts"]):
+                if not all(B["lo"][k] - 1e-4 <= p[k] <= B["hi"][k] + 1e-4 for k in range(3)):
+                    continue
+                if _parity_in(B["tree"], p):
+                    inside_any[j] = True
+                    dmax = max(dmax, B["tree"].find_nearest(p)[3])
+            if dmax <= 0:
+                continue
+            pair = (A["cat"], B["cat"])
+            worst[pair] = max(worst.get(pair, 0.0), dmax)
+            lim = SINK_LIMIT.get(pair, BURY)
+            if dmax > lim + 1e-3:
+                over.append({"shell": A["name"], "in": B["name"], "depth": round(dmax, 3)})
+        if all(inside_any):
+            hidden.append(A["name"])
+    bm.free()
+    return {"worst_depth": {f"{a_}>{b_}": round(d, 3) for (a_, b_), d in sorted(worst.items())},
+            "over_limit": over, "fully_hidden": hidden, "buried": len(over) + len(hidden)}
+
+
+def pierce_report(o):
+    """(m064) Thin slabs hide pass-throughs from the bury report (the 0.12 canvas is at most 0.06 deep anywhere):
+    count the edges of every other shell that cross a thin surface (canvas, banner, emblem) twice."""
+    bm, ids, n, groups, labels = _shells(o)
+    cos, polys = [], []
+    for k in range(n):
+        if labels[k][0] not in THIN_KINDS:
+            continue
+        vs = list({v for f in groups[k] for v in f.verts})
+        vi = {v: i + len(cos) for i, v in enumerate(vs)}
+        cos += [v.co.copy() for v in vs]
+        polys += [[vi[v] for v in f.verts] for f in groups[k]]
+    out = {}
+    if polys:
+        tree = BVHTree.FromPolygons(cos, polys)
+        for k in range(n):
+            if labels[k][0] in THIN_KINDS:
+                continue
+            bad = 0
+            for e in {e for f in groups[k] for e in f.edges}:
+                p, q = e.verts[0].co, e.verts[1].co
+                d = q - p
+                L = d.length
+                if L < 1e-6:
+                    continue
+                d = d / L
+                hits, t0 = 0, 0.0
+                while t0 < L and hits < 2:
+                    h = tree.ray_cast(p + d * (t0 + 1e-4), d, L - t0 - 1e-4)
+                    if h[0] is None:
+                        break
+                    hits += 1
+                    t0 = (h[0] - p).length + 1e-4
+                bad += hits >= 2
+            if bad:
+                out[labels[k][1]] = bad
+    bm.free()
+    return out
+
+
+def rope_ends_report(o):
+    """(m064) Every open rope / strap touches what it ties at both ends: each end point's gap to the nearest other
+    shell (surface distance minus the rope radius, 0 when the end is inside another shell)."""
+    bm, ids, n, groups, labels = _shells(o)
+    off = Vector(o[OFF])
+    fsh = [ids[f.index] for f in bm.faces]
+    tree = BVHTree.FromBMesh(bm)
+    byname = {labels[k][1]: k for k in range(n)}
+    out, bad = {}, []
+    for r in json.loads(o.get("m068_ropes", "[]")):
+        k = byname.get(r["name"])
+        if k is None:
+            continue
+        gaps = []
+        for p in r["ends"]:
+            q = Vector(p) - off
+            best = 9.0
+            for loc, nrm, fi, d in tree.find_nearest_range(q, r["rt"] + 0.3):
+                if fsh[fi] != k:
+                    best = min(best, d)
+            gaps.append(round(max(0.0, best - r["rt"]), 3) if best < 9 else None)
+        out[r["name"]] = gaps
+        if any(g is None or g > CONTACT for g in gaps):
+            bad.append(r["name"])
+    bm.free()
+    return {"ends": out, "loose": bad}
+
+
+def _hero_tree(o, skip=lambda kind, name: False):
+    """BVH of the hero's shells in the build frame (skip(kind, name) leaves a shell out); owner name per polygon."""
+    bm, ids, n, groups, labels = _shells(o)
+    off = Vector(o[OFF])
+    cos, polys, owner = [], [], []
+    for k in range(n):
+        if skip(*labels[k]):
+            continue
+        vs = list({v for f in groups[k] for v in f.verts})
+        vi = {v: i for i, v in enumerate(vs)}
+        co = [v.co + off for v in vs]
+        pl = [[vi[v] for v in f.verts] for f in groups[k]]
+        base = len(cos)
+        cos += co
+        polys += [[base + i for i in p] for p in pl]
+        owner += [labels[k][1]] * len(pl)
+    bm.free()
+    return BVHTree.FromPolygons(cos, polys), owner
+
+
+def _boxes(o):
+    """Per named shell: [lo, hi] in the build frame."""
+    bm, ids, n, groups, labels = _shells(o)
+    off = Vector(o[OFF])
+    out = {}
+    for k in range(n):
+        co = [v.co + off for v in {v for f in groups[k] for v in f.verts}]
+        out[labels[k][1]] = [Vector((min(c.x for c in co), min(c.y for c in co), min(c.z for c in co))),
+                             Vector((max(c.x for c in co), max(c.y for c in co), max(c.z for c in co)))]
+    bm.free()
+    return out
+
+
+PROXY = ((1.0, 0.5, 0.0, 4.4), (0.55, 0.5, 4.4, 5.5))     # (half x, half y, z0, z1): body, head (spec 2.10)
+WALK_Y = (-15.0, 0.0)
+WALK_LIFT = 0.10                                           # proxy feet above the surface it stands on
+FLOOR_NAMES = ("tread", "deck_", "thresh_", "floor_under")     # the underlay lies under the deck
+
+
+def _proxy_samples(yaw=0.0):
+    R = Matrix.Rotation(math.radians(yaw), 3, "Z")
+    out = []
+    for hx, hy, z0, z1 in PROXY:
+        for i in range(9):
+            for j in range(9):
+                u, w = -1 + 2 * i / 8, -1 + 2 * j / 8
+                z = z0 + (z1 - z0) * j / 8
+                out += [R @ Vector((hx * u, -hy, z)), R @ Vector((hx * u, hy, z)), R @ Vector((-hx, hy * u, z)),
+                        R @ Vector((hx, hy * u, z)), R @ Vector((hx * u, hy * w, z1))]
+    return out
+
+
+def walk_report(o):
+    """Spec 2.10: a 5.5 proxy (2 x 1 body to 4.4, a 1.1-wide head to 5.5) walks from (0, -15) up the stairs, over the
+    threshold, through the doorway to (0, 0) and turns round there. Its feet ride WALK_LIFT above the highest surface
+    under its footprint; the clearance is the nearest hero surface that is not a walking surface (treads, deck,
+    threshold). Also the riser heights met on the way, the door's clear width and height, the interior's lowest
+    overhead member and the lanterns' bottoms."""
+    tree, owner = _hero_tree(o)
+    skip_floor = lambda kind, name: name.startswith(FLOOR_NAMES)
+    ctree, cown = _hero_tree(o, skip_floor)
+    samples = _proxy_samples()
+    feet = [Vector((x, y, 0)) for x in (-0.95, 0.0, 0.95) for y in (-0.45, 0.0, 0.45)]
+
+    def base_at(x, y):
+        z = 0.0
+        for f in feet:
+            h = tree.ray_cast(Vector((x + f.x, y + f.y, 8.0)), Vector((0, 0, -1)), 9.0)
+            if h[0] is not None:
+                z = max(z, h[0].z)
+        return z
+    worst, at, who, prof = 9.0, None, None, []
+    steps = int((WALK_Y[1] - WALK_Y[0]) / 0.1)
+    for s in range(steps + 1):
+        y = WALK_Y[0] + 0.1 * s
+        zb = base_at(0.0, y)
+        if not prof or abs(prof[-1][1] - zb) > 1e-3:
+            prof.append((round(y, 2), round(zb, 3)))
+        for p0 in samples:
+            p = p0 + Vector((0.0, y, zb + WALK_LIFT))
+            loc, nrm, fi, d = ctree.find_nearest(p)
+            if loc is not None and d < worst:
+                worst, at, who = d, round(y, 2), cown[fi]
+    turn = (9.0, None, None)
+    zb = base_at(0.0, 0.0)
+    for yaw in range(0, 181, 15):
+        for p0 in _proxy_samples(yaw):
+            loc, nrm, fi, d = ctree.find_nearest(p0 + Vector((0, 0, zb + WALK_LIFT)))
+            if loc is not None and d < turn[0]:
+                turn = (d, yaw, cown[fi])
+    rises = [round(prof[i][1] - prof[i - 1][1], 3) for i in range(1, len(prof))]
+    # door clear width (horizontal rays both ways from the centre line) and height (ray up), at the posts' plane and
+    # the wall plane
+    door = {}
+    for nm, y in (("posts", -8.95), ("wall", -7.80)):
+        widths = []
+        for k in range(14):
+            z = FLOOR_Z + 0.05 + k * 0.5
+            hl = ctree.ray_cast(Vector((0, y, z)), Vector((-1, 0, 0)), 20.0)
+            hr = ctree.ray_cast(Vector((0, y, z)), Vector((1, 0, 0)), 20.0)
+            if hl[0] is not None and hr[0] is not None:
+                widths.append(hr[0].x - hl[0].x)
+        up = ctree.ray_cast(Vector((0, y, FLOOR_Z + 0.02)), Vector((0, 0, 1)), 20.0)
+        door[nm] = {"min_width": round(min(widths), 3) if widths else None,
+                    "clear_height": round(up[0].z - FLOOR_Z, 3) if up[0] is not None else None,
+                    "head": cown[up[2]] if up[0] is not None else None}
+    # interior: the lowest member over the floor (rays up from 0.05 above the deck, the open leaf left out)
+    itree, iown = _hero_tree(o, lambda kind, name: name.startswith(("leaf_", "post_")) or skip_floor(kind, name))
+    low, low_at, low_who = 99.0, None, None
+    x = -WALL_IN_X + 0.2
+    while x <= WALL_IN_X - 0.2 + 1e-6:
+        y = -WALL_IN_Y + 0.2
+        while y <= WALL_IN_Y - 0.2 + 1e-6:
+            h = itree.ray_cast(Vector((x, y, FLOOR_Z + 0.05)), Vector((0, 0, 1)), 30.0)
+            if h[0] is not None and h[0].z < low:
+                low, low_at, low_who = h[0].z, (round(x, 2), round(y, 2)), iown[h[2]]
+            y += 0.4
+        x += 0.4
+    lan = GEO.get("lanterns", {})
+    return {"min_clearance": round(worst, 3), "at_y": at, "nearest": who,
+            "turn_min_clearance": round(turn[0], 3), "turn_yaw": turn[1], "turn_nearest": turn[2],
+            "surface_profile": prof, "rises": rises, "door": door,
+            "interior_overhead_min": round(low, 3), "overhead_above_floor": round(low - FLOOR_Z, 3),
+            "overhead_at": low_at, "overhead_member": low_who,
+            "lantern_bottoms": {k: v["bottom"] for k, v in lan.items()}}
+
+
+ESC_PLANES = {"R": (0, 1), "L": (0, -1), "B": (1, 1), "F": (1, -1)}     # wall: (axis, sign) of its outward normal
+ESC_ALLOWED = ("door",)
+
+
+def _fib(n, lower=False):
+    """n unit directions spread evenly over the sphere (lower: over the lower hemisphere)."""
+    ga = math.pi * (3.0 - math.sqrt(5.0))
+    out = []
+    for i in range(n):
+        z = -(i + 0.5) / n if lower else 1.0 - 2.0 * (i + 0.5) / n
+        r = math.sqrt(max(0.0, 1.0 - z * z))
+        out.append(Vector((r * math.cos(ga * i), r * math.sin(ga * i), z)))
+    return out
+
+
+def _leak_where(p, d):
+    """Where an escaping ray (it hit nothing) leaves the hut's envelope: the walls' outer planes (|x| 7.00, |y|
+    8.00), the floor's underside (z 2.30) or the canvas top. Returns (region, point)."""
+    t = 0.0
+    while t < 40.0:
+        q = p + d * t
+        if abs(q.x) < DOOR_X and -(WALL_IN_Y + WALL_T) < q.y < -WALL_IN_Y and FLOOR_Z < q.z < DOOR_TOP:
+            return "door", q                                # through the doorway in the wall plane
+        if q.z < 2.30:
+            return "floor", q
+        if q.z > zt(q.x) + 0.02:
+            return "roof", q
+        if q.y < -(WALL_IN_Y + WALL_T):
+            if abs(q.x) < DOOR_X + 0.05 and q.z < DOOR_TOP + 0.05:      # (one 0.01 march step of slack)
+                return "door", q
+            return ("gable_F" if q.z > PLATE[2] else "wall_F"), q
+        if q.y > WALL_IN_Y + WALL_T:
+            return ("gable_B" if q.z > PLATE[2] else "wall_B"), q
+        if abs(q.x) > WALL_IN_X + WALL_T:
+            s = "R" if q.x > 0 else "L"
+            if abs(q.y) < WIN[0] and WIN[1] < q.z < WIN[2]:
+                return "window_" + s, q
+            return ("eave_" if q.z > PLATE[2] else "wall_") + s, q
+        t += 0.01
+    return "far", p + d * t
+
+
+def escape_report(o, n_dirs=320, step=0.10, offs=(-0.0007, 0.0007)):
+    """Inside escape scan (round 1 blocker): rays that leave the room without hitting anything, by where they leave.
+    1. Rays in n_dirs directions from a grid of points inside the room and up into the roof space (each at least
+       0.15 off every surface).
+    2. The same from just above the floor (z 2.65), the lower hemisphere only.
+    3. Seam rays: through every wall, the gables and the floor, along lines at each distinct vertex coordinate of the
+       pieces in that plane (where joints between shells lie) +- 0.0007, square to the plane and slanted along the
+       seam.
+    4. Rays over the upper hemisphere from a 0.04 grid of points just under the canvas round the chimney's cut.
+    Only the door opening may let rays out."""
+    tree, owner = _hero_tree(o)
+    off = Vector(o[OFF])
+    bm = bmesh.new()
+    bm.from_mesh(o.data)
+    vco = [v.co + off for v in bm.verts]
+    bm.free()
+    out = {"rays": 0, "escapes": {}, "examples": {}}
+
+    def cast(p, d):
+        out["rays"] += 1
+        if tree.ray_cast(p, d, 200.0)[0] is not None:
+            return
+        reg, q = _leak_where(p, d)
+        out["escapes"][reg] = out["escapes"].get(reg, 0) + 1
+        ex = out["examples"].setdefault(reg, [])
+        if len(ex) < 6:
+            ex.append([round(c, 3) for c in q])
+    # 1-2: interior points
+    dirs, down = _fib(n_dirs), _fib(n_dirs // 2, lower=True)
+    pts = []
+    for i in range(9):
+        x = -6.30 + 12.6 * i / 8
+        for j in range(9):
+            y = -7.30 + 14.6 * j / 8
+            for z in (3.2, 4.6, 6.0, 7.4, 8.8, 10.2, 11.6, 13.0, 14.4):
+                if z < zu(x) - 0.25:
+                    pts.append(Vector((x, y, z)))
+    pts = [p for p in pts if tree.find_nearest(p)[3] > 0.15]
+    for p in pts:
+        for d in dirs:
+            cast(p, d)
+    for i in range(13):
+        for j in range(15):
+            p = Vector((-6.30 + 12.6 * i / 12, -7.30 + 14.6 * j / 14, FLOOR_Z + 0.05))
+            if tree.find_nearest(p)[3] > 0.02:
+                for d in down:
+                    cast(p, d)
+    # 3: seam rays
+    def coords(sel, k):
+        return sorted({round(c[k], 4) for c in vco if sel(c)})
+    for wall, (ax, sg) in ESC_PLANES.items():
+        inner = WALL_IN_X if ax == 0 else WALL_IN_Y
+        along = 1 - ax                                    # in-plane horizontal axis (y for long walls, x for ends)
+        half = WALL_IN_Y if ax == 0 else WALL_IN_X
+        sel = lambda c, ax=ax, sg=sg, inner=inner: inner - 0.05 <= sg * c[ax] <= inner + WALL_T + 0.05
+        zs = [z for z in coords(sel, 2) if FLOOR_Z - 0.4 < z < 16.0]
+        ts = [t for t in coords(sel, along) if abs(t) < half + 0.3]
+        n = Vector((0, 0, 0))
+        n[ax] = sg
+
+        def start(t, z):
+            p = Vector((0, 0, z))
+            p[ax] = sg * (inner - 0.30)
+            p[along] = t
+            return p
+        top = lambda t: zu(t) - 0.05 if ax == 1 else zu(inner) - 0.05
+        sl = Vector((0, 0, 0))
+        sl[along] = 0.5
+        for zc in zs:                                     # horizontal seams: square and slanted along the seam
+            for dz in offs:
+                z = zc + dz
+                t = -half
+                while t <= half:
+                    if FLOOR_Z < z < top(t):
+                        for d in (n, (n + sl).normalized(), (n - sl).normalized()):
+                            cast(start(t, z), d)
+                    t += step
+        up = Vector((0, 0, 0.5))
+        for tc in ts:                                     # vertical seams
+            for dt in offs:
+                t = tc + dt
+                z = FLOOR_Z + 0.02
+                while z < top(t):
+                    for d in (n, (n + up).normalized(), (n - up).normalized()):
+                        cast(start(t, z), d)
+                    z += step
+    sel = lambda c: abs(c[0]) < WALL_IN_X and abs(c[1]) < WALL_IN_Y + 0.1 and 1.6 < c[2] < FLOOR_Z + 0.01
+    for ax in (0, 1):                                     # floor seams: rays down along both deck axes
+        along = 1 - ax
+        half_a, half_b = (WALL_IN_X, WALL_IN_Y) if ax == 0 else (WALL_IN_Y, WALL_IN_X)
+        sl = Vector((0, 0, 0))
+        sl[along] = 0.5
+        dn = Vector((0, 0, -1))
+        for c in coords(sel, ax):
+            if abs(c) > half_a:
+                continue
+            for dc in offs:
+                u = -half_b + 0.02
+                while u < half_b:
+                    p = Vector((0, 0, FLOOR_Z + 0.05))
+                    p[ax] = c + dc
+                    p[along] = u
+                    for d in (dn, (dn + sl).normalized(), (dn - sl).normalized()):
+                        cast(p, d)
+                    u += step
+    # 4: round the chimney's cut: points 0.03 under the canvas within 0.3 of the cut, rays over the upper hemisphere
+    x0, x1, y0, y1 = HOLE
+    ups = [-d for d in _fib(48, lower=True)]
+    u = x0 - 0.30
+    while u <= x1 + 0.30:
+        v = y0 - 0.30
+        while v <= y1 + 0.30:
+            inside = x0 + 0.30 < u < x1 - 0.30 and y0 + 0.30 < v < y1 - 0.30
+            if not inside:
+                p = Vector((u, v, zu(u) - 0.03))
+                if tree.find_nearest(p)[3] > 0.004:
+                    for d in ups:
+                        cast(p, d)
+            v += 0.04
+        u += 0.04
+    leaks = {k: v for k, v in out["escapes"].items() if k not in ESC_ALLOWED}
+    out["points"] = len(pts)
+    out["leaks"] = sum(leaks.values())
+    out["leak_regions"] = leaks
+    return out
+
+
+def placement_report(o):
+    """Measured targets (spec 4.4): floor, plates, ridge, chimney, walls, bargeboards, ridge-beam ends, stairs,
+    lanterns, banner, extents, all from the built shells in the build frame."""
+    B = _boxes(o)
+
+    def mx(prefix, k, hi=True):
+        vals = [(b[1] if hi else b[0])[k] for nm, b in B.items() if nm.startswith(prefix)]
+        return round(max(vals) if hi else min(vals), 3) if vals else None
+    deck = [round(b[1].z, 3) for nm, b in B.items() if nm.startswith(("deck_", "thresh_"))]
+    posts = [b for nm, b in B.items() if nm.startswith("post_")]
+    out = {"floor_top": [min(deck), max(deck)] if deck else None,
+           "plate_top": mx("plate_", 2), "canvas_top": mx("canvas_", 2), "canvas_eave_x": mx("canvas_R", 0),
+           "chimney_top": mx("chim_cap", 2), "chimney_foot": GEO.get("chimney_foot"),
+           "walls": [round(max(b[1].x for b in posts) - min(b[0].x for b in posts), 3),
+                     round(max(b[1].y for b in posts) - min(b[0].y for b in posts), 3)] if posts else None,
+           "pitch_deg": PITCH, "bargeboard_tip_top": mx("bb_", 2),
+           "tips_above_apex": round(mx("bb_", 2) - RIDGE_Z, 3) if mx("bb_", 2) else None,
+           "ridge_beam_y": [mx("ridge", 1, False), mx("ridge", 1)],
+           "ridge_past_bargeboards": round(RIDGE_END - BB_Y[1], 3),
+           "lintel_underside": mx("lintel", 2, False), "risers": GEO.get("risers"),
+           "lanterns": GEO.get("lanterns"), "banner": GEO.get("banner"), "flue": GEO.get("flue"),
+           "size": [round(d, 3) for d in o.dimensions]}
+    return out
+
+
+# ---- build -----------------------------------------------------------------------------------------------------------------
+PARTS = ((ROOF_P, roof_part), (RIDGE_P, ridge_part), (CHIMNEY_P, chimney_part), (BANNER_P, banner_part),
+         (LANTERN_P, lantern_part), (WALL_P, wall_part), (WINDOW_P, window_part), (DOOR_P, door_part),
+         (GABLE_P, gable_part), (FLOOR_P, floor_part), (STAIRS_P, stairs_part), (FOUND_P, foundation_part))
+# hero W (X), D (Y), H (Z) +- tolerance: spec 2.11's 20.6 x 26.1 x 19.4 with the ruled banner pole (-9.55, 10.55),
+# whose crossarm now ends at y 13.80
+TARGET_SIZE = ((20.7, 0.4), (26.5, 0.5), (19.4, 0.2))
+HERO_BUDGET = 8000
+THIN_FLOOR = 0.3
+SEATS = [("post_LF", "corner_LF_top"), ("plate_L", "post_LF"), ("plate_R", "post_RB"), ("collar_F", "lintel"),
+         ("lintel", "dpost_L"), ("header", "lintel"), ("bb_F_A", "plate_L"), ("bb_F_B", "plate_R"),
+         ("saddle_F", "bb_F_A"), ("ridge", "bb_F_A"), ("rafter_L-1.94", "plate_L"), ("canvas_L", "rafter_L-1.94"),
+         ("canvas_R", "ridge"), ("tie_L0", "canvas_L"), ("tie_L0", "plate_L"), ("bplate_LF", "plate_L"),
+         ("bpeg_LF", "bplate_LF"), ("trimmer_0", "rafter_R-1.94"), ("chim_lo", "trimmer_0"),
+         ("chim_lo", "trimmer_1"), ("L1_hook", "L1_ring"), ("L1_strap", "plate_L"), ("L2_strap", "pl_F4_0"),
+         ("crossarm", "pole"), ("sleeve", "crossarm"), ("banner", "sleeve"), ("thresh_beam", "dpost_L"),
+         ("deck_1", "floor_under"), ("floor_under", "sleeper_0"), ("leaf_plank0", "deck_3"), ("tread0_1", "dpost_L"),
+         ("eaveblk_L", "plate_L"), ("eaveblk_L", "canvas_L"), ("shutter_L0", "pl_L2_1"), ("shutter_R1", "shutter_R0"),
+         ("cleat_FL0", "bb_F_A"), ("cleat_BR1", "bb_B_B"), ("gboard_F_apex", "ridge"), ("gboard_BL5", "plate_L")]
+LANTERN_MIN = {"L1": 6.3, "L2": 6.0, "L3": 6.0}
+
+
+def _cleanup_tmp():
+    for o in list(bpy.data.objects):
+        if o.name.startswith(PFX):
+            me = o.data
+            bpy.data.objects.remove(o, do_unlink=True)
+            if isinstance(me, bpy.types.Mesh) and me.users == 0:
+                bpy.data.meshes.remove(me)
+
+
+def _drop_unused():
+    mats = [m for m in bpy.data.materials if m.users == 0 and not m.use_fake_user and m.name.startswith("FB_m068_")]
+    for m in mats:
+        bpy.data.materials.remove(m)
+    meshes = [m for m in bpy.data.meshes if m.users == 0 and m.name.startswith((PFX, "_probe", "T_Calib", HERO))]
+    for m in meshes:
+        bpy.data.meshes.remove(m)
+    return len(mats), len(meshes)
+
+
+def _sockets(h):
+    for c in [c for c in h.children if c.get("vfx_kind")]:
+        bpy.data.objects.remove(c, do_unlink=True)
+    off = Vector(h[OFF])
+    return [K.socket(h, kind, Vector(p) - off, **kw) for kind, p, kw in FX]
+
+
+def export_stats(objs):
+    out = {}
+    for o in objs:
+        socks = [c for c in o.children_recursive if c.get("vfx_kind")]
+        glow = sorted({m.name[3:] for m in o.data.materials if list(m.get("flintkit_spec", [0, 0, 0]))[2] >= NEON})
+        out[o.name] = {"vfx_sockets": len(socks), "kinds": sorted(c["vfx_kind"] for c in socks), "glow_keys": glow}
+    return out
+
+
+def _rel(p, o):
+    return [round(x, 3) for x in Vector(p) - Vector(o[OFF])]
+
+
+def _store(h, objs):
+    h["m068_centre"] = _rel((0.0, 0.0, FLOOR_Z), h)
+    h["m068_door"] = {"threshold": _rel((0.0, -(WALL_IN_Y + WALL_T), FLOOR_Z), h), "facing": [0.0, -1.0, 0.0]}
+    hg = GEO["hinge"]
+    h["m068_hinge"] = {"axis_bottom": _rel(hg["axis_bottom"], h), "closed_yaw": hg["closed_yaw"],
+                       "open_yaw": hg["open_yaw"]}
+    h["m068_chimney"] = _rel(GEO["flue"], h)
+    if DOOR_P in objs:
+        dp = objs[DOOR_P]
+        hg = PART_INFO["hinge"]
+        dp["m068_hinge"] = {"axis_bottom": _rel(hg["axis_bottom"], dp), "closed_yaw": hg["closed_yaw"],
+                            "open_yaw": hg["open_yaw"]}
+    if LANTERN_P in objs:
+        lp = objs[LANTERN_P]
+        lp["m068_hang"] = _rel(PART_INFO["hang"], lp)
+        lp["m068_mount"] = _rel(PART_INFO["mount"], lp)
+        for c in [c for c in lp.children if c.get("vfx_kind")]:
+            bpy.data.objects.remove(c, do_unlink=True)
+        K.socket(lp, "heat_glow", Vector(_rel(PART_INFO["glass"], lp)), **_fx_spec(12))
+    if CHIMNEY_P in objs:
+        cp = objs[CHIMNEY_P]
+        for c in [c for c in cp.children if c.get("vfx_kind")]:
+            bpy.data.objects.remove(c, do_unlink=True)
+        K.socket(cp, "chimney_smoke", Vector(_rel(PART_INFO["flue"], cp)), **SMOKE)
+        cp["m068_flue"] = _rel(PART_INFO["flue"], cp)
+    if BANNER_P in objs:
+        bp = objs[BANNER_P]
+        bp["m068_top"] = _rel(PART_INFO["banner_hang"], bp)
+
+
+def build(render=True, parts=True, close=True):
+    t0 = time.time()
+    M.coll(NUM, TITLE)
+    palette()
+    objs, log = {}, {}
+    if parts:
+        for name, fn in PARTS:
+            objs[name], log[name] = _make(name, fn)
+    h, log["hero"] = _make(HERO, hero_all, "hero", HERO_BUDGET)
+    geo = json.loads(json.dumps(GEO, default=lambda v: [round(x, 3) for x in v]))
+    _sockets(h)
+    _store(h, objs)
+    _cleanup_tmp()
+    order = [h] + [objs[n] for n, _ in PARTS if n in objs]
+    M.display(NUM, order, TITLE)
+    log["dropped"] = _drop_unused()
+    for o in order:
+        d = o.dimensions
+        o["studs"] = f"{d.x:.2f} x {d.y:.2f} x {d.z:.2f}"
+    out = {"build_s": round(time.time() - t0, 1)}
+    out.update(report(h, order, log, geo))
+    if render:
+        out["views"] = render_views(order, close=close)
+        out["render_s"] = round(time.time() - t0 - out["build_s"], 1)
+    return out
+
+
+def _idp(v):
+    if v is None:
+        return None
+    if hasattr(v, "to_dict"):
+        return v.to_dict()
+    if hasattr(v, "to_list"):
+        return v.to_list()
+    return v
+
+
+def report(h=None, order=None, log=None, geo=None):
+    """Every stage 2 check on the hero and its parts; problems lists whatever misses a target."""
+    h = h or bpy.data.objects[HERO]
+    order = order or [h] + [bpy.data.objects[n] for n, _ in PARTS if n in bpy.data.objects]
+    audits = [M.audit(o) for o in order]
+    thin = {o.name: _thin(o, 3.0) for o in order}
+    shells = {o.name: shells_report(o) for o in order}
+    problems = list(K.check(order))
+    for o, au in zip(order, audits):
+        lim = HERO_BUDGET if o is h else 999
+        if au["tris"] > lim:
+            problems.append(f"{o.name}: {au['tris']} tris over {lim}")
+        for k in ("nonmanifold_edges", "nonmanifold_verts", "boundary_edges", "wire_edges", "loose_verts",
+                  "zero_area_faces", "ngons", "dup_verts"):
+            if au[k]:
+                problems.append(f"{o.name}: {k} {au[k]}")
+        if au["normals"] != "outward":
+            problems.append(f"{o.name}: normals {au['normals']}")
+        for i, s in enumerate(shells[o.name]):
+            for k in ("nonmanifold_edges", "nonmanifold_verts", "boundary_edges", "winding_errors", "self_hits"):
+                if s[k]:
+                    problems.append(f"{o.name} shell {i} ({s['name']}): {k} {s[k]}")
+            if s["volume"] <= 0:
+                problems.append(f"{o.name} shell {i} ({s['name']}): not closed outward (volume {s['volume']})")
+            if s["kind"] == "?":
+                problems.append(f"{o.name} shell {i}: not matched to a built piece")
+    parity = {o.name: winding_parity(o) for o in order}
+    for n_, p in parity.items():
+        if p:
+            problems.append(f"{n_}: inward faces by ray parity {p}")
+    contact = {o.name: contact_report(o, seats=SEATS if o is h else ()) for o in order}
+    for n_, c in contact.items():
+        if c["floating"] or c["unchained"]:
+            problems.append(f"{n_}: floating {c['floating_names']}, unchained {c['unchained_names']}")
+        if n_ == HERO and c["sink"] < -0.051:
+            problems.append(f"{n_}: sinks {c['sink']} below the ground")
+    for k, g in contact[h.name]["seats"].items():
+        if g is None or g > CONTACT:
+            problems.append(f"{HERO}: seat {k} gap {g}")
+    bury = {o.name: bury_report(o) for o in order}
+    for n_, b in bury.items():
+        if b["buried"]:
+            problems.append(f"{n_}: buried {b['over_limit']} hidden {b['fully_hidden']}")
+    pierce = {o.name: pierce_report(o) for o in order}
+    for n_, p in pierce.items():
+        if p:
+            problems.append(f"{n_}: edges passing through thin canvas / banner {p}")
+    ropes = {o.name: rope_ends_report(o) for o in order if json.loads(o.get("m068_ropes", "[]"))}
+    for n_, r in ropes.items():
+        if r["loose"]:
+            problems.append(f"{n_}: rope ends not touching {r['loose']}")
+    walk = walk_report(h)
+    if walk["min_clearance"] < 0.10:
+        problems.append(f"{HERO}: walk clearance {walk['min_clearance']} at y {walk['at_y']} ({walk['nearest']})")
+    if walk["turn_min_clearance"] < 0.10:
+        problems.append(f"{HERO}: turn clearance {walk['turn_min_clearance']} ({walk['turn_nearest']})")
+    if len(walk["rises"]) != 3 or any(abs(r - 0.87) > 0.02 for r in walk["rises"]):
+        problems.append(f"{HERO}: risers {walk['rises']} (three of 0.87 +- 0.02 wanted)")
+    for nm, d in walk["door"].items():
+        if (d["min_width"] or 0) < 3.5 or (d["clear_height"] or 0) < 6.9:
+            problems.append(f"{HERO}: door at the {nm} {d}")
+    if walk["overhead_above_floor"] < 7.8 - 1e-3:
+        problems.append(f"{HERO}: interior overhead {walk['overhead_above_floor']} above the floor (7.8 wanted)")
+    for k, z in walk["lantern_bottoms"].items():
+        if z < LANTERN_MIN.get(k, 0.0):
+            problems.append(f"{HERO}: lantern {k} bottom {z}")
+    escape = escape_report(h)
+    if escape["leaks"]:
+        problems.append(f"{HERO}: inside escape scan: {escape['leaks']} rays out of the room outside the door "
+                        f"{escape['leak_regions']}")
+    place = placement_report(h)
+    for (tgt, tol), got, ax in zip(TARGET_SIZE, h.dimensions, "WDH"):
+        if abs(got - tgt) > tol:
+            problems.append(f"{HERO}: {ax} {got:.2f} outside {tgt} +- {tol}")
+    for n_, t in thin.items():
+        if t["min_deg"] < THIN_FLOOR:
+            problems.append(f"{n_}: a face corner of {t['min_deg']} deg (floor {THIN_FLOOR})")
+    winding = {o.name: sum(s["winding_errors"] for s in shells[o.name]) for o in order}
+    bowties = {o.name: au["nonmanifold_verts"] for o, au in zip(order, audits)}
+    uv = {o.name: {k: v for k, v in M.uv_stats(o).items() if k in ("islands", "overlap_pairs", "flipped", "min_gap",
+                                                                    "border", "density", "stretch_conformal_p95")}
+          for o in order}
+    for n_, u in uv.items():
+        if u.get("overlap_pairs") or u.get("flipped"):
+            problems.append(f"{n_}: UV overlaps {u.get('overlap_pairs')} flipped {u.get('flipped')}")
+        if u.get("min_gap") is not None and u["min_gap"] < 0.0159:
+            problems.append(f"{n_}: UV island gap {u['min_gap']} (margin 0.008)")
+    stats = export_stats(order)
+    want = {HERO: ["chimney_smoke", "heat_glow", "heat_glow", "heat_glow"], LANTERN_P: ["heat_glow"],
+            CHIMNEY_P: ["chimney_smoke"]}
+    for n_, kinds in want.items():
+        if n_ in stats and stats[n_]["kinds"] != kinds:
+            problems.append(f"{n_}: sockets {stats[n_]['kinds']} ({kinds} wanted)")
+    kinds = {}
+    for s in shells[h.name]:
+        kk = kinds.setdefault(s["kind"], {"n": 0, "tris": 0})
+        kk["n"] += 1
+        kk["tris"] += s["tris"]
+    return {"audit": [{k: au[k] for k in ("name", "tris", "size", "shells", "nonmanifold_edges", "nonmanifold_verts",
+                                          "boundary_edges", "wire_edges", "loose_verts", "zero_area_faces", "normals",
+                                          "ngons", "dup_verts", "origin_offset", "transforms_applied")}
+                      for au in audits],
+            "hero_shells": kinds, "contact": contact, "bury": bury, "rope_ends": ropes, "walk": walk, "escape": escape,
+            "placement": place, "winding": winding, "parity": parity, "bowties": bowties, "thin": thin,
+            "log": log, "geo": geo, "problems": problems, "uv": uv, "export_stats": stats, "pierce": pierce,
+            "offsets": {o.name: [round(x, 3) for x in o[OFF]] for o in order},
+            "stored": {k: _idp(h.get(k)) for k in ("m068_centre", "m068_door", "m068_hinge", "m068_chimney")},
+            "sockets": {o.name: [{"kind": c["vfx_kind"], "local": [round(x, 3) for x in c.location]}
+                                 for c in o.children if c.get("vfx_kind")] for o in order},
+            "materials": {o.name: [m.name[3:] for m in o.data.materials] for o in order}}
+
+
+# ---- renders (spec 2.12, 4.2; decision 11: mirrored renders for the cells drawn mirrored front-to-back) ----------------
+SHEET_LENS = 3.0
+SHEET_VIEWS = {"side_sheet": (90, 3), "f34_sheet": (-40, 15), "front3q_low_sheet": (-45, 5), "rear_sheet": (-90, 3),
+               "r34_sheet": (-135, 15), "top_sheet": (0, 89.9)}
+# the side, rear, r34 and top cells draw the chimney and dressing mirrored front-to-back (spec 3.6, decision 11):
+# these are rendered again with the hero mirrored along Y (scale y -1) -> M068_mirror.png
+MIRROR_VIEWS = ("side_sheet", "rear_sheet", "r34_sheet", "top_sheet")
+VIEW_NAMES = ("front34", "rear34", "front", "side", "rear", "top")
+PARTS_SHOT = (-30, 15)
+PART_SHOTS = {ROOF_P: (60, 35), BANNER_P: (-60, 8), WALL_P: (160, 12), WINDOW_P: (60, 12), DOOR_P: (-20, 10),
+              GABLE_P: (-20, 10), STAIRS_P: (-35, 20)}
+SPIN = tuple(range(0, 360, 45))
+SPIN_EL = 10
+
+
+def _long_lens(kit):
+    """(m033) render_group with a long lens and the studio floor hidden for the *_sheet shots."""
+    orig = kit["render_group"]
+
+    def rg(group, path, azimuth=-22, elevation=20):
+        cam = bpy.data.objects["FB_Cam"].data
+        lens = cam.lens
+        ground = bpy.data.objects.get("FB_Ground")
+        gh = ground.hide_render if ground else None
+        name = path.rsplit("/", 1)[-1]
+        if "_sheet" in name:
+            cam.lens = lens * SHEET_LENS
+            if ground:
+                ground.hide_render = True
+        try:
+            return orig(group, path, azimuth, elevation)
+        finally:
+            cam.lens = lens
+            if ground:
+                ground.hide_render = gh
+    return orig, rg
+
+
+def render_close(objs, path, az, el, centre, radius, cell=(480, 400)):
+    """(m033) A close-up from (az, el), framed on a sphere (centre, radius)."""
+    kit = K.NS["KIT"]
+    fb = kit["frame_box"]
+    c = Vector(centre)
+    box = [c + Vector((dx, dy, dz)) * radius for dx in (-1, 1) for dy in (-1, 1) for dz in (-1, 1)]
+    kit["frame_box"] = lambda corners, a_, e_: fb(box, a_, e_)
+    ground = bpy.data.objects.get("FB_Ground")
+    if ground:
+        ground.hide_render = el < 0
+    old = kit["CELL"]
+    kit["CELL"] = cell
+    try:
+        return kit["render_group"](objs, path, az, el)
+    finally:
+        kit["CELL"] = old
+        kit["frame_box"] = fb
+        if ground:
+            ground.hide_render = False
+
+
+def _at(o, p):
+    """A build-frame point in world space for object o (mirrors and moves with it)."""
+    return o.matrix_world @ (Vector(p) - Vector(o[OFF]))
+
+
+def _exploded(objs):
+    """Linked copies of the parts laid out like the sheet's Exploded Construction: the roof panels (one mirrored) and
+    ridge beam lifted, the chimney and banner at the left, the wall panels, door frame and gable frame in a row, the
+    floor, foundation and stairs in front."""
+    by = {o.name: o for o in objs}
+    coll = objs[0].users_collection[0]
+    shown = []
+    x0 = objs[0].location.x + 70
+    o0 = Matrix.Translation((x0, objs[0].location.y, 0))
+
+    def put(tag, part, m):
+        if part not in by:
+            return
+        c = bpy.data.objects.new(f"{PFX}expl_{tag}", by[part].data)
+        coll.objects.link(c)
+        c.matrix_world = o0 @ m
+        shown.append(c)
+    rz = lambda d: Matrix.Rotation(math.radians(d), 4, "Z")
+    put("roof_r", ROOF_P, Matrix.Translation((5.0, 4.0, 17.0)))
+    put("roof_l", ROOF_P, Matrix.Translation((-5.0, 4.0, 17.0)) @ Matrix.Diagonal((-1, 1, 1, 1)))
+    put("ridge", RIDGE_P, Matrix.Translation((0.0, 4.0, 24.0)))
+    put("chimney", CHIMNEY_P, Matrix.Translation((-15.0, 6.0, 14.0)))
+    put("banner", BANNER_P, Matrix.Translation((-22.0, -2.0, 0.0)))
+    put("lantern", LANTERN_P, Matrix.Translation((-22.0, -12.0, 3.0)))
+    put("wall_l", WALL_P, Matrix.Translation((-12.0, 4.0, 3.0)) @ rz(90))
+    put("wall_rear", WALL_P, Matrix.Translation((-2.0, 12.0, 3.0)))
+    put("window", WINDOW_P, Matrix.Translation((6.0, 10.0, 3.0)) @ rz(90))
+    put("door", DOOR_P, Matrix.Translation((12.0, -4.0, 0.0)))
+    put("gable", GABLE_P, Matrix.Translation((24.0, 2.0, 2.0)))
+    put("floor", FLOOR_P, Matrix.Translation((-1.0, -4.0, 0.0)))
+    put("found_f", FOUND_P, Matrix.Translation((-10.0, -14.0, 0.0)) @ rz(90))
+    put("found_s", FOUND_P, Matrix.Translation((-14.0, -6.0, 0.0)))
+    put("stairs", STAIRS_P, Matrix.Translation((14.0, -16.0, 0.0)))
+    bpy.context.view_layer.update()
+    return shown
+
+
+def _marker(h, at, name, proxy=False):
+    """A 5.5-stud character stand-in (proxy: the spec 2.10 walk box, body 2 x 1 to 4.4, head 1.1 wide to 5.5)."""
+    a = K.fk().Asset(PFX + name, "probe", seed=1, tint_var=0.0)
+    if proxy:
+        for hx, hy, z0, z1 in PROXY:
+            _box(a, (-hx, -hy, z0), (hx, hy, z1), IRON, 0.8)
+    else:
+        a.cyl(0.6, 0.6, 3.3, sides=8, loc=(0, 0, 0), mat=IRON, tint=0.7)
+        a.cyl(0.45, 0.45, 0.9, sides=8, loc=(0, 0, 3.4), mat=IRON, tint=0.7)
+        a.cyl(0.55, 0.3, 1.2, sides=8, loc=(0, 0, 4.3), mat=IRON, tint=0.7)
+    c = a.finish(collection=h.users_collection[0], mark_asset=False)
+    c.location = _at(h, at)
+    bpy.context.view_layer.update()
+    return c
+
+
+def _remove(objs):
+    for o in objs:
+        me = o.data
+        bpy.data.objects.remove(o, do_unlink=True)
+        if isinstance(me, bpy.types.Mesh) and me.users == 0:
+            bpy.data.meshes.remove(me)
+
+
+def render_views(objs, close=True):
+    h = objs[0]
+    shown = _exploded(objs) if len(objs) > 1 else []
+    markers = [_marker(h, (-3.0, -11.2, 0.0), "char"), _marker(h, (0.0, -2.0, FLOOR_Z), "char2", proxy=True)]
+    try:
+        extra = {k: ([h], az, el) for k, (az, el) in SHEET_VIEWS.items()}
+        for o in objs[1:]:
+            extra["part_" + o.name.replace(HERO, "").lower()] = ([o], *PART_SHOTS.get(o.name, PARTS_SHOT))
+        if shown:
+            extra["exploded"] = (shown, -25, 18)
+        extra["scale"] = ([h] + markers, -30, 8)
+        kit = K.NS["KIT"]
+        orig, kit["render_group"] = _long_lens(kit)
+        try:
+            sheet = M.views(NUM, [h], names=VIEW_NAMES, extra=extra, vfx=True)
+            spin = render_spin(h)
+            mirror = render_mirror(h)
+        finally:
+            kit["render_group"] = orig
+        out = {"sheet": sheet, "spin": spin, "mirror": mirror}
+        if close:
+            out.update(render_close_ups(objs))
+        return out
+    finally:
+        _remove(shown + markers)
+        M.display(NUM, objs, TITLE)
+
+
+def _stack(paths, out, cols=4):
+    kit = K.NS["KIT"]
+    rows = [kit["hstack"](paths[i:i + cols]) for i in range(0, len(paths), cols)]
+    w = max(r.shape[1] for r in rows)
+    rows = [np.concatenate([r, np.ones((r.shape[0], w - r.shape[1], 4), np.float32)], axis=1) if r.shape[1] < w else r
+            for r in rows]
+    kit["save_px"](kit["vstack"](rows), out)
+    return out
+
+
+def render_spin(h):
+    """The eight-azimuth contact sheet: az 0, 45 ... 315 at e 10, long lens, floor hidden -> M068_spin.png."""
+    kit = K.NS["KIT"]
+    d = f"{M.MODEL_RENDERS}/{M.code(NUM)}"
+    old = kit["CELL"]
+    kit["CELL"] = (420, 360)
+    sc = bpy.context.scene
+    try:
+        kit["vfx"].clear(sc)
+        kit["vfx"].realize(sc, [h])
+        paths = [kit["render_group"]([h], f"{d}/spin{az:03d}_sheet.png", az, SPIN_EL) for az in SPIN]
+    finally:
+        kit["CELL"] = old
+        kit["vfx"].clear(sc)
+    return _stack(paths, f"{d}/M068_spin.png")
+
+
+def render_mirror(h):
+    """Decision 11: the side, rear, r34 and top cells with the hero mirrored front-to-back (scale y -1 about its
+    origin), so the chimney and dressing sit where those cells draw them -> <view>_mirror.png, M068_mirror.png."""
+    kit = K.NS["KIT"]
+    d = f"{M.MODEL_RENDERS}/{M.code(NUM)}"
+    sc = bpy.context.scene
+    old = kit["CELL"]
+    kit["CELL"] = (480, 400)
+    sy = h.scale.y
+    h.scale.y = -sy
+    bpy.context.view_layer.update()
+    try:
+        kit["vfx"].clear(sc)
+        kit["vfx"].realize(sc, [h])
+        paths = [kit["render_group"]([h], f"{d}/{k.replace('_sheet', '')}_mirror_sheet.png", *SHEET_VIEWS[k])
+                 for k in MIRROR_VIEWS]
+    finally:
+        h.scale.y = sy
+        bpy.context.view_layer.update()
+        kit["CELL"] = old
+        kit["vfx"].clear(sc)
+    return _stack(paths, f"{d}/M068_mirror.png")
+
+
+def render_cam(objs, path, loc, look, lens=18.0, cell=(560, 420), vfx=True):
+    """(m064) A render from a fixed camera (loc looking at look)."""
+    kit = K.NS["KIT"]
+    fb = kit["frame_box"]
+    cam = bpy.data.objects["FB_Cam"]
+    lens0 = cam.data.lens
+    ground = bpy.data.objects.get("FB_Ground")
+    loc, look = Vector(loc), Vector(look)
+    z0 = objs[0].matrix_world.translation.z
+
+    def fixed(corners, az, el):
+        cam.data.shift_x = cam.data.shift_y = 0.0
+        cam.location = loc
+        cam.rotation_euler = (look - loc).to_track_quat("-Z", "Y").to_euler()
+        cam.data.lens = lens
+        if ground:
+            ground.location = (loc.x, loc.y, z0)
+    kit["frame_box"] = fixed
+    old = kit["CELL"]
+    kit["CELL"] = cell
+    sc = bpy.context.scene
+    try:
+        if vfx:
+            kit["vfx"].clear(sc)
+            kit["vfx"].realize(sc, objs)
+        return kit["render_group"](objs, path, 0, 10)
+    finally:
+        kit["frame_box"] = fb
+        kit["CELL"] = old
+        cam.data.lens = lens0
+        if vfx:
+            kit["vfx"].clear(sc)
+
+
+def render_close_ups(objs):
+    """Spec 4.2: junction_cu (close-up A, the front-left plate end), base_cu (close-up B, the front-left corner),
+    apex_cu (the front apex), door_cu (from the stairs), lantern_cu, underside_cu (close-up C, from inside looking up
+    at the +X slope), inside_cu (from the doorway looking in), door_walk (the 5.5 proxy on the stairs, in the doorway
+    and inside: front, side, three-quarter), thumb (the f34 at about 140 px)."""
+    d = f"{M.MODEL_RENDERS}/{M.code(NUM)}"
+    h = objs[0]
+    out = {}
+    rc = render_close
+    kit = K.NS["KIT"]
+    sc = bpy.context.scene
+    kit["vfx"].clear(sc)
+    kit["vfx"].realize(sc, [h])
+    try:
+        out["junction_cu"] = rc([h], f"{d}/junction_cu.png", -30, 12, _at(h, (-7.0, -10.1, 10.9)), 1.6)
+        out["base_cu"] = rc([h], f"{d}/base_cu.png", -40, 18, _at(h, (-7.0, -8.0, 1.6)), 2.0)
+        out["apex_cu"] = rc([h], f"{d}/apex_cu.png", -20, 10, _at(h, (0.0, -9.8, 16.3)), 2.0)
+        out["door_cu"] = rc([h], f"{d}/door_cu.png", -12, 8, _at(h, (0.0, -9.0, 6.0)), 5.2)
+        out["lantern_cu"] = rc([h], f"{d}/lantern_cu.png", -35, 6, _at(h, (-6.5, -8.0, 8.0)), 2.6)
+        out["chimney_cu"] = rc([h], f"{d}/chimney_cu.png", -40, 20, _at(h, (2.2, -3.5, 16.5)), 3.2)
+    finally:
+        kit["vfx"].clear(sc)
+    out["underside_cu"] = render_cam([h], f"{d}/underside_cu.png", _at(h, (-1.0, 0.5, 4.5)),
+                                     _at(h, (3.5, -3.0, 13.5)), lens=14.0)
+    out["inside_cu"] = render_cam([h], f"{d}/inside_cu.png", _at(h, (0.0, -9.5, 7.0)), _at(h, (0.0, 4.0, 6.0)),
+                                  lens=14.0)
+    lanes = [_marker(h, (0.0, y, z), f"proxy{i}", proxy=True)
+             for i, (y, z) in enumerate(((-11.9, TREADS[1][2]), (-8.6, FLOOR_Z), (-3.0, FLOOR_Z)))]
+    try:
+        old = kit["CELL"]
+        kit["CELL"] = (420, 360)
+        try:
+            p1 = kit["render_group"]([h] + lanes, f"{d}/walk_front.png", 0, 4)
+            p2 = kit["render_group"]([h] + lanes, f"{d}/walk_side.png", 90, 4)
+            p3 = rc([h] + lanes, f"{d}/walk_f34.png", -35, 10, _at(h, (0.0, -8.0, 5.0)), 6.5, cell=(420, 360))
+        finally:
+            kit["CELL"] = old
+        out["door_walk"] = _stack([p1, p2, p3], f"{d}/door_walk.png")
+    finally:
+        _remove(lanes)
+    old = kit["CELL"]
+    kit["CELL"] = (180, 150)
+    try:
+        orig, kit["render_group"] = _long_lens(kit)
+        try:
+            out["thumb"] = kit["render_group"]([h], f"{d}/thumb_sheet.png", *SHEET_VIEWS["f34_sheet"])
+        finally:
+            kit["render_group"] = orig
+    finally:
+        kit["CELL"] = old
+    return out
+
+
+def preview(names=("side_sheet", "f34_sheet", "rear_sheet", "r34_sheet"), vfx=False, spin=False):
+    """Just the sheet comparison shots of the hero (fast tuning loop)."""
+    h = bpy.data.objects[HERO]
+    kit = K.NS["KIT"]
+    orig, kit["render_group"] = _long_lens(kit)
+    try:
+        r = M.views(NUM, [h], names=(), extra={k: ([h], *SHEET_VIEWS[k]) for k in names}, vfx=vfx)
+        if spin:
+            r = [r, render_spin(h)]
+        return r
+    finally:
+        kit["render_group"] = orig
+
+
+def hero_only():
+    """Rebuild just the hero (tuning loop)."""
+    M.coll(NUM, TITLE)
+    palette()
+    h, lg = _make(HERO, hero_all, "hero", HERO_BUDGET)
+    _sockets(h)
+    hg = GEO["hinge"]
+    h["m068_hinge"] = {"axis_bottom": _rel(hg["axis_bottom"], h), "closed_yaw": hg["closed_yaw"],
+                       "open_yaw": hg["open_yaw"]}
+    _cleanup_tmp()
+    M.display(NUM, [h] + [bpy.data.objects[n] for n, _ in PARTS if n in bpy.data.objects], TITLE)
+    au = M.audit(h)
+    return {"hero": {k: au[k] for k in ("tris", "size", "shells", "nonmanifold_edges", "nonmanifold_verts",
+                                        "boundary_edges", "normals", "dup_verts")}, "log": lg,
+            "geo": json.loads(json.dumps(GEO, default=lambda v: [round(x, 3) for x in v])),
+            "offset": [round(x, 3) for x in h[OFF]]}
