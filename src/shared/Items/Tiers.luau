@@ -147,8 +147,6 @@ Tiers.BASE = {
 	Sword = 18,
 	Dagger = 9,
 }
--- The wooden spear's confirmed damage (Q66) sits below the curve.
-Tiers.WOODEN_SPEAR_DAMAGE = 15
 -- Bows: the Wooden Bow's damage, then ×STEP per metal bow in ladder order.
 Tiers.WOODEN_BOW_DAMAGE = 6
 -- Armor above Iron's confirmed ×2.0 compounds by STEP per tier (owner decision).

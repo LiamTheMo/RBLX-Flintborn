@@ -52,10 +52,9 @@ GameConstants.MELEE = {
 	Dagger = { cooldown = 0.4 },
 	Sword = { cooldown = 0.7 },
 	Spear = { cooldown = 0.9 },
-	WoodenSpear = { damage = 15, cooldown = 0.9 },
-	StoneSpear = { damage = 25, cooldown = 0.9 },
+	-- Its cadence is the Spear family's.
+	WoodenSpear = { damage = 15 },
 }
-GameConstants.ARROWS_PER_CRAFT = 10
 
 -- Downed and revive (GDD §5.3, Q68, Q136, Q159) ----------------------------------
 

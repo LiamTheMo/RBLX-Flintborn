@@ -12,8 +12,6 @@ local ReasonText = require(script.Parent.ReasonText)
 local PartyModel = {}
 
 PartyModel.MAX_SIZE = 8
--- Rows the Your Party list shows before it scrolls (D5).
-PartyModel.VISIBLE_ROWS = 7
 PartyModel.JOIN_TYPE = "Invite Only"
 PartyModel.NO_TIME = "—"
 
