@@ -29,33 +29,61 @@ function VaultRules.BankMaterial(profile, catalogId: string, quantity: number, n
 	return over
 end
 
--- How much of the material stack in a lobby backpack slot depositing it would
--- delete for lack of vault capacity (0 for anything else).
-function VaultRules.DepositLoss(profile, backpackIndex: number): number
+-- How many of a lobby backpack slot's stack a deposit moves: `quantity` when it
+-- is a whole number from 1 to the stack (a unique item is always 1), the whole
+-- stack when nil; nil for anything else (the client's amount is never trusted).
+function VaultRules.DepositAmount(item, quantity: any?): number?
+	local owned = if item.instanceId then 1 else math.max(1, item.quantity or 1)
+	if quantity == nil then
+		return owned
+	end
+	if type(quantity) ~= "number" or quantity ~= quantity or quantity % 1 ~= 0 then
+		return nil
+	end
+	if quantity < 1 or quantity > owned then
+		return nil
+	end
+	return quantity
+end
+
+-- How much of the material stack in a lobby backpack slot depositing it (or
+-- `quantity` of it) would delete for lack of vault capacity (0 for anything else).
+function VaultRules.DepositLoss(profile, backpackIndex: number, quantity: any?): number
 	local item = profile.lobbyBackpack.slots[backpackIndex]
 	if item == nil or item.instanceId ~= nil or not ItemCatalog.IsMaterial(item.catalogId) then
 		return 0
 	end
+	local amount = VaultRules.DepositAmount(item, quantity)
+	if amount == nil then
+		return 0
+	end
 	local current = profile.vault.materials[item.catalogId] or 0
-	local _, over = GameConstants.SettleMaterialStack(current, math.max(0, item.quantity or 0))
+	local _, over = GameConstants.SettleMaterialStack(current, amount)
 	return over
 end
 
 VaultRules.WOULD_OVERFLOW = "VaultWouldOverflow"
 
--- Moves one lobby backpack slot into the vault. Returns (ok, reason). A material
--- stack banks whole; one that would go past the capacity is refused with
--- WOULD_OVERFLOW (DepositLoss says how much) unless `confirmed` = {catalogId,
--- loss} accepts it: the slot must still hold that material and lose no more than
--- the player agreed to, and then the excess is deleted (BankMaterial).
-function VaultRules.Deposit(profile, backpackIndex: number, now: number?, confirmed: any?)
+-- Moves one lobby backpack slot (or `quantity` of its stack; nil: all of it)
+-- into the vault. Returns (ok, reason). A material banks into its vault stack;
+-- one that would go past the capacity is refused with WOULD_OVERFLOW
+-- (DepositLoss says how much) unless `confirmed` = {catalogId, loss} accepts it:
+-- the slot must still hold that material and lose no more than the player agreed
+-- to, and then the excess is deleted (BankMaterial). What is not stored stays in
+-- the backpack slot.
+function VaultRules.Deposit(profile, backpackIndex: number, now: number?, confirmed: any?, quantity: any?)
 	local slots = profile.lobbyBackpack.slots
 	local item = slots[backpackIndex]
 	if item == nil then
 		return false, "Empty"
 	end
+	local amount = VaultRules.DepositAmount(item, quantity)
+	if amount == nil then
+		return false, "BadQuantity"
+	end
+	local owned = if item.instanceId then 1 else math.max(1, item.quantity or 1)
 	if item.instanceId == nil and ItemCatalog.IsMaterial(item.catalogId) then
-		local loss = VaultRules.DepositLoss(profile, backpackIndex)
+		local loss = VaultRules.DepositLoss(profile, backpackIndex, amount)
 		local accepted = type(confirmed) == "table"
 			and confirmed.catalogId == item.catalogId
 			and type(confirmed.loss) == "number"
@@ -63,12 +91,24 @@ function VaultRules.Deposit(profile, backpackIndex: number, now: number?, confir
 		if loss > 0 and not accepted then
 			return false, VaultRules.WOULD_OVERFLOW
 		end
-		VaultRules.BankMaterial(profile, item.catalogId, item.quantity or 0, now or 0)
-		table.remove(slots, backpackIndex)
+		VaultRules.BankMaterial(profile, item.catalogId, amount, now or 0)
+		if amount >= owned then
+			table.remove(slots, backpackIndex)
+		else
+			item.quantity = owned - amount
+		end
 		return true, nil
 	end
 	if #profile.vault.items >= VaultRules.ItemCapacity(profile) then
 		return false, "VaultFull"
+	end
+	if amount < owned then
+		-- Part of a stack: that many go in as their own vault entry.
+		local part = table.clone(item)
+		part.quantity = amount
+		table.insert(profile.vault.items, part)
+		item.quantity = owned - amount
+		return true, nil
 	end
 	if item.instanceId then
 		item.location = "Vault"
