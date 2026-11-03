@@ -22,7 +22,7 @@ art, UiAssets.Placement) and this script uploads it like any new name.
   python scripts/roblox_upload_ui_assets.py               # dry run
   python scripts/roblox_upload_ui_assets.py --dry-run --atlases   # atlases only
   python scripts/roblox_upload_ui_assets.py --sprites     # refresh UiSprites.json
-  python scripts/roblox_upload_ui_assets.py --upload --only frame_slot,icon_heart
+  python scripts/roblox_upload_ui_assets.py --upload --only atlas_lk_play
   python scripts/roblox_upload_ui_assets.py --dry-run --only 'atlas_lk_items2_*,lk_item_*__hi'
 
 --only takes names or shell-style patterns (* and ?). A long run (the item
@@ -320,12 +320,16 @@ def resolve_decals(cloud, only=None):
 
     Only real image ids go into UiAssetIds.json: a decal id there would show a
     blank ImageLabel, while a missing id keeps UiAssets' styled-frame fallback.
+    Decals of art the manifest no longer lists (the retired parchment-era
+    sprites and atlases) stay on Roblox and in the decal record, but never come
+    back into UiAssetIds.json.
     """
     ids = load_json(IDS_FILE)
     decals = load_json(DECALS_FILE)
+    listed = load_json(MANIFEST)
     resolved = failed = 0
     for name, decal_id in sorted(decals.items()):
-        if ids.get(name):
+        if ids.get(name) or name not in listed:
             continue
         if only and not any(fnmatch.fnmatchcase(name, pattern) for pattern in only):
             continue

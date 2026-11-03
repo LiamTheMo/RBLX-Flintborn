@@ -70,7 +70,7 @@ local function update()
 		local bonus = event.kind == ExtractionRules.Kinds.Center and " (2× materials)" or ""
 		table.insert(lines, ("%s%s — %ds%s"):format(event.name, bonus, remaining, where))
 	end
-	if #lines > 0 and not HudMode.ReplacesLegacy() then
+	if #lines > 0 and not HudMode.WorldHud() then
 		table.sort(lines)
 		ui.list:Show(table.concat(lines, "\n"))
 	else

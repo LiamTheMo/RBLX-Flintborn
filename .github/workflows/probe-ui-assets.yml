@@ -11,7 +11,7 @@ on:
         options: [lobby, world]
         default: lobby
       names:
-        description: "Comma-separated sprite names (empty = a sample of old and new sprites)"
+        description: "Comma-separated sprite names (empty = a sample of the atlases the game draws)"
         required: false
         default: ""
       reports:

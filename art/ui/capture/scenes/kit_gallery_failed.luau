@@ -97,29 +97,29 @@ do
 	end
 	Kit.TabGroup.new(cats):Select("All")
 	local items = {
-		{ "stone_axe", 1 },
-		{ "pickaxe", 1 },
-		{ "spear", 1 },
-		{ "torch", 6 },
-		{ "logs", 32 },
-		{ "stones", 28 },
-		{ "plank", 18 },
-		{ "rope", 12 },
-		{ "plant_fiber", 8 },
-		{ "berries", 14 },
-		{ "mushroom", 11 },
-		{ "hide", 3 },
-		{ "bone", 7 },
-		{ "hatchet", 1 },
-		{ "stone", 4 },
-		{ "log", 9 },
+		{ "StoneAxe", 1 },
+		{ "StonePickaxe", 1 },
+		{ "StoneSpear", 1 },
+		{ "FireBomb", 6 },
+		{ "Wood", 32 },
+		{ "Stone", 28 },
+		{ "IronBar", 18 },
+		{ "Thornvine", 12 },
+		{ "Fiber", 8 },
+		{ "Redberry", 14 },
+		{ "ChestnutMushroom", 11 },
+		{ "Hide", 3 },
+		{ "Bone", 7 },
+		{ "IronAxe", 1 },
+		{ "Flint", 4 },
+		{ "Clay", 9 },
 	}
 	for i = 1, 24 do
 		local col, row = (i - 1) % 6, (i - 1) // 6
 		local entry = items[i]
 		local slot = Kit.Slot.new(v, {
 			rect = { 249 + col * 99.8, 181 + row * 107.3, 92, 99 },
-			item = entry and { catalogId = "Gallery" .. i, icon = entry[1], quantity = entry[2] } or nil,
+			item = entry and { catalogId = entry[1], quantity = entry[2] } or nil,
 			zIndex = 8,
 		})
 		if i == 1 then
@@ -292,9 +292,7 @@ do
 	for s, state in sstates do
 		local sx = 30 + (s - 1) * 110
 		caption(root, state, sx, 578, 100)
-		local item = if state ~= "empty"
-			then { catalogId = "G", icon = "logs", quantity = 32, permanent = s == 1 }
-			else nil
+		local item = if state ~= "empty" then { catalogId = "Wood", quantity = 32, permanent = s == 1 } else nil
 		force(Kit.Slot.new(root, { rect = { sx, 600, 92, 99 }, item = item }), state)
 		force(
 			Kit.Slot.new(root, { rect = { sx, 720, 99, 98 }, variant = "hotbar", hotkey = tostring(s), item = item }),
@@ -304,7 +302,7 @@ do
 	caption(root, "count plaque", 830, 578)
 	Kit.Slot.new(root, {
 		rect = { 830, 600, 92, 99 },
-		item = { catalogId = "G", icon = "stones", quantity = 99 },
+		item = { catalogId = "Stone", quantity = 99 },
 		countStyle = "plaque",
 	})
 	caption(root, "hotbar empty 6", 830, 700)
@@ -473,12 +471,18 @@ do
 	heading(root, "row, line, option", 440, 14)
 	Kit.ListRow.new(
 		root,
-		{ rect = { 440, 52, 280, 52 }, icon = "logs", title = "Wood", value = "12", onPress = function() end }
+		{ rect = { 440, 52, 280, 52 }, catalogId = "Wood", title = "Wood", value = "12", onPress = function() end }
 	)
 	force(
 		Kit.ListRow.new(
 			root,
-			{ rect = { 440, 112, 280, 52 }, icon = "stones", title = "Iron Ore", value = "6", onPress = function() end }
+			{
+				rect = { 440, 112, 280, 52 },
+				catalogId = "IronOre",
+				title = "Iron Ore",
+				value = "6",
+				onPress = function() end,
+			}
 		),
 		"selected"
 	)

@@ -2,15 +2,13 @@
 -- D10, D11): its category tab (All / Tools / Materials / Consumables / Plants /
 -- Misc),
 -- a short description (authored here, in the UI layer, or derived from the
--- catalog), labelled stat rows for detail cards, the kit art (and tint) that
--- shows it while it has no art of its own, and the older stat chips. Pure functions over
--- the catalogs, for the client and specs.
+-- catalog), labelled stat rows for detail cards and the sprite of its icon.
+-- Pure functions over the catalogs, for the client and specs.
 
 local ArmorRules = require(script.Parent.Parent.Combat.ArmorRules)
 local GameConstants = require(script.Parent.Parent.GameConstants)
 local ItemCatalog = require(script.Parent.ItemCatalog)
 local NodeCatalog = require(script.Parent.Parent.Resources.NodeCatalog)
-local Tiers = require(script.Parent.Tiers)
 local WeaponCatalog = require(script.Parent.Parent.Combat.WeaponCatalog)
 
 local ItemInfo = {}
@@ -233,61 +231,12 @@ function ItemInfo.StatRows(item): { StatRow }
 	return rows
 end
 
--- Item art (docs/ui/ITEM_ART.md). Until an item's own art (lk_item_<id>,
--- ItemInfo.ItemSprite) is uploaded, ItemInfo.Icon names the kit art that shows it: the exact icon
--- where the kit has one, otherwise the closest kit art, often tinted (an
--- ImageColor3 multiply, so tints only darken or shift a hue). Names are kit icon
--- ids (lk_icon_<id>) or full lk_ sprite names for other kit art. Only art
--- that reads as the item is used: bows, swords, daggers and armour have
--- nothing in the kit that does (a tusk read as a sword, hide as iron armour),
--- so Icon returns nil for them and the kit draws its neutral kind glyph, with
--- the name in tooltips and detail cards (docs/ui/ITEM_ART.md).
-
--- Every kit sprite item art may use. KitModel's role table does not list icons
--- and specs cannot read the sprite manifest, so the item_info spec checks
--- Icon's answers against this list and the inventory capture checks the list
--- against the manifest.
-ItemInfo.ART_SPRITES = {
-	"lk_icon_berries",
-	"lk_icon_bone",
-	"lk_icon_build",
-	"lk_icon_campfire",
-	"lk_icon_crystals",
-	"lk_icon_drumstick",
-	"lk_icon_hatchet",
-	"lk_icon_heart",
-	"lk_icon_hide",
-	"lk_icon_lightning",
-	"lk_icon_logs",
-	"lk_icon_magma_ore",
-	"lk_icon_mushroom",
-	"lk_icon_pickaxe",
-	"lk_icon_plank",
-	"lk_icon_plant_fiber",
-	"lk_icon_rocks",
-	"lk_icon_rope",
-	"lk_icon_runestone",
-	"lk_icon_spear",
-	"lk_icon_star",
-	"lk_icon_stone",
-	"lk_icon_stone_axe",
-	"lk_icon_stones",
-	"lk_icon_torch",
-	"lk_icon_tusk",
-	"lk_icon_warning",
-}
-
--- The sprite an icon name draws (lk_icon_<id> for an icon id).
-function ItemInfo.Sprite(name: string): string
-	return if string.sub(name, 1, 3) == "lk_" then name else "lk_icon_" .. name
-end
-
--- Every catalog item's own icon (art/ui/items/ICONS.json, built by
--- art/ui/items/build_item_icons.py from the owner's item art): lk_item_<id>, a
--- 110 px slot icon packed into the atlas_lk_items2_* atlases, whose `hi` copy
--- lk_item_<id>__hi (356 px, an image of its own) draws only in the hero boxes.
--- Kit.ItemIcon draws it once its atlas is uploaded and, until then, the kit
--- art below (Icon), so a deploy before the upload never loses an item's art.
+-- Item art (docs/ui/ITEM_ART.md): every catalog item's own icon
+-- (art/ui/items/ICONS.json, built by art/ui/items/build_item_icons.py from the
+-- owner's item art): lk_item_<id>, a 110 px slot icon packed into the
+-- atlas_lk_items2_* atlases, whose `hi` copy lk_item_<id>__hi (356 px, an image
+-- of its own) draws only in the hero boxes. Kit.ItemIcon draws it everywhere an
+-- item is shown.
 ItemInfo.ITEM_SPRITE_PREFIX = "lk_item_"
 
 -- The item's own icon sprite, or nil for an unknown item.
@@ -296,210 +245,6 @@ function ItemInfo.ItemSprite(catalogId: string?): string?
 		return nil
 	end
 	return ItemInfo.ITEM_SPRITE_PREFIX .. (catalogId :: string)
-end
-
-local function rgb(r: number, g: number, b: number): Color3
-	return Color3.fromRGB(r, g, b)
-end
-
--- Material tints for gear made from it, ores and bars (multiplied over art
--- that is grey stone, iron, ivory or brown wood). The stone spear and the
--- iron-headed hatchet and pickaxe are drawn untinted.
-ItemInfo.TIER_TINTS = {
-	Wood = rgb(230, 175, 120),
-	Stone = rgb(205, 205, 212),
-	Flint = rgb(150, 150, 165),
-	Bone = rgb(250, 240, 215),
-	Obsidian = rgb(115, 100, 140),
-	Jade = rgb(150, 225, 170),
-	Hide = rgb(215, 165, 120),
-	Copper = rgb(240, 160, 110),
-	Iron = rgb(195, 200, 212),
-	Silver = rgb(240, 245, 255),
-	Cobalt = rgb(130, 160, 240),
-	Mithril = rgb(170, 240, 235),
-	Adamantine = rgb(190, 130, 215),
-}
-
--- Items the kit draws exactly (the art depicts that very item).
-ItemInfo.EXACT = {
-	StoneAxe = true,
-	IronAxe = true,
-	IronPickaxe = true,
-	StoneSpear = true,
-	Wood = true,
-	Stone = true,
-	Fiber = true,
-	Hide = true,
-	Bone = true,
-	Redberry = true,
-	CookedMeat = true,
-	ChestnutMushroom = true,
-}
-
--- Per item: {icon, tint?}. Gear, ores and bars are filled in from their tier below.
-local ART = {
-	-- Materials.
-	Wood = { "logs" },
-	Stone = { "stones" },
-	Flint = { "stone", ItemInfo.TIER_TINTS.Flint },
-	Fiber = { "plant_fiber" },
-	Herbs = { "plant_fiber", rgb(190, 235, 160) },
-	Resin = { "crystals", rgb(255, 185, 70) },
-	Hide = { "hide" },
-	RawMeat = { "drumstick", rgb(255, 150, 150) },
-	Bone = { "bone" },
-	Clay = { "stone", rgb(225, 140, 100) },
-	CaveMushroom = { "mushroom", rgb(250, 235, 215) },
-	RedcapMushroom = { "mushroom", rgb(255, 120, 110) },
-	ChestnutMushroom = { "mushroom" },
-	Thornvine = { "rope", rgb(150, 200, 110) },
-	Frostleaf = { "plant_fiber", rgb(175, 220, 255) },
-	JuniperBerry = { "berries", rgb(140, 150, 230) },
-	Elderberry = { "berries", rgb(120, 90, 160) },
-	Raspberry = { "berries", rgb(255, 170, 190) },
-	Hazelnut = { "berries", rgb(200, 140, 80) },
-	Amethyst = { "crystals", rgb(200, 140, 255) },
-	Starstone = { "stone", rgb(255, 235, 150) },
-	Stormglass = { "crystals" },
-	Obsidian = { "stone", ItemInfo.TIER_TINTS.Obsidian },
-	Jade = { "crystals", rgb(120, 230, 150) },
-	DireHide = { "hide", rgb(140, 115, 110) },
-	ChargedCore = { "lightning" },
-	GlowFur = { "hide", rgb(190, 245, 245) },
-	GuardianHeart = { "heart", rgb(190, 90, 110) },
-	AshenOil = { "magma_ore", rgb(170, 165, 160) },
-	SiegeResin = { "crystals", rgb(230, 120, 60) },
-	AbyssalShard = { "crystals", rgb(120, 90, 170) },
-	Emberglass = { "crystals", rgb(255, 140, 70) },
-	Bloodroot = { "plant_fiber", rgb(230, 120, 120) },
-	Moonpetal = { "plant_fiber", rgb(220, 225, 255) },
-	AncientEmber = { "campfire" },
-	-- Ammunition, siege items and placeables.
-	FlintArrow = { "spear", ItemInfo.TIER_TINTS.Flint },
-	FireBomb = { "torch" },
-	BreachingCharge = { "warning" },
-	Workbench = { "build" },
-	ExtractionRune = { "runestone" },
-	GuardianFang = { "tusk" },
-	-- Medicine, food and draughts.
-	BasicMedicine = { "heart", rgb(255, 200, 200) },
-	AdvancedMedicine = { "heart" },
-	Potion = { "heart", rgb(230, 150, 200) },
-	GreaterPotion = { "heart", rgb(190, 110, 200) },
-	Redberry = { "berries" },
-	Sweetberry = { "berries", rgb(255, 180, 220) },
-	Sunberry = { "berries", rgb(255, 215, 110) },
-	Glimmerberry = { "berries", rgb(150, 230, 255) },
-	CookedMeat = { "drumstick" },
-	HeartyTonic = { "heart", rgb(255, 180, 110) },
-	SunberryDraught = { "lightning" },
-	StrongSunberryDraught = { "lightning", rgb(255, 190, 90) },
-	GlimmerDraught = { "star", rgb(170, 230, 255) },
-	StrongGlimmerDraught = { "star", rgb(130, 190, 255) },
-}
-
--- Gear by kind: the kit's art for it, and whether the art is already iron.
--- Swords, daggers and armour are not listed: no kit art reads as them.
-local GEAR = {
-	Axe = { "hatchet", true },
-	Pickaxe = { "pickaxe", true },
-	Spear = { "spear", false },
-}
-
-for id, def in ItemCatalog.Items do
-	if ART[id] then
-		continue
-	end
-	local kind = if def.tool
-		then def.tool.kind
-		elseif def.weapon then def.weapon.family
-		elseif def.armor then "Armor"
-		else nil
-	local gear = kind and GEAR[kind]
-	if gear and def.tier then
-		local plain = (def.tier == "Iron" and gear[2]) or (def.tier == "Stone" and kind == "Spear")
-		ART[id] = { gear[1], if plain then nil else ItemInfo.TIER_TINTS[def.tier] }
-	end
-end
-ART.StoneAxe = { "stone_axe" }
-ART.StonePickaxe = { "pickaxe", rgb(215, 215, 220) }
-for _, metal in Tiers.Metals do
-	local tier = Tiers.Get(metal)
-	local tint = ItemInfo.TIER_TINTS[metal]
-	ART[tier.ore] = if metal == "Adamantine" then { "magma_ore", tint } else { "rocks", tint }
-	ART[tier.material] = { "plank", tint }
-end
-
--- Icon names and tints, kept as two tables (ICONS[id] = name, TINTS[id] = Color3).
-ItemInfo.ICONS = {}
-ItemInfo.TINTS = {}
-for id, art in ART do
-	ItemInfo.ICONS[id] = art[1]
-	ItemInfo.TINTS[id] = art[2]
-end
-
--- The kit art for an item and its tint, or nil when the kit has nothing that
--- reads as it (bows, swords, daggers, armour) or the item is unknown.
-function ItemInfo.Icon(catalogId: string?): (string?, Color3?)
-	if type(catalogId) ~= "string" then
-		return nil, nil
-	end
-	return ItemInfo.ICONS[catalogId], ItemInfo.TINTS[catalogId]
-end
-
--- "exact" (the art depicts the item), "stand-in" (the closest art, maybe
--- tinted) or "none".
-function ItemInfo.ArtStatus(catalogId: string?): string
-	if catalogId == nil or ItemInfo.ICONS[catalogId] == nil then
-		return "none"
-	end
-	return if ItemInfo.EXACT[catalogId] then "exact" else "stand-in"
-end
-
--- Stat chips for an item ({catalogId, quantity?, qualityRoll?}), at most three
--- ({glyph?, text}; the older compact form of StatRows).
-function ItemInfo.Stats(item): { { glyph: string?, text: string } }
-	local def = ItemCatalog.Get(item and item.catalogId)
-	if def == nil then
-		return {}
-	end
-	local chips = {}
-	if def.weapon then
-		local profile = WeaponCatalog.For(def.id)
-		-- A bow's own damage (arrows add theirs).
-		local base = profile.damage or profile.bowDamage or 0
-		local damage = base * (1 + (item.qualityRoll or 0))
-		table.insert(chips, { glyph = "sword", text = ("%d dmg"):format(math.round(damage)) })
-		if profile.cooldown then
-			table.insert(chips, { text = ("%.1fs"):format(profile.cooldown) })
-		end
-	elseif def.tool then
-		table.insert(chips, { glyph = "hammer", text = ("Tier %d"):format(def.tool.tier or 1) })
-		table.insert(chips, { text = def.tool.kind })
-	elseif def.armor then
-		local increment = ArmorRules.PieceIncrement(def.armor.tier, def.armor.slot, item.qualityRoll)
-		table.insert(chips, { text = "Armour +" .. percent(increment) })
-		table.insert(chips, { text = def.armor.slot })
-	elseif def.consumable then
-		local c = def.consumable
-		if (c.heal or 0) > 0 then
-			table.insert(chips, { text = ("Heals %d"):format(c.heal) })
-		end
-		if (c.hunger or 0) > 0 then
-			table.insert(chips, { text = "Food +" .. percent(c.hunger) })
-		end
-		if c.boost then
-			table.insert(chips, { text = ("%s +%s"):format(c.boost.kind, percent(c.boost.amount)) })
-		end
-	end
-	if item.quantity and #chips < 3 then
-		table.insert(chips, { glyph = "weight", text = ("×%d"):format(item.quantity) })
-	end
-	while #chips > 3 do
-		table.remove(chips)
-	end
-	return chips
 end
 
 return ItemInfo

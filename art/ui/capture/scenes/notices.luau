@@ -49,7 +49,7 @@ invite:AddButton("Decline", "paper", function() end)
 invite:Show("River wants to trade with you.")
 local safe = NoticeCard.new(side, { name = "Safe", width = 360, title = "Safe camp" })
 safe.frame.Position = UDim2.fromOffset(1220, 440)
-safe:SetTone("haveEnough")
+safe:SetTone("toggleOn")
 safe:Show("Elder's Camp: no damage here.")
 check(safe.text.Text == "Elder's Camp: no damage here.", "the note's text reads back as given")
 

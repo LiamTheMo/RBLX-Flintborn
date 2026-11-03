@@ -23,9 +23,9 @@ size, and every random draw is made on the 1000-px grid (fields upsampled), so
 the large map is the same painting with more detail, not a different one. The
 large painting goes into art/ui/sprites as pm_map_island__hi: 2 x 2 tiles of at
 most 1024 px (Roblox's largest image) overlapping by 2 px each side of the cut,
-the way slice_parchment.py tiles big art, with "hi" / "scale" / "of" in
-manifest.json (UiAssets.Placement). pm_map_island.png itself (slice_parchment.py,
-uploaded in atlas_island) is left as it is.
+with "hi" / "scale" / "of" in manifest.json (UiAssets.Placement).
+pm_map_island.png itself (the 1000 px painting as it was cut for the parchment
+UI, uploaded in atlas_island) is left as it is.
 """
 import json
 import re
@@ -41,15 +41,13 @@ from PIL import Image
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[2]
 sys.path.insert(0, str(ROOT / "art" / "ui" / "capture"))
-sys.path.insert(0, str(ROOT / "art" / "ui"))
 import capture  # noqa: E402
-from slice_parchment import box_blur  # noqa: E402
 
 CELLS = 400
 MAP_SPAN = 4400
 BASE = 1000
-# 2 x 2 tiles of at most 1024 px that overlap by 2 px each side of the cut (the
-# tiling of slice_parchment.py), so 2040 rather than 2048.
+# 2 x 2 tiles of at most 1024 px that overlap by 2 px each side of the cut, so
+# 2040 rather than 2048.
 HI_SIZE = 2040
 OUT = HERE / "island.png"
 OUT_HI = HERE / "island_hi.png"
@@ -122,6 +120,19 @@ def noise(rng, rec):
         field = rec["noise"][len(rec["used"])]
         rec["used"].append(field)
     return field if SIZE == BASE else up(field)
+
+
+def box_blur(x, r):
+    """Separable box blur with edge clamping; x is HxW or HxWxC."""
+    k = 2 * r + 1
+    for axis in (0, 1):
+        pad = [(0, 0)] * x.ndim
+        pad[axis] = (r + 1, r)
+        c = np.cumsum(np.pad(x, pad, mode="edge"), axis=axis)
+        hi = np.take(c, range(k, c.shape[axis]), axis=axis)
+        lo = np.take(c, range(0, c.shape[axis] - k), axis=axis)
+        x = (hi - lo) / k
+    return x
 
 
 def blur(x, r):

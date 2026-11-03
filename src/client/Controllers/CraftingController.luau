@@ -19,11 +19,9 @@ local RecipeModel = require(ReplicatedStorage.Shared.UI.RecipeModel)
 local Recipes = require(ReplicatedStorage.Shared.Crafting.Recipes)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local InventoryController = require(script.Parent.InventoryController)
-local HudMode = require(script.Parent.Parent.Hud.HudMode)
 local RecipeWindow = require(script.Parent.Parent.Hud.Screens.RecipeWindow)
 local Binds = require(script.Parent.Parent.Ui.Binds)
 local Reasons = require(script.Parent.Parent.Ui.Reasons)
-local Theme = require(script.Parent.Parent.Ui.Theme)
 
 local CraftingController = {}
 
@@ -32,8 +30,6 @@ local CraftingController = {}
 CraftingController.WATCH_SECONDS = 0.5
 
 local player = Players.LocalPlayer
-local make = Theme.Make
-local ui = {}
 local window = nil
 local nearbyKey = ""
 local watching = nil
@@ -216,32 +212,9 @@ local function build()
 		watching = nil
 	end)
 	CraftingController.window = window
-
-	-- The legacy HUD's Craft button (the new HUD's nav bar has its own).
-	local gui = make("ScreenGui", { Name = "Crafting", ResetOnSpawn = false }, player:WaitForChild("PlayerGui"))
-	ui.toggle = make("TextButton", {
-		Text = "Craft (" .. Binds.Label("Craft") .. ")",
-		AnchorPoint = Vector2.new(0, 1),
-		Position = UDim2.new(0.5, 8 + 9 * 33, 1, -12),
-		Size = UDim2.fromOffset(100, 30),
-		BackgroundColor3 = Color3.fromRGB(70, 56, 40),
-		TextColor3 = Color3.fromRGB(245, 236, 222),
-		Font = Enum.Font.GothamBold,
-		TextSize = 13,
-		Visible = false,
-	}, gui)
-	make("UICorner", { CornerRadius = UDim.new(0, 6) }, ui.toggle)
-	Binds.Changed:Connect(function()
-		ui.toggle.Text = "Craft (" .. Binds.Label("Craft") .. ")"
-	end)
-	ui.toggle.Activated:Connect(function()
-		CraftingController.Toggle()
-	end)
 end
 
 local function setInRun(inRun: boolean)
-	-- With the new HUD the hotbar spans this spot; the nav bar keeps a Craft button.
-	ui.toggle.Visible = inRun and not HudMode.ReplacesLegacy()
 	if not inRun then
 		window:Close()
 		Binds.Unbind("Craft")
@@ -255,7 +228,7 @@ local function setInRun(inRun: boolean)
 	end)
 end
 
--- Opens or closes the window (the Craft key, and the on-screen navigation bar).
+-- Opens or closes the window (the Craft key, and the HUD's Craft tile).
 -- Escape / B close it (Kit.Modal).
 function CraftingController.Toggle()
 	if window == nil then

@@ -3,8 +3,9 @@
 -- hotbar that shows the deploy loadout and Settings (bottom left), drawn by
 -- Hud/Screens/LobbyHud from the shared Kit. There is no Enter button or server
 -- choice here: the Play tile opens the Play window, which deploys.
--- Lobby place only (HudMode.ReplacesLobby); the older lobby visuals stay hidden.
--- If the HUD fails to build, the lobby falls back to those older visuals.
+-- Lobby place only (HudMode.ReplacesLobby). If the HUD fails to build, the
+-- error is logged and the kit's own ⚙, currency pills and level bar show
+-- (HudMode.SetLobbyFailed); there is no older lobby screen behind it.
 --
 -- Everything acts through the existing controllers: the tiles open the
 -- Inventory (VaultController), Play (PlayController), Quests (JournalController),
@@ -321,11 +322,9 @@ function LobbyHudController.Start()
 	end
 	local ok, err = pcall(start)
 	if not ok then
-		-- Never leave the lobby without Deploy: hand it back to the older visuals.
-		warn("[LobbyHud] failed to build, using the older lobby screen: " .. tostring(err))
+		warn("[LobbyHud] failed to build: " .. tostring(err))
 		teardown()
 		HudMode.SetLobbyFailed()
-		LobbyController.BuildFallback()
 	end
 end
 

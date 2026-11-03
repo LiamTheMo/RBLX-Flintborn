@@ -18,6 +18,7 @@ local RunService = game:GetService("RunService")
 local ExtractionRules = require(ReplicatedStorage.Shared.Extraction.ExtractionRules)
 local GameConstants = require(ReplicatedStorage.Shared.GameConstants)
 local HudModel = require(ReplicatedStorage.Shared.UI.HudModel)
+local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local PoiCatalog = require(ReplicatedStorage.Shared.World.PoiCatalog)
 local Keybinds = require(ReplicatedStorage.Shared.Settings.Keybinds)
 local SessionStates = require(ReplicatedStorage.Shared.Admission.SessionStates)
@@ -837,7 +838,12 @@ local function remount()
 end
 
 function HudController.Start()
-	if not HudMode.ReplacesLegacy() then
+	if not PlaceConfig.IsWorld() then
+		return
+	end
+	if not HudMode.WorldHud() then
+		-- No older HUD stands behind this one: say why the run has none.
+		warn("[Hud] the HUD layout (Shared.UI.HudLayout) did not load; the world HUD is not built")
 		return
 	end
 	layout = Layout.Get()

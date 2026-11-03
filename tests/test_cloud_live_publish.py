@@ -43,13 +43,17 @@ class CloudPublishSafetyTests(unittest.TestCase):
         self.assertNotIn("versionType=Published", script)
 
     def test_every_script_deleted_from_git_is_retired(self):
-        # Each removed parchment-UI module is listed, sits under a managed root and
-        # is no longer published, so the deploy removes it from the places.
+        # Each removed parchment-UI module and fallback controller is listed, sits
+        # under a managed root and is no longer published, so the deploy removes it
+        # from the places.
         client = ("StarterPlayer", "StarterPlayerScripts", "Client")
         for name in ("CraftingPanel", "InventoryPanel", "ItemSlot", "JournalPanel", "LobbyHud",
                      "LobbyPopups", "Parchment", "SettingsPanel"):
             self.assertIn(client + ("Hud", name), cloud.RETIRED)
         self.assertNotIn(client + ("Hud", "Screens", "LobbyHud"), cloud.RETIRED)
+        # The plain fallback UI the kit HUD replaced.
+        for name in ("NavController", "SurvivalHudController"):
+            self.assertIn(client + ("Controllers", name), cloud.RETIRED)
         retired = cloud.retired_paths(cloud.spec_list())
         script = cloud.make_script([], retired=retired)
         for path in retired:

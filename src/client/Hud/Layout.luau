@@ -15,7 +15,8 @@ local cached = nil
 local loaded = false
 
 -- The layout table, or nil when the JSON module is missing (for example a place
--- whose scripts were published without it); the old HUD then stays in charge.
+-- whose scripts were published without it); HudController then logs that the
+-- world HUD cannot build.
 function Layout.Get()
 	if not loaded then
 		loaded = true

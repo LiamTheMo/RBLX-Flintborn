@@ -1,238 +1,212 @@
 # Item art
 
-**Every catalog item now has art of its own**: `lk_item_<CatalogId>` (110 px,
-atlases `atlas_lk_items2_1` / `_2`) and its 356 px hero copy
-`lk_item_<CatalogId>__hi`, built from `src/assets/Models/2D/` by
-`art/ui/items/build_item_icons.py` with the mapping in
-`art/ui/items/ICONS.json` (STYLE_GUIDE §9.7). `Kit.ItemIcon` draws it once its
-atlas is uploaded. The table below is the older kit art each item keeps drawing
-until then (and the fallback if the new atlas ever fails to have an id).
+Every catalog item (`ItemCatalog.Items`, generated gear, ores and bars
+included) draws **its own icon and nothing else**: `lk_item_<CatalogId>`, a
+110 px slot icon packed into `atlas_lk_items2_1` / `atlas_lk_items2_2`, and its
+356 px hero copy `lk_item_<CatalogId>__hi` (an image of its own) in the Forge /
+Crafting picture and the Inventory detail card. Both are built from the owner's
+512 px PNGs in `src/assets/Models/2D/` by `art/ui/items/build_item_icons.py`,
+with the mapping in `art/ui/items/ICONS.json` (STYLE_GUIDE §9.7).
 
-Which art every catalog item (`ItemCatalog.Items`, generated gear, ores and bars
-included) draws in slots, cards and the hotbar until it has art of its own. The
-source is `ItemInfo.Icon(id) → (name, tint)` in `src/shared/Items/ItemInfo.luau`
-(`ICONS`, `TINTS`, `EXACT`, `ART_SPRITES`); `Kit.ItemIcon` draws an item's own
-`lk_item_<id>` / `item_<id>` sprite first when one exists, then this art, then a
-neutral ink glyph for the item's kind (tools and weapons a hammer, armour a
-backpack, food a drumstick, anything else a chest). A slot never prints the
-item's name: the name is in the icon root's `KitItemName` attribute, for
-tooltips and detail cards (`KitStandIn` marks the glyph).
+`Kit.ItemIcon` draws it everywhere an item is shown (`Art.ItemIcon` →
+`ItemInfo.ItemSprite`). While the icon's atlas has not loaded on a client, the
+picture shows the item's kind glyph (⚒ tools and weapons, ▤ armour, ◇
+everything else; `Art.KindGlyph`), faded, and the icon replaces it by itself
+when the atlas loads (STYLE_GUIDE §6.5). A slot never prints the item's name:
+the name is in the icon root's `KitItemName` attribute, for tooltips and detail
+cards.
 
-- **exact**: the kit art depicts that very item.
-- **stand-in**: the closest kit art, usually tinted. A tint is an `ImageColor3`
-  multiply, so it darkens or shifts a hue; it cannot lighten. These items need
-  real icon art.
-- **none**: nothing in the kit reads as the item (a borrowed picture would
-  mislead); slots, rows and the big detail pictures show the item's kind
-  glyph faded to 40 % (tools and weapons a hammer, armour a backpack, the rest
-  a chest), which reads as "picture missing" rather than as a real item; the
-  name is in the tooltip and detail card (KitItemName).
+The older kit art items drew before their own icons (`ItemInfo.Icon`: the
+closest `lk_icon_*`, often tinted, for 95 items, and nothing for bows, swords,
+daggers and armour) is gone. The `lk_icon_*` sprites it used stay in the
+uploaded `atlas_lk_items`, where menus, stat rows, events and the Journal still
+use them as icons.
 
-Totals: 144 items, 12 exact, 83 stand-in, 49 none.
+Totals: 144 items; 81 in `atlas_lk_items2_1`, 63 in `atlas_lk_items2_2`.
 
-Kit art used (all in `art/ui/kit/CATALOG.md`, checked against the sprite
-manifest by the `inventory_backpack` capture scene): `lk_icon_berries`, `lk_icon_bone`, `lk_icon_build`, `lk_icon_campfire`, `lk_icon_crystals`, `lk_icon_drumstick`, `lk_icon_hatchet`, `lk_icon_heart`, `lk_icon_hide`, `lk_icon_lightning`, `lk_icon_logs`, `lk_icon_magma_ore`, `lk_icon_mushroom`, `lk_icon_pickaxe`, `lk_icon_plank`, `lk_icon_plant_fiber`, `lk_icon_rocks`, `lk_icon_rope`, `lk_icon_runestone`, `lk_icon_spear`, `lk_icon_star`, `lk_icon_stone`, `lk_icon_stone_axe`, `lk_icon_stones`, `lk_icon_torch`, `lk_icon_tusk`, `lk_icon_warning`.
-
-Rebuild this table from `ItemInfo` when the mapping changes; the `item_info`
-spec fails if an item stops resolving to listed art.
-
+Rebuild this table from `ICONS.json` when an item is added; the `item_info`
+spec fails if a catalog item has no icon or hero copy in `UiSprites.json`.
 
 ## Materials
 
-| Item | Id | Art | Tint | Status |
-|---|---|---|---|---|
-| Abyssal Shard | `AbyssalShard` | `lk_icon_crystals` | #785AAA | stand-in |
-| Adamantine Bar | `AdamantineBar` | `lk_icon_plank` | #BE82D7 | stand-in |
-| Adamantine Ore | `AdamantineOre` | `lk_icon_magma_ore` | #BE82D7 | stand-in |
-| Amethyst | `Amethyst` | `lk_icon_crystals` | #C88CFF | stand-in |
-| Ancient Ember | `AncientEmber` | `lk_icon_campfire` | — | stand-in |
-| Ashen Oil | `AshenOil` | `lk_icon_magma_ore` | #AAA5A0 | stand-in |
-| Bloodroot | `Bloodroot` | `lk_icon_plant_fiber` | #E67878 | stand-in |
-| Bone | `Bone` | `lk_icon_bone` | — | exact |
-| Cave Mushroom | `CaveMushroom` | `lk_icon_mushroom` | #FAEBD7 | stand-in |
-| Charged Core | `ChargedCore` | `lk_icon_lightning` | — | stand-in |
-| Chestnut Mushroom | `ChestnutMushroom` | `lk_icon_mushroom` | — | exact |
-| Clay | `Clay` | `lk_icon_stone` | #E18C64 | stand-in |
-| Cobalt Bar | `CobaltBar` | `lk_icon_plank` | #82A0F0 | stand-in |
-| Cobalt Ore | `CobaltOre` | `lk_icon_rocks` | #82A0F0 | stand-in |
-| Copper Bar | `CopperBar` | `lk_icon_plank` | #F0A06E | stand-in |
-| Copper Ore | `CopperOre` | `lk_icon_rocks` | #F0A06E | stand-in |
-| Dire Hide | `DireHide` | `lk_icon_hide` | #8C736E | stand-in |
-| Elderberry | `Elderberry` | `lk_icon_berries` | #785AA0 | stand-in |
-| Emberglass | `Emberglass` | `lk_icon_crystals` | #FF8C46 | stand-in |
-| Flint | `Flint` | `lk_icon_stone` | #9696A5 | stand-in |
-| Frostleaf | `Frostleaf` | `lk_icon_plant_fiber` | #AFDCFF | stand-in |
-| Glow-Fur | `GlowFur` | `lk_icon_hide` | #BEF5F5 | stand-in |
-| Guardian Heart | `GuardianHeart` | `lk_icon_heart` | #BE5A6E | stand-in |
-| Hazelnut | `Hazelnut` | `lk_icon_berries` | #C88C50 | stand-in |
-| Herbs | `Herbs` | `lk_icon_plant_fiber` | #BEEBA0 | stand-in |
-| Hide | `Hide` | `lk_icon_hide` | — | exact |
-| Iron Bar | `IronBar` | `lk_icon_plank` | #C3C8D4 | stand-in |
-| Iron Ore | `IronOre` | `lk_icon_rocks` | #C3C8D4 | stand-in |
-| Jade | `Jade` | `lk_icon_crystals` | #78E696 | stand-in |
-| Juniper Berry | `JuniperBerry` | `lk_icon_berries` | #8C96E6 | stand-in |
-| Mithril Bar | `MithrilBar` | `lk_icon_plank` | #AAF0EB | stand-in |
-| Mithril Ore | `MithrilOre` | `lk_icon_rocks` | #AAF0EB | stand-in |
-| Moonpetal | `Moonpetal` | `lk_icon_plant_fiber` | #DCE1FF | stand-in |
-| Obsidian | `Obsidian` | `lk_icon_stone` | #73648C | stand-in |
-| Plant Fiber | `Fiber` | `lk_icon_plant_fiber` | — | exact |
-| Raspberry | `Raspberry` | `lk_icon_berries` | #FFAABE | stand-in |
-| Raw Meat | `RawMeat` | `lk_icon_drumstick` | #FF9696 | stand-in |
-| Redcap Mushroom | `RedcapMushroom` | `lk_icon_mushroom` | #FF786E | stand-in |
-| Resin | `Resin` | `lk_icon_crystals` | #FFB946 | stand-in |
-| Siege Resin | `SiegeResin` | `lk_icon_crystals` | #E6783C | stand-in |
-| Silver Bar | `SilverBar` | `lk_icon_plank` | #F0F5FF | stand-in |
-| Silver Ore | `SilverOre` | `lk_icon_rocks` | #F0F5FF | stand-in |
-| Starstone | `Starstone` | `lk_icon_stone` | #FFEB96 | stand-in |
-| Stone | `Stone` | `lk_icon_stones` | — | exact |
-| Stormglass | `Stormglass` | `lk_icon_crystals` | — | stand-in |
-| Thornvine | `Thornvine` | `lk_icon_rope` | #96C86E | stand-in |
-| Wood | `Wood` | `lk_icon_logs` | — | exact |
+| Item | Id | Source (`src/assets/Models/2D/`) | Atlas |
+|---|---|---|---|
+| Abyssal Shard | `AbyssalShard` | `abyssal-shard.png` | `atlas_lk_items2_1` |
+| Adamantine Bar | `AdamantineBar` | `adamantine-bar.png` | `atlas_lk_items2_1` |
+| Adamantine Ore | `AdamantineOre` | `adamantine-ore.png` | `atlas_lk_items2_1` |
+| Amethyst | `Amethyst` | `amethyst.png` | `atlas_lk_items2_1` |
+| Ancient Ember | `AncientEmber` | `ancient-ember.png` | `atlas_lk_items2_1` |
+| Ashen Oil | `AshenOil` | `ashen-oil.png` | `atlas_lk_items2_1` |
+| Bloodroot | `Bloodroot` | `bloodroot.png` | `atlas_lk_items2_1` |
+| Bone | `Bone` | `bone.png` | `atlas_lk_items2_1` |
+| Cave Mushroom | `CaveMushroom` | `cave-mushroom.png` | `atlas_lk_items2_1` |
+| Charged Core | `ChargedCore` | `charged-core.png` | `atlas_lk_items2_1` |
+| Chestnut Mushroom | `ChestnutMushroom` | `chestnut-mushroom.png` | `atlas_lk_items2_1` |
+| Clay | `Clay` | `clay.png` | `atlas_lk_items2_1` |
+| Cobalt Bar | `CobaltBar` | `cobalt-bar.png` | `atlas_lk_items2_1` |
+| Cobalt Ore | `CobaltOre` | `cobalt-ore.png` | `atlas_lk_items2_1` |
+| Copper Bar | `CopperBar` | `copper-bar.png` | `atlas_lk_items2_1` |
+| Copper Ore | `CopperOre` | `copper-ore.png` | `atlas_lk_items2_1` |
+| Dire Hide | `DireHide` | `dire-hide.png` | `atlas_lk_items2_1` |
+| Elderberry | `Elderberry` | `elderberry.png` | `atlas_lk_items2_1` |
+| Emberglass | `Emberglass` | `emberglass.png` | `atlas_lk_items2_1` |
+| Flint | `Flint` | `flint.png` | `atlas_lk_items2_1` |
+| Frostleaf | `Frostleaf` | `frostleaf.png` | `atlas_lk_items2_1` |
+| Glow-Fur | `GlowFur` | `glow-fur.png` | `atlas_lk_items2_1` |
+| Guardian Heart | `GuardianHeart` | `guardian-heart.png` | `atlas_lk_items2_1` |
+| Hazelnut | `Hazelnut` | `hazelnut.png` | `atlas_lk_items2_1` |
+| Herbs | `Herbs` | `herbs.png` | `atlas_lk_items2_1` |
+| Hide | `Hide` | `hide.png` | `atlas_lk_items2_1` |
+| Iron Bar | `IronBar` | `iron-bar.png` | `atlas_lk_items2_1` |
+| Iron Ore | `IronOre` | `iron-ore.png` | `atlas_lk_items2_1` |
+| Jade | `Jade` | `jade.png` | `atlas_lk_items2_1` |
+| Juniper Berry | `JuniperBerry` | `juniper-berry.png` | `atlas_lk_items2_1` |
+| Mithril Bar | `MithrilBar` | `mithril-bar.png` | `atlas_lk_items2_1` |
+| Mithril Ore | `MithrilOre` | `mithril-ore.png` | `atlas_lk_items2_1` |
+| Moonpetal | `Moonpetal` | `moonpetal.png` | `atlas_lk_items2_1` |
+| Obsidian | `Obsidian` | `obsidian.png` | `atlas_lk_items2_1` |
+| Plant Fiber | `Fiber` | `plant-fiber.png` | `atlas_lk_items2_1` |
+| Raspberry | `Raspberry` | `raspberry.png` | `atlas_lk_items2_1` |
+| Raw Meat | `RawMeat` | `raw-meat.png` | `atlas_lk_items2_1` |
+| Redcap Mushroom | `RedcapMushroom` | `redcap-mushroom.png` | `atlas_lk_items2_1` |
+| Resin | `Resin` | `resin.png` | `atlas_lk_items2_1` |
+| Siege Resin | `SiegeResin` | `siege-resin.png` | `atlas_lk_items2_1` |
+| Silver Bar | `SilverBar` | `silver-bar.png` | `atlas_lk_items2_1` |
+| Silver Ore | `SilverOre` | `silver-ore.png` | `atlas_lk_items2_1` |
+| Starstone | `Starstone` | `starstone.png` | `atlas_lk_items2_1` |
+| Stone | `Stone` | `stone.png` | `atlas_lk_items2_1` |
+| Stormglass | `Stormglass` | `stormglass.png` | `atlas_lk_items2_1` |
+| Thornvine | `Thornvine` | `thornvine.png` | `atlas_lk_items2_1` |
+| Wood | `Wood` | `wood.png` | `atlas_lk_items2_1` |
 
 ## Tools
 
-| Item | Id | Art | Tint | Status |
-|---|---|---|---|---|
-| Adamantine Axe | `AdamantineAxe` | `lk_icon_hatchet` | #BE82D7 | stand-in |
-| Adamantine Pickaxe | `AdamantinePickaxe` | `lk_icon_pickaxe` | #BE82D7 | stand-in |
-| Cobalt Axe | `CobaltAxe` | `lk_icon_hatchet` | #82A0F0 | stand-in |
-| Cobalt Pickaxe | `CobaltPickaxe` | `lk_icon_pickaxe` | #82A0F0 | stand-in |
-| Copper Axe | `CopperAxe` | `lk_icon_hatchet` | #F0A06E | stand-in |
-| Copper Pickaxe | `CopperPickaxe` | `lk_icon_pickaxe` | #F0A06E | stand-in |
-| Iron Axe | `IronAxe` | `lk_icon_hatchet` | — | exact |
-| Iron Pickaxe | `IronPickaxe` | `lk_icon_pickaxe` | — | exact |
-| Mithril Axe | `MithrilAxe` | `lk_icon_hatchet` | #AAF0EB | stand-in |
-| Mithril Pickaxe | `MithrilPickaxe` | `lk_icon_pickaxe` | #AAF0EB | stand-in |
-| Silver Axe | `SilverAxe` | `lk_icon_hatchet` | #F0F5FF | stand-in |
-| Silver Pickaxe | `SilverPickaxe` | `lk_icon_pickaxe` | #F0F5FF | stand-in |
-| Stone Axe | `StoneAxe` | `lk_icon_stone_axe` | — | exact |
-| Stone Pickaxe | `StonePickaxe` | `lk_icon_pickaxe` | #D7D7DC | stand-in |
-| Wooden Axe | `WoodenAxe` | `lk_icon_hatchet` | #E6AF78 | stand-in |
-| Wooden Pickaxe | `WoodenPickaxe` | `lk_icon_pickaxe` | #E6AF78 | stand-in |
+| Item | Id | Source (`src/assets/Models/2D/`) | Atlas |
+|---|---|---|---|
+| Adamantine Axe | `AdamantineAxe` | `adamantine-axe.png` | `atlas_lk_items2_2` |
+| Adamantine Pickaxe | `AdamantinePickaxe` | `adamantine-pickaxe.png` | `atlas_lk_items2_2` |
+| Cobalt Axe | `CobaltAxe` | `cobalt-axe.png` | `atlas_lk_items2_2` |
+| Cobalt Pickaxe | `CobaltPickaxe` | `cobalt-pickaxe.png` | `atlas_lk_items2_2` |
+| Copper Axe | `CopperAxe` | `copper-axe.png` | `atlas_lk_items2_2` |
+| Copper Pickaxe | `CopperPickaxe` | `copper-pickaxe.png` | `atlas_lk_items2_2` |
+| Iron Axe | `IronAxe` | `iron-axe.png` | `atlas_lk_items2_2` |
+| Iron Pickaxe | `IronPickaxe` | `iron-pickaxe.png` | `atlas_lk_items2_2` |
+| Mithril Axe | `MithrilAxe` | `mithril-axe.png` | `atlas_lk_items2_2` |
+| Mithril Pickaxe | `MithrilPickaxe` | `mithril-pickaxe.png` | `atlas_lk_items2_2` |
+| Silver Axe | `SilverAxe` | `silver-axe.png` | `atlas_lk_items2_2` |
+| Silver Pickaxe | `SilverPickaxe` | `silver-pickaxe.png` | `atlas_lk_items2_2` |
+| Stone Axe | `StoneAxe` | `stone-axe.png` | `atlas_lk_items2_1` |
+| Stone Pickaxe | `StonePickaxe` | `stone-pickaxe.png` | `atlas_lk_items2_1` |
+| Wooden Axe | `WoodenAxe` | `wooden-axe.png` | `atlas_lk_items2_1` |
+| Wooden Pickaxe | `WoodenPickaxe` | `wooden-pickaxe.png` | `atlas_lk_items2_1` |
 
 ## Weapons
 
-| Item | Id | Art | Tint | Status |
-|---|---|---|---|---|
-| Adamantine Bow | `AdamantineBow` | — | — | none |
-| Adamantine Dagger | `AdamantineDagger` | — | — | none |
-| Adamantine Spear | `AdamantineSpear` | `lk_icon_spear` | #BE82D7 | stand-in |
-| Adamantine Sword | `AdamantineSword` | — | — | none |
-| Bone Dagger | `BoneDagger` | — | — | none |
-| Bone Spear | `BoneSpear` | `lk_icon_spear` | #FAF0D7 | stand-in |
-| Cobalt Bow | `CobaltBow` | — | — | none |
-| Cobalt Dagger | `CobaltDagger` | — | — | none |
-| Cobalt Spear | `CobaltSpear` | `lk_icon_spear` | #82A0F0 | stand-in |
-| Cobalt Sword | `CobaltSword` | — | — | none |
-| Copper Bow | `CopperBow` | — | — | none |
-| Copper Dagger | `CopperDagger` | — | — | none |
-| Copper Spear | `CopperSpear` | `lk_icon_spear` | #F0A06E | stand-in |
-| Copper Sword | `CopperSword` | — | — | none |
-| Flint Dagger | `FlintDagger` | — | — | none |
-| Flint Spear | `FlintSpear` | `lk_icon_spear` | #9696A5 | stand-in |
-| Guardian's Fang | `GuardianFang` | `lk_icon_tusk` | — | stand-in |
-| Iron Bow | `IronBow` | — | — | none |
-| Iron Dagger | `IronDagger` | — | — | none |
-| Iron Spear | `IronSpear` | `lk_icon_spear` | #C3C8D4 | stand-in |
-| Iron Sword | `IronSword` | — | — | none |
-| Jade Dagger | `JadeDagger` | — | — | none |
-| Jade Spear | `JadeSpear` | `lk_icon_spear` | #96E1AA | stand-in |
-| Mithril Bow | `MithrilBow` | — | — | none |
-| Mithril Dagger | `MithrilDagger` | — | — | none |
-| Mithril Spear | `MithrilSpear` | `lk_icon_spear` | #AAF0EB | stand-in |
-| Mithril Sword | `MithrilSword` | — | — | none |
-| Obsidian Dagger | `ObsidianDagger` | — | — | none |
-| Obsidian Spear | `ObsidianSpear` | `lk_icon_spear` | #73648C | stand-in |
-| Silver Bow | `SilverBow` | — | — | none |
-| Silver Dagger | `SilverDagger` | — | — | none |
-| Silver Spear | `SilverSpear` | `lk_icon_spear` | #F0F5FF | stand-in |
-| Silver Sword | `SilverSword` | — | — | none |
-| Stone Dagger | `StoneDagger` | — | — | none |
-| Stone Spear | `StoneSpear` | `lk_icon_spear` | — | exact |
-| Stone Sword | `StoneSword` | — | — | none |
-| Wooden Bow | `WoodenBow` | — | — | none |
-| Wooden Spear | `WoodenSpear` | `lk_icon_spear` | #E6AF78 | stand-in |
+| Item | Id | Source (`src/assets/Models/2D/`) | Atlas |
+|---|---|---|---|
+| Adamantine Bow | `AdamantineBow` | `adamantine-bow.png` | `atlas_lk_items2_2` |
+| Adamantine Dagger | `AdamantineDagger` | `adamantine-dagger.png` | `atlas_lk_items2_2` |
+| Adamantine Spear | `AdamantineSpear` | `adamantine-spear.png` | `atlas_lk_items2_2` |
+| Adamantine Sword | `AdamantineSword` | `adamantine-sword.png` | `atlas_lk_items2_2` |
+| Bone Dagger | `BoneDagger` | `bone-dagger.png` | `atlas_lk_items2_1` |
+| Bone Spear | `BoneSpear` | `bone-spear.png` | `atlas_lk_items2_2` |
+| Cobalt Bow | `CobaltBow` | `cobalt-bow.png` | `atlas_lk_items2_2` |
+| Cobalt Dagger | `CobaltDagger` | `cobalt-dagger.png` | `atlas_lk_items2_2` |
+| Cobalt Spear | `CobaltSpear` | `cobalt-spear.png` | `atlas_lk_items2_2` |
+| Cobalt Sword | `CobaltSword` | `cobalt-sword.png` | `atlas_lk_items2_2` |
+| Copper Bow | `CopperBow` | `copper-bow.png` | `atlas_lk_items2_2` |
+| Copper Dagger | `CopperDagger` | `copper-dagger.png` | `atlas_lk_items2_2` |
+| Copper Spear | `CopperSpear` | `copper-spear.png` | `atlas_lk_items2_2` |
+| Copper Sword | `CopperSword` | `copper-sword.png` | `atlas_lk_items2_2` |
+| Flint Dagger | `FlintDagger` | `flint-dagger.png` | `atlas_lk_items2_2` |
+| Flint Spear | `FlintSpear` | `flint-spear.png` | `atlas_lk_items2_2` |
+| Guardian's Fang | `GuardianFang` | `guardians-fang.png` | `atlas_lk_items2_1` |
+| Iron Bow | `IronBow` | `iron-bow.png` | `atlas_lk_items2_2` |
+| Iron Dagger | `IronDagger` | `iron-dagger.png` | `atlas_lk_items2_2` |
+| Iron Spear | `IronSpear` | `iron-spear.png` | `atlas_lk_items2_2` |
+| Iron Sword | `IronSword` | `iron-sword.png` | `atlas_lk_items2_2` |
+| Jade Dagger | `JadeDagger` | `jade-dagger.png` | `atlas_lk_items2_2` |
+| Jade Spear | `JadeSpear` | `jade-spear.png` | `atlas_lk_items2_2` |
+| Mithril Bow | `MithrilBow` | `mithril-bow.png` | `atlas_lk_items2_2` |
+| Mithril Dagger | `MithrilDagger` | `mithril-dagger.png` | `atlas_lk_items2_2` |
+| Mithril Spear | `MithrilSpear` | `mithril-spear.png` | `atlas_lk_items2_2` |
+| Mithril Sword | `MithrilSword` | `mithril-sword.png` | `atlas_lk_items2_2` |
+| Obsidian Dagger | `ObsidianDagger` | `obsidian-dagger.png` | `atlas_lk_items2_2` |
+| Obsidian Spear | `ObsidianSpear` | `obsidian-spear.png` | `atlas_lk_items2_2` |
+| Silver Bow | `SilverBow` | `silver-bow.png` | `atlas_lk_items2_2` |
+| Silver Dagger | `SilverDagger` | `silver-dagger.png` | `atlas_lk_items2_2` |
+| Silver Spear | `SilverSpear` | `silver-spear.png` | `atlas_lk_items2_2` |
+| Silver Sword | `SilverSword` | `silver-sword.png` | `atlas_lk_items2_2` |
+| Stone Dagger | `StoneDagger` | `stone-dagger.png` | `atlas_lk_items2_1` |
+| Stone Spear | `StoneSpear` | `stone-spear.png` | `atlas_lk_items2_1` |
+| Stone Sword | `StoneSword` | `stone-sword.png` | `atlas_lk_items2_1` |
+| Wooden Bow | `WoodenBow` | `wooden-bow.png` | `atlas_lk_items2_1` |
+| Wooden Spear | `WoodenSpear` | `wooden-spear.png` | `atlas_lk_items2_1` |
 
 ## Armour
 
-| Item | Id | Art | Tint | Status |
-|---|---|---|---|---|
-| Adamantine Chest | `AdamantineChest` | — | — | none |
-| Adamantine Head | `AdamantineHead` | — | — | none |
-| Adamantine Legs/Boots | `AdamantineLegs` | — | — | none |
-| Bone Chest | `BoneChest` | — | — | none |
-| Bone Head | `BoneHead` | — | — | none |
-| Bone Legs/Boots | `BoneLegs` | — | — | none |
-| Cobalt Chest | `CobaltChest` | — | — | none |
-| Cobalt Head | `CobaltHead` | — | — | none |
-| Cobalt Legs/Boots | `CobaltLegs` | — | — | none |
-| Copper Chest | `CopperChest` | — | — | none |
-| Copper Head | `CopperHead` | — | — | none |
-| Copper Legs/Boots | `CopperLegs` | — | — | none |
-| Hide Chest | `HideChest` | — | — | none |
-| Hide Head | `HideHead` | — | — | none |
-| Hide Legs/Boots | `HideLegs` | — | — | none |
-| Iron Chest | `IronChest` | — | — | none |
-| Iron Head | `IronHead` | — | — | none |
-| Iron Legs/Boots | `IronLegs` | — | — | none |
-| Mithril Chest | `MithrilChest` | — | — | none |
-| Mithril Head | `MithrilHead` | — | — | none |
-| Mithril Legs/Boots | `MithrilLegs` | — | — | none |
-| Silver Chest | `SilverChest` | — | — | none |
-| Silver Head | `SilverHead` | — | — | none |
-| Silver Legs/Boots | `SilverLegs` | — | — | none |
+| Item | Id | Source (`src/assets/Models/2D/`) | Atlas |
+|---|---|---|---|
+| Adamantine Chest | `AdamantineChest` | `adamantine-chest.png` | `atlas_lk_items2_2` |
+| Adamantine Head | `AdamantineHead` | `adamantine-head.png` | `atlas_lk_items2_2` |
+| Adamantine Legs/Boots | `AdamantineLegs` | `adamantine-legs-and-boots.png` | `atlas_lk_items2_2` |
+| Bone Chest | `BoneChest` | `bone-chest.png` | `atlas_lk_items2_1` |
+| Bone Head | `BoneHead` | `bone-head.png` | `atlas_lk_items2_2` |
+| Bone Legs/Boots | `BoneLegs` | `bone-legs-and-boots.png` | `atlas_lk_items2_2` |
+| Cobalt Chest | `CobaltChest` | `cobalt-chest.png` | `atlas_lk_items2_2` |
+| Cobalt Head | `CobaltHead` | `cobalt-head.png` | `atlas_lk_items2_2` |
+| Cobalt Legs/Boots | `CobaltLegs` | `cobalt-legs-and-boots.png` | `atlas_lk_items2_2` |
+| Copper Chest | `CopperChest` | `copper-chest.png` | `atlas_lk_items2_2` |
+| Copper Head | `CopperHead` | `copper-head.png` | `atlas_lk_items2_2` |
+| Copper Legs/Boots | `CopperLegs` | `copper-legs-and-boots.png` | `atlas_lk_items2_2` |
+| Hide Chest | `HideChest` | `hide-chest.png` | `atlas_lk_items2_1` |
+| Hide Head | `HideHead` | `hide-head.png` | `atlas_lk_items2_1` |
+| Hide Legs/Boots | `HideLegs` | `hide-legs-and-boots.png` | `atlas_lk_items2_1` |
+| Iron Chest | `IronChest` | `iron-chest.png` | `atlas_lk_items2_2` |
+| Iron Head | `IronHead` | `iron-head.png` | `atlas_lk_items2_2` |
+| Iron Legs/Boots | `IronLegs` | `iron-legs-and-boots.png` | `atlas_lk_items2_2` |
+| Mithril Chest | `MithrilChest` | `mithril-chest.png` | `atlas_lk_items2_2` |
+| Mithril Head | `MithrilHead` | `mithril-head.png` | `atlas_lk_items2_2` |
+| Mithril Legs/Boots | `MithrilLegs` | `mithril-legs-and-boots.png` | `atlas_lk_items2_2` |
+| Silver Chest | `SilverChest` | `silver-chest.png` | `atlas_lk_items2_2` |
+| Silver Head | `SilverHead` | `silver-head.png` | `atlas_lk_items2_2` |
+| Silver Legs/Boots | `SilverLegs` | `silver-legs-and-boots.png` | `atlas_lk_items2_2` |
 
 ## Ammunition
 
-| Item | Id | Art | Tint | Status |
-|---|---|---|---|---|
-| Flint Arrow | `FlintArrow` | `lk_icon_spear` | #9696A5 | stand-in |
+| Item | Id | Source (`src/assets/Models/2D/`) | Atlas |
+|---|---|---|---|
+| Flint Arrow | `FlintArrow` | `flint-arrow.png` | `atlas_lk_items2_1` |
 
 ## Medicine, food and draughts
 
-| Item | Id | Art | Tint | Status |
-|---|---|---|---|---|
-| Advanced Medicine | `AdvancedMedicine` | `lk_icon_heart` | — | stand-in |
-| Basic Medicine | `BasicMedicine` | `lk_icon_heart` | #FFC8C8 | stand-in |
-| Cooked Meat | `CookedMeat` | `lk_icon_drumstick` | — | exact |
-| Glimmer Draught | `GlimmerDraught` | `lk_icon_star` | #AAE6FF | stand-in |
-| Glimmerberry | `Glimmerberry` | `lk_icon_berries` | #96E6FF | stand-in |
-| Greater Healing Potion | `GreaterPotion` | `lk_icon_heart` | #BE6EC8 | stand-in |
-| Healing Potion | `Potion` | `lk_icon_heart` | #E696C8 | stand-in |
-| Hearty Tonic | `HeartyTonic` | `lk_icon_heart` | #FFB46E | stand-in |
-| Redberry | `Redberry` | `lk_icon_berries` | — | exact |
-| Strong Glimmer Draught | `StrongGlimmerDraught` | `lk_icon_star` | #82BEFF | stand-in |
-| Strong Sunberry Draught | `StrongSunberryDraught` | `lk_icon_lightning` | #FFBE5A | stand-in |
-| Sunberry | `Sunberry` | `lk_icon_berries` | #FFD76E | stand-in |
-| Sunberry Draught | `SunberryDraught` | `lk_icon_lightning` | — | stand-in |
-| Sweetberry | `Sweetberry` | `lk_icon_berries` | #FFB4DC | stand-in |
+| Item | Id | Source (`src/assets/Models/2D/`) | Atlas |
+|---|---|---|---|
+| Advanced Medicine | `AdvancedMedicine` | `advanced-medicine.png` | `atlas_lk_items2_1` |
+| Basic Medicine | `BasicMedicine` | `basic-medicine.png` | `atlas_lk_items2_1` |
+| Cooked Meat | `CookedMeat` | `cooked-meat.png` | `atlas_lk_items2_1` |
+| Glimmer Draught | `GlimmerDraught` | `glimmer-draught.png` | `atlas_lk_items2_1` |
+| Glimmerberry | `Glimmerberry` | `glimmerberry.png` | `atlas_lk_items2_1` |
+| Greater Healing Potion | `GreaterPotion` | `greater-healing-potion.png` | `atlas_lk_items2_1` |
+| Healing Potion | `Potion` | `healing-potion.png` | `atlas_lk_items2_1` |
+| Hearty Tonic | `HeartyTonic` | `hearty-tonic.png` | `atlas_lk_items2_1` |
+| Redberry | `Redberry` | `redberry.png` | `atlas_lk_items2_1` |
+| Strong Glimmer Draught | `StrongGlimmerDraught` | `strong-glimmer-draught.png` | `atlas_lk_items2_1` |
+| Strong Sunberry Draught | `StrongSunberryDraught` | `strong-sunberry-draught.png` | `atlas_lk_items2_1` |
+| Sunberry | `Sunberry` | `sunberry.png` | `atlas_lk_items2_1` |
+| Sunberry Draught | `SunberryDraught` | `sunberry-draught.png` | `atlas_lk_items2_1` |
+| Sweetberry | `Sweetberry` | `sweetberry.png` | `atlas_lk_items2_1` |
 
 ## Siege items
 
-| Item | Id | Art | Tint | Status |
-|---|---|---|---|---|
-| Breaching Charge | `BreachingCharge` | `lk_icon_warning` | — | stand-in |
-| Fire Bomb | `FireBomb` | `lk_icon_torch` | — | stand-in |
+| Item | Id | Source (`src/assets/Models/2D/`) | Atlas |
+|---|---|---|---|
+| Breaching Charge | `BreachingCharge` | `breaching-charge.png` | `atlas_lk_items2_1` |
+| Fire Bomb | `FireBomb` | `fire-bomb.png` | `atlas_lk_items2_1` |
 
 ## Placeables
 
-| Item | Id | Art | Tint | Status |
-|---|---|---|---|---|
-| Portable Extraction Rune | `ExtractionRune` | `lk_icon_runestone` | — | stand-in |
-| Workbench | `Workbench` | `lk_icon_build` | — | stand-in |
-
-## Notes
-
-- Armour: the kit has no helmet, chestpiece or boots art, and the hide icon read
-  as hide rather than armour, so every piece is "none" (the backpack kind
-  glyph); the Equipped tab labels the slots Head, Chest and Legs. Each needs its
-  own icon.
-- Swords and daggers are "none" (the hammer kind glyph): the tusk read as a tusk,
-  not a blade. Guardian's Fang keeps the untinted tusk (it is a fang). Spears
-  use the spear icon; the stone spear is exact.
-- Bows have no art: nothing in the kit reads as a bow.
-- Ores are the rocks icon tinted per metal (Adamantine Ore uses the magma ore);
-  bars are the plank tinted per metal (no ingot art).
-- Medicine and potions use the heart; draughts use the lightning (XP) or star
-  (Luck) icon, the same glyphs as the boost stat rows.
-
+| Item | Id | Source (`src/assets/Models/2D/`) | Atlas |
+|---|---|---|---|
+| Portable Extraction Rune | `ExtractionRune` | `portable-extraction-rune.png` | `atlas_lk_items2_1` |
+| Workbench | `Workbench` | `workbench.png` | `atlas_lk_items2_1` |

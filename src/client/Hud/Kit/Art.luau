@@ -603,49 +603,55 @@ end
 -- Glyphs drawn white (for leather); on paper they are tinted ink.
 Art.WHITE_GLYPHS = { lk_glyph_play = true, lk_glyph_check_white = true, lk_icon_backpack_white = true }
 
--- An icon by id (lk_icon_<id> / lk_glyph_<id> / "ink:<id>" / "white:<id>")
--- at rect, fitted. opts: tint (colour token), color (a Color3 tint, item
--- recolours), glyph (prefer the flat glyph), transparency, standInScale (the
--- ink glyph's size as a share of the rect, 0.8), z, name, maxScale (draw the
--- art at no more than this many design px per pixel of the art that draws at
--- that size, centred in the rect: Art.Capped). Before upload, or while its
--- uploaded image is not served, it is its glyph in ink.
--- The stand-in for an item's own icon (lk_item_<id>): its kind's glyph, never a
--- letter of the sprite's name.
+-- The stand-in for an item's own icon (lk_item_<id>) while its atlas has not
+-- loaded (or has no id): the item's kind glyph (Art.KindGlyph), in inkSoft at
+-- the no-art fade (Art.STAND_IN_FADE), never a letter of the sprite's name.
 local ITEM_KIND_GLYPH = { hammer = "⚒", backpack = "▤", chest = "◇" }
+Art.ITEM_KIND_GLYPH = ITEM_KIND_GLYPH
 
 local function glyphLabel(parent: Instance, sprite: string?, id: string, rect, opts, z: number): TextLabel
 	local itemId = sprite and string.match(sprite, "^lk_item_(.+)$")
+	local text
 	if itemId then
-		sprite = nil
-		id = string.gsub(Art.KindGlyph(itemId), "^ink:", "")
+		local kind = string.gsub(Art.KindGlyph(itemId), "^ink:", "")
+		text = ITEM_KIND_GLYPH[kind]
+	else
+		local short = if sprite then string.gsub(string.gsub(sprite, "^lk_icon_", ""), "^lk_glyph_", "") else id
+		short = string.gsub(short, "^%a+_", function(prefix)
+			return if prefix == "ink_" or prefix == "white_" then "" else prefix
+		end)
+		short = string.gsub(short, "_white$", "")
+		text = Art.GLYPHS[short] or string.upper(string.sub(short, 1, 1))
 	end
-	local short = if sprite then string.gsub(string.gsub(sprite, "^lk_icon_", ""), "^lk_glyph_", "") else id
-	short = string.gsub(short, "^%a+_", function(prefix)
-		return if prefix == "ink_" or prefix == "white_" then "" else prefix
-	end)
-	short = string.gsub(short, "_white$", "")
 	local glyph = Core.Make("TextLabel", {
 		Name = opts.name or "Icon",
 		BackgroundTransparency = 1,
 		Position = UDim2.fromOffset(rect[1], rect[2]),
 		Size = UDim2.fromOffset(rect[3], rect[4]),
-		Text = (if itemId then ITEM_KIND_GLYPH[short] else nil) or Art.GLYPHS[short] or string.upper(
-			string.sub(short, 1, 1)
-		),
-		TextColor3 = Tokens.Color(opts.tint or "ink"),
+		Text = text,
+		TextColor3 = Tokens.Color(opts.tint or (if itemId then "inkSoft" else "ink")),
 		TextScaled = true,
 		ZIndex = z,
 	}, parent)
 	glyph.FontFace = Tokens.Font("symbol")
 	Widgets.TextCap(glyph, math.max(10, math.floor(math.min(rect[3], rect[4]) * (opts.standInScale or 0.8))))
-	if opts.transparency then
+	local fade = opts.transparency or (if itemId then Art.STAND_IN_FADE else nil)
+	if fade then
 		-- The same resting fade as the art it stands in for (Core.Dim keeps it).
-		Core.SetRestFade(glyph, opts.transparency)
+		Core.SetRestFade(glyph, fade)
 	end
 	return glyph
 end
 
+-- An icon by id (lk_icon_<id> / lk_glyph_<id> / "ink:<id>" / "white:<id>", or
+-- a full sprite name such as an item's lk_item_<id>) at rect, fitted. opts:
+-- tint (colour token), color (a Color3 tint), glyph (prefer the flat glyph),
+-- transparency, standInScale (the ink glyph's size as a share of the rect,
+-- 0.8), z, name, maxScale (draw the art at no more than this many design px
+-- per pixel of the art that draws at that size, centred in the rect:
+-- Art.Capped). Before upload, or while its uploaded image is not served, it is
+-- its glyph in ink (an item: its kind glyph), which the art replaces by itself
+-- the moment its image loads (SpriteLoader.OnState).
 function Art.Icon(parent: Instance, id: string, rect, opts): GuiObject
 	opts = opts or {}
 	local sprite = Art.IconSprite(id, opts.glyph)
@@ -705,42 +711,19 @@ function Art.Icon(parent: Instance, id: string, rect, opts): GuiObject
 	return glyphLabel(parent, sprite, id, rect, opts, z)
 end
 
--- The sprite (and optional Color3 tint) a catalog item draws: its own icon
--- (ItemInfo.ItemSprite, lk_item_<id>) once that icon's atlas is uploaded (or
--- previewed in a capture), else the kit art ItemInfo.Icon / ItemInfo.Sprite
--- give it, so an item keeps its older art until its new atlas has an id; nil
--- when the kit can draw neither.
-function Art.ItemIcon(catalogId: string?): (string?, Color3?)
-	if catalogId == nil then
-		return nil, nil
-	end
-	local okOwn, own = pcall(ItemInfo.ItemSprite, catalogId)
-	if okOwn and type(own) == "string" and Widgets.HasBaseArt(own) then
-		return own, nil
-	end
-	local ok, icon, tint = pcall(ItemInfo.Icon, catalogId)
-	if not ok or type(icon) ~= "string" then
-		return nil, nil
-	end
-	local sprite = ItemInfo.Sprite(icon)
-	if UiAssets.sprite(sprite) == nil and not Widgets.HasArt(sprite) then
-		return nil, nil
-	end
-	return sprite, if typeof(tint) == "Color3" then tint else nil
-end
-
--- The sprite of a catalog item: lk_item_<id>, then item_<id>; nil when neither
--- has art or a manifest entry (ItemIcon then writes the item's name in ink).
-function Art.ItemSprite(catalogId: string?): string?
-	if catalogId == nil then
+-- The sprite a catalog item draws: its own icon, lk_item_<id>
+-- (ItemInfo.ItemSprite), whether or not its atlas has loaded on this client yet
+-- (Art.Icon shows the item's kind glyph until it has, then swaps to the icon by
+-- itself); nil for an unknown item or an icon missing from the sprite table.
+function Art.ItemIcon(catalogId: string?): string?
+	if type(catalogId) ~= "string" then
 		return nil
 	end
-	for _, name in { "lk_item_" .. catalogId, "item_" .. catalogId } do
-		if Widgets.HasBaseArt(name) then
-			return name
-		end
+	local sprite = ItemInfo.ItemSprite(catalogId)
+	if sprite == nil or UiAssets.sprite(sprite) == nil then
+		return nil
 	end
-	return nil
+	return sprite
 end
 
 -- How faded an item's kind glyph draws when the item has no art: it reads as

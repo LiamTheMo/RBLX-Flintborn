@@ -705,7 +705,7 @@ local function build()
 	ui.markBad.Visible = false
 end
 
--- Opens or closes this panel (keys, and the on-screen navigation bar).
+-- Opens or closes this panel (keys, and the HUD's menu tiles).
 function BuildController.Toggle()
 	local inRun = player:GetAttribute("SessionState") == "ActiveRun"
 	setActive(inRun and not state.active)
