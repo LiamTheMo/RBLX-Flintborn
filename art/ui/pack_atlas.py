@@ -33,6 +33,22 @@ SIDE = 1024
 # Space between sprites; their edges are already bled into transparent pixels,
 # so filtering at a rectangle's border never reaches a neighbour.
 GAP = 4
+# Every catalog item's own icon (art/ui/items/build_item_icons.py) and the
+# atlas group it is packed into.
+ITEM_ICONS = HERE / "items" / "ICONS.json"
+
+
+def item_groups():
+    """{atlas group: [lk_item_<id>, ...]} from art/ui/items/ICONS.json, names
+    sorted: the slot icons of the item art. Their hero copies (`__hi`) are
+    images of their own, not packed."""
+    if not ITEM_ICONS.is_file():
+        return {}
+    out = {}
+    for item_id, entry in sorted(json.loads(ITEM_ICONS.read_text(encoding="utf-8"))["items"].items()):
+        out.setdefault(entry["atlas"], []).append("lk_item_" + item_id)
+    return out
+
 
 GROUPS = {
     # What the lobby shows on joining (the popups' panel opens later).
@@ -215,6 +231,10 @@ GROUPS = {
     # 1024 px, each an atlas of its own: the world map draws it up to 2600 design
     # px wide, so the 1,000 px painting was magnified.
     **{f"atlas_island_hi_{row}_{col}": [f"pm_map_island__hi__{row}_{col}"] for row in (1, 2) for col in (1, 2)},
+    # Every catalog item's own icon (art/ui/items/ICONS.json `atlas`), 110 px,
+    # 81 an atlas: new atlases, so atlas_lk_items keeps its bytes and rects; until
+    # they are uploaded, items draw their old kit art (Kit/Art.ItemIcon).
+    **item_groups(),
 }
 
 

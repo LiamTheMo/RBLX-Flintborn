@@ -135,6 +135,37 @@ test("every item resolves to kit art", function()
 	expectEq(ItemInfo.Icon("GuardianFang"), "tusk", "the fang keeps the tusk (it is one)")
 end)
 
+test("every catalog item has its own icon and hero copy", function()
+	local Sprites = require(Shared.UI.UiSprites)
+	local Ids = require(Shared.UI.UiAssetIds)
+	local count = 0
+	for id in ItemCatalog.Items do
+		count += 1
+		local name = ItemInfo.ItemSprite(id)
+		expectEq(name, "lk_item_" .. id, id .. " has an icon mapping")
+		local entry = name and Sprites[name]
+		expect(entry ~= nil, id .. ": its icon is in UiSprites")
+		if entry then
+			expect(entry.w == entry.h, id .. ": a square icon")
+			expect(
+				type(entry.atlas) == "string" and string.find(entry.atlas, "^atlas_lk_items2_") ~= nil,
+				id .. ": packed into an atlas_lk_items2 atlas"
+			)
+			expect(Ids[entry.atlas] ~= nil, id .. ": its atlas has an id or a placeholder")
+			local hero = Sprites[entry.hi]
+			expectEq(entry.hi, name .. "__hi", id .. ": its hero copy is next in the chain")
+			expect(hero ~= nil and hero.of == name, id .. ": the hero copy is in UiSprites, of the icon")
+			if hero then
+				expectEq(hero.atlas, nil, id .. ": the hero copy is an image of its own")
+				expectNear(hero.scale, hero.w / entry.w, 1e-3, id .. ": its scale is its size over the icon's")
+				expect(Ids[entry.hi] ~= nil, id .. ": the hero image has an id or a placeholder")
+			end
+		end
+	end
+	expect(count > 100, "the catalog is all there")
+	expectEq(ItemInfo.ItemSprite("Nope"), nil, "unknown items have none")
+end)
+
 test("stat chips describe the item", function()
 	local spear = ItemInfo.Stats({ catalogId = "StoneSpear" })
 	expectEq(spear[1].text, "25 dmg", "stone spear deals 25")

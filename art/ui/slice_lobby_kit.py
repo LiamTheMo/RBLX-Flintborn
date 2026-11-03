@@ -51,6 +51,7 @@ DOCS = HERE / "kit"
 MANIFEST = OUT / "manifest.json"
 PREFIX = "lk_"
 GLYPH_PREFIXES = ("lk_glyph_ink_", "lk_glyph_white_")
+ITEM_PREFIXES = ("lk_item_",)
 PAD = 8          # source pixels read around each box
 EDGE_PAD = 2     # transparent pixels kept around each sprite
 MAX_SIDE = 1024
@@ -1414,8 +1415,9 @@ def main():
     # Manifest: every non-lk entry is kept as it is (same order, same values).
     manifest = json.loads(MANIFEST.read_text(encoding="utf-8")) if MANIFEST.is_file() else {}
     # The flat ink and white glyphs are built from these sprites by
-    # art/ui/capture/glyphs.py, which owns their files and entries.
-    owned = lambda n: n.startswith(PREFIX) and not n.startswith(GLYPH_PREFIXES)  # noqa: E731
+    # art/ui/capture/glyphs.py, and the item icons (lk_item_*) by
+    # art/ui/items/build_item_icons.py; each owns its files and entries.
+    owned = lambda n: n.startswith(PREFIX) and not n.startswith(GLYPH_PREFIXES + ITEM_PREFIXES)  # noqa: E731
     for old in OUT.glob(f"{PREFIX}*.png"):
         if old.stem not in info and old.stem not in hires and owned(old.stem):
             old.unlink()

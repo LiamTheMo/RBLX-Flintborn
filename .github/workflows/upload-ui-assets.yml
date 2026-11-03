@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
     inputs:
       only:
-        description: "Comma-separated sprite names (empty = every sprite not yet in UiAssetIds.json)"
+        description: "Comma-separated sprite names or patterns, e.g. atlas_lk_items2_*,lk_item_*__hi (empty = every sprite not yet in UiAssetIds.json)"
         required: false
         default: ""
       upload:

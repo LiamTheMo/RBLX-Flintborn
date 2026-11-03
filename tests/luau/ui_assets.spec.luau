@@ -44,6 +44,10 @@ local SPRITES = {
 		hi = "tusk__hi2",
 	},
 	tusk__hi2 = { w = 285, h = 356, scale = 3.56, of = "tusk", atlas = "atlas_items_hi", rect = { 0, 0, 285, 356 } },
+	-- An item icon (art/ui/items/build_item_icons.py): a 110 px slot icon in an
+	-- atlas, its hero copy an image of its own (no atlas).
+	lk_item_Wood = { w = 110, h = 110, atlas = "atlas_items2", rect = { 0, 0, 110, 110 }, hi = "lk_item_Wood__hi" },
+	lk_item_Wood__hi = { w = 356, h = 356, scale = 3.2364, of = "lk_item_Wood" },
 }
 
 local function ids(list)
@@ -131,7 +135,7 @@ end)
 test("hero copies draw in both hero boxes and never in a slot", function()
 	-- slice_lobby_kit.py sizes an item's hero copy to 356 px on its long side
 	-- (the 254 px Forge box at 1.4); item art is 72 to 196 px, about square.
-	for _, size in { { 72, 73 }, { 85, 76 }, { 86, 116 }, { 116, 103 }, { 135, 124 }, { 156, 196 } } do
+	for _, size in { { 72, 73 }, { 85, 76 }, { 86, 116 }, { 110, 110 }, { 116, 103 }, { 135, 124 }, { 156, 196 } } do
 		local w, h = size[1], size[2]
 		local from = UiAssets.HiFrom(356 / math.max(w, h))
 		local forge = math.min(254 / w, 254 / h)
@@ -141,4 +145,19 @@ test("hero copies draw in both hero boxes and never in a slot", function()
 		-- The biggest slot, the Inventory grid's 91 x 99, draws its item 67 px.
 		expect(math.min(67 / w, 67 / h) <= from, ("%dx%d: a slot keeps the 1x art"):format(w, h))
 	end
+end)
+
+test("a hero copy with an image of its own draws from that image", function()
+	local all = ids({ atlas_items2 = "a", lk_item_Wood__hi = "h" })
+	expectEq(UiAssets.Placement("lk_item_Wood", 67 / 110, SPRITES, all).image, "a", "a slot: the 1x atlas")
+	local hero = UiAssets.Placement("lk_item_Wood", 254 / 110, SPRITES, all)
+	expectEq(hero and hero.name, "lk_item_Wood__hi", "the Forge picture: the hero copy")
+	expectEq(hero and hero.image, "h", "from its own image")
+	expectEq(hero and hero.rect, nil, "the whole image, no atlas rect")
+	expectEq(UiAssets.Placement("lk_item_Wood", 152 / 110, SPRITES, all).name, "lk_item_Wood__hi", "the detail card")
+	local noHero = ids({ atlas_items2 = "a" })
+	expectEq(UiAssets.Placement("lk_item_Wood", 254 / 110, SPRITES, noHero).image, "a", "hero not uploaded: 1x")
+	local onlyHero = ids({ lk_item_Wood__hi = "h" })
+	expectEq(UiAssets.Placement("lk_item_Wood", 0, SPRITES, onlyHero), nil, "no 1x art at magnification 0")
+	expectEq(UiAssets.Placement("lk_item_Wood", 67 / 110, SPRITES, onlyHero), nil, "nor in a slot")
 end)

@@ -23,8 +23,15 @@ art, UiAssets.Placement) and this script uploads it like any new name.
   python scripts/roblox_upload_ui_assets.py --dry-run --atlases   # atlases only
   python scripts/roblox_upload_ui_assets.py --sprites     # refresh UiSprites.json
   python scripts/roblox_upload_ui_assets.py --upload --only frame_slot,icon_heart
+  python scripts/roblox_upload_ui_assets.py --dry-run --only 'atlas_lk_items2_*,lk_item_*__hi'
+
+--only takes names or shell-style patterns (* and ?). A long run (the item
+icons: two atlases and 144 hero images) is safe: every upload is recorded as it
+lands, throttling (HTTP 429) waits as long as Roblox asks, and a run that still
+stops can be re-run with the same arguments; it continues where it stopped.
 """
 import argparse
+import fnmatch
 import gzip
 import json
 import os
@@ -51,6 +58,11 @@ DELIVERY_URL = "https://apis.roblox.com/asset-delivery-api/v1/assetId/"
 MAX_BYTES = 20 * 1024 * 1024
 POLL_SECONDS = 2
 POLL_LIMIT_SECONDS = 120
+# Retries of a throttled (429) or failing (5xx) request: exponential backoff
+# from RETRY_BASE seconds, or the server's Retry-After, at most RETRY_MAX.
+RETRIES = 8
+RETRY_BASE = 3
+RETRY_MAX = 120
 
 
 def sprite_files():
@@ -77,7 +89,7 @@ def pending(files, ids, only, atlases=False):
     chosen = []
     for file in files:
         name = file.stem
-        if only and name not in only:
+        if only and not any(fnmatch.fnmatchcase(name, pattern) for pattern in only):
             continue
         if atlases and not name.startswith("atlas_"):
             continue
@@ -137,13 +149,19 @@ class Cloud:
         self.creator = creator
 
     def _send(self, request):
-        for attempt in range(5):
+        for attempt in range(RETRIES):
             try:
                 with urllib.request.urlopen(request, timeout=60) as response:
                     return json.loads(response.read().decode("utf-8"))
             except urllib.error.HTTPError as exc:
-                if exc.code in (429, 500, 502, 503, 504) and attempt < 4:
-                    time.sleep(3 * (2 ** attempt))
+                if exc.code in (429, 500, 502, 503, 504) and attempt < RETRIES - 1:
+                    wait = RETRY_BASE * (2 ** attempt)
+                    after = (exc.headers.get("Retry-After") or "").strip() if exc.headers else ""
+                    if after.replace(".", "", 1).isdigit():
+                        wait = max(wait, float(after))
+                    wait = min(wait, RETRY_MAX)
+                    print(f"  HTTP {exc.code}; retrying in {wait:.0f} s", flush=True)
+                    time.sleep(wait)
                     continue
                 body = exc.read(800).decode("utf-8", errors="replace")
                 raise RuntimeError(f"Roblox API HTTP {exc.code}: {body}") from None
@@ -225,7 +243,7 @@ def main(argv=None):
     mode = parser.add_mutually_exclusive_group()
     mode.add_argument("--dry-run", action="store_true", help="list what would upload (default)")
     mode.add_argument("--upload", action="store_true", help="upload for real and write UiAssetIds.json")
-    parser.add_argument("--only", default="", help="comma-separated sprite names to consider")
+    parser.add_argument("--only", default="", help="comma-separated sprite names or patterns (* ?) to consider")
     parser.add_argument("--atlases", action="store_true", help="consider only atlas images (atlas_*)")
     parser.add_argument("--sprites", action="store_true", help="regenerate UiSprites.json from the manifest")
     parser.add_argument("--inspect", default="", help="print Open Cloud details for an asset id and exit")
@@ -251,7 +269,8 @@ def main(argv=None):
         key = os.environ.get("ROBLOX_API_KEY", "").strip()
         if not key:
             raise ValueError("ROBLOX_API_KEY is required for --resolve")
-        resolved, failed = resolve_decals(Cloud(key, None))
+        only = {name.strip() for name in args.only.split(",") if name.strip()}
+        resolved, failed = resolve_decals(Cloud(key, None), only)
         print(f"Resolved {resolved}; {failed} still need an image id")
         return 0 if failed == 0 else 1
 
@@ -287,14 +306,17 @@ def main(argv=None):
         # Saved after every upload so an interrupted run never repeats one.
         write_json(DECALS_FILE, decals)
         print(f"[{index}/{len(todo)}] {file.stem} -> decal {decal_id}")
-    resolved, failed = resolve_decals(cloud)
+    # Only what this run uploaded: a decal whose id was blanked on purpose (the
+    # high-resolution sheets, docs/ui/STYLE_GUIDE.md §9.4) stays off.
+    resolved, failed = resolve_decals(cloud, {file.stem for file in todo})
     print(f"Uploaded {len(todo)}; resolved {resolved} image ids, {failed} still need one "
           f"(run --resolve once the key can use Asset Delivery)")
     return 0
 
 
-def resolve_decals(cloud):
-    """Fill UiAssetIds.json with the image id behind each uploaded decal.
+def resolve_decals(cloud, only=None):
+    """Fill UiAssetIds.json with the image id behind each uploaded decal (only
+    the names or patterns in `only`, when given).
 
     Only real image ids go into UiAssetIds.json: a decal id there would show a
     blank ImageLabel, while a missing id keeps UiAssets' styled-frame fallback.
@@ -304,6 +326,8 @@ def resolve_decals(cloud):
     resolved = failed = 0
     for name, decal_id in sorted(decals.items()):
         if ids.get(name):
+            continue
+        if only and not any(fnmatch.fnmatchcase(name, pattern) for pattern in only):
             continue
         image_id, how = cloud.image_id(decal_id)
         if how in ("resolved from decal", "already an image"):

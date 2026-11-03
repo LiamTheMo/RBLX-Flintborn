@@ -233,8 +233,8 @@ function ItemInfo.StatRows(item): { StatRow }
 	return rows
 end
 
--- Item art (docs/ui/ITEM_ART.md). Until an item has art of its own (lk_item_<id>
--- / item_<id>), ItemInfo.Icon names the kit art that shows it: the exact icon
+-- Item art (docs/ui/ITEM_ART.md). Until an item's own art (lk_item_<id>,
+-- ItemInfo.ItemSprite) is uploaded, ItemInfo.Icon names the kit art that shows it: the exact icon
 -- where the kit has one, otherwise the closest kit art, often tinted (an
 -- ImageColor3 multiply, so tints only darken or shift a hue). Names are kit icon
 -- ids (lk_icon_<id>) or full lk_ sprite names for other kit art. Only art
@@ -280,6 +280,22 @@ ItemInfo.ART_SPRITES = {
 -- The sprite an icon name draws (lk_icon_<id> for an icon id).
 function ItemInfo.Sprite(name: string): string
 	return if string.sub(name, 1, 3) == "lk_" then name else "lk_icon_" .. name
+end
+
+-- Every catalog item's own icon (art/ui/items/ICONS.json, built by
+-- art/ui/items/build_item_icons.py from the owner's item art): lk_item_<id>, a
+-- 110 px slot icon packed into the atlas_lk_items2_* atlases, whose `hi` copy
+-- lk_item_<id>__hi (356 px, an image of its own) draws only in the hero boxes.
+-- Kit.ItemIcon draws it once its atlas is uploaded and, until then, the kit
+-- art below (Icon), so a deploy before the upload never loses an item's art.
+ItemInfo.ITEM_SPRITE_PREFIX = "lk_item_"
+
+-- The item's own icon sprite, or nil for an unknown item.
+function ItemInfo.ItemSprite(catalogId: string?): string?
+	if ItemCatalog.Get(catalogId) == nil then
+		return nil
+	end
+	return ItemInfo.ITEM_SPRITE_PREFIX .. (catalogId :: string)
 end
 
 local function rgb(r: number, g: number, b: number): Color3

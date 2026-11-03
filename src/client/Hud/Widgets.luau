@@ -19,11 +19,13 @@ local SpriteLoader = require(script.Parent.SpriteLoader)
 
 local Widgets = {}
 
--- The atlases that hold high-resolution copies (entries named `…__hi…`). A copy
--- is drawn only once its atlas has actually loaded on this client: until then
--- (and for good if it never loads) the sprite draws its 1x art, which every
--- screen already fetches, so a slow or refused new upload can never leave a
--- screen on stand-ins. The first time a copy is wanted its atlas is fetched in
+-- The images that hold high-resolution copies (entries named `…__hi…`): their
+-- atlases, or the copy itself when it is an image of its own (an item's hero
+-- copy, lk_item_<id>__hi). A copy is drawn only once that image has actually
+-- loaded on this client: until then (and for good if it never loads) the
+-- sprite draws its 1x art, which every screen already fetches, so a slow or
+-- refused new upload can never leave a screen on stand-ins. The first time a
+-- copy is wanted its image is fetched in
 -- the background (after every image a label is waiting on); screens built after
 -- it arrives draw the copy.
 local HI_ATLASES: { [string]: boolean } = {}
@@ -205,6 +207,14 @@ end
 -- stand-ins in the kit's style.
 function Widgets.HasArt(name: string): boolean
 	return placement(name) ~= nil
+end
+
+-- True when sprite `name`'s own (1x) art is uploaded: its atlas or its own
+-- image, copies aside. Art that has only a high-resolution copy uploaded would
+-- draw nothing in a slot, so a caller choosing between two sprites (an item's
+-- new icon or its older kit art) asks this.
+function Widgets.HasBaseArt(name: string): boolean
+	return placement(name, 0) ~= nil
 end
 
 -- Image properties a nine-piece sprite's holder passes on to its pieces.
