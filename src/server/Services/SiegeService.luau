@@ -18,6 +18,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
 
 local BuildRules = require(ReplicatedStorage.Shared.Building.BuildRules)
+local Characters = require(ReplicatedStorage.Shared.World.Characters)
 local InventoryRules = require(ReplicatedStorage.Shared.Inventory.InventoryRules)
 local MovementRules = require(ReplicatedStorage.Shared.Security.MovementRules)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
@@ -65,16 +66,6 @@ local function siegeFolder(): Folder
 		folder.Parent = workspace
 	end
 	return folder
-end
-
-local function characters()
-	local list = {}
-	for _, other in Players:GetPlayers() do
-		if other.Character then
-			table.insert(list, other.Character)
-		end
-	end
-	return list
 end
 
 local function validDirection(direction: any): Vector3?
@@ -151,7 +142,7 @@ local function burst(player: Player, result: RaycastResult, validated: Vector3?)
 	if player.Parent == nil or not SiegeRules.WithinRange(validated, center) or SafeZoneService.Contains(center) then
 		return
 	end
-	local ignore = characters()
+	local ignore = Characters.All()
 	local structures = workspace:FindFirstChild(BuildingService.FOLDER_NAME)
 	if structures then
 		local params = OverlapParams.new()
@@ -350,7 +341,7 @@ local function placeCharge(player: Player, aim: Vector3): (boolean, string?)
 	end
 	-- What the player looks at: the first solid thing along the aim, from the head
 	-- (so nothing can be set through a wall).
-	local ignore = characters()
+	local ignore = Characters.All()
 	table.insert(ignore, siegeFolder())
 	local params = RaycastParams.new()
 	params.FilterType = Enum.RaycastFilterType.Exclude

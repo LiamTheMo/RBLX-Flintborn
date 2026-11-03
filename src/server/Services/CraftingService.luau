@@ -26,6 +26,7 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local BuildRules = require(ReplicatedStorage.Shared.Building.BuildRules)
+local Characters = require(ReplicatedStorage.Shared.World.Characters)
 local CraftingRules = require(ReplicatedStorage.Shared.Crafting.CraftingRules)
 local InventoryRules = require(ReplicatedStorage.Shared.Inventory.InventoryRules)
 local ItemCatalog = require(ReplicatedStorage.Shared.Items.ItemCatalog)
@@ -75,14 +76,9 @@ local function now(): number
 	return workspace:GetServerTimeNow()
 end
 
-local function rootOf(player: Player)
-	local character = player.Character
-	return character and character:FindFirstChild("HumanoidRootPart")
-end
-
 -- The closest standing tagged station part in range, or nil.
 local function nearestStation(player: Player, tag: string)
-	local root = rootOf(player)
+	local root = Characters.RootOf(player)
 	if root == nil then
 		return nil
 	end
@@ -194,7 +190,7 @@ local function grantBonusBar(player: Player, inventory, job, carried: boolean)
 		InventoryService.Publish(player)
 		return
 	end
-	local root = rootOf(player)
+	local root = Characters.RootOf(player)
 	if root then
 		DropService.Spawn(bonus, root.Position - Vector3.new(0, 2.5, 0))
 	end
@@ -232,7 +228,7 @@ end
 local function interruption(player: Player, job): string?
 	local character = player.Character
 	local humanoid = character and character:FindFirstChildOfClass("Humanoid")
-	local root = rootOf(player)
+	local root = Characters.RootOf(player)
 	local station = job.station
 	return CraftingRules.Interruption({
 		atRisk = player.Parent ~= nil and WorldAdmissionService.IsAtRisk(player),
@@ -369,7 +365,7 @@ local function place(player: Player, hotbarIndex: any)
 	if def == nil or def.placeable ~= "Workbench" then
 		return false, "NotPlaceable"
 	end
-	local root = rootOf(player)
+	local root = Characters.RootOf(player)
 	if root == nil then
 		return false, "NoCharacter"
 	end

@@ -21,6 +21,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 
 local AggroRules = require(ReplicatedStorage.Shared.Enemies.AggroRules)
+local Characters = require(ReplicatedStorage.Shared.World.Characters)
 local CreatureModels = require(ReplicatedStorage.Shared.Visuals.CreatureModels)
 local DamageRules = require(ReplicatedStorage.Shared.Combat.DamageRules)
 local EnemyCatalog = require(ReplicatedStorage.Shared.Enemies.EnemyCatalog)
@@ -224,13 +225,9 @@ local function kill(npc)
 	NpcService.Died:Fire(npc)
 end
 
-local function rootOf(player: Player)
-	return player.Character and player.Character:FindFirstChild("HumanoidRootPart")
-end
-
 -- True when `player` stands inside a safe zone, where nobody deals damage.
 local function inSafeZone(player: Player): boolean
-	local root = rootOf(player)
+	local root = Characters.RootOf(player)
 	return root ~= nil and SafeZoneService.Contains(root.Position)
 end
 
@@ -328,7 +325,7 @@ local canTarget = NpcService.CanTarget
 -- The attacker a recent hit provoked `npc` into hunting, and their root, if any.
 function NpcService.Provoker(npc, leash: number, now: number)
 	local attacker = npc.lastAttacker
-	local root = attacker and rootOf(attacker)
+	local root = attacker and Characters.RootOf(attacker)
 	if root and canTarget(attacker) and AggroRules.Provoked(npc.provokedAt, now, npc.home, root.Position, leash) then
 		return attacker, root
 	end
@@ -392,7 +389,7 @@ local function step(dt: number)
 	local now = os.clock()
 	local roots, rootPositions = {}, {}
 	for _, player in Players:GetPlayers() do
-		local root = rootOf(player)
+		local root = Characters.RootOf(player)
 		if root then
 			roots[player] = root
 			table.insert(rootPositions, root.Position)

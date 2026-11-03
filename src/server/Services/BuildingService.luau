@@ -20,6 +20,7 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local BuildRules = require(ReplicatedStorage.Shared.Building.BuildRules)
+local Characters = require(ReplicatedStorage.Shared.World.Characters)
 local CraftingRules = require(ReplicatedStorage.Shared.Crafting.CraftingRules)
 local DamageRules = require(ReplicatedStorage.Shared.Combat.DamageRules)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
@@ -299,15 +300,9 @@ end
 -- The builder must see the spot: nothing solid between their head and the base.
 local function inSight(head: BasePart, base: Vector3, half: Vector3): boolean
 	local target = base + Vector3.new(0, math.min(0.5, half.Y), 0)
-	local ignore = {}
-	for _, other in Players:GetPlayers() do
-		if other.Character then
-			table.insert(ignore, other.Character)
-		end
-	end
 	local params = RaycastParams.new()
 	params.FilterType = Enum.RaycastFilterType.Exclude
-	params.FilterDescendantsInstances = ignore
+	params.FilterDescendantsInstances = Characters.All()
 	params.RespectCanCollide = true
 	params.IgnoreWater = true
 	local offset = target - head.Position

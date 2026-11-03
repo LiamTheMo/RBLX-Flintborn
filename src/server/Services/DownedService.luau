@@ -9,6 +9,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 
 local ArmorRules = require(ReplicatedStorage.Shared.Combat.ArmorRules)
+local Characters = require(ReplicatedStorage.Shared.World.Characters)
 local DownedRules = require(ReplicatedStorage.Shared.Combat.DownedRules)
 local GameConstants = require(ReplicatedStorage.Shared.GameConstants)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
@@ -23,14 +24,6 @@ local DownedService = {}
 DownedService.RANGE_ALLOWANCE = 2
 
 local downed = {}
-
-local function humanoidOf(player: Player): Humanoid?
-	return player.Character and player.Character:FindFirstChildOfClass("Humanoid") or nil
-end
-
-local function rootOf(player: Player)
-	return player.Character and player.Character:FindFirstChild("HumanoidRootPart")
-end
 
 local function armorFactor(player: Player): number
 	return ArmorRules.Factor(InventoryService.ArmorPieces(player))
@@ -65,7 +58,7 @@ local function clear(player: Player)
 end
 
 local function finish(player: Player)
-	local humanoid = humanoidOf(player)
+	local humanoid = Characters.HumanoidOf(player)
 	clear(player)
 	if humanoid then
 		humanoid.Health = 0
@@ -73,7 +66,7 @@ local function finish(player: Player)
 end
 
 local function revive(player: Player)
-	local humanoid = humanoidOf(player)
+	local humanoid = Characters.HumanoidOf(player)
 	clear(player)
 	if humanoid and humanoid.Health > 0 then
 		local health = DownedRules.RevivedHealth(humanoid.MaxHealth, armorFactor(player))
@@ -83,7 +76,7 @@ local function revive(player: Player)
 end
 
 local function canRevive(reviver: Player, target: Player): boolean
-	local humanoid = humanoidOf(reviver)
+	local humanoid = Characters.HumanoidOf(reviver)
 	return reviver ~= target
 		and humanoid ~= nil
 		and humanoid.Health > 0
@@ -97,8 +90,8 @@ function DownedService.TryDown(player: Player): boolean
 	if downed[player] or not TribeService.InTribe(player) or not WorldAdmissionService.IsAtRisk(player) then
 		return false
 	end
-	local humanoid = humanoidOf(player)
-	local root = rootOf(player)
+	local humanoid = Characters.HumanoidOf(player)
+	local root = Characters.RootOf(player)
 	if humanoid == nil or root == nil then
 		return false
 	end
@@ -157,8 +150,8 @@ local function step(dt: number)
 		local reviverId = entry.rules.reviverId
 		if reviverId then
 			local reviver = Players:GetPlayerByUserId(reviverId)
-			local reviverRoot = reviver and rootOf(reviver)
-			local root = rootOf(player)
+			local reviverRoot = reviver and Characters.RootOf(reviver)
+			local root = Characters.RootOf(player)
 			local inRange = reviverRoot ~= nil
 				and root ~= nil
 				and (reviverRoot.Position - root.Position).Magnitude
