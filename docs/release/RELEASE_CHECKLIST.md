@@ -42,7 +42,7 @@ Run every Studio and live check in `docs/release/MANUAL_VALIDATION.md` (v0.01–
 - [ ] Roblox paid-random-item and Premium policy reviewed (§38.1); every paid benefit has its earnable route (enforced by spec).
 - [ ] Redemption codes in `src/server/Config/Codes.luau` reviewed (remove any not meant for launch).
 - [ ] Admin allowlist in `src/server/Config/Admins.luau` reviewed.
-- [ ] Repository secrets confirmed; rotate `ROBLOX_API_KEY` if it was ever shared.
+- [ ] Repository secrets confirmed (docs/ops/DEPLOYMENT.md); rotate `ROBLOX_API_KEY` and `ROBLOX_ASSETS_API_KEY` if either was ever shared.
 - [ ] Store page: icon, thumbnails, description and the age/content questionnaire.
 - [ ] Decision recorded: keep or reset the playtest profile DataStore (`ProfileService.STORE_NAME`).
 - [ ] The authored Shattered Crater map (if ready) placed in the world place as a `ShatteredCrater` model; the generated placeholder steps aside automatically.
