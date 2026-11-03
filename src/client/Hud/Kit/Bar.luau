@@ -39,12 +39,14 @@ Bar.FILLS = {
 }
 
 -- Frame art and its well (the fill's area) in the sprite's own px:
--- {role, left, top, right, bottom}.
+-- {role, left, top, right, bottom}. The track's art has one more clear row
+-- below its rim than above (KitModel.EDGES lk_bar_track), so its well is one
+-- px taller at the bottom: the fill then centres on the track's dark channel.
 Bar.FRAMES = {
-	track = { "bar.track", 3, 3, 3, 3 },
+	track = { "bar.track", 3, 3, 3, 4 },
 	well = { "bar.frame", 24, 15, 23, 16 },
 	thin = { "bar.frameThin", 10, 9, 10, 8 },
-	stat = { "bar.track", 3, 3, 3, 3 },
+	stat = { "bar.track", 3, 3, 3, 4 },
 }
 -- The stat frame, as shares of the bar's height: the icon's size and its left
 -- inset, the gap after it, the track's inset from the plate's top, bottom and
