@@ -1,6 +1,6 @@
--- Hides Roblox's own player list in both places (GDD §46): Tab is the game's
--- Backpack key, which opens the inventory (the backpack in a run, the backpack
--- and vault panel in the lobby) instead of the list.
+-- Hides Roblox's own player list and backpack in both places (GDD §46). The game
+-- has its own hotbar and inventory window (the Backpack key, B by default), so
+-- the default backpack, which ` would open, and its hotbar are turned off.
 
 local StarterGui = game:GetService("StarterGui")
 
@@ -9,17 +9,21 @@ local CoreGuiController = {}
 -- The core scripts can refuse the call for a moment while they load.
 CoreGuiController.ATTEMPTS = 10
 
+CoreGuiController.HIDDEN = { Enum.CoreGuiType.PlayerList, Enum.CoreGuiType.Backpack }
+
 function CoreGuiController.Start()
-	task.spawn(function()
-		for _ = 1, CoreGuiController.ATTEMPTS do
-			local ok = pcall(StarterGui.SetCoreGuiEnabled, StarterGui, Enum.CoreGuiType.PlayerList, false)
-			if ok then
-				return
+	for _, coreGui in CoreGuiController.HIDDEN do
+		task.spawn(function()
+			for _ = 1, CoreGuiController.ATTEMPTS do
+				local ok = pcall(StarterGui.SetCoreGuiEnabled, StarterGui, coreGui, false)
+				if ok then
+					return
+				end
+				task.wait(1)
 			end
-			task.wait(1)
-		end
-		warn("[CoreGui] could not hide the player list")
-	end)
+			warn("[CoreGui] could not hide the " .. coreGui.Name)
+		end)
+	end
 end
 
 return CoreGuiController
