@@ -11,7 +11,6 @@
 
 local CollectionService = game:GetService("CollectionService")
 local HttpService = game:GetService("HttpService")
-local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 
@@ -71,29 +70,13 @@ local function activeFootprints()
 end
 
 -- Map ground only: structures, bodies, bosses and other events are see-through.
+-- Trunks, boulders and logs (the scenery) are solid and queryable: events never
+-- stand on them either.
 local function groundParams()
-	local ignore = { folder }
-	for _, name in { BuildingService.FOLDER_NAME, "EventEnemies", "Bosses", "GuardianArena", "Arrows" } do
-		local other = workspace:FindFirstChild(name)
-		if other then
-			table.insert(ignore, other)
-		end
-	end
-	-- Trunks, boulders and logs are solid and queryable: events never stand on them.
-	local scenery = WorldState.Scenery()
-	if scenery then
-		table.insert(ignore, scenery)
-	end
-	for _, player in Players:GetPlayers() do
-		if player.Character then
-			table.insert(ignore, player.Character)
-		end
-	end
-	local params = RaycastParams.new()
-	params.FilterType = Enum.RaycastFilterType.Exclude
-	params.FilterDescendantsInstances = ignore
-	params.RespectCanCollide = true
-	return params
+	return WorldState.GroundParams(
+		{ BuildingService.FOLDER_NAME, "EventEnemies", "Bosses", "GuardianArena", "Arrows" },
+		folder
+	)
 end
 
 -- The ground under (x, z), cast down from `fromY` (default: above the whole map;

@@ -2,6 +2,8 @@
 -- built in the background at startup, so anything that reads the map's terrain or
 -- its tagged POI parts waits for it here; the authored map is ready at once.
 
+local Characters = require(script.Parent.Characters)
+
 local WorldState = {}
 
 WorldState.READY_ATTRIBUTE = "FlintbornWorldReady"
@@ -36,6 +38,34 @@ WorldState.SCENERY_FOLDER = "Scenery"
 function WorldState.Scenery(): Instance?
 	local map = workspace:FindFirstChild(WorldState.MAP_NAME)
 	return map and map:FindFirstChild(WorldState.SCENERY_FOLDER)
+end
+
+-- Ray params that see only the map's ground: `own` (the caller's folder, if any),
+-- each workspace folder named in `names`, the scenery and every character are
+-- excluded. Each caller passes its own list of what is see-through for it.
+function WorldState.GroundParams(names: { string }, own: Instance?): RaycastParams
+	local ignore = {}
+	if own then
+		table.insert(ignore, own)
+	end
+	for _, name in names do
+		local other = workspace:FindFirstChild(name)
+		if other then
+			table.insert(ignore, other)
+		end
+	end
+	local scenery = WorldState.Scenery()
+	if scenery then
+		table.insert(ignore, scenery)
+	end
+	for _, character in Characters.All() do
+		table.insert(ignore, character)
+	end
+	local params = RaycastParams.new()
+	params.FilterType = Enum.RaycastFilterType.Exclude
+	params.FilterDescendantsInstances = ignore
+	params.RespectCanCollide = true
+	return params
 end
 
 -- Where a creature stands at a column: always the ground, the bed under any water

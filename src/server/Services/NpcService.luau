@@ -64,28 +64,7 @@ local rng = Random.new()
 -- characters and resource nodes are see-through, so nobody stands on a tree, a
 -- wall or another body (a boss's hitbox would otherwise lift a wolf onto its head).
 local function groundParams()
-	local params = RaycastParams.new()
-	params.FilterType = Enum.RaycastFilterType.Exclude
-	params.RespectCanCollide = true
-	local ignore = { folder }
-	for _, name in NOT_GROUND do
-		local other = workspace:FindFirstChild(name)
-		if other then
-			table.insert(ignore, other)
-		end
-	end
-	-- Solid island scenery (trunks, boulders, logs) is queryable but never ground.
-	local scenery = WorldState.Scenery()
-	if scenery then
-		table.insert(ignore, scenery)
-	end
-	for _, player in Players:GetPlayers() do
-		if player.Character then
-			table.insert(ignore, player.Character)
-		end
-	end
-	params.FilterDescendantsInstances = ignore
-	return params
+	return WorldState.GroundParams(NOT_GROUND, folder)
 end
 
 -- Creatures walk on the bed of knee-deep water, 30% slower (GDD §55).

@@ -303,30 +303,12 @@ function BossService.Spawn(bossId: string, position: Vector3, options)
 	return boss
 end
 
+-- Only the map is ground: never climb onto pillars, walls, bases or other bodies.
 local function groundParams()
-	local params = RaycastParams.new()
-	params.FilterType = Enum.RaycastFilterType.Exclude
-	local ignore = { folder }
-	-- Only the map is ground: never climb onto pillars, walls, bases or other bodies.
-	for _, name in { "EventEnemies", "Arrows", "GuardianArena", "WorldEvents", "PlayerStructures", "ResourceNodes" } do
-		local other = workspace:FindFirstChild(name)
-		if other then
-			table.insert(ignore, other)
-		end
-	end
-	-- Solid island scenery (trunks, boulders, logs) is queryable but never ground.
-	local scenery = WorldState.Scenery()
-	if scenery then
-		table.insert(ignore, scenery)
-	end
-	for _, player in Players:GetPlayers() do
-		if player.Character then
-			table.insert(ignore, player.Character)
-		end
-	end
-	params.FilterDescendantsInstances = ignore
-	params.RespectCanCollide = true
-	return params
+	return WorldState.GroundParams(
+		{ "EventEnemies", "Arrows", "GuardianArena", "WorldEvents", "PlayerStructures", "ResourceNodes" },
+		folder
+	)
 end
 
 -- Bosses follow the terrain like other enemies.
