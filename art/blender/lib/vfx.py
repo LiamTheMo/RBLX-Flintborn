@@ -59,7 +59,7 @@ import zlib
 
 import bmesh
 import bpy
-from mathutils import Euler, Matrix, Vector
+from mathutils import Euler, Vector
 
 # Colours are sRGB hex. Sizes and speeds are in studs. Rates are particles/second.
 # Optional emitter keys: `flipbook` (FlipbookLayout), `acceleration` (Roblox XYZ),

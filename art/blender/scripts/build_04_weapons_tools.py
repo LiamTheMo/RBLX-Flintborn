@@ -562,24 +562,6 @@ def grip_cross(a, z, tilt=0.55, th=0.066, mat="rope"):
     return lash(a, bvh_of(a), (0, 0, z), (math.sin(tilt), 0, math.cos(tilt)), th, mat=mat)
 
 
-def axe_head_lashing(a, bvh_block, bvh_all, block_c, junction, th, rings=(-0.28, -0.12, 0.04),
-                     tilts=(-0.2, 0.0, 0.15, 0.3), bands=1, bind=()):
-    """Reference hafted-axe binding: a bundle of tilted turns hugging the split
-    haft end, `bind` turns (dz offsets from the junction) that take in the
-    stone's shoulder too, and `bands` turns round the block foot."""
-    for k, dz in enumerate(rings):
-        tl = tilts[k % len(tilts)]
-        lash(a, bvh_block, (block_c[0], 0, block_c[2] + dz), (math.sin(tl), 0, math.cos(tl)), th,
-             mat="rope_dark" if k == 1 else "rope")
-    for k, dz in enumerate(bind):
-        tl = (0.18, -0.06, 0.1, -0.14)[k % 4]
-        lash(a, bvh_all, Vector(junction) + Vector((0, 0, dz)), (math.sin(tl), 0, math.cos(tl)), th,
-             mat="rope_dark" if k % 2 else "rope")
-    for k in range(bands):
-        c = Vector(junction) + Vector((0, 0, 0.13 * k))
-        lash(a, bvh_all, c, (math.sin(0.32), 0, math.cos(0.32)), th, mat="rope_dark" if k else "rope")
-
-
 def split_end(a, z0, z1, r, phase=0.3):
     """Chunky split haft end: a squat 6-sided block plus an offset split-off piece."""
     hewn(a, [(z0, r), (z1, r * 0.95)], sides=6, jit=0.1, chamfer=0.3, end0=False, phase=phase,

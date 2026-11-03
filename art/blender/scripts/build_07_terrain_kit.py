@@ -1162,11 +1162,6 @@ def ground(a, poly, z=0.35, seed=0, mat=(DIRT, 0.95), patches=6, spacing=3.0, sk
     skirt(a, poly.p, z, 0.0, closed=True, mat=skirt_mat, lumpy=0.25)
 
 
-def mound_skirt(a, poly, H, seed, mat="earth", zmax=1.2):
-    """Low rounded dirt skirt round a mound's outline (no tall slab sides)."""
-    skirt(a, poly.p, lambda p: min(H(p.x, p.y), zmax), 0.0, closed=True, mat=mat, lumpy=0.35)
-
-
 # ---------------------------------------------------------------------------
 # Tiles
 # ---------------------------------------------------------------------------
