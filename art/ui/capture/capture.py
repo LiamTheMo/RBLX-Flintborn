@@ -36,7 +36,10 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[2]
 sys.path.insert(0, str(HERE))
+sys.path.insert(0, str(ROOT / "scripts"))
 import render  # noqa: E402
+# The release scripts' JSON -> Luau converter (ASCII-only, \u{...} escapes).
+from roblox_cloud_sync import json_to_luau  # noqa: E402
 
 MOUNTS = {
     ("ReplicatedStorage", "Shared"): ROOT / "src" / "shared",
@@ -70,20 +73,9 @@ def manifest_sprites():
             if isinstance(e, dict) and "w" in e and (SPRITES / f"{name}.png").is_file()}
 
 
-def lua_literal(value, indent=0):
-    """A JSON value as a Luau table constructor."""
-    if value is None:
-        return "nil"
-    if isinstance(value, bool):
-        return "true" if value else "false"
-    if isinstance(value, (int, float)):
-        return repr(value)
-    if isinstance(value, str):
-        return json.dumps(value)
-    if isinstance(value, list):
-        return "{" + ", ".join(lua_literal(v) for v in value) + "}"
-    items = ", ".join("[%s] = %s" % (json.dumps(k), lua_literal(v)) for k, v in value.items())
-    return "{" + items + "}"
+def lua_literal(value):
+    """A JSON value as a Luau expression."""
+    return json_to_luau(json.dumps(value, ensure_ascii=False))[len("return "):]
 
 
 def module_entries(extra_ids):
@@ -102,7 +94,7 @@ def module_entries(extra_ids):
                     data = {**data, **extra_ids}
                 elif file == SPRITES_FILE:
                     data = {**manifest_sprites(), **data}
-                source = "return " + lua_literal(data)
+                source = json_to_luau(json.dumps(data, ensure_ascii=False))
             else:
                 source = file.read_text(encoding="utf-8")
             entries.append((list(prefix) + parts, source))
