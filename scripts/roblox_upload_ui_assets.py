@@ -252,7 +252,12 @@ def main(argv=None):
     args = parser.parse_args(argv)
 
     if args.inspect:
+        # The id goes into a request path, so it must be a plain asset id.
+        if not args.inspect.isascii() or not args.inspect.isdecimal():
+            raise ValueError("--inspect takes a numeric asset id")
         key = os.environ.get("ROBLOX_API_KEY", "").strip()
+        if not key:
+            raise ValueError("ROBLOX_API_KEY is required for --inspect")
         cloud = Cloud(key, None)
         for url in (f"{ASSETS_URL}/{args.inspect}", f"{ASSETS_URL}/{args.inspect}?readMask=*"):
             try:

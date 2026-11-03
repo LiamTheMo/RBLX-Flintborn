@@ -9,13 +9,12 @@ Requires Roblox's Save Place API permission and a closed Team Create session.
 import argparse
 import json
 import os
-import re
 import sys
 import time
 import urllib.error
 import urllib.request
 
-from roblox_cloud_sync import discover, is_json_module, local_source
+from roblox_cloud_sync import SCRIPT_TYPES, discover, is_json_module, local_source
 
 ANCHORS = (
     ("ServerScriptService", "Server"),
@@ -200,7 +199,7 @@ def spec_list():
     for path, (file, kind) in sorted(discover().items()):
         if not any(path[:len(anchor)] == anchor for anchor in ANCHORS):
             raise ValueError("Target outside approved script containers: " + "/".join(path))
-        if kind not in ("Script", "LocalScript", "ModuleScript"):
+        if kind not in SCRIPT_TYPES:
             raise ValueError("Unsupported script type: " + str(kind))
         # JSON modules become the Luau table Rojo would generate, so publish
         # and verify both compare against the converted source.
