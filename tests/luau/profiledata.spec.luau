@@ -10,21 +10,8 @@ test("a missing profile becomes a complete default at the current version", func
 	expectEq(profile.schemaVersion, ProfileSchema.CURRENT_VERSION, "current version")
 	expectEq(profile.profileRevision, 0, "fresh revision")
 	expectEq(profile.createdAt, 100, "creation time")
-	for _, group in
-		{
-			"vault",
-			"lobbyBackpack",
-			"permanentItems",
-			"currency",
-			"progression",
-			"rebirth",
-			"recipes",
-			"receipts",
-			"operations",
-			"choices",
-			"metrics",
-		}
-	do
+	local groups = "vault lobbyBackpack permanentItems currency progression rebirth recipes receipts operations"
+	for group in string.gmatch(groups .. " choices metrics", "%S+") do
 		expect(type(profile[group]) == "table", "has " .. group)
 	end
 	expectEq(profile.currency.coins, 0, "no coins")
