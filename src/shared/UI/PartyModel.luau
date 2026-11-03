@@ -68,11 +68,6 @@ function PartyModel.MembersText(count: number?, maxSize: number?): string
 	return ("%d / %d"):format(math.clamp(count or 1, 1, cap), cap)
 end
 
--- How many empty slots follow the members (the cap minus the members).
-function PartyModel.EmptySlots(count: number, maxSize: number?): number
-	return math.max(0, (maxSize or PartyModel.MAX_SIZE) - count)
-end
-
 -- The time since `createdAt` (server os.time) at `now` (workspace:
 -- GetServerTimeNow()): "Just now" under a minute, then "5 min ago", "2 h ago",
 -- "3 d ago". No party (or no time) reads "—"; a clock slightly behind the

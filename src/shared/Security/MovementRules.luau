@@ -52,11 +52,6 @@ local function horizontal(from: Vector3, to: Vector3): number
 	return math.sqrt(dx * dx + dz * dz)
 end
 
--- True when moving from `from` to `to` in `dt` seconds is physically plausible.
-function MovementRules.Plausible(from: Vector3, to: Vector3, dt: number, maxSpeed: number): boolean
-	return horizontal(from, to) <= MovementRules.Limit(dt, maxSpeed)
-end
-
 -- True when a client-owned `live` position is horizontally within `slack` studs of
 -- the last server-validated one (nil: untracked, so nothing to compare). A client
 -- that teleports, acts and teleports back between two samples fails this.

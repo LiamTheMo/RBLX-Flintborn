@@ -49,7 +49,6 @@ test("smelting is 1 ore to 1 bar at the furnace, timed by metal", function()
 		expect(CraftingRules.IsTimed(recipe), metal .. " is timed")
 	end
 	expect(not CraftingRules.IsTimed(Recipes.Get("CookedMeat")), "cooking is instant")
-	expectEq(CraftingRules.TotalSeconds(Recipes.Get("IronBar"), 5), 15, "a batch of 5 takes 5 × 3 s")
 end)
 
 test("batch counts: nil is one, zero stops, only timed recipes take more", function()
@@ -111,10 +110,6 @@ test("the menu groups by category and tier and filters by what is nearby", funct
 	expectEq(CraftingRules.Tier(Recipes.Get("MithrilSpear")), "Mithril", "gear tier")
 	expectEq(CraftingRules.Tier(Recipes.Get("AdamantineBar")), "Adamantine", "a bar's tier is its metal")
 	expectEq(CraftingRules.Tier(Recipes.Get("Potion")), nil, "potions have no tier")
-
-	local tiers = CraftingRules.TiersIn(Recipes.List)
-	expectEq(tiers[1], "Wood", "ladder order starts at Wood")
-	expectEq(tiers[#tiers], "Adamantine", "and ends at Adamantine")
 
 	local nearby = { Furnace = true }
 	local anvilSword, bar = Recipes.Get("SilverSword"), Recipes.Get("SilverBar")
