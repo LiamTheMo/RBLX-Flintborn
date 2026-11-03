@@ -15,12 +15,7 @@ local Scheduler = require(TestSupport.Scheduler)
 local LobbyTrade = {}
 
 function LobbyTrade.new()
-	local scheduler = Scheduler.new():Install()
-	workspace = {
-		GetServerTimeNow = function()
-			return scheduler.clock
-		end,
-	}
+	local scheduler = Scheduler.new():Install():InstallServerTime()
 	local Players = FakeRoblox.Players()
 	FakeRoblox.Provide({ Players = Players, HttpService = FakeRoblox.Guids() })
 	game.JobId = "job-trade"

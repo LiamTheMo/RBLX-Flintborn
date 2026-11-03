@@ -7,6 +7,7 @@
 -- instead of stopping the spec; ExpectNoThreadErrors() fails a case on any.
 --
 --     local scheduler = require(game:GetService("ServerStorage").TestSupport.Scheduler).new():Install()
+--     scheduler:InstallServerTime() -- workspace:GetServerTimeNow() follows the clock
 --     scheduler:Advance(5)
 
 local Scheduler = {}
@@ -54,6 +55,16 @@ function Scheduler:Install()
 		return seconds
 	end
 	warn = function() end
+	return self
+end
+
+-- Makes workspace:GetServerTimeNow() read this clock (creating `workspace` when a
+-- spec has none). Returns the scheduler.
+function Scheduler:InstallServerTime()
+	workspace = workspace or {}
+	workspace.GetServerTimeNow = function()
+		return self.clock
+	end
 	return self
 end
 

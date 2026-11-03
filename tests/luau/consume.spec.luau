@@ -13,30 +13,15 @@ local Server = game:GetService("ServerScriptService").Server
 local ConsumeRules = require(Shared.Survival.ConsumeRules)
 local Consumables = require(Shared.Items.Consumables)
 local GameConstants = require(Shared.GameConstants)
-local Signal = require(Shared.Core.Signal)
 local SurvivalRules = require(Shared.Survival.SurvivalRules)
 
--- Fake clock and scheduler ----------------------------------------------------------
-
-local clock = 100
-workspace = {
-	GetServerTimeNow = function()
-		return clock
-	end,
-}
-task = {}
-function task.spawn(fn, ...)
-	local thread = if type(fn) == "thread" then fn else coroutine.create(fn)
-	coroutine.resume(thread, ...)
-	return thread
-end
-
--- Fake services ---------------------------------------------------------------------
+local TestSupport = game:GetService("ServerStorage").TestSupport
+local FakeRoblox = require(TestSupport.FakeRoblox)
+local scheduler = require(TestSupport.Scheduler).new(100):Install():InstallServerTime()
 
 -- One player's world: carried counts, the held hotbar item, survival state.
 local function newPlayer(name: string)
-	local attributes = {}
-	return {
+	return FakeRoblox.Player(0, {
 		Name = name,
 		Parent = {},
 		counts = {},
@@ -46,16 +31,10 @@ local function newPlayer(name: string)
 		removed = {},
 		notices = {},
 		boosts = {},
-		GetAttribute = function(_, key)
-			return attributes[key]
-		end,
-		SetAttribute = function(_, key, value)
-			attributes[key] = value
-		end,
-	}
+	})
 end
 
-local stubs = {
+FakeRoblox.StubServices({
 	InventoryService = {
 		Count = function(player, catalogId)
 			return player.counts[catalogId] or 0
@@ -103,15 +82,7 @@ local stubs = {
 			return { kind = boost.kind, amount = boost.amount }, true
 		end,
 	},
-}
-local realRequire = require
-require = function(node)
-	local path = type(node) == "table" and rawget(node, "__path")
-	if path and path[1] == "ServerScriptService" and path[3] == "Services" and stubs[path[4]] then
-		return stubs[path[4]]
-	end
-	return realRequire(node)
-end
+})
 
 local HealingService = require(Server.Services.HealingService)
 local used = {}
@@ -139,8 +110,8 @@ local function ask(player, catalogId: string, id: string?)
 end
 
 local function advance(seconds: number)
-	clock += seconds
-	HealingService.Step(clock)
+	scheduler:Advance(seconds)
+	HealingService.Step(scheduler.clock)
 end
 
 local function holding(catalogId: string, count: number)
@@ -153,8 +124,10 @@ end
 -- ConsumeRules ----------------------------------------------------------------------
 
 test("use time: medicine its animation, food and boosts CONSUME_SECONDS", function()
-	expectEq(ConsumeRules.Duration(Consumables.Get("BasicMedicine")), 0.5, "basic medicine 0.5 s")
-	expectEq(ConsumeRules.Duration(Consumables.Get("Potion")), 1.5, "potion 1.5 s")
+	for _, catalogId in { "BasicMedicine", "Potion" } do
+		local item = Consumables.Get(catalogId)
+		expectEq(ConsumeRules.Duration(item), item.animationSeconds, catalogId .. " takes its animation")
+	end
 	expectEq(ConsumeRules.Duration(Consumables.Get("CookedMeat")), GameConstants.CONSUME_SECONDS.Food, "food")
 	expectEq(ConsumeRules.Duration(Consumables.Get("GlimmerDraught")), GameConstants.CONSUME_SECONDS.Boost, "boost")
 	expect(
@@ -236,7 +209,7 @@ end)
 
 -- HealingService --------------------------------------------------------------------
 
-test("food is used only when its animation ends, one item per request", function()
+test("food is used only when its animation ends, one item per request; clicks meanwhile are Busy", function()
 	local player = holding("CookedMeat", 3)
 	player.rules.food = 0.5
 	local answer = ask(player, "CookedMeat")
@@ -244,7 +217,7 @@ test("food is used only when its animation ends, one item per request", function
 	expectEq(player:GetAttribute(ConsumeRules.ITEM_ATTRIBUTE), "CookedMeat", "every client sees what is eaten")
 	expectEq(
 		player:GetAttribute(ConsumeRules.END_ATTRIBUTE),
-		clock + GameConstants.CONSUME_SECONDS.Food,
+		scheduler.clock + GameConstants.CONSUME_SECONDS.Food,
 		"and until when"
 	)
 	advance(GameConstants.CONSUME_SECONDS.Food - 0.1)
@@ -262,19 +235,17 @@ test("food is used only when its animation ends, one item per request", function
 	advance(5)
 	expectEq(player.counts.CookedMeat, 2, "never applied twice")
 	expectEq(#player.removed, 1, "one removal in total")
-end)
 
-test("a request during the animation is refused as Busy and consumes nothing", function()
-	local player = holding("Redberry", 5)
-	local first = ask(player, "Redberry")
-	local second = ask(player, "Redberry")
-	local result = second()
-	expect(result ~= nil and result[1] == false and result[2] == "Busy", "the second click is refused at once")
+	-- Clicks during the animation are refused as Busy and consume nothing.
+	local berries = holding("Redberry", 5)
+	local first = ask(berries, "Redberry")
+	local second = ask(berries, "Redberry")()
+	expect(second ~= nil and second[1] == false and second[2] == "Busy", "the second click is refused at once")
 	advance(0.5)
-	expect(ask(player, "Redberry")()[2] == "Busy", "still busy part-way")
+	expect(ask(berries, "Redberry")()[2] == "Busy", "still busy part-way")
 	advance(1)
 	expect(first()[1] == true, "the first finishes")
-	expectEq(player.counts.Redberry, 4, "one berry for three clicks")
+	expectEq(berries.counts.Redberry, 4, "one berry for three clicks")
 end)
 
 test("medicine heals at once and its animation is the lock (Q64); a request during it consumes nothing", function()
@@ -285,8 +256,8 @@ test("medicine heals at once and its animation is the lock (Q64); a request duri
 	expect(result ~= nil and result[1] == true, "answered at once")
 	expectEq(player.humanoid.Health, 60, "+10 immediately")
 	expectEq(player.counts.BasicMedicine, 2, "one consumed")
-	expectEq(player.rules.medicineLockUntil, clock + 0.5, "the 0.5 s animation is the lock")
-	expectEq(player:GetAttribute(ConsumeRules.END_ATTRIBUTE), clock + 0.5, "and is animated")
+	expectEq(player.rules.medicineLockUntil, scheduler.clock + 0.5, "the 0.5 s animation is the lock")
+	expectEq(player:GetAttribute(ConsumeRules.END_ATTRIBUTE), scheduler.clock + 0.5, "and is animated")
 	advance(0.4)
 	local refused = ask(player, "BasicMedicine")()
 	expect(refused[1] == false and refused[2] == "Busy", "refused during the medicine animation")
@@ -434,5 +405,5 @@ test("the last one used leaves the hand empty; the Used signal fires once per it
 	expectEq(#used, before + 1, "one Used")
 	local result = ask(player, "Sweetberry")()
 	expect(result[1] == false and result[2] == "NotCarried", "nothing more to eat")
-	expect(Signal ~= nil and not HealingService.IsUsing(player), "idle")
+	expect(not HealingService.IsUsing(player), "idle")
 end)
