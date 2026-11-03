@@ -43,10 +43,14 @@ local tab = "Buy"
 -- Bumped by every render; a render that yielded and is no longer the latest drops.
 local renderToken = 0
 
--- Remotes.Invoke with a refusal's reason as player-facing text.
+-- Remotes.Invoke with a refusal's reason as player-facing text. A call that never
+-- reached the server keeps its "Request failed" as it was.
 local function invoke(name: string, ...)
 	local success, reason = Remotes.Invoke(name, ...)
-	return success, if success then reason else Reasons.Text(reason)
+	if success or reason == "Request failed" then
+		return success, reason
+	end
+	return success, Reasons.Text(reason)
 end
 
 local function nonce(): string
