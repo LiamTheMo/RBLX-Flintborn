@@ -96,7 +96,7 @@ local function lineHeight(size: number): number
 end
 
 local function buttonWidth(label: string): number
-	return math.max(104, math.ceil(Kit.Text.Width(label, "buttonS")) + 44)
+	return Kit.Button.Width(label, 104, 44)
 end
 
 -- opts: name, title, icon (header icon id), tabs ({{id, label, icon}}),

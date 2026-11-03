@@ -158,7 +158,7 @@ function PlayerRow:Set(data)
 	local action = data.action
 	if action then
 		local size = action.size
-		local bw = if size then size[1] else math.max(96, math.ceil(Text.Width(action.label, "buttonS")) + 40)
+		local bw = if size then size[1] else Button.Width(action.label, 96, 40)
 		local bh = if size then size[2] else math.min(42, h - 10)
 		self.action = Button.new(self.content, {
 			name = "Action",

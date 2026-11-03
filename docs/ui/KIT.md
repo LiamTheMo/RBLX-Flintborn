@@ -336,7 +336,8 @@ local party = Kit.Panel.new(body, { rect = { 0, 0, 360, 445 }, title = "Your Par
 `Kit.Button.new(parent, {rect | size, label, variant = "primary" | "secondary" | "play" | "playSecondary" | "flat", sizeClass = "s" | "m" | "l", icon?, textRole?, textSize?, onPress})`;
 `:SetLabel`, `:SetVariant`, `:SetEnabled`, `:SetBusy`. Heights s 42 / m 58 /
 l 76. Icons sit left of the label, centred together; white glyphs
-(`play`, `check_white`) are tinted ink on paper.
+(`play`, `check_white`) are tinted ink on paper. `Kit.Button.Width(label, min,
+pad)` sizes a small button to its label (text width + `pad`, at least `min`).
 **Invited (D18)**: `b:SetVariant("secondary"); b:SetLabel("Invited"); b:SetEnabled(false)`.
 ```lua
 Kit.Button.new(footer, { rect = { 600, 0, 420, 76 }, label = "Play", icon = "play", variant = "play", sizeClass = "l", onPress = play })
