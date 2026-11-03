@@ -49,7 +49,7 @@ local function notify(kind: string, title: string, text: string?)
 end
 
 local function refused(reason: any)
-	notify("warn", "Not possible", (Reasons.Text(reason):gsub("^%l", string.upper)) .. ".")
+	notify("warn", "Not possible", Reasons.Sentence(reason))
 end
 
 local function nameOf(entry): string
