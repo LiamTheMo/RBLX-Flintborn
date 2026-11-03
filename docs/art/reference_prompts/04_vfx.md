@@ -123,11 +123,11 @@ BUILDING AND RAIDS
 283 TOTEM PLACED / UPGRADED AND SPIKE TRAP: the totem slams in with an amber
     ground ring that expands to its protection radius; the spike trap snaps
     with a wood-splinter burst and a red flash.
-284 FIRE BOMB BURST: the clay pot shatters, then a round chunky orange fireball
-    with clay shards, short ground flames and a smoke puff.
-285 BREACHING CHARGE FUSE AND BLAST: a sputtering rope-fuse spark and a
-    countdown glow that speeds up, then a heavy directional blast into the wall
-    with timber and stone debris and a dust shockwave.
+284 EMBER POT BURST: the thrown clay pot breaks, then a round cartoon puff of
+    orange flame with clay shards, small ground flames and a smoke puff.
+285 WALL-BREAKER SPARK AND PUFF: a sputtering wick spark and a countdown glow
+    that speeds up, then a cartoon dust puff against the wall with timber and
+    stone chips flying off.
 286 CROP RIPE AND NODE REGROW: a ripe planter crop gets a gentle gold sparkle
     and bob; a depleted node regrows with green upward motes and a soft pop.
 287 MATERIAL DROP POP AND PICKUP: a gathered chunk pops out of the node in a
