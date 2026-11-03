@@ -5,7 +5,7 @@
 -- the vault's items and materials) or the Vault tab (the vault alone;
 -- InventoryModel.LobbySections). Choose a slot to see it in the detail
 -- card: STORE puts a backpack item in the vault, TAKE brings a vault entry out
--- (a vault material in the amount picked with the stepper) and it deploys with
+-- (a stack or vault material in the amount picked with the stepper) and it deploys with
 -- the backpack on the next Play. STORE ALL vaults the whole backpack; SORT cycles
 -- the order. A material deposit the vault cannot hold in full asks first how
 -- much it would delete (GDD §53). The latest extraction receipt arrives as an
@@ -152,6 +152,11 @@ local function showDetail()
 		item = item,
 	}
 	if choice.kind == "backpack" then
+		-- A stack picks how many to store, the same way TAKE picks how many to take.
+		local quantity = if entry.instanceId then 1 else (entry.quantity or 1)
+		if quantity > 1 then
+			detail.amount = { min = 1, max = quantity, value = math.clamp(amount, 1, quantity), allLabel = "All" }
+		end
 		detail.actions = { { id = "store", label = "Store", enabled = not busy } }
 	elseif choice.kind == "item" then
 		detail.actions = { { id = "take", label = "Take", enabled = not busy } }
@@ -227,18 +232,21 @@ local function hold(fn)
 	end
 end
 
--- Deposits backpack slot `index`. A material the vault cannot hold in full asks
--- first how much would be deleted (GDD §53); "deposit anyway" goes through only
--- while that slot still holds the same stack.
+-- Deposits backpack slot `index` (the amount picked with the stepper when it
+-- holds a stack). A material the vault cannot hold in full asks first how much
+-- would be deleted (GDD §53); "deposit anyway" goes through only while that slot
+-- still holds the same stack.
 local function deposit(index: number)
 	local item = view and view.backpack[index]
 	if item == nil then
 		return
 	end
 	local name = nameOf(item)
+	local owned = if item.instanceId then 1 else (item.quantity or 1)
+	local store = math.clamp(amount, 1, owned)
 	local overflow = nil
 	hold(function()
-		local ok, reason, lost = invoke("VaultDeposit", index)
+		local ok, reason, lost = invoke("VaultDeposit", index, nil, nil, store)
 		if ok then
 			notify("info", "Stored", name .. " is safe in your vault.")
 		elseif reason == "VaultWouldOverflow" and type(lost) == "number" then
@@ -263,7 +271,7 @@ local function deposit(index: number)
 					notify("warn", "Nothing stored", "Your backpack changed, so nothing was deposited.")
 					return
 				end
-				local stored, why = invoke("VaultDeposit", index, item.catalogId, overflow)
+				local stored, why = invoke("VaultDeposit", index, item.catalogId, overflow, store)
 				if stored then
 					notify("info", "Stored", name .. " is in your vault.")
 				else

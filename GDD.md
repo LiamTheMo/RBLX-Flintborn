@@ -1,8 +1,8 @@
 # Flintborn — Game Design Document
 
 > **Status:** Release-candidate specification — implemented through v0.18 (see §44)  
-> **Design revision:** 1.24  
-> **Last updated:** 2026-10-30  
+> **Design revision:** 1.26  
+> **Last updated:** 2026-11-03  
 > **Project:** Roblox / RBLX-Flintborn  
 > **Genre:** Primitive-fantasy survival sandbox / PvPvE extraction  
 > **Primary references:** Rust-style building and raiding, Booga Booga-style primitive progression, tactical extraction risk/reward  
@@ -205,7 +205,7 @@ This GDD is the source of truth for gameplay intent. Engineering contracts, tuni
 | Potion | Valid item consumed | **Immediately +50 HP** (up to current max HP) | **1.5 s** after-heal animation is the only reuse cooldown (Q135) |
 | Food | Valid edible consumed | **Over 10 seconds** after eating; amount depends on food | Each hit halves unapplied remaining heal; if post-hit remainder ≤10 HP, cancel remainder completely |
 
-**Important:** A medical animation is the **cooldown**, not a pre-heal channel. Incoming damage cannot retroactively cancel an already applied instant medical heal. Repeated use requests during the animation must not apply another heal or consume another item. A player may still be attacked while animating; movement lock/speed during the animation remains Open.
+**Important:** A medical animation is the **cooldown**, not a pre-heal channel. Incoming damage cannot retroactively cancel an already applied instant medical heal. Repeated use requests during the animation must not apply another heal or consume another item. A player may still be attacked while animating; movement stays at full speed during the animation (§59). Since §59 medicine and food are held and used with the attack input; food is consumed when its 1.2 s eating animation ends.
 
 **Confirmed food interruption (Q65):** Each damaging hit cuts the **remaining, not-yet-applied** food healing in half. If the **remainder after the 50% cut is ≤10 HP**, set remaining food healing to **zero**. Already-healed HP is never removed by the interruption rule (normal hit damage still applies). Example: 40 HP remaining potential → hit leaves 20; a second hit leaves 10 and therefore cancels the rest. Food item total varies, but its heal window is **10 seconds**. The term “overheal” here means *pending food regeneration*, not a temporary shield or permission to exceed maximum HP. **Confirmed Q160:** several food heals **may run at the same time**, and alongside instant medicine. Pause/tick timing and whether the duration resets on hit are still Open.
 
@@ -272,7 +272,7 @@ This GDD is the source of truth for gameplay intent. Engineering contracts, tuni
 
 - **Initial progression:** **wood → stone → iron** for structural tiers, with further tiers added only as materials/content expand. Exact HP, harvest requirements, upgrade prices and damage resistances remain Open.
 - **Confirmed desired objects:** Walls, floors/foundations, doors, roofs, storage chests, farms/planters, beds, crafting/workbenches, traps, furnaces/smelters and functional structures as useful.
-- **Booga Booga-style usability:** Select a structure from simple craft/build palette, see placement preview, rotate/position quickly and place using owned materials (preview/snap requirements Proposed, but accessible building Confirmed).
+- **Booga Booga-style usability:** Select a structure from simple craft/build palette, see placement preview, rotate/position quickly and place using owned materials (accessible building Confirmed). **Placement is free (§60):** pieces stand wherever they are aimed, turn in 15° steps and can stick to a neighbouring piece's faces and edges with an optional magnetic snap; there is no grid.
 - **Beds:** Can be furniture/utility structures, **not same-world respawn points**. No respawn in the same public instance after death (§5).
 - **Storage:** Anyone in the public world can **open/access storage** once they can physically reach it. Walls and doors can still block movement but are raid-able. **No owner-only secure chest** in the island; only the out-of-world vault is safe.
 - **Farming:** Players can plant and grow crops/trees and harvest products. Farming continues **while owner is away** if the **public server remains populated and running**, subject to server-side growth timestamps. After world empties, farms reset with all other world content.
@@ -2184,6 +2184,8 @@ NPC shop stock/prices, opt-in auto-sell and safe settlement; Gem trade level/lim
 | **1.7** | 2026-10-23 | Owner confirmed Q163: the game uses two places, a lobby (start place) and a play world, in one universe (§34.1). |
 | **1.8** | 2026-10-23 | Implementation of phases v0.01–v0.18 complete and deployed from `main`. Added §44 recording every unconfirmed number as a deliberate launch starting value, and the release checklist for v1.00. No rule changed. |
 | **1.22** | 2026-10-28 | Owner decision (§56): the hotbar has **6 slots** for now (keys 1–6), replacing Q126's nine. |
+| **1.27** | 2026-11-03 | Owner request (§60): **free-placement building**, no grid. The ghost stands wherever it is aimed, upright, and turns in 15° steps (R, Shift+R back, RB / LB, palette buttons); an optional magnetic snap lines it up with a nearby piece's faces and edges (hold Ctrl or switch Snap off to place freely). The server validates the position and turn: world bounds, reach, auras and safe zones, overlap with other pieces by their turned shapes (small tolerance), world geometry, support below the base and a 40° slope limit. Costs, limits, totems, claims, decay and raiding unchanged; structures are not saved, so no data migrates. Gamepad rotate moves from L2 to the bumpers and placing from R1 to RT. |
+| **1.26** | 2026-11-03 | Owner request (§59): consumables are **held and used from the hand**. A hotbar key or tap holds food, medicine or a draught like a tool (the same key puts it away); the attack input (click, touch attack button or RT) starts an eat or drink animation, one item per press. Food and boosts are used when the animation ends (1.2 s starting value) and are interrupted, with nothing used, by putting the item away, switching slots, going down, dying or leaving; medicine keeps Q64 (heals at once, its animation is the only cooldown). Settles §4.5's open movement question for now: moving stays at full speed. |
 | **1.25** | 2026-10-31 | Owner decision (§58): the first fully playable build (v0.19). Gathering uses the attack input (click, tap or RT) instead of an Interact prompt: axes chop, pickaxes mine, empty hands gather plants. Every item, node, creature, boss, event and structure gets a placeholder model until the real art arrives. |
 | **1.24** | 2026-10-30 | Owner decisions (§46): **crouching is removed** from the game (no key, touch button, speed or HUD text); default keys change to **E** for Interact, **B** for Backpack and **M** for Map. |
 | **1.23** | 2026-10-28 | Owner decision (§57): the parchment Settings screen with five tabs and new settings — Music and Effects volumes, Camera Sensitivity, Invert Camera, Show Damage (floating damage numbers), Show Names and Graphics Quality — saved through APPLY. |
@@ -2241,7 +2243,7 @@ Every number this document marks as a proposal or placeholder ships as a **delib
 | Drop item | Q | L1 |
 | Hotbar slots 1–6 | 1–6 (§56) | — |
 | Crafting | V | D-pad up |
-| Build mode / rotate piece | X / R | D-pad right / L2 |
+| Build mode / rotate piece | X / R (Shift+R turns back, §60) | D-pad right / RB (LB turns back) |
 | Tribe | T | D-pad left |
 | Map | M | D-pad down |
 | Progress | P | Select |
@@ -2342,7 +2344,7 @@ The owner defined the launch item and material catalog in a question round on 20
 
 1. **Boosts never weaken.** One boost runs per kind (XP, Luck). While it runs it stays exactly as it is until it ends: a weaker or equally strong boost of the same kind changes nothing, and only a **stronger** one takes over, with its own timer (owner confirmed). A draught that would change nothing is refused and kept; a boost berry still feeds you and its toast says the running boost keeps going.
 2. **Crafting mastery gives only two benefits:** better gear quality-roll chances (Q139's +5% relative per level) and, when smelting, a **chance of one bonus bar per bar smelted** (starting value 2% per level, 20% at level 10; a bonus bar with no room drops at the smelter's feet). **Everything about crafting speed is removed**, as are ingredient savings and larger craft outputs. Every player crafts at the same rate (one craft per second; smelting times per §51). Recipe gates that require a Crafting mastery level stay (owner confirmed).
-3. **Touch hotbar:** the HUD hotbar shows each slot's item (name in its rarity colour, stack count), the selection follows the equipped slot, and **tapping a slot uses it exactly as its number key does** (equip, eat or drink, place, ready a siege item).
+3. **Touch hotbar:** the HUD hotbar shows each slot's item (name in its rarity colour, stack count), the selection follows the equipped slot, and **tapping a slot uses it exactly as its number key does** (equip, eat or drink, place, ready a siege item; since §59 a consumable is held and the attack button eats or drinks it).
 4. **Tab and the player list:** Roblox's player list is disabled in both places; Tab (the rebindable Backpack key) opens the run backpack in the world and the backpack and vault panel in the lobby.
 
 
@@ -2462,6 +2464,31 @@ The Settings window is rebuilt from the parchment reference (`art/reference/ui/p
 1. **Gathering is a swing.** Clicking (or tapping the attack button, or pressing RT) with whatever is held does the natural thing: weapons attack, an **axe chops** trees, a **pickaxe mines** rocks, ores and gems, and **empty hands gather** plants and berries. Resource nodes no longer show an Interact prompt; on desktop, pointing at a node within reach shows its name, the action and any pickaxe gate. Every rule of §53 and §51 is unchanged: the same reach, cadence, tool gates, drops, XP, mastery and regrowth, all decided by the server.
 2. **Target order for one swing:** players, then creatures; then, holding a tool or nothing, a resource node before a structure, and holding a weapon, a structure before a node. Inside a safe zone a swing can only gather.
 3. **Placeholder models.** Until the authored art arrives, every held tool and weapon shows in the hand, worn armor shows on the body, dropped gear shows a small model, and resource nodes, creatures, bosses, event sites, caches, meteors and the generated island's structures and scenery are built from simple primitive shapes coloured by tier and type. They are data recipes (`src/shared/Visuals`), so real models replace them without gameplay changes.
+
+
+## 59. Owner request: hold a consumable and click to use it (2026-11-03)
+
+The owner asked that "holding a consumable and clicking should start the consumption animation". Until now a hotbar key or tap used food, medicine and draughts at once, with no hold and no animation.
+
+1. **Held like a tool.** A hotbar key, a tap on a HUD hotbar slot or a gamepad press on a selected slot **holds** a consumable: it shows in the character's hand (the placeholder pouch or flask, §58) and its slot is the selected one. The same key or tap again puts it away, as for tools. The first time one is held in a session a toast says how to use it.
+2. **The attack input uses it.** While a consumable is held, a click, the touch attack button or RT starts the consumption: the character raises the item to its mouth (eating nibbles for food, a steady tilt for medicine and draughts) and the local player sees a kit progress bar ("Eating Cooked Meat") under the screen centre. Holding the item never swings or gathers.
+3. **One item per press.** Holding the button down does not repeat; a press while a use is running does nothing (the server refuses it as Busy and nothing is consumed). Each request ID is applied at most once.
+4. **Timing.** Food and boost berries or draughts take **1.2 s** (launch starting value, `GameConstants.CONSUME_SECONDS`) and are consumed and applied **when the animation ends**. **Medicine keeps Q64:** it heals at once and its 0.5/1/1.5 s animation is the only cooldown; the animation now plays from the hand. (`ConsumeRules.APPLY_AT_START` holds this choice; removing Medicine there makes medicine heal at the end of the drink instead.)
+5. **Interruptions.** Putting the item away, switching slots, the stack leaving the slot (dropped, moved), going down, dying or leaving the run stops a use not yet applied: nothing is consumed or applied. For medicine only the animation stops; the heal already landed and the medicine lock runs on. Taking damage does not interrupt (food's heal-over-time rule, Q65, is unchanged). Moving stays at full speed during the animation (§4.5 left it Open). Opening a menu does not interrupt.
+6. **Inventory window.** USE on a hotbar consumable holds it and starts the same animated use.
+7. The animation is built in code (the right shoulder turned toward the mouth on every client, from replicated attributes); no animation asset was added. The server decides everything; the request answers when the item is applied or refused, and refusals show the usual reason text.
+
+## 60. Owner request: free-placement building (2026-11-03)
+
+The owner asked to "change the building system to be more like a free-placement survival builder — not locked to a grid." Until now every piece snapped to a 4-stud grid and turned in quarter turns. The mechanic is our own: free placement with an optional snap; no other game's assets, names or exact UI are copied.
+
+1. **Free position.** The placement ghost stands wherever the aim lands, with its base flush on that surface: the mouse on desktop; on touch the last spot tapped in the world (the screen centre until the first tap; dragging still turns the camera); on a controller the screen centre. Aimed at a wall-like face, the ghost stands just clear of that face on whatever is below it. Pieces always stay upright; only their turn about the vertical changes.
+2. **Rotation in 15° steps** (starting value, `BuildRules.ROTATE_STEP`). R turns one step, Shift+R one step back, and holding either keeps turning; RB / LB on a controller; the palette's **+15°** / **-15°** buttons on touch (and for anyone). The server accepts only multiples of the step.
+3. **Optional magnetic snap.** When the ghost comes within 1.5 studs of another player-built piece and is turned the same way or at a right angle to it, it slides up to 1.5 studs per axis so their faces and edges line up: end to end, side by side, into a corner, flush with a floor's edge, level with the neighbour's base or standing on its top. It never pulls a piece into the one it snaps to, and one rotate step off the neighbour's angle frees it. The status line says "lined up" while it holds. **Hold Ctrl** to place freely for a moment; the palette's **Snap: on / off** switch turns it off for every input. Free by default, aligned when wanted.
+4. **The server decides.** The Build request carries the base position (a Vector3) and the turn (degrees). It is refused when the values are malformed (not a Vector3, NaN or infinite, a turn off the step) — **BadRequest**; outside the build area (the island's ±2,304-stud lattice, heights −40 to 1,000) — **OutOfBounds**; beyond the 24-stud reach (also from the last validated position) — **TooFar**; any part of the turned footprint inside a portal, rune or Guardian aura — **NoBuildZone**; touching a safe zone — **SafeZone**; overlapping another piece by more than 0.25 stud a side (by the exact turned shapes, so flush pieces fit), a generated structure, a player, creature, resource node or drop, or ground and rocks above its bottom stud — **Blocked**; with nothing solid (ground, another piece, a part) within 1.5 studs below its centre or any corner — **NoGround**; resting on ground steeper than 40° — **TooSteep**; out of the builder's sight — **NoLineOfSight**. Costs, the 300-piece and three-totem limits, totem cover, claims, decay, raiding, doors, chests, planters and crafting stations are unchanged.
+5. **Feedback.** The ghost is green with ✓ or red with ✕, and the palette's status line gives the reason in the shared refusal words. The ghost checks what the client can see with the same rules (bounds, reach, auras, other pieces, support, slope, materials); anything else shows from the server's answer after Place.
+6. **Nothing saved changes.** Structures are world state (§6.3): they are never saved, so there is no stored grid data to migrate. A carried workbench is placed where it lands, turned the way the player faces. Planters need no grid and are placed freely like every other piece.
+7. **Starting values:** 15° steps, snap distance 1.5 studs, overlap tolerance 0.25 stud, support within 1.5 studs, 40° maximum slope (`BuildRules`).
 
 ---
 

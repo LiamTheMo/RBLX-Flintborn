@@ -227,6 +227,7 @@ Options, not decisions. Row pitches from the mock: slider row 69 px (label cap
 | `invertCamera` | boolean | Gameplay (replacing FOV/Range or after the checkboxes) or Controls | checkbox row |
 | `showDamage` | boolean | Gameplay | checkbox row |
 | `showNames` | boolean | Gameplay | checkbox row |
+| `showHealthBars` (default on) | boolean | Gameplay | checkbox row: "Show Health Bars" / "Bars over hurt players" (the overhead health bars, [HudScreen](HudScreen.md#overhead-health-bars)) |
 | `colourBlindMode` | boolean | Accessibility | checkbox row |
 | `reducedMotion` | boolean | Accessibility | checkbox row |
 | Replay tutorial | action | Accessibility | RESET-style parchment button |
@@ -311,7 +312,9 @@ Each has the default that will be used if unanswered.
 ## Fix round 3
 
 - **Gameplay** holds only gameplay controls (V3): Camera Sensitivity, then the
-  three checkboxes at the Audio page's pitch; Music and Effects live on Audio
+  checkboxes at the Audio page's pitch (three, then four with Show Health Bars
+  after Show Names: rows end at y 464 on desktop and 498 on touch, inside the
+  column's foot at 551); Music and Effects live on Audio
   only, and RESET on Gameplay no longer touches them.
 - **Tab icons** (V15): the kit has no gamepad, speaker or monitor drawing, and
   its stand-ins (compass, speech bubble, map) read as something else, so only

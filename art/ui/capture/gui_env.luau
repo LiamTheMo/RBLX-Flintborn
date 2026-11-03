@@ -606,6 +606,7 @@ local EVENTS = {
 	AttributeChanged = true,
 	Completed = true,
 	TouchTap = true,
+	TouchTapInWorld = true,
 	PromptShown = true,
 	PromptHidden = true,
 	PromptTriggered = true,

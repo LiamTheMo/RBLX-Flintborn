@@ -88,6 +88,7 @@ function ProfileSchema.Default(now: number?)
 			invertCamera = false,
 			showDamage = true,
 			showNames = true,
+			showHealthBars = true,
 			graphicsQuality = "High",
 		},
 		tutorial = { step = 1, skipped = false, everSkipped = false, completedAt = nil, rewardsGranted = {} },

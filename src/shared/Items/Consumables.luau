@@ -1,6 +1,8 @@
--- Medicine, food and boosts (GDD §4.5, §51, Q64, Q135, Q137). Medicine heals at
--- once and its animation is the only cooldown; food restores hunger and heals over
--- the fixed 10-second window; some berries and every draught add a timed boost.
+-- Medicine, food and boosts (GDD §4.5, §51, §59, Q64, Q135, Q137). Each is held
+-- and used from the hand (ConsumeRules): medicine heals at once and its drinking
+-- animation is its only cooldown; food (used when its eating animation ends)
+-- restores hunger and heals over the fixed 10-second window; some berries and every
+-- draught add a timed boost.
 
 local GameConstants = require(script.Parent.Parent.GameConstants)
 

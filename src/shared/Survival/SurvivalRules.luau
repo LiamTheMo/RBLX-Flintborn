@@ -170,13 +170,24 @@ function SurvivalRules.CanUseMedicine(state: State, now: number): boolean
 	return now >= state.medicineLockUntil
 end
 
--- Immediate heal capped at max HP, then the animation locks further medicine (Q64,
--- Q135). Returns the new health, or nil while locked (nothing is consumed).
-function SurvivalRules.UseMedicine(state: State, item, health: number, maxHealth: number, now: number): number?
+-- Medicine is drunk from the hand (GDD §59): it heals at once and its animation
+-- (0.5/1/1.5 s, Q64, Q135) locks further medicine from the moment it starts.
+-- Returns false while locked (nothing is consumed).
+function SurvivalRules.StartMedicine(state: State, item, now: number): boolean
 	if not SurvivalRules.CanUseMedicine(state, now) then
-		return nil
+		return false
 	end
 	state.medicineLockUntil = now + item.animationSeconds
+	return true
+end
+
+-- A drink refused before it healed gives the lock back: nothing was drunk.
+function SurvivalRules.CancelMedicine(state: State, previousLock: number)
+	state.medicineLockUntil = previousLock
+end
+
+-- The medicine's heal, capped at max HP.
+function SurvivalRules.MedicineHeal(item, health: number, maxHealth: number): number
 	return math.min(maxHealth, health + item.heal)
 end
 

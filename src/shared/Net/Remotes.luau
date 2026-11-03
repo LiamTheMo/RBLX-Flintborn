@@ -25,7 +25,7 @@ local DEFINITIONS = {
 	RequestPlay = "RemoteFunction", -- (requestId) -> ok, reason
 	ReturnToLobby = "RemoteFunction", -- () -> ok, reason
 	SetMovement = "RemoteEvent", -- client -> server: (sprintHeld)
-	UseConsumable = "RemoteFunction", -- (requestId, catalogId) -> ok, reason
+	UseConsumable = "RemoteFunction", -- (requestId, held catalogId) -> ok, reason once applied (§59)
 	InventoryChanged = "RemoteEvent", -- server -> client: inventory snapshot
 	MoveItem = "RemoteFunction", -- (fromArea, fromIndex, toArea, toIndex) -> ok, reason
 	EquipSlot = "RemoteFunction", -- (hotbarIndex or nil) -> ok, reason
@@ -58,7 +58,9 @@ local DEFINITIONS = {
 	-- 1..ForgeRules.MAX_BATCH (default 1, Permanent conversions only 1), all paid for or none
 	ForgeCraft = "RemoteFunction",
 	DropItem = "RemoteFunction", -- (area, index) -> ok, reason
-	Build = "RemoteFunction", -- (pieceId, tier, basePosition, quarterTurns) -> ok, reason
+	-- (pieceId, tier, basePosition: Vector3 (bottom centre, anywhere), yaw: degrees on a
+	-- BuildRules.ROTATE_STEP multiple) -> ok, reason (free placement, GDD §60)
+	Build = "RemoteFunction",
 	BuildInfo = "RemoteFunction", -- () -> no-build auras and build reach
 	ChestOpened = "RemoteEvent", -- server -> client: (chestId, {{index, key, catalogId, name, rarity, quantity?, permanent?}})
 	ChestTake = "RemoteFunction", -- (chestId, index, key) -> ok, reason; key from ChestOpened (ListingKeys)
