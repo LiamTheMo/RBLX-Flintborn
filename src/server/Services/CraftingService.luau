@@ -37,6 +37,7 @@ local QualityRoll = require(ReplicatedStorage.Shared.Crafting.QualityRoll)
 local Recipes = require(ReplicatedStorage.Shared.Crafting.Recipes)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local Validation = require(ReplicatedStorage.Shared.Data.Validation)
+local RequestLedger = require(script.Parent.Parent.Infrastructure.RequestLedger)
 local BuildingService = require(script.Parent.BuildingService)
 local DownedService = require(script.Parent.DownedService)
 local DropService = require(script.Parent.DropService)
@@ -68,7 +69,9 @@ local STOP_TEXT = {
 }
 
 local rng = Random.new()
-local seenRequests = {}
+local requests = RequestLedger.new(function()
+	return CraftingService.REMEMBERED_REQUESTS
+end)
 local lastCraft = {}
 local jobs = {}
 
@@ -92,23 +95,6 @@ local function nearestStation(player: Player, tag: string)
 		end
 	end
 	return best
-end
-
-local function firstTime(player: Player, requestId: string): boolean
-	local seen = seenRequests[player]
-	if seen == nil then
-		seen = { set = {}, order = {} }
-		seenRequests[player] = seen
-	end
-	if seen.set[requestId] then
-		return false
-	end
-	seen.set[requestId] = true
-	table.insert(seen.order, requestId)
-	if #seen.order > CraftingService.REMEMBERED_REQUESTS then
-		seen.set[table.remove(seen.order, 1)] = nil
-	end
-	return true
 end
 
 local function craftingMastery(player: Player): number
@@ -323,7 +309,7 @@ local function craft(player: Player, requestId: any, recipeId: any, count: any)
 	if lastCraft[player] and at - lastCraft[player] < CraftingService.CRAFT_SECONDS then
 		return false, "TooFast"
 	end
-	if not firstTime(player, requestId) then
+	if not requests:FirstTime(player, requestId) then
 		return false, "Duplicate"
 	end
 
@@ -397,7 +383,7 @@ function CraftingService.Start()
 	end)
 	Players.PlayerRemoving:Connect(function(player)
 		jobs[player] = nil
-		seenRequests[player] = nil
+		requests:Forget(player)
 		lastCraft[player] = nil
 	end)
 	task.spawn(function()
