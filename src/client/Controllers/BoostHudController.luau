@@ -15,6 +15,7 @@ local Consumables = require(ReplicatedStorage.Shared.Items.Consumables)
 local HudModel = require(ReplicatedStorage.Shared.UI.HudModel)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local SessionStates = require(ReplicatedStorage.Shared.Admission.SessionStates)
+local SettingsController = require(script.Parent.SettingsController)
 local KitScale = require(script.Parent.Parent.Hud.Kit.Scale)
 local Layout = require(script.Parent.Parent.Hud.Layout)
 local NoticeCard = require(script.Parent.Parent.Hud.NoticeCard)
@@ -36,9 +37,9 @@ BoostHudController.WIDTH = 340
 function BoostHudController.Position(gui: GuiBase2d, listScale: number): UDim2
 	local grid, gear = Layout.Grid(), Layout.Gear()
 	local k = KitScale.HudScaleOf(gui)
-	local margin = if grid then grid.margin else 24
+	local margin = if grid then grid.margin else SettingsController.MARGIN
 	local gap = if grid then grid.gap else 12
-	local size = if gear then gear.size else { 52, 46 }
+	local size = SettingsController.GearSize()
 	local left = margin
 	if grid and gear then
 		left = HudModel.GearCorner(grid, gear, KitScale.HudScreen(gui, k))

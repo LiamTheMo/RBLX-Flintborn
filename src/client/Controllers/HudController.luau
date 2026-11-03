@@ -69,7 +69,7 @@ HudController.SLOW_SECONDS = 0.25
 -- ZoneRadius attribute and the catalog has no entry.
 HudController.DEFAULT_ZONE_RADIUS = 10
 -- Where Theme's shared top column sits when the HUD is not pushing it down.
-HudController.TOP_STACK_POSITION = UDim2.new(0.5, 0, 0, 2)
+HudController.TOP_STACK_POSITION = Theme.TOP_STACK_POSITION
 -- Compass waypoint icons per kind of point (events use their category's icon).
 HudController.WAYPOINT_ICONS = {
 	landmark = "mountain",

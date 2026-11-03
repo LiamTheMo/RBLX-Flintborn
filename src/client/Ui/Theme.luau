@@ -72,6 +72,8 @@ Theme.TopOrder = {
 
 -- The column's width in design px; banners are at most this wide.
 Theme.TOP_WIDTH = 640
+-- Where the column sits (top centre) unless the world HUD pushes it down.
+Theme.TOP_STACK_POSITION = UDim2.new(0.5, 0, 0, 2)
 
 local topStack = nil
 
@@ -156,7 +158,7 @@ function Theme.TopStack()
 		topStack = Theme.Make("Frame", {
 			Name = "Stack",
 			AnchorPoint = Vector2.new(0.5, 0),
-			Position = UDim2.new(0.5, 0, 0, 2),
+			Position = Theme.TOP_STACK_POSITION,
 			Size = UDim2.fromOffset(Theme.TOP_WIDTH, 0),
 			AutomaticSize = Enum.AutomaticSize.Y,
 			BackgroundTransparency = 1,
