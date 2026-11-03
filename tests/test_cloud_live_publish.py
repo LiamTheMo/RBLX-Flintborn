@@ -149,6 +149,16 @@ class CloudPublishSafetyTests(unittest.TestCase):
             for name in ("AlphaService", "AlphaController", "server entry", "client entry"):
                 self.assertNotIn(name, batch["publish"])
 
+    def test_the_repository_runners_fit_one_batch(self):
+        # The guarantee above holds only while every script that runs on its own
+        # fits one task. If this fails, the Services and Controllers outgrew one
+        # batch: split them by dependency, or publish only the last batch.
+        specs = cloud.spec_list()
+        runners = [spec for spec in specs if cloud.runs_on_its_own(spec[0], spec[1])]
+        plan = cloud.plan_batches(specs)
+        self.assertEqual(plan[-1]["count"], len(runners),
+                         "the entry scripts, Services and Controllers no longer fit one deploy batch")
+
     def test_rate_limits_back_off(self):
         # The longer of Retry-After and an exponential backoff, capped.
         self.assertEqual(cloud.retry_delay(0, "7"), 7.0)
