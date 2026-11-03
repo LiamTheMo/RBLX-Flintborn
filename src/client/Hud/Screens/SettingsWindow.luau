@@ -39,7 +39,7 @@ SettingsWindow.TABS = {
 
 -- What RESET puts back on each tab: its settings and its keys.
 SettingsWindow.TAB_SETTINGS = {
-	Gameplay = { "cameraSensitivity", "showDamage", "showNames", "invertCamera" },
+	Gameplay = { "cameraSensitivity", "showDamage", "showNames", "showHealthBars", "invertCamera" },
 	Audio = { "musicVolume", "effectsVolume", "subtitles" },
 	Graphics = { "graphicsQuality", "uiScale", "colourBlindMode", "reducedMotion" },
 	Controls = {},
@@ -474,7 +474,8 @@ function SettingsWindow:_gameplay(page: Instance)
 	local pitch = checkPitch()
 	self:_check(page, rule + 15, "Show Damage Numbers", "Numbers over what you hit", "showDamage")
 	self:_check(page, rule + 15 + pitch, "Show Names", "Name tags above players", "showNames")
-	self:_check(page, rule + 15 + pitch * 2, "Invert Camera", "Moving up looks down", "invertCamera")
+	self:_check(page, rule + 15 + pitch * 2, "Show Health Bars", "Bars over hurt players", "showHealthBars")
+	self:_check(page, rule + 15 + pitch * 3, "Invert Camera", "Moving up looks down", "invertCamera")
 	self:_divider(page)
 
 	rightHeader(page, "Key Binds")

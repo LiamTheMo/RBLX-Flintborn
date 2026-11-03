@@ -17,6 +17,7 @@ test("a fresh profile has every setting at its default", function()
 	expectEq(values.graphicsQuality, "High", "graphics High")
 	expectEq(values.showDamage, true, "damage numbers on")
 	expectEq(values.showNames, true, "names on")
+	expectEq(values.showHealthBars, true, "overhead health bars on")
 	expectEq(values.invertCamera, false, "camera not inverted")
 end)
 

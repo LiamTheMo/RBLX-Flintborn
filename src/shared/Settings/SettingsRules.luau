@@ -38,6 +38,8 @@ SettingsRules.Settings = {
 	{ key = "invertCamera", attribute = "InvertCamera", kind = "boolean", default = false },
 	{ key = "showDamage", attribute = "ShowDamage", kind = "boolean", default = true },
 	{ key = "showNames", attribute = "ShowNames", kind = "boolean", default = true },
+	-- Bars over other players' heads while they are hurt (OverheadHealthModel).
+	{ key = "showHealthBars", attribute = "ShowHealthBars", kind = "boolean", default = true },
 	{
 		key = "graphicsQuality",
 		attribute = "GraphicsQuality",
