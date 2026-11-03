@@ -26,17 +26,10 @@ test("level and XP lines", function()
 	expectEq(LobbyHudModel.Progress({ level = 3, xp = 12.7, xpToNext = 100 }).text, "12/100 XP", "whole numbers")
 end)
 
-test("solo: a party of one led by you", function()
-	local party = LobbyHudModel.Party({ party = nil, invites = {}, maxSize = 8 }, ME)
-	expectEq(party.count, "1/8", "count")
-	expectEq(#party.members, 1, "one row")
-	expectEq(party.members[1].leader, true, "you lead")
-	expectEq(party.members[1].self, true, "self")
-	expectEq(party.free, 7, "free rows up to the cap")
-	expectEq(party.canInvite, true, "solo can invite")
-end)
-
-test("in a party: leader crown, no ready state, invite rights", function()
+test("solo you lead a party of one; in a party: leader crown, no ready state, invite rights", function()
+	local solo = LobbyHudModel.Party({ party = nil, invites = {}, maxSize = 8 }, ME)
+	expect(solo.count == "1/8" and #solo.members == 1 and solo.free == 7, "solo: one row, free rows up to the cap")
+	expect(solo.members[1].leader and solo.members[1].self and solo.canInvite, "solo: you lead and can invite")
 	local view = {
 		party = {
 			id = "p1",
