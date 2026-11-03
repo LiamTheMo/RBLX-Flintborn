@@ -186,7 +186,7 @@ function Theme.Subtitle(text: string)
 		local gui = Theme.Make("ScreenGui", {
 			Name = "Subtitles",
 			ResetOnSpawn = false,
-			DisplayOrder = 50,
+			DisplayOrder = KitTokens.Order("subtitles"),
 			ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
 		}, Players.LocalPlayer:WaitForChild("PlayerGui"))
 		local holder = Theme.Make("Frame", {
