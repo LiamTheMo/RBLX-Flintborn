@@ -24,7 +24,8 @@ Keybinds.Actions = {
 	{ id = "Hotbar6", label = "Hotbar slot 6", default = "Six", gamepad = {} },
 	{ id = "Craft", label = "Crafting", default = "V", gamepad = { "DPadUp" } },
 	{ id = "Build", label = "Build mode", default = "X", gamepad = { "DPadRight" } },
-	{ id = "Rotate", label = "Rotate piece", default = "R", gamepad = { "ButtonL2" } },
+	-- Build mode only: turns the piece one step (Shift + the key, or LB, turns it back).
+	{ id = "Rotate", label = "Rotate piece", default = "R", gamepad = { "ButtonR1" } },
 	{ id = "Tribe", label = "Tribe", default = "T", gamepad = { "DPadLeft" } },
 	{ id = "Map", label = "Map", default = "M", gamepad = { "DPadDown" } },
 	{ id = "Progression", label = "Progress", default = "P", gamepad = { "ButtonSelect" } },

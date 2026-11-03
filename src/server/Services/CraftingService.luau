@@ -25,6 +25,7 @@ local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+local BuildRules = require(ReplicatedStorage.Shared.Building.BuildRules)
 local CraftingRules = require(ReplicatedStorage.Shared.Crafting.CraftingRules)
 local InventoryRules = require(ReplicatedStorage.Shared.Inventory.InventoryRules)
 local ItemCatalog = require(ReplicatedStorage.Shared.Items.ItemCatalog)
@@ -378,8 +379,10 @@ local function place(player: Player, hotbarIndex: any)
 		return false, "NoGround"
 	end
 	-- A placed workbench is an ordinary structure: raidable, and it decays without
-	-- totem cover like everything else built in the world.
-	return BuildingService.PlaceFromItem(player, "Workbench", hit.Position, entry.catalogId)
+	-- totem cover like everything else built in the world. It stands where it
+	-- lands (free placement, GDD §60), turned the way the player faces.
+	local yaw = BuildRules.YawFromLook(root.CFrame.LookVector)
+	return BuildingService.PlaceFromItem(player, "Workbench", hit.Position, entry.catalogId, yaw)
 end
 
 function CraftingService.Start()

@@ -111,7 +111,8 @@ compass letters included).
   default control when opened with a gamepad.
 - The right bumper steps the hotbar selection.
 - Build mode opens with the current piece selected; B leaves the palette and
-  B again goes back into it.
+  B again goes back into it. While building, RB / LB turn the piece (instead of
+  stepping the hotbar or dropping) and RT places it (GDD §60).
 
 ## Behaviour
 

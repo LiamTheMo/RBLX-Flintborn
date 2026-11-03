@@ -598,8 +598,8 @@ local function bindHotbar(active: boolean)
 	end
 	-- One step above InventoryController's bindings (Medium, rebound often, so
 	-- otherwise usually first) and passing every key on, so the hotbar keys still
-	-- use their slot, as before. Below High, so build mode's placement (ButtonR1)
-	-- sinks the bumper before it reaches us.
+	-- use their slot, as before. Below High, so build mode's rotate (ButtonR1 /
+	-- ButtonL1) sinks the bumpers before they reach us.
 	-- Rebinding in Settings re-runs this with the new keys (Binds.Changed).
 	local count = layout.bottom.hotbar.count
 	local slotKeys = hotbarKeys(count)

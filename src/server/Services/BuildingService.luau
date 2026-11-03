@@ -7,7 +7,12 @@
 -- the ground or other world geometry), within the builder's sight, with no corner
 -- in a safe zone or no-build aura (portals, the Guardian arena mid-encounter);
 -- each owner keeps at most three totems. The original builder keeps control of
--- pieces their solo key still owns after joining a tribe. World place only.
+-- pieces their solo key still owns after joining a tribe. Placement is free
+-- (§60): the client sends the base position it aimed at and a yaw in degrees
+-- (a BuildRules.ROTATE_STEP multiple); the server checks types, world bounds,
+-- reach, auras, safe zones, overlap with other pieces (oriented boxes, a small
+-- tolerance), world geometry, support and slope, and sight before charging.
+-- Structures are world state only: nothing here is saved. World place only.
 
 local CollectionService = game:GetService("CollectionService")
 local HttpService = game:GetService("HttpService")
@@ -18,6 +23,7 @@ local BuildRules = require(ReplicatedStorage.Shared.Building.BuildRules)
 local CraftingRules = require(ReplicatedStorage.Shared.Crafting.CraftingRules)
 local DamageRules = require(ReplicatedStorage.Shared.Combat.DamageRules)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
+local PlacementProbe = require(ReplicatedStorage.Shared.Building.PlacementProbe)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local Signal = require(ReplicatedStorage.Shared.Core.Signal)
 local StructureCatalog = require(ReplicatedStorage.Shared.Building.StructureCatalog)
@@ -36,7 +42,7 @@ BuildingService.GENERATED_TAG = "GeneratedStructure"
 BuildingService.NO_BUILD_TAG = "NoBuildZone"
 BuildingService.MAX_PIECES_PER_OWNER = 300
 BuildingService.HIT_ALLOWANCE = 2
-BuildingService.FOLDER_NAME = "PlayerStructures"
+BuildingService.FOLDER_NAME = PlacementProbe.FOLDER_NAME
 -- Extra slack between the live and the last validated root position for reach.
 BuildingService.VALIDATED_SLACK = 8
 -- Folders whose contents block placement even when they do not collide.
@@ -193,14 +199,33 @@ local function countFor(ownerKey: string): number
 	return count
 end
 
-local function overlapsStructures(center: Vector3, half: Vector3): boolean
-	-- Shrunk slightly so neighbouring pieces can sit flush against each other.
-	local size = half * 2 - Vector3.new(0.5, 0.5, 0.5)
-	for _, part in workspace:GetPartBoundsInBox(CFrame.new(center), size) do
-		if CollectionService:HasTag(part, BuildingService.STRUCTURE_TAG) then
-			return true
-		end
-		if CollectionService:HasTag(part, BuildingService.GENERATED_TAG) then
+local function turned(center: Vector3, yaw: number): CFrame
+	return CFrame.new(center) * CFrame.Angles(0, math.rad(yaw), 0)
+end
+
+-- True when the piece (own half-size `half`, turned `yaw`) overlaps another
+-- player piece by more than BuildRules.OVERLAP_TOLERANCE (flush and touching
+-- pieces fit), or any server-generated structure's bounds.
+local function overlapsStructures(center: Vector3, half: Vector3, yaw: number): boolean
+	local inset = BuildRules.OVERLAP_TOLERANCE
+	local size = Vector3.new(
+		math.max(half.X - inset, 0.05) * 2,
+		math.max(half.Y - inset, 0.05) * 2,
+		math.max(half.Z - inset, 0.05) * 2
+	)
+	local box = { center = center, half = half, yaw = yaw }
+	for _, part in workspace:GetPartBoundsInBox(turned(center, yaw), size) do
+		local record = byPart[part]
+		if record then
+			if
+				BuildRules.BoxesOverlap(box, { center = record.position, half = record.localHalf, yaw = record.yaw })
+			then
+				return true
+			end
+		elseif
+			CollectionService:HasTag(part, BuildingService.STRUCTURE_TAG)
+			or CollectionService:HasTag(part, BuildingService.GENERATED_TAG)
+		then
 			return true
 		end
 	end
@@ -236,9 +261,12 @@ local function blocksPlacement(part: BasePart): boolean
 	return false
 end
 
--- True when solid terrain fills any voxel whose centre lies in the box.
-local function terrainInside(boxCenter: Vector3, boxSize: Vector3): boolean
-	local low, high = boxCenter - boxSize / 2, boxCenter + boxSize / 2
+-- True when solid terrain fills any voxel whose centre lies in the box (own
+-- size `boxSize`, turned `yaw`).
+local function terrainInside(boxCenter: Vector3, boxSize: Vector3, yaw: number): boolean
+	local boxHalf = boxSize / 2
+	local bounds = BuildRules.HalfExtents(boxSize, yaw)
+	local low, high = boxCenter - bounds, boxCenter + bounds
 	local region = Region3.new(low, high):ExpandToGrid(4)
 	local materials, occupancies = workspace.Terrain:ReadVoxels(region, 4)
 	local size = materials.Size
@@ -249,10 +277,12 @@ local function terrainInside(boxCenter: Vector3, boxSize: Vector3): boolean
 			if voxelY >= low.Y and voxelY <= high.Y then
 				for z = 1, size.Z do
 					local material = materials[x][y][z]
+					local voxel = origin + Vector3.new((x - 0.5) * 4, (y - 0.5) * 4, (z - 0.5) * 4)
 					if
 						material ~= Enum.Material.Air
 						and material ~= Enum.Material.Water
 						and occupancies[x][y][z] > 0.5
+						and BuildRules.InFootprint(voxel, boxCenter, boxHalf, yaw)
 					then
 						return true
 					end
@@ -265,14 +295,14 @@ end
 
 -- A piece must stand in the open: nothing solid may fill it above its bottom
 -- GROUND_ALLOWANCE studs (no totems buried in the ground or inside rocks).
-local function overlapsWorld(center: Vector3, half: Vector3): boolean
+local function overlapsWorld(center: Vector3, half: Vector3, yaw: number): boolean
 	local boxCenter, boxSize = BuildRules.ClearanceBox(center, half)
-	for _, part in workspace:GetPartBoundsInBox(CFrame.new(boxCenter), boxSize) do
+	for _, part in workspace:GetPartBoundsInBox(turned(boxCenter, yaw), boxSize) do
 		if blocksPlacement(part) then
 			return true
 		end
 	end
-	return terrainInside(boxCenter, boxSize)
+	return terrainInside(boxCenter, boxSize, yaw)
 end
 
 -- The builder must see the spot: nothing solid between their head and the base.
@@ -294,12 +324,12 @@ local function inSight(head: BasePart, base: Vector3, half: Vector3): boolean
 	return BuildRules.InSight(hit and (hit.Position - head.Position).Magnitude, offset.Magnitude)
 end
 
-local function makePart(pieceId: string, tier: string, material: string, center: Vector3, half: Vector3)
+local function makePart(pieceId: string, tier: string, material: string, center: Vector3, size: Vector3, yaw: number)
 	local part = Instance.new("Part")
 	part.Name = pieceId
 	part.Anchored = true
-	part.Size = half * 2
-	part.CFrame = CFrame.new(center)
+	part.Size = size
+	part.CFrame = turned(center, yaw)
 	-- Tiered pieces look like their tier; single-tier pieces like what they are
 	-- built from (a stone furnace, an iron anvil).
 	local look = TIER_LOOK[material] or TIER_LOOK[tier] or TIER_LOOK.Wood
@@ -319,6 +349,8 @@ local function makePart(pieceId: string, tier: string, material: string, center:
 	end
 	part:SetAttribute("Piece", pieceId)
 	part:SetAttribute("Tier", tier)
+	-- The build ghost snaps to pieces by their own size and this turn.
+	part:SetAttribute("Yaw", yaw)
 	CollectionService:AddTag(part, BuildingService.STRUCTURE_TAG)
 	if CraftingRules.IsStation(pieceId) then
 		-- Crafting stations (CraftingService): Workbench, Furnace, Anvil, Cauldron.
@@ -399,21 +431,26 @@ local function setupTotem(record)
 	end)
 end
 
--- Validates and places one piece; `pay` charges for it last (materials or an item).
-local function placePiece(player: Player, pieceId: any, tier: any, position: any, steps: any, pay)
+-- Validates and places one piece with its base (bottom centre) at `position`,
+-- turned `yaw` degrees; `pay` charges for it last (materials or an item).
+local function placePiece(player: Player, pieceId: any, tier: any, position: any, yaw: any, pay)
 	local piece, stats = StructureCatalog.Get(pieceId, tier)
-	if piece == nil or stats == nil or typeof(position) ~= "Vector3" then
+	if piece == nil or stats == nil or typeof(position) ~= "Vector3" or not BuildRules.FiniteVector(position) then
 		return false, "BadRequest"
 	end
-	if type(steps) ~= "number" or steps % 1 ~= 0 or steps < 0 or steps > 3 then
+	local turn = BuildRules.ParseYaw(yaw)
+	if turn == nil then
 		return false, "BadRequest"
 	end
 	if not canAct(player) then
 		return false, "NotInRun"
 	end
+	local base = position
+	if not BuildRules.InWorld(base) then
+		return false, "OutOfBounds"
+	end
 	local root = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
 	local head = player.Character and player.Character:FindFirstChild("Head")
-	local base = BuildRules.Snap(position)
 	if root == nil or head == nil or (base - root.Position).Magnitude > BuildRules.REACH then
 		return false, "TooFar"
 	end
@@ -422,16 +459,23 @@ local function placePiece(player: Player, pieceId: any, tier: any, position: any
 	if validated and (base - validated).Magnitude > BuildRules.REACH + BuildingService.VALIDATED_SLACK then
 		return false, "TooFar"
 	end
-	local half = BuildRules.HalfExtents(piece.size, steps)
+	-- `half` is the world-aligned box around the turned piece (coarse checks,
+	-- raids and siege); `localHalf` its own half-size for the exact ones.
+	local localHalf = piece.size / 2
+	local half = BuildRules.HalfExtents(piece.size, turn)
 	local center = base + Vector3.new(0, half.Y, 0)
-	if BuildRules.OverlapsAura(center, half, auras()) then
+	if BuildRules.OverlapsAura(center, localHalf, auras(), turn) then
 		return false, "NoBuildZone"
 	end
 	if SafeZoneService.OverlapsBox(center, half) then
 		return false, "SafeZone"
 	end
-	if overlapsStructures(center, half) or overlapsWorld(center, half) then
+	if overlapsStructures(center, localHalf, turn) or overlapsWorld(center, localHalf, turn) then
 		return false, "Blocked"
+	end
+	local unsupported = BuildRules.SupportVerdict(PlacementProbe.SupportSamples(base, localHalf, turn))
+	if unsupported then
+		return false, unsupported
 	end
 	if not inSight(head, base, half) then
 		return false, "NoLineOfSight"
@@ -459,10 +503,12 @@ local function placePiece(player: Player, pieceId: any, tier: any, position: any
 		ownerKey = ownerKey,
 		position = center,
 		half = half,
+		localHalf = localHalf,
+		yaw = turn,
 		isTotem = isTotem,
 		level = isTotem and 1 or nil,
 		radius = level and level.radius or nil,
-		part = makePart(pieceId, tier, stats.material, center, half),
+		part = makePart(pieceId, tier, stats.material, center, piece.size, turn),
 	}
 	record.part:SetAttribute("Owner", ownerName(player, ownerKey))
 	records[record.id] = record
@@ -486,15 +532,23 @@ local function placePiece(player: Player, pieceId: any, tier: any, position: any
 	return true, nil
 end
 
-local function build(player: Player, pieceId: any, tier: any, position: any, steps: any)
-	return placePiece(player, pieceId, tier, position, steps, function(stats)
+-- The Build remote: (pieceId, tier, base position, yaw in degrees).
+local function build(player: Player, pieceId: any, tier: any, position: any, yaw: any)
+	return placePiece(player, pieceId, tier, position, yaw, function(stats)
 		return InventoryService.RemoveAll(player, stats.cost)
 	end)
 end
 
--- Places a piece paid for by a carried placeable item (the craftable workbench).
-function BuildingService.PlaceFromItem(player: Player, pieceId: string, position: Vector3, catalogId: string)
-	return placePiece(player, pieceId, "Wood", position, 0, function()
+-- Places a piece paid for by a carried placeable item (the craftable workbench),
+-- turned `yaw` degrees (a ROTATE_STEP multiple; 0 when omitted).
+function BuildingService.PlaceFromItem(
+	player: Player,
+	pieceId: string,
+	position: Vector3,
+	catalogId: string,
+	yaw: number?
+)
+	return placePiece(player, pieceId, "Wood", position, yaw or 0, function()
 		return InventoryService.RemoveAll(player, { [catalogId] = 1 })
 	end)
 end
@@ -524,7 +578,7 @@ function BuildingService.Pick(
 		if record == nil or BuildingService.IsOwnedBy(player, record) then
 			continue
 		end
-		local distance = BuildRules.HorizontalDistance(origin, record.position, record.half)
+		local distance = BuildRules.HorizontalDistance(origin, record.position, record.localHalf, record.yaw)
 		local offset = record.position - origin
 		if
 			distance <= reach + BuildingService.HIT_ALLOWANCE
@@ -572,7 +626,7 @@ end
 function BuildingService.ClearWithin(center: Vector3, radius: number): number
 	local doomed = {}
 	for _, record in records do
-		if BuildRules.HorizontalDistance(center, record.position, record.half) <= radius then
+		if BuildRules.HorizontalDistance(center, record.position, record.localHalf, record.yaw) <= radius then
 			table.insert(doomed, record)
 		end
 	end
