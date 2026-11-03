@@ -222,7 +222,7 @@ Keep collision simple and intentional. Decorative branches and roof fibers shoul
 
 Preserve category organization described in [src/assets/README.md](../../src/assets/README.md). Models belong under the existing model structure; world layouts belong in `src/maps`. Concept renders are reference art, not runtime models or collision assets.
 
-The repository's automated release publishes scripts; non-script art assets require the existing Studio asset workflow. Adding this document does not apply a visual overhaul to the live game.
+The repository's automated release publishes scripts; non-script art assets go through Studio or the manual upload workflows in [DEPLOYMENT.md](../ops/DEPLOYMENT.md#manual-asset-workflows) (lobby map, player character, UI sprites). Adding this document does not apply a visual overhaul to the live game.
 
 Exact triangle, texture, instance, memory and draw-call limits remain to be established through device profiling. Do not treat a guessed per-tree budget or a concept image's apparent tree count as an approved limit.
 

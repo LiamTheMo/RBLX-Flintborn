@@ -4,9 +4,11 @@ Everything under `src/assets` is synced 1:1 into `ReplicatedStorage.Assets`
 via `default.project.json`, so folder names here are instance names in
 Studio too — keep them PascalCase.
 
-The automated release only ships scripts. Models, images and other assets
-placed here reach the live game through Studio (Rojo sync, then publish from
-Studio), never through GitHub Actions.
+The automated release (`deploy.yml`) only ships scripts. Models, images and
+other assets placed here reach the live game through Studio (Rojo sync, then
+publish from Studio). The lobby map, the player character and the UI sprites
+have their own manual upload workflows instead
+([docs/ops/DEPLOYMENT.md](../../docs/ops/DEPLOYMENT.md#manual-asset-workflows)).
 
 ## Models
 
