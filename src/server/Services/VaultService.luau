@@ -140,9 +140,13 @@ function VaultService.Start()
 	-- the amount it would delete, until the client confirms the loss (GDD §53).
 	-- The confirmation names the material and the loss shown, so a stack that
 	-- changed in between (a withdraw merged into it, slots shifted) is refused again.
-	Remotes.Handle("VaultDeposit", function(player, index, confirmCatalogId, confirmLoss)
+	-- `quantity` (optional): how many of the slot's stack to store; nil stores it all.
+	Remotes.Handle("VaultDeposit", function(player, index, confirmCatalogId, confirmLoss, quantity)
 		if not Validation.IsQuantity(index, 1, 50) then
 			return false, "BadRequest"
+		end
+		if quantity ~= nil and not Validation.IsQuantity(quantity, 1, GameConstants.MATERIAL_STACK_MAX) then
+			return false, "BadQuantity"
 		end
 		local confirmed = nil
 		if confirmCatalogId ~= nil then
@@ -152,13 +156,13 @@ function VaultService.Start()
 			confirmed = { catalogId = confirmCatalogId, loss = confirmLoss }
 		end
 		local ok, reason = operate(player, "VaultDeposit", function(profile)
-			return VaultRules.Deposit(profile, index, os.time(), confirmed)
+			return VaultRules.Deposit(profile, index, os.time(), confirmed, quantity)
 		end)
 		if ok then
 			VaultService.Deposited:Fire(player)
 		elseif reason == VaultRules.WOULD_OVERFLOW then
 			local profile = ProfileService.GetProfile(player)
-			return false, reason, profile and VaultRules.DepositLoss(profile, index) or 0
+			return false, reason, profile and VaultRules.DepositLoss(profile, index, quantity) or 0
 		end
 		return ok, reason
 	end)

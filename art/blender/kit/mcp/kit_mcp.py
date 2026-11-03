@@ -4,7 +4,7 @@ The kit is re-modelled by hand in the open Blender (art/blender/assets/kit/Flint
 Helpers defined only inside an MCP call vanish when Blender restarts, so the shared ones live here.
 Load once per Blender session (each MCP call can then use NS["..."]):
 
-    import sys; sys.path.insert(0, "D:/Projects/Roblox/RBLX-Flintborn/art/blender/kit/mcp")
+    import sys; sys.path.insert(0, "<repo>/art/blender/kit/mcp")
     import importlib, kit_mcp; importlib.reload(kit_mcp); kit_mcp.install()
 
 Per-model shape builders stay in the MCP calls; only generic tools belong here.
@@ -19,7 +19,8 @@ import bmesh
 import bpy
 from mathutils import Matrix, Vector
 
-REPO = "D:/Projects/Roblox/RBLX-Flintborn"
+# Repo root from this file's place (art/blender/kit/mcp), so the kit works on any machine.
+REPO = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "..")).replace("\\", "/")
 LIB = REPO + "/art/blender/lib"
 NS = bpy.app.driver_namespace
 
@@ -958,9 +959,44 @@ def restore_palette():
     return added
 
 
+def relink_images():
+    """Fix image paths after the kit file moves between checkouts: point paths under another repo root at this one
+    (relative), and repaint water previews missing from the gitignored assets/kit/water_preview/ cache from each
+    material's stored flintkit_key / flintkit_hex. Missing images otherwise render pink."""
+    import kitwater
+    import flintkit
+    fixed = []
+    for mat in bpy.data.materials:
+        node = mat.node_tree.nodes.get("FB_WaterTex") if mat.node_tree else None
+        im = node.image if node is not None else None
+        if im is None or im.packed_file or os.path.exists(bpy.path.abspath(im.filepath)):
+            continue
+        key, hexcol = mat.get("flintkit_key"), mat.get("flintkit_hex")
+        if key and hexcol:
+            stem = os.path.splitext(im.name)[0]
+            path = kitwater.cached_png(os.path.join(flintkit.WATER_PREVIEW_DIR, stem + ".png"), hexcol, key)
+            im.filepath = bpy.path.relpath(path) if bpy.data.filepath else path
+            im.reload()
+            fixed.append(im.name)
+    for im in bpy.data.images:
+        if im.source != "FILE" or im.packed_file or os.path.exists(bpy.path.abspath(im.filepath)):
+            continue
+        p = im.filepath.replace("\\", "/")
+        i = p.find("/art/")
+        tries = [REPO + p[i:]] if i >= 0 else []
+        tries += [REPO + d + os.path.basename(p) for d in ("/art/reference/kit/", "/art/blender/assets/references/")]
+        new = next((t for t in tries if os.path.exists(t)), None)
+        if new:
+            im.filepath = bpy.path.relpath(new) if bpy.data.filepath else new
+            im.reload()
+            fixed.append(im.name)
+    return fixed
+
+
 def install():
     load_kit()
     restore_palette()
+    relink_images()
     NS.update(set_colour=set_colour, sheet_coll=sheet_coll, socket=socket, hull_rock=hull_rock, tag=tag,
               mk=mk, row_objs=row_objs, render_row=render_row, check=check, stats=stats, DOME=DOME,
               crop=crop, ref_sheet=ref_sheet, sample=sample, calibrate=calibrate, pebble=pebble, drape=drape, leaf=leaf, clover=clover, daisy=daisy,

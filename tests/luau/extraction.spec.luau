@@ -226,6 +226,37 @@ test("backpack materials stay put until deposited; a confirmed deposit past capa
 	expectEq(profile.vault.lastOverflow.at, 77, "a deposit with no loss keeps the last notice")
 end)
 
+test("a deposit can store part of a backpack stack; the client's amount is checked", function()
+	local profile = ProfileSchema.Default(0)
+	profile.vault.materials.Stone = 990
+	profile.lobbyBackpack.slots = {
+		{ catalogId = "Stone", quantity = 300 },
+		sword("a"),
+		{ catalogId = "Redberry", quantity = 9 },
+	}
+	for _, bad in { 0, -1, 301, 2.5, 0 / 0, math.huge, "5", true } do
+		local ok, reason = VaultRules.Deposit(profile, 1, 1, nil, bad)
+		expect(not ok and reason == "BadQuantity", "refused amount " .. tostring(bad))
+	end
+	expectEq(profile.vault.materials.Stone, 990, "refused amounts change nothing")
+	expectEq(VaultRules.DepositLoss(profile, 1, 10), 0, "10 more fit")
+	expectEq(VaultRules.DepositLoss(profile, 1, 30), 20, "30 would lose 20")
+	expect(VaultRules.Deposit(profile, 1, 1, nil, 10), "store 10 of the 300 Stone")
+	expectEq(profile.vault.materials.Stone, 1000, "10 banked")
+	expectEq(profile.lobbyBackpack.slots[1].quantity, 290, "290 stay in the backpack slot")
+	local ok, reason = VaultRules.Deposit(profile, 1, 2, nil, 5)
+	expect(not ok and reason == VaultRules.WOULD_OVERFLOW, "a full material still asks first")
+	expect(not VaultRules.Deposit(profile, 2, 2, nil, 2), "a unique item stores only as one")
+	expect(VaultRules.Deposit(profile, 3, 3, nil, 4), "store 4 of 9 berries")
+	expectEq(profile.lobbyBackpack.slots[3].quantity, 5, "5 berries stay")
+	local stored = profile.vault.items[#profile.vault.items]
+	expectEq(stored.catalogId, "Redberry", "the part goes in as its own vault entry")
+	expectEq(stored.quantity, 4, "with the amount stored")
+	expect(VaultRules.Deposit(profile, 3, 4, nil, 5), "the rest stores too")
+	expectEq(#profile.lobbyBackpack.slots, 2, "an emptied slot leaves the backpack")
+	expect(VaultRules.Deposit(profile, 2, 5, nil, nil), "nil stores the whole slot")
+end)
+
 test("replaying a settlement receipt never credits twice", function()
 	local profile = ProfileSchema.Default(0)
 	local items = { { catalogId = "Stone", quantity = 30 }, sword("s1") }

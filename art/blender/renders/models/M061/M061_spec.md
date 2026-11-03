@@ -822,3 +822,390 @@ All 14 recommendations are accepted. The open questions are ruled as follows:
     - Petals are warm white, not grey or blue.
     - The rosette is not dark overall, which was W07's fault.
 14. **Budget.** Small-prop extended: hero ceiling 1400 (plan 1100–1250), every part under 1000. Accepted because thick petals and 17 solid leaves need the tris.
+
+## Stage 1 — Modelling (modeller, 2026-10-31)
+
+Builder `art/blender/kit/mcp/m061.py` (`build()`, `hero_only()`, `preview()`, `render_spin()`), background Blender on port
+9880, work file `art/blender/assets/kit/wip/M061.blend`. Every part has its own function and the hero is assembled strictly
+from them: `hub`, `leaf` (17 leaves from the `LEAVES` table), `petal`, `bead`, `cup`, `stem` (→ `head`, `flower`). The hero
+is one object of 42 separate closed shells (hub 1, leaves 13, rim leaves 4, stems 3, cups 3, beads 3, petals 15); no
+booleans. Each shell is registered with its kind and name (`o["m061_pieces"]`, JSON), so every report names pieces.
+
+- **Heads** (§2.3, decision 3). Fixed growth normals H_M az 300° tilt 45°, H_R 330° 60°, H_L 250° 55°; petal-plane
+  centres H_M (0.10, 0.30, 1.73), H_R (0.89, −0.165, 1.60), H_L (−0.81, −0.06, 1.37). Bead centres land at z 1.80 / 1.65 /
+  1.42 (sheet 1.88 / 1.66 / 1.42; H_M is 0.08 lower so the tallest petal tip stays at 2.19 against the 2.2 target).
+  - **Petals:** five per head, a closed blunt lozenge plate: 5-vert section (two top edges, a centre crease raised 0.012,
+    two bottom edges), thickness 0.05 (0.062 at the crease), three stations from r 0.06 under the bead: base 0.30 W, widest
+    1.0 W at 0.58 L, a blunt end 0.56 W wide (outline: six corners). L 0.50, W 0.37 (W : L 0.74; H_L 0.44 × 0.36). Each
+    lifts 11–14.5° out of the head plane (a shallow cup; no two petals coplanar) and is turned ±3–5° on its own axis;
+    adjacent petals overlap near the bead, with clear notches between the tips. 26 tris.
+  - **Bead:** a squat gem: bottom point (sunk in the cup), 8-sided equator Ø 0.40 at +0.04, 8-sided top ring turned half a
+    step at +0.145 (antiprism facets), flat octagonal top. 30 tris. Stands 0.12 above the petal tops.
+  - **Cup:** 8-sided, two rings of outer faces (Ø 0.16 → 0.26 → 0.35 over 0.17), flat top just inside the petal bases,
+    flat bottom. 44 tris.
+  - **Stem:** a hexagonal prism (Ø 0.15 → 0.13) through foot (inside the hub top) → two via points → the **crook** on the
+    cup axis 0.09 under the cup → the top end 0.06 inside the cup; rings mitred at each bend. H_M nearly straight with a
+    0.06 forward bow and a back lean, H_L rising up-left with a kink, H_R a smooth arc to the right. 56 tris.
+- **Leaves** (§2.4, decision 4). Closed kites, 6-vert section (left edge top, ridge, right edge top, right edge bottom,
+  keel, left edge bottom): edges 0.06 thick, each half rises 13° to the ridge (one half lit, one shaded), keel 0.02. The
+  face turns up and radially outward along the leaf's growth azimuth; a few leaves carry a fixed growth twist (`roll`).
+  Three spine types:
+  - **Bezier** (fan F1–F3, rising N5 / N6): base on the hub, control along azimuth / pitch, stations at t 0 / 0.42 /
+    0.74 with half-widths 0.17 / 0.5 / 0.36 W, tip point. 34 tris.
+  - **Hanging** (`spine`: N1–N4, N7 / N8, and the spreading F4 / F5): base on the hub, the blade's narrow upper end high
+    near the centre, its widest point on the way down, the tip on (or, for F4 / F5, above) the ground; the rising petiole
+    hides behind the blade. This is how the sheet's big front leaves read: kites hanging from z 0.82 with their tips on the
+    ground. 34 tris.
+  - **Rim** (K1–K4): base on the ground (keel at −0.02), a low arch (top z 0.33) and the tip back down at z 0.05; one
+    station plus the base. 22 tris.
+- **Hub:** 8-sided collar Ø 0.42 → 0.36, z −0.02 … 0.18, closed, no socket (decision 6). 28 tris.
+
+**Tuning on the renders.** The first build (spec §2.4 numbers, all leaves Bezier with narrow 0.28 W bases) read as a
+spiky tuft: narrow blades, the side views full of edge-on spikes, the front's two big leaves a "W" of upright cards.
+Changes, each checked on front / f34 / spin:
+1. Leaves broadened (W 0.46–0.74, base 0.34 W, widest earlier); the big front / back leaves rebuilt as hanging kites
+   (above); the rim leaves broadened and arched.
+2. Every leaf placed by growth only. Twists are kept only where they help every azimuth (fan F1–F3 ±30°, spread F4 / F5
+   ±30° toward the front); the hanging leaves are untwisted, since their outward-up faces already read from the front and
+   the sides.
+3. Leaves moved off the stems (fan F1 az 72, F2 140, F3 18; F4 / F5 / N5 / N6 moved; never the stems).
+4. Width: H_L and H_R moved in so the herb is 2.64 wide (target 2.55 ± 0.15); depth from the hanging leaves' tips.
+
+**Measured (final; `meas.py` with the study's `cls()`; sheet / ours):**
+
+| View | W : H | G / W / Y | Fill | Notes |
+| --- | --- | --- | --- | --- |
+| front_sheet (0, 5) | 1.167 / **1.131** ✓ | 61.8 / 32.5 / 5.7 → **62.0 / 32.1 / 5.9** ✓ | 0.65 / 0.568 (0.03 under the band) | heads (x, h) H_L −0.39, .64 / **−0.36, .66**; H_M .05, .85 / **.05, .83**; H_R .45, .75 / **.41, .76** ✓ |
+| f34_sheet (−10, 12) | 1.286 / **1.04** ✗ | 65.6 / 28.9 / 5.6 → 62.9 / 31.3 / 5.8 ✓ | 0.611 / 0.561 | see notes (the sheet's f34 draws the plant 10 % wider than its own front) |
+| rear_sheet (180, 5) | 1.082 / **1.161** ✓ | Y 0.4 / **0.1** ✓; G 71 / 67.5 | 0.568 / 0.546 | three cups from behind |
+| r34_sheet (170, 12) | 1.122 / **1.109** ✓ | Y 0.3 / **0.1**; G 78 / 71.5 | | |
+| side_sheet (90, 5) | 0.917 / **0.891** ✓ | 64.7 / 30.8 / 4.5 → 65.9 / 29.4 / 4.6 | 0.41 / 0.528 | side270 0.906; kept 90 |
+| top_sheet (0, 85) | 1.17 / 1.455 | | | content: three face-up five-petal heads over a star of kites |
+
+- Front top profile (f .0 → 1.0): sheet `.55 .74 .82 .80 .95 1.00 .94 .94 .90 .85 .70`, ours `.68 .75 .85 .77 .99 .94 .97
+  .84 .94 .89 .69`: within 0.08 for f .1–.9 except f .7 (−0.10).
+- Front fifths: green 26 / 39 / 31 / 5 / 0 (sheet 30 / 42 / 22 / 6 / 0; the third fifth +9), petals 0 / 0 / 15 / 52 / 34
+  (86 % above h .6 ✓).
+- **Hero size 2.64 × 2.03 × 2.21** (targets 2.55 ± 0.15, 2.1 ± 0.15, 2.2 ± 0.08 ✓). Origin offset from the hub axis
+  (0.013, −0.035, −0.02).
+- Leaf hierarchy: fan tips z 1.26–1.32, rising 0.98 / 1.02, spread blades top 1.05–1.09 with tips at 0.62–0.66, hanging
+  tops 0.78–0.82 with tips on the ground (0.02–0.03), diamonds top 0.46–0.48, rim tops 0.33.
+
+## Stage 2 — Optimisation and cleanup
+
+`_post()` per object: triangulate, normals per shell, flat shading, no custom normals, origin at the bbox bottom centre
+(`o["m061_offset"]`), `M.fix_bowties` (none needed), UVs.
+
+| Object | Tris | Size (studs) | Shells | Collision |
+| --- | --- | --- | --- | --- |
+| MeadowHerb (hero) | **1338** / 1400 | 2.64 × 2.03 × 2.21 | 42 | none |
+| MeadowHerbPetal | 26 | 0.42 × 0.50 × 0.16 | 1 | none |
+| MeadowHerbCenter | 30 | 0.40 × 0.40 × 0.22 | 1 | none |
+| MeadowHerbStem | 100 | 0.33 × 0.55 × 1.75 | 2 (stem, cup) | none |
+| MeadowHerbLeaf | 34 | 0.75 × 1.02 × 0.80 | 1 | none |
+| MeadowHerbLeafBase | 198 | 2.60 × 1.13 × 1.34 | 6 (hub + F1–F5) | none |
+
+Hero split: leaves 442, petals 390, stems 168, cups 132, beads 90, rim leaves 88, hub 28. Every object has 0 non-manifold
+edges, **0 bowtie verts**, 0 boundary / wire / loose, 0 zero-area, 0 n-gons, 0 duplicate verts, normals outward, transforms
+applied and origin offset (0, 0, 0). Every shell has **0 winding errors**, 0 self-intersections and a positive volume. The
+smallest corner is 2.97° (0 under 2°). `K.check`: no problems; baked shading hero 0.02, parts ≤ 0.10.
+
+**Contact / float / bury** (`contact_report`, `bury_report`, ray parity):
+- **Floating shells 0, unchained 0** (also 0 at chain tolerance 0.1). Hub and rim leaves on the ground; sink −0.02 (≤ 0.03 ✓).
+- Seats: every petal touches its cup and its bead (gap 0.0, 15 / 15); every bead touches its cup; every stem its cup and
+  the hub.
+- Stem feet 0.07 in the hub, stem tops 0.06 in their cups (0.06–0.08 / 0.05–0.08 ✓); beads 0.07 in their cups (≤ 0.12 ✓).
+- Petals: seat depth under the bead 0.069–0.074; **0.000 inside bead or cup outside the seat** (r > 0.22) for all 15.
+- Leaves: 0 inside the hub outside their bases; visible stem cuts ≤ 0.013 (≤ 0.03 ✓); share of a leaf's verts (outside the
+  hub region) inside another leaf ≤ 0.25 (F1 0.25, others ≤ 0.23). In the leaf junction (r < 0.30, z < 0.50), where the
+  petioles and stem feet crowd out of the hub, petioles overlap stem feet by up to 0.046 (close-up 2's butt joins, hidden
+  by the leaves). Buried pieces: 0.
+- Every leaf vertex is at z ≥ −0.005 (the hub at −0.02); hanging tips rest at 0.02–0.03.
+
+## Stage 3 — UV
+
+`M.smart_uv(angle 45, ANGLE_BASED, margin 0.008)` + `m012._uv_unfold` (nothing cut): every object 0 overlaps, 0 flipped,
+min island gap 0.016, border 0.008, texel density 1.0 / 1.0 / 1.0, conformal stretch p95 ≤ 1.03. Hero 445 islands. The
+exporter writes its own palette UVs.
+
+## Stage 4 — Materials, colour and texture
+
+**Calibration.** `m061.calibrate()` (`K.calibrate`, faceted dome, 6 iterations) against §5.4, then checked on the hero's
+own front / f34 renders with the sheet masks:
+
+| Key | Final hex | Dome result (rendered) | Why the final differs |
+| --- | --- | --- | --- |
+| `m061_petal` | **`#D6D0C3`** | `#C1C3BE` (244, 240, 223) | the dome value has B > R (bluish grey); kept warm-neutral (R ≥ G ≥ B), tested on the hero: front W median `#FEF0D7` vs sheet `#F5EFDF`, lit `#FFFFF1` vs `#FEFDF5` |
+| `m061_petal_base` | **`#CFC6B5`** | `#C0BBB1` (243, 229, 206) | same; slightly warmer and deeper than the body |
+| `m061_centre` | **`#EDB600`** | `#EAA900` (255, 206, 34) | the hero's bead rendered orange-ish (`#FFC22C`); G raised: now `#FFD12C` vs `#FCCE0B` |
+| `m061_leaf_light` | **`#80A533`** | (156, 200, 52) | unchanged; hero light tone `#96C935` vs `#9ECB34` |
+| `m061_leaf_mid` | **`#44751C`** | `#4C771C` (88, 140, 28) | greener so the front all-green median sits within 15: `#669327` vs `#598D1D` |
+| `m061_leaf_dark` | **`#43702B`** | (77, 131, 43) | unchanged |
+| `m061_stem` | **`#3F681E`** | (72, 120, 30) | unchanged; the Stem part renders `#45751C` vs the sheet's parts stem `#477A1D` |
+
+`m061_centre_deep` is dropped (see "Deviations"). Key hues: light 80°, mid 92°, dark 100°, stem 93°; no olive key.
+
+**Colour by role and position, never by facing.**
+- Leaves: three station bands per leaf (base / body / tip), each one tone on the ladder dark 0 / mid 1 / light 2 (25 %
+  mix steps), by the leaf's role (§5.3):
+  - front hanging N1 / N2: mid base → 50 % light body → light tip;
+  - back hanging N3: 25 % light base → light; N4: mid → 75 % light → light;
+  - right fan F3, spread F5, rising N5, diamonds N7 / N8: mid to light;
+  - fan F1 / F2, spread F4, rising N6: 50 % dark base → mid → 75 % light tip;
+  - rim K1–K4: dark with a 25 % mid tip.
+- Petals: inner band (base → 0.58 L) 50 % `petal_base`, base cap `petal_base`, the rest `petal`.
+- Stems `stem`, the lowest segment 50 % `leaf_dark`; cups `stem`, the upper ring and top 50 % `leaf_mid`; hub `leaf_dark`.
+- Bead: one `centre` key.
+- **Tint:** per leaf ±0.03 and per band ±0.02; per petal ±0.02; beads, stems, cups ±0.02; hub ±0.03. Finish: greens rough
+  0.8–0.85 low-spec, petals 0.8 low-spec, bead 0.6; no metal, no emission.
+
+**Re-measured on the final renders (same masks):**
+
+| | Sheet | Ours | Tolerance |
+| --- | --- | --- | --- |
+| front tones light / mid / dark | 31 / 40 / 29 | **27 / 41 / 32** | ± 8 ✓ |
+| f34 tones | 33 / 40 / 27 | **30 / 44 / 26** | ± 8 ✓ |
+| front all-green median | `#598D1D` | `#669327` | within 15 ✓ (R +13) |
+| front light-tone median | `#9ECB34` | `#96C935` | within 12 ✓ |
+| front mid / dark medians | `#588B1B` / `#2C5712` | `#6B9C29` / `#30510F` | mid R +19 |
+| front petal median / lit | `#F5EFDF` / `#FEFDF5` | `#FEF0D7` / `#FFFFF1` | within 10 ✓ |
+| front bead median | `#FCCE0B` | `#FFD12C` | within 12 except B (+33, studio fill) |
+| Stem part | `#477A1D` | `#45751C` | within 12 ✓ |
+| rear tones | 28 / 51 / 21 | 3 / 55 / 42 | the studio key is front-left (as 059) |
+
+## Stage 5 — Lighting
+
+Skipped: the sheet shows nothing glowing and no light (§7). No emission. Studio-side notes (Requires Manual Validation):
+- The petals must read warm white under the game sun. Their key `#D6D0C3` is the calibrated value for the kit studio,
+  which renders it `#FEF0D7`. If Roblox shows them greyish, raise the petal keys toward `#E8E0CC` / `#DED2B8` (tested:
+  front median `#FFFFDE`, still warm).
+- The beads should stay golden, the lime leaves lime, the stems dark green.
+
+## Stage 6 — VFX
+
+Skipped: the sheet shows no effect (§7); no sockets (checked in `build()`'s problems). A pollen mote or wind sway would be
+a Studio-side choice (decision 11).
+
+## Modeller's notes for the verifier
+
+- **Cameras.** `front_sheet (0, 5)` governs positions. `f34_sheet` is **(−10, 12)**.
+  - Probing az −20 / −10 / 0 × e 8 / 12 / 16 / 20 (`pscore.py`: top-profile + width-profile + W : H error) gave W : H 1.10
+    at (0, 8), falling to 0.95 at (−20, 20). No camera reaches the sheet's 1.286, because the sheet's f34 cell draws the
+    herb about 10 % wider than its own front (2.83 vs 2.57 studs, §1.1).
+  - (−10, 12) is a compromise: three-quarter enough to show the heads' depth, W : H 1.04.
+  - Also `r34_sheet (170, 12)`, `front34` / `rear34` the same, `side_sheet (90, 5)` (and `side270_sheet`), `top_sheet
+    (0, 85)`. All `*_sheet` shots use the 3× lens with the floor hidden. `spin.png`: az 0 … 315 in 45° steps at e 10.
+- **Eight azimuths** (`vis.py`, ray grid at e 10, step 0.02): leaf pixels within 12° / 20° of edge-on, the bare core (hub
+  + stems) as a share of the visible leaf pixels, and each head's ring ratio |n · d|:
+
+  | View | Edge-on 12° / 20° | Core / foliage | Hub px | Head ratios H_M / H_R / H_L |
+  | --- | --- | --- | --- | --- |
+  | az 0 | 2.4 / 5.0 % | 15 % | 55 | .73 / .51 / .86 |
+  | az 45 | 5.9 / 8.6 | 12 | 10 | .80 / .91 / .44 |
+  | az 90 | 2.2 / 10.0 | 11 | 77 | .47 / .83 / .18 (H_L hidden behind) |
+  | az 135 | 7.0 / 18.0 | 12 | 9 | **.06** / .31 / .63 |
+  | az 180 | 1.8 / 10.3 | 13 | 54 | .48 / .34 / .66 |
+  | az 225 | 4.5 / 8.9 | 11 | 8 | .55 / .74 / .24 |
+  | az 270 | 2.2 / 16.1 | 15 | 82 | .23 / .65 / .38 |
+  | az 315 | 5.8 / 13.1 | 14 | 38 | .30 / **.13** / .83 |
+  | top | 0.4 / 5.7 | 8 | 19 | .76 / .54 / .64 |
+
+  - Edge-on leaf area is ≤ 7 % at 12° in every view (≤ 18 % at 20°).
+  - At most one head is near edge-on in any view (az 135 H_M, az 315 H_R); those still show the bead, cup and petal
+    thickness.
+  - The first build measured 32–36 % (20°) at az 90 / 270: the spread leaves pointed at the side cameras with flat tips,
+    and twists set the wrong way turned the hanging leaves' faces away from the sides. Fixes: spread leaves droop at the
+    tips, hanging leaves untwisted, rim leaves arched.
+- **Twist sign.** `Matrix.Rotation(roll, 3, T)` turns the face normal toward −w for a positive roll (w = the leaf's
+  left-hand width axis, 90° counter-clockwise from its azimuth). F4 −30 / F5 +30 turn both spread faces toward the front.
+- **Leaf junction.** Petioles cross the stem feet within r 0.30 / z 0.50 of the hub axis by up to 0.046 (reported as
+  `junction`); everywhere else stem cuts are ≤ 0.013. The hub shows as a sliver in the side views (77–82 of about 4800
+  visible px, about 1 %), between the rim leaves.
+- **Leaf shape.** Kite tips are 59–72° (spec 45–60°) and L : W is 1.7–2.5 (spec 2.1–2.7; parts row 1.9): broader and
+  blunter than §2.4, chosen against the renders (the spec's narrower kites read as spikes). Never needles.
+- **Parts.**
+  - MeadowHerbPetal lies in its own frame (head normal +Z, lifted 11°).
+  - MeadowHerbCenter is upright.
+  - MeadowHerbStem is H_M's stem and cup as in the hero (crook and tilted cup).
+  - MeadowHerbLeaf is N1 as in the hero (a hanging kite).
+  - MeadowHerbLeafBase is the hub with F1–F5 as in the hero.
+  - Offsets are in `o["m061_offset"]`.
+- **Exploded shot** is a temp build (`EXPLODE["on"]`): heads lifted along their normals (petals spread 0.25, bead 0.85,
+  cup 0.30), stems lifted 0.3, ring and rim leaves pulled 0.35 out.
+- **Close-ups:**
+  - `head_cu`, and `head_edge` (H_M in its own plane);
+  - `petal_edge` (the Petal part edge-on: 0.05 thickness);
+  - `head_under`, `rosette_cu`, `junction_cu`;
+  - `base_under` (LeafBase from below: the octagonal collar);
+  - `edge_side`;
+  - `thumb_sheet` (about 120 px: three five-petal stars with yellow dots over a rosette of separate tips);
+  - `scale` (5.5-stud markers on either side; the herb is 0.40 of them).
+- **Scratch scripts** in
+  `<temp>\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m061w\`:
+  - `meas.py`: the sheet masks on our renders (`uv run --no-project --with pillow --with numpy --with scipy python meas.py
+    front_sheet sheet:front …`);
+  - `pm.py` (colours), `pscore.py` (camera probes);
+  - `vis.py` (eight azimuths) and `cut.py` (leaf / stem cuts), both run in Blender;
+  - `full.py` / `hp.py` (builds);
+  - outputs `final_meas.txt`, `vis.json`, `full.json`.
+
+### Deviations from the Decisions and the study
+
+| Item | What and why |
+| --- | --- |
+| Bead colour | One `centre` key, no `centre_deep` lower band (§5.3). Any band on a gem follows facing (K.check corr 0.95–0.98 on the Center part, even for the bottom cone alone), and in the hero the bead's lower half sits inside the petal ring and cup. The sheet's orange lower band is left to the lighting. |
+| Petal key hex | `#D6D0C3` (a warm light grey in Blender), because the kit studio renders bright; it renders cream `#FEF0D7`. Not white, not blue (R ≥ G ≥ B). Studio check noted in Stage 5. |
+| Leaf shapes | Hanging spine for N1–N4, N7 / N8 and the spreading F4 / F5 instead of a single arch; broader, blunter kites (above); rim leaves arched with their tips on the ground. |
+| Leaf positions | Fan F1 az 72 / F2 140 / F3 18 (spec 95 / 160 / 30), N5 az 342 (spec 10), N6 150 (165), F4 194 / F5 6: moved off the stems and each other. |
+| f34 camera | (−10, 12); W : H 1.04 against the sheet's 1.286 (see notes). |
+| Budget | 1338 tris (plan 1100–1250, ceiling 1400 ✓). Cups kept at two rings (44 tris), petals with the crease (26). |
+| Head height | H_M's bead at 1.80 (sheet 1.88, within ±0.06 H) so the top stays at 2.19. |
+
+### Leftovers
+
+- Front fill 0.568 (band 0.60–0.70) and the third green fifth 31 % (sheet 22 ± 6): the rosette has a little less mass
+  low at the sides and a little more in the middle than the sheet.
+- Rear / r34 / side tones read 3 % light (sheet 28 %): the studio key comes from the front-left.
+- Top W : H 1.455 (sheet 1.176; a content-only view).
+- Rear petal median `#A59E91` vs the sheet's `#CBBB9B`: greyer in the rear shade.
+
+### Main session ruling on the modeller's deviations (2026-10-31)
+- **Accepted:**
+  - deviation 1: the bead uses one golden key, because a band on a gem would follow its facing;
+  - deviation 3: broader, blunter leaves and moved directions;
+  - deviation 4: the f34 camera at (−10, 12);
+  - deviation 5: H_M at z 1.80;
+  - deviation 6: 1338 tris, under the 1400 ceiling.
+- **Deviation 2, the petal key:** `#D6D0C3` is accepted for now. Its read in Roblox goes on the Studio check list. If it reads grey there, raise it to `#E8E0CC` / `#DED2B8`.
+- **Verifier:** judge the leftovers against the sheet.
+
+## Stage 7 verification (round 1)
+
+Fresh verifier, read-only. Background Blender on port 9880 on `art/blender/assets/kit/wip/M061_verify.blend` (not
+saved; two session-only tests below were restored before stopping). Renders in `art/blender/renders/models/M061/verify/`;
+scripts in `<temp>\...\scratchpad\m061v\` (`geo.py`, `contact.py`, `bury2.py`, `ren*.py`, `lt.py`, `ptest.py`; the
+modeller's `meas.py` and `vis.py` re-run unchanged after reading them).
+
+**Verdict: PASS, 8 / 10.** No blockers. The herb reads like the sheet: three chunky five-petal daisies at three heights
+on thick hex stems over a broad rosette of thick faceted kites. The minors below are worth a fix if a round is spent, the
+petal key first.
+
+### Technical (re-measured)
+
+| Object | Tris | Size (studs) | Shells | Non-manifold / boundary / wire / loose / zero-area / n-gons / bowties / winding / self-hits / dup | Origin, transforms |
+| --- | --- | --- | --- | --- | --- |
+| MeadowHerb | **1338** / 1400 | 2.645 × 2.030 × 2.211 | 42 (hub 1, leaves 13, rim 4, stems 3, cups 3, beads 3, petals 15) | all 0; every shell volume > 0 | bbox bottom centre (0, 0, 0); rot 0, scale 1; no modifiers |
+| MeadowHerbPetal | 26 | 0.421 × 0.498 × 0.160 | 1 | all 0 | ✓ |
+| MeadowHerbCenter | 30 | 0.397 × 0.397 × 0.225 | 1 | all 0 | ✓ |
+| MeadowHerbStem | 100 | 0.325 × 0.553 × 1.746 | 2 | all 0 | ✓ |
+| MeadowHerbLeaf | 34 | 0.753 × 1.024 × 0.799 | 1 | all 0 | ✓ |
+| MeadowHerbLeafBase | 198 | 2.600 × 1.127 × 1.340 | 6 | all 0 | ✓ |
+
+- Sizes within the decision-1 tolerances (2.55 ± 0.15, 2.1 ± 0.15, 2.2 ± 0.08). Hero sink −0.02 (≤ 0.03 ✓); origin
+  offset from the hub axis (0.013, −0.035).
+- Flat shading, no custom normals, `M.audit` normals outward on all six. `K.check`: no problems. No emission, no VFX
+  children. Collision `none` on all six.
+- Smallest corner 2.97° on the hero and the Leaf part (stage 2 asked ≥ 3°; the build check is 2°). Numeric only.
+- UVs: 0 overlaps, 0 flipped, min island gap 0.016, border 0.008, density 1.0, conformal stretch p95 ≤ 1.03 on all six.
+- Colour code read: leaves by station band and role (`_tone` per band), petals by band, cups by ring, stems by
+  segment, one bead key. Nothing reads a face normal. ✓
+
+### Floating and buried (own BVH gaps and 3-ray parity, edge midpoints sampled too)
+
+- **Floating 0, unchained 0.** The ground set is the hub and K1–K4; every other shell chains to it within 0.03.
+- Seats: all 15 petals touch their cup and their bead (gap 0.0); every bead touches its cup; every stem touches its cup
+  and the hub.
+- Designed seat depths: petals under the bead 0.069–0.074; beads in their cups 0.070; stem tops in their cups 0.060;
+  stem feet in the hub 0.073–0.078; ring-leaf bases in the hub 0.073–0.084 (spec 0.04–0.08, +0.004 at most).
+- **Beyond the seats:** petals inside bead or cup at r > 0.22 are 0.000 for all 15. Leaves inside the hub outside
+  r 0.24 are 0 for all 17. Leaf-in-leaf share (verts outside the hub region) is at most 0.18 (F5 in N5); the limit is
+  0.25. Buried 0.
+- **Leaf through stem.** F4 cuts H_L's stem by **0.057** at (−0.21, 0.02, 0.40). F5 / F3 / F1 cut the stem feet by
+  0.042–0.053 at z 0.16–0.30. All of these are inside the leaf junction (r < 0.30, z < 0.50) and hidden in the rosette.
+  The modeller reported up to 0.046; denser sampling finds 0.057. Outside the junction every cut is ≤ 0.022 ✓. Numeric
+  and hidden.
+
+### Views against the sheet (`meas.py`, the study's masks; sheet → ours)
+
+| View | W : H | G / W / Y | Fill | Tones L / M / D | Notes |
+| --- | --- | --- | --- | --- | --- |
+| front (0, 5) | 1.167 → **1.144** ✓ | 61.8 / 32.5 / 5.7 → **60.6 / 33.7 / 5.7** ✓ | 0.650 → **0.581** ✗ | 31 / 40 / 29 → **30 / 39 / 31** ✓ | heads (x, h) −0.37, .65 / 0.05, .82 / 0.41, .76 (sheet −0.39, .64 / 0.05, .85 / 0.45, .75) ✓; petals 84 % above h .6 ✓ |
+| f34 (−10, 12) | 1.286 → 1.043 | 65.6 / 28.9 / 5.6 → 61.9 / 32.4 / 5.6 ✓ | 0.611 → 0.565 | 33 / 40 / 27 → **33 / 41 / 26** ✓ | accepted camera (deviation 4); (0, 20) gives 1.014, (−20, 20) 0.957 |
+| rear (180, 5) | 1.082 → 1.173 | Y 0.4 → 0.1 ✓; G 71 → 66 | 0.568 → 0.555 ✓ | 28 / 51 / 21 → 3 / 56 / 41 | three cups from behind ✓ |
+| r34 (170, 12) | 1.122 → 1.120 ✓ | Y 0.3 → 0.1 ✓; G 78 → 71 | | 31 / 45 / 23 → 3 / 60 / 37 | |
+| side (90, 5) | 0.917 → 0.886 ✓ | 64.7 / 30.8 / 4.5 → 64.6 / 30.9 / 4.5 ✓ | 0.412 → **0.539** | 17 / 51 / 32 → 3 / 53 / 44 | side270: 0.909, fill 0.516 |
+| top (0, 85) | 1.17 → 1.454 | | | | content ✓: three face-up five-petal heads over a kite star |
+
+- **Front green fifths** 27 / 39 / 29 / 5 / 0 (sheet 30 / 42 / 22 / 6 / 0). **Width per height** at h .1–.3 is .70 / .57 / .72
+  (sheet .84 / .73 / .92): the rosette is narrower low at the sides.
+- **Colours, front:** all-green median `#6A962B` against `#598D1D` (R +17, just over the ±15 band; hue 85° against 88°, not
+  olive). Light `#97C138` against `#9ECB34` ✓; mid `#6A9B2B` (86°) ✓; dark `#325212` against `#2C5712` ✓. Petal median
+  `#FBEBD7` against `#F5EFDF` ✓ (warm, R ≥ G ≥ B); lit `#FFFFF1` against `#FEFDF5` ✓; shade quartile `#A9A08D` against
+  `#C4B79F` (greyer). Bead `#FFD12E` against `#FCCE0B` (47° golden ✓; B +35 from the studio fill). The rosette is not
+  dark overall (light 30 %) ✓.
+- **Eight azimuths** (`vis.py` re-run; same numbers as the modeller's): edge-on leaf area at 12° is 1.8–7.0 % in every
+  view, at 20° 5–18 % (az 135 18 %, az 270 16 %). The leaves are ridged solids, so I judged them by eye on `spin.png`: they
+  read as kites from every azimuth, with no balls, flaps or fins. At most one head is near edge-on per view (az 135 H_M
+  0.06, az 315 H_R 0.13), and it still shows its bead, cup and petal thickness. Bare core 8–15 % ✓.
+- **Shapes:**
+  - Petals are broad blunt lozenges (W : L 0.74, end 0.56 W) with visible thickness bands; never thin or pointed ✓.
+  - Beads are chunky, standing clearly above the petals ✓.
+  - Leaves are closed kites with a ridge V ✓.
+  - Cups are faceted and flared, with the stems entering them (`head_under`, `head_under2`) ✓.
+  - Parts against their cells: Petal, Leaf and LeafBase (a five-leaf fan) ✓. The Center is a squat gem (W : H 1.77;
+    exploded 1.25, parts row round). The Stem part is long and thin (1.75 tall, the hero's H_M stem) where the parts row
+    draws a stub; the hero governs the size (§3.9). Both are minor.
+
+### The modeller's leftovers, judged
+
+1. **Front fill 0.581 (0.60–0.70) and the third green fifth 29–31 % (22 ± 6).**
+   - The fill is **visible, mildly**. The sheet's lower corners are filled by chunky dark rim leaves and the wide spread
+     leaves (widths .84–.92 at h .1–.3). Ours has gaps there, and the rim leaves K1–K4 read as **thin dark spikes** at the
+     foot in the front, f34, rear and spin.
+   - The third fifth is **numeric only**: the upper rosette is a little fuller, which nobody would notice next to the
+     sheet.
+2. **Rear / r34 / side reading ~3 % light (sheet 28 %).** **Lighting, not composition** (unlike 059).
+   - I rendered the hero turned 180° in the same studio, so its rear faced the key: light share 29 % (rear) and 34 %
+     (r34), against the sheet's 28 / 31.
+   - The key comes from az −40 at 50° elevation, which leaves the rear in the fill only. Numeric only; the geometry and
+     tone roles are right.
+3. **Hub sliver ~1 % in the sides** (77–82 ray-px of ~4800). **Numeric only**: not distinguishable in `big_side_sheet`.
+4. **Top view wider than the sheet** (W : D 1.454 against 1.17). **Visible**: H_L and H_R stick out beyond the rosette at
+   the left and right. The sheet's top draws only two heads (§3.3, content-only view). Accepted.
+5. **Rear petals greyer than the sheet.** **Visible**, and partly the material, not only the light.
+   - Rear petal median `#ABA494` against `#CBBB9B`, and lit `#E0D6C5` against `#F9F6EB`. The petals read mid-grey in the
+     rear, r34, side270 and spin 180 / 225.
+   - Re-lit from the front (turned 180°), the undersides measure `#857E71`: they face down, away from the key, whatever
+     the azimuth. The low key `#D6D0C3` is what turns them grey.
+   - Session test with the Stage-5 fallback keys (`m061_petal #E8E0CC`, `m061_petal_base #DED2B8`, restored afterwards):
+     - rear median `#BBB19B` (+16), lit `#F0E5CE`;
+     - front median `#FFF8D9`, still within 10 of `#F5EFDF`, and warm;
+     - front shade `#B6AC93`, closer to the sheet's `#C4B79F`.
+   - **Recommended now, not only on the Studio list.**
+
+### Minors (none blocking)
+
+1. **Petal key low** (leftover 5): grey undersides in the rear and side views. Raise to `#E8E0CC` / `#DED2B8` (tested
+   above).
+2. **Rim leaves read as thin dark spikes** at the foot (front, f34, rear, spin); the sheet draws small chunky dark kites
+   lying flat. Make them broader and lower (W 0.52 → ~0.6, a lower arch), which also lifts the front fill and the
+   low-side widths.
+3. **H_L's stem is almost hidden in the front and f34.** H_L's own petals cover it down to z ≈ 0.96, and the F2 / N6
+   leaves cover it below that, so the left head looks seated on the leaves. The sheet shows that stem rising clearly
+   from the rosette. A higher H_L, or N6 / F2 moved off its line, would show it.
+4. Front all-green median R +17 against the ±15 band (numeric).
+5. Side fill 0.539 against 0.41 ± 0.06: a denser bush from the side with the stems hidden by the fan. Accepted as
+   composition (§3.4).
+6. Leaf-through-stem cuts up to 0.057 inside the junction, hidden (numeric).
+7. Ring-leaf base seats 0.084 against 0.08, and a smallest corner of 2.97° against 3° (numeric).
+8. Center part squat (W : H 1.77); Stem part long against the parts row's stub (hero governs).
+
+### Main session ruling (2026-10-31)
+Round 1 PASSED at 8/10, so the model is committed.
+- **Change before the commit:** verifier minor 1 was applied in the main session. The petal keys were raised to `#E8E0CC` / `#DED2B8`; the verifier had tested this, with the rear petals 16 lighter and the front still warm. After the GUI rebuild, `problems` was [].
+- **Recorded for polish:** minors 2–8, chiefly:
+  - the rim leaves K1–K4 reading as thin dark spikes;
+  - H_L's stem hidden in the front and f34;
+  - a narrow low rosette, giving a front fill of 0.581.
+
+Export: 6 assets, 1726 tris, 0 problems.

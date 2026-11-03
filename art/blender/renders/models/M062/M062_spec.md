@@ -837,3 +837,692 @@ All 14 recommendations are accepted. The open questions are ruled as follows:
     - The front orange leaf is the standard orange with a rust inner band; the rust leaf under the twigs is the variant.
     - Stones are warm grey with R > G > B, never lavender.
 14. **Budget.** Light full asset: hero ceiling 2200 (plan 1590–1850), every part under 1000, pinecone at most 600.
+
+## Stage 1 — Modelling (modeller, 2026-10-31)
+
+Builder `art/blender/kit/mcp/m062.py`, `build()`; built and rendered in a background session (port 9877) on
+`art/blender/assets/kit/wip/M062.blend`. Imports only committed builders (`m012`, `m033`, `m047`); nothing from
+`m057`–`m061`. Scratch scripts (measurement, comparison, camera probe) are in `<temp>\...\scratchpad\m062w\`.
+
+**Parts, each from its own function** (spec 4.1):
+- `leaf_shell(kind, …)`: one closed slab per leaf. The outline is star-shaped about the petiole hub: lobes are given as
+  (angle, length, half-span, flank profile), and the sinus radii lie between them. Construction:
+  - flat-ish bottom (one n-gon, triangulated);
+  - a vertical side band;
+  - a chamfer ring (`cham` > 0) up to an inset top ring;
+  - a top made of a hub vert plus one raised vein vert per lobe. Each lobe fans from its vein vert, so it folds along
+    its midrib.
+  The lobe flanks droop (`droop`) and the tips rise (`cup`). A vein vert is pulled toward the hub until its fan has no
+  folded triangle (`bad_fans` = 0 on every leaf).
+  Kinds:
+  - `large` (22 outline verts, a tooth on each side lobe);
+  - `maple` (24, toothed);
+  - `maple_small` (16);
+  - `variant` (20, `curl` lifts two lobes 16–18°);
+  - `ivy3` (10, no chamfer).
+  Petioles: a 5-sided tapered prism, its own closed shell, starting inside the leaf base.
+- `twig_shell`: a chamfered square section (8 verts) through station centres, with flat caps skewed 5–8°, a knot ring
+  (×1.13) on T1, and a 6° lateral kink at the knot.
+- `pinecone`: a dark 8-sided egg core plus 56 closed scales.
+  - Five rings point down and out like shingles (7 / 8 / 9 / 9 / 8).
+  - A crown ring of 9 runs up the egg's surface, lifted 12° off it.
+  - A 6-scale cap lies nearly flat over the top.
+  - Every scale root is 0.02 inside the core.
+  - Scale shape: a flat pentagon (narrow root, widest at 0.48 L, a blunt two-vert tip) under a faceted pyramid whose
+    apex is at 0.56 L, lifted T: 8 tris, a chunky faceted shingle like the sheet's.
+- `stone`: hull of jittered rings (m033 `_ring_pts` / `_hull`): flat base sunk 0.02, broad top sloping down toward the
+  front-left.
+- `chip`: hull of a jittered box with one corner chamfered (C4: a flat hexagonal leaf fragment).
+
+**Assembly by gravity** (`hero_all`, the order of spec 2.1):
+- **Base pieces.** The pinecone and stones go on the ground first.
+- **Leaves.** Ground leaves follow (Y1, Y2, L1, L2, O1, V1, G1–G3). Each lies on the ground (0.006 into it) and then
+  **drapes** over any leaf already under it. The drape is a dilated support height field, h(p) = max z(q) − slope·|p − q|,
+  applied to the whole outline column, hub, vein verts and petiole. The slope falls from 0.45 toward 0.15 until no
+  support point is more than 0.025 inside the leaf. If a leaf cuts more than 0.035 into a stone or the pinecone, it
+  moves 0.025 away from the solid it cuts and tries again.
+- **Chips.** Rigid drop onto the ground or leaves.
+- **Ts and T1.** Station heights come from a dense support profile along the beam: every 0.05 studs across 5 width
+  samples, plus every support vert inside the beam's strip. The stations either side of any profile point above the
+  chord are raised. An interior station sags at most 0.02, and an end bends down at most 4°. The twig then drops rigidly
+  0.006 into what it rests on.
+- **T2.** Its foot rests on the ground or leaf under it, and it is pitched about the foot until it first touches T1:
+  binary search, then pressed in 0.7°.
+- **O2.** Rear edge on the ground, tipped up about that edge until it first touches T1 or T2.
+- **L1's petiole.** Re-aimed from the leaf base at the pinecone's right foot, ending 0.012 inside the first surface it
+  meets.
+
+**What changed from the plan, and why** (all measured on the renders):
+- Leaves rest on the leaves under them by draping, not by a rigid drop. A rigid drop lifted a whole flat leaf 0.08–0.2
+  onto a neighbour's lobe tip, leaving it hovering on its far side.
+- V1 curls lobes 0 (front) and 4 (back-left basal). Curled side or main lobes under T1 and Ts lifted the twigs 0.08–0.2
+  and pushed T2 to a 37–43° pitch.
+- The pinecone scales are 8-tri faceted shingles, 56 of them (spec 36–40 lozenge plates at 12 tris).
+  - 12-tri inset lozenges read as separate cubes with the dark core showing everywhere.
+  - Broad pentagons with a raised apex overlap like the part cell's shingles, and the same tri count buys more scales.
+  - A crown ring that hugs the surface plus a flat 6-scale cap closes the top (the first cap left a dark collar).
+
+## Stage 2 — Optimisation and cleanup
+
+Objects (final build, `build()` audit; tris after triangulation):
+
+| Object | Tris | Size (studs) | Shells | Budget |
+| --- | --- | --- | --- | --- |
+| `ForestLitter` (hero) | **2102** | 4.57 × 3.79 × 1.13 | 82 | ≤ 2200 |
+| `ForestLitterLeafLarge` (L1) | 168 | 2.15 × 2.17 × 0.16 | 2 (leaf + petiole) | < 1000 |
+| `ForestLitterLeafMedium` (O1) | 168 | 1.62 × 1.65 × 0.14 | 2 | < 1000 |
+| `ForestLitterLeafSmall` (Y1) | 120 | 0.86 × 0.85 × 0.11 | 2 | < 1000 |
+| `ForestLitterLeafVariant` (V1) | 128 | 1.23 × 1.34 × 0.18 | 1 | < 1000 |
+| `ForestLitterTwigLarge` (T1) | 108 | 3.46 × 1.39 × 0.27 | 1 | < 1000 |
+| `ForestLitterTwigSmall` (Ts) | 76 | 1.06 × 0.53 × 0.17 | 1 | < 1000 |
+| `ForestLitterPinecone` | **526** | 0.94 × 0.94 × 1.00 | 57 | ≤ 600 |
+| `ForestLitterStoneLarge` (S1) | 42 | 1.04 × 0.90 × 0.67 | 1 | < 1000 |
+| `ForestLitterStoneSmall` (S2) | 34 | 0.75 × 0.67 × 0.55 | 1 | < 1000 |
+
+- Hero tris by kind:
+  - leaves 1076 (10);
+  - petioles 96 (6);
+  - twigs 260 (3);
+  - pinecone core 78 plus scales 448 (56);
+  - stones 76;
+  - chips 68 (4).
+  The parts are the hero's pieces alone at hero size. The leaf parts point their tip at az 10°, and the twig parts lie
+  along az 20° on the ground, so they compare with the part cells.
+- On every object:
+  - 0 non-manifold edges;
+  - 0 bowtie verts (`fix_bowties` found 0);
+  - 0 boundary, wire or loose elements;
+  - 0 zero-area faces, 0 n-gons, 0 duplicate verts.
+  Every shell is closed with positive volume and **0 winding errors** (`shells_report`); 0 self-intersections in any
+  shell. The smallest corner is 3.13° (twig chamfer strips: T1 has 7 stations, chamfer 0.045, so no strip is longer than
+  0.95).
+- Normals are outward, flat shading, no custom normals, transforms applied, origin at the bbox bottom centre on every
+  object. The hero's origin sits at (−0.167, +0.067, −0.02) in the build frame (`o["m062_offset"]`). Pieces sink at most
+  0.02 (stones and the pinecone foot); leaves lie 0.004–0.006 into the ground.
+- `o["m062_pieces"]` (JSON) records every piece's name, kind and build-frame centroid. The reports use it to name shells:
+  - `shells_report`, `contact_report`, `bury_report`, `leaf_ground`, `vis_report`, `screen_report`.
+
+**Contact and bury** (`contact_report`, `bury_report` on the hero):
+- **Floating shells 0; unchained 0** (also 0 at a 0.1 chain tolerance). The named rests all overlap (gap 0.0):
+  - T2 on T1;
+  - O2 on a twig;
+  - L1's petiole on the pinecone;
+  - Ts on L1 and T1.
+  Every one of the 56 scales touches the core or another scale.
+- **Buried: 0 shells more than 0.05 inside another.** Deepest per kind:
+  - scale in core 0.035 (the root seat);
+  - V1 in S1 0.034;
+  - G2 in S2 0.035;
+  - Ts in T1 0.019;
+  - L1's petiole in a scale 0.014;
+  - stone or chip ≤ 0.009.
+  The T2 seat in T1 is pressed about 0.01.
+
+## Stage 3 — UV
+
+`M.smart_uv` (angle-based, margin 0.008) plus `m012._uv_unfold` (cut 1 overlapping face free on the hero).
+- Every object: 0 overlapping pairs, 0 flipped, minimum island gap 0.016, border 0.008, density 1.0 / 1.0 / 1.0.
+- Hero conformal stretch p95 1.025, 613 islands (the exporter writes its own palette UVs; this layer is clean).
+
+## Stage 4 — Materials, colour and texture
+
+**Calibration.** `K.calibrate` (6 rounds, kit studio dome) to the spec 5.4 targets. Every key converged within 6 per
+channel of its rendered target:
+
+| Key | Target (rendered) | Calibrated hex in `PALETTE` | Rendered |
+| --- | --- | --- | --- |
+| `m062_leaf_green` | `#78AD32` | `#628E31` | (116, 170, 50) |
+| `m062_leaf_deep` | `#5C922B` | `#4D792B` | (89, 142, 43) |
+| `m062_leaf_lime` | `#8EB839` | `#739637` | (139, 180, 57) |
+| `m062_leaf_pale` | `#B6C75C` | `#90A255` | (178, 196, 91) |
+| `m062_leaf_olive` | `#876A1D` | `#6D5B1D` | (131, 104, 29) |
+| `m062_leaf_yellow` | `#F0BE40` | `#BE9E3E` | (239, 191, 65) |
+| `m062_leaf_amber` | `#D5921E` | `#AA7C1E` | (213, 146, 30) |
+| `m062_leaf_orange` | `#E07630` | `#B1672F` | (222, 119, 48) |
+| `m062_leaf_rust` | `#A1542A` | `#814A2A` | (158, 83, 42) |
+| `m062_wood` | `#8E5A35` | `#734F34` | (139, 89, 53) |
+| `m062_wood_light` | `#AC835F` | `#896E58` | (168, 128, 95) |
+| `m062_wood_dark` | `#6C3E22` | `#5A3822` | (106, 61, 34) |
+| `m062_cone_scale` | `#C8804A` | `#9E6C46` | (196, 125, 74) |
+| `m062_cone_mid` | `#874D29` | `#6D4529` | (131, 77, 41) |
+| `m062_cone_core` | `#4A250F` | `#40230E` | (73, 37, 15) |
+| `m062_stone` | `#AEA6A2` | calibrated `#8A898C` → **`#837F7E`** | see below |
+| `m062_stone_deep` | `#9F9490` | calibrated `#7F7B7E` → **`#777372`** | |
+
+**Stones.** The calibrated stone hexes have B > G (`#8A898C`), so they would read lavender in Roblox's neutral light.
+Decision 13 requires R > G > B, so the palette uses red-warm greys: `#837F7E` / `#777372`, R − G 4, G − B 1.
+- The kit studio light is warm. A neutral grey renders at h 31°, which falls outside the study's S mask (h < 28°).
+- This hex renders at h ≈ 26°, s ≈ 0.12: inside the mask, but darker than the sheet (front S median `#968C85` vs
+  `#B0A6A5`).
+- Brighter versions put the lit facets over the mask's v 0.865 limit (counted as background).
+
+**Colour by role and position, never by facing** (`K.check` baked-shading correlation 0.00 on all ten objects):
+- **Leaves**, radial bands from the petiole hub. Each outline segment's top fan triangle, chamfer quad and side quad
+  take one key from that segment's mean radius as a fraction of its lobe's length; hub triangles are the base band;
+  bottom triangles go by centroid.
+  - Big greens: deep base (< 0.30), deep→green 50 %, green body, green→lime 50 % (0.70–0.80), lime tips.
+  - O1: rust 75 % at the hub, rust 50 % (< 0.30), rust 25 % (< 0.42), then orange (spec 3.7's redder f34 read).
+  - O2: orange with a 25 % rust hub.
+  - V1: rust, the curled lobe tips 50 % toward wood.
+  - Yellows: amber–olive base, amber inner band, amber→yellow 50 %, yellow body.
+  - G1: pale with an olive base. G2: lime with a green base. G3: green with a deep base.
+  - Petioles: deep green, olive, or rust-mixed per leaf.
+- **Twigs:** wood body; the cut caps wood_light; the end bands and the bands either side of the knot 25 % toward
+  wood_light.
+- **Pinecone:** core `cone_core`. For each scale, the two root facets are `cone_mid`, the two flank facets cone_mid→scale
+  50 %, and the tip facet and base `cone_scale`. The crown and cap scales are 25 % toward wood_light with body-coloured
+  flanks. This is position along the scale (root → flank → tip), which gives the sheet's dark scale body under a lit tip
+  (lit band B_lit `#B17143` vs the sheet's `#BF7F4E`).
+- **Stones:** broad noise patches across facets (stone, stone→deep 50 %, deep). No height or foot band: the planned
+  0–0.25 H foot band follows face direction on a squat block, the lighting-not-paint rule.
+- **Chips:** C1 / C3 wood_dark, C2 wood_light, C4 amber.
+- **Tint:** 0.03 per leaf and per twig, 0.02 per band, 0.04 per scale, 0.04 per stone facet, 0.03 per chip. All broad,
+  never per-triangle. Finish: matte everywhere (roughness 0.75–0.9, low specular), no metal, no emission.
+
+**Re-measured on the final renders** (study `cls()` masks, `<temp>\...\scratchpad\m062w\meas.py`; sheet in brackets):
+
+| View | W : H | fill | G | Y | O | B | S |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| front_sheet (0, 30) | 1.80 (1.88) | 0.52 (0.60) | 34.6 (38.8) | 2.7 (1.3) | 9.0 (11.0) | 45.5 (38.6) | 8.2 (10.4) |
+| f34_sheet (−5, 38) | 1.56 (1.72) | 0.52 (0.59) | 37.6 (37.0) | 3.3 (2.0) | 9.5 (11.2) | 41.7 (38.2) | 7.9 (11.6) |
+| top_sheet (0, 68) | 1.31 (1.21) | 0.56 (0.64) | 41.9 (38.1) | 4.6 (1.0) | 10.7 (15.9) | 35.1 (34.7) | 7.8 (10.3) |
+
+- Medians (front): G `#6F9C33` (sheet `#7DB031`), O `#DC7732` (`#CC6F35`), B `#8B5732` (`#77401F`), S `#968C85`
+  (`#B0A6A5`).
+- Camera probe (front az −10…10 × e 20–35; f34 az −20…5 × e 30–45; top e 60–75): fill stays 0.49–0.53 at every camera,
+  and the best-scoring cameras are within 5° of the decided ones, so the decided cameras are kept.
+- Rear, r34 and side (content only): the twig X, the pinecone, both stones, and green and orange leaves show in each.
+  Shares: rear G 31.6 / O 10.8 / B 36.4 / S 16.4; side G 37.5 / B 41.6 / S 12.2.
+
+## Stage 5 — Lighting
+
+Skipped: the sheet shows no glow, light or emission (spec 7). No emissive parts; no lights.
+Studio notes (Requires Manual Validation):
+- the big leaves stay bright green and the maples orange / yellow under the game sun;
+- the stones stay warm grey: their hex is R > G > B, so not blue under a cool sky;
+- the pinecone scales stay tan-orange over the dark core.
+
+## Stage 6 — VFX
+
+Skipped: "the sheet shows no effect" (spec 7). No sockets (`build()` checks there are none). Collision:
+- hero `none`;
+- parts `none`, except `ForestLitterStoneLarge` `hull` (decision 8).
+
+## Modeller's notes for the verifier
+
+**Renders** (`art/blender/renders/models/M062/`):
+- `M062_views.png`: the sheet views, nine part shots at (−20, 35), the exploded view, and the scale shot with two
+  5.5-stud markers.
+- `M062_spin.png`: eight azimuths at e 25 (`spin_000` … `spin_315`).
+- Close-ups:
+  - `cone_cu` (0, 20);
+  - `junction_cu` (−30, 50) and `twig_x`;
+  - `leaf_edge` (L1's lobe tip, e 6) and `leaf_edge_part` (the large-leaf part edge-on);
+  - `underside_cu` (0, 5);
+  - `thumb`.
+- `compare_sheet.png`: the sheet cell beside our render for front, f34, top and rear, cropped and scaled to one height.
+
+**Eight azimuths** (`vis_report`, ray grid at e 25; share of hits):
+
+| az | leaf | twig | cone (core + scales) | stone | chip | leaf edge-on | leaf slab faces | leaves seen |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 0 | 49.8 | 20.8 | 13.3 | 11.8 | 3.2 | 20.6 | 77.2 | 8 |
+| 45 | 47.2 | 19.1 | 14.0 | 15.7 | 3.1 | 24.6 | 78.6 | 9 |
+| 90 | 48.5 | 19.8 | 15.2 | 13.5 | 2.7 | 21.3 | 78.3 | 9 |
+| 135 | 48.0 | 16.8 | 14.4 | 18.2 | 1.7 | 16.3 | 73.7 | 9 |
+| 180 | 50.9 | 13.7 | 14.1 | 18.5 | 1.7 | 18.2 | 74.1 | 9 |
+| 225 | 51.7 | 14.7 | 15.3 | 14.4 | 2.7 | 17.2 | 72.4 | 9 |
+| 270 | 49.2 | 22.3 | 14.5 | 10.4 | 2.6 | 19.5 | 73.0 | 9 |
+| 315 | 49.4 | 21.2 | 14.1 | 11.2 | 3.1 | 24.5 | 75.0 | 8 |
+
+- The leaves lie flat by gravity, so they read the same from every side. "Leaf edge-on" (16–25 %) counts hits on faces
+  within 70° of the view axis. These are the bevel and side bands of thick slabs, not flat cards: 72–79 % of leaf hits
+  land on the top and bottom slab faces.
+
+**Projected piece centroids at front_sheet** (x from the left, h from the bottom; the spec 1.2 sheet value in brackets):
+- within 0.05:
+  - P (0.49, 0.42) [0.48, 0.45]
+  - L2 (0.26, 0.55) [0.29, 0.60]
+  - O1 (0.30, 0.17) [0.28, 0.18]
+  - S2 (0.18, 0.38) [0.21, 0.40]
+  - G1 (0.49, 0.08) [0.51, 0.09]
+  - G2 (0.07, 0.27) [0.07, 0.32]
+  - O2 (0.53, 0.80) [0.49, 0.81]
+- off:
+  - L1 (0.75, 0.20) [0.78, 0.26]
+  - Y1 (0.12, 0.47) [0.13, 0.55]
+  - G3 (0.91, 0.44) [0.90, 0.61]
+  - S1 (0.81, 0.60) [0.77, 0.73]
+- These are 3D centroids projected near-orthographically. The sheet's values are centroids of the visible pixels, so
+  back pieces whose lower half hides behind the twigs or stones (S1, G3, Y1) read 0.08–0.17 higher on the sheet.
+
+**Deviations from the Decisions and the plan (with reasons):**
+1. **Piece sizes are 6–20 % over the spec 2 table**, to get the pile's coverage and green share toward the sheet:
+   - L1 2.20 across (spec 1.85);
+   - L2 1.96 (1.63);
+   - O1 1.68 (1.45);
+   - O2 1.15 (1.05);
+   - V1 1.36 (1.20);
+   - Y1 / Y2 0.86 (0.80);
+   - G 0.80 / 0.78 / 0.70 (0.70 / 0.70 / 0.60);
+   - S1 1.05 × 0.89 × 0.64;
+   - S2 0.80 × 0.66 × 0.54.
+   At the spec sizes the front fill was 0.43 and G 32 %. The hero stays inside decision 1's tolerances: 4.57 × 3.79 ×
+   1.13 (D 3.79 is near the 3.85 limit). The pinecone is Ø 0.94 × 1.00.
+2. **Positions moved** for gaps, nudges out of the stones, and the sheet's composition. Plan points used:
+   - L1 (0.93, −0.86), L2 (−1.25, 0.95) az 140, O1 (−1.12, −0.94), O2 rear edge (−0.32, 1.76) az 280, V1 (0.64, 0.44);
+   - Y1 (−1.92, 0.62) (behind S2, under L2's lobe), Y2 (0.48, 1.36), G1 (−0.20, −1.48), G2 (−1.93, −0.32);
+   - G3 (1.74, 0.42) az 350, S2 (−1.64, −0.18), Ts (0.42, 0.30) → (1.40, −0.10).
+   Leaves that cut a stone are pushed out in 0.025 steps. Final centroids are in `leaves[*].centre` of `build()`.
+3. **Twig X.** Section and placement:
+   - T1 is 0.24 square and T2 0.22 (spec 0.25 / 0.23), so the twigs stay near 20 % of the front.
+   - T2 is 1.82 long (1.75), with its foot at (−0.02, 0.10) right behind the pinecone (spec (0.10, 0.30)).
+   - T2 rests on T1 at a **27.0° pitch, top z 1.107** (spec 28°, 1.08).
+   - T1 lies on L2, V1 and L1's side-lobe tip at bottom z 0.12–0.21. Its front end rests on L1's tip 0.12 above the
+     ground, not on the ground.
+4. **O2 propped at 46.5° with its tip at z 0.87** (spec 33–40°, 0.55). The larger maple touches T1 first at that angle,
+   so a lower prop would cut T1.
+5. **L1's petiole** runs 0.435 long and rises 6.6° onto the pinecone's foot (spec 0.40, 10–15°).
+6. **Pinecone:** 56 faceted shingles at 8 tris each (spec 36–40 at 12) plus a crown ring and cap (see stage 1);
+   526 tris, within the 600 cap.
+7. **Stone colour:** the hex is not the calibrated value (stage 4) and there is no foot band (lighting-not-paint).
+
+**Leftovers and known misses:**
+- **Fill** 0.52 front / 0.52 f34 / 0.56 top vs the sheet's 0.60 / 0.59 / 0.64 (tolerance ±0.05). The painted sheet packs
+  broad, overlapping leaves; ours keep their sinuses and settle without merging. The camera probe can't close this.
+- **Shares slightly outside tolerance:**
+  - front B 45.5 (≤ 44.6);
+  - f34 S 7.9 (≥ 8.6);
+  - top O 10.7 (≥ 11.9) and Y 4.6 (≤ 2.5);
+  - f34 W : H 1.56 (1.65–1.80, a soft check);
+  - top W : D 1.31 (1.15–1.28).
+  Front G 34.6, O 9.0, S 8.2, Y 2.7 and W : H 1.80 are within tolerance.
+- **Stones render darker** than the sheet's (S median 26 below in each channel). This trades against keeping their lit
+  facets inside the S mask under the warm studio with an R > G > B hex.
+- **The pinecone part** seen from above (−20, 35) shows the crown cap as a slightly lifted lid with a thin dark line
+  under it. From the hero cameras it reads as a scaly egg (`cone_cu`).
+- Petioles read as thin sticks in places (spin 180 / 225: O2's petiole stub under the propped leaf).
+- The rear, r34 and side cells are the sheet's redrawn compositions (two pinecones). They are judged for content only.
+
+**Re-running:** `import importlib, kit_models, m062; importlib.reload(kit_models); importlib.reload(m062); m062.build()`
+builds the hero and parts, renders, and returns the audit, UV, materials, contact, bury, leaf_ground, winding, vis,
+screen and `problems` (an empty list in the final build). `m062.hero_only()` and `m062.preview()` are the fast loops.
+
+## Stage 7 verification (round 1)
+
+Fresh verifier, read-only. Background session on port 9877, on `art/blender/assets/kit/wip/M062_verify.blend` (not
+saved). Every number below is my own measurement, made with my own scripts in `<temp>\...\scratchpad\m062v\` (topology,
+contact, hover, bury, sizes, visible centroids, eight-azimuth ray grid, and image masks that reuse the study's `cls()`).
+Renders are in `art/blender/renders/models/M062/verify/`:
+- sheet views `*_sheet.png`;
+- `v_spin.png` (eight azimuths at e 25);
+- `v_parts.png` (parts at (−20, 35) plus the cone side view);
+- `v_misc.png` (the cone from above and from the side, leaf and stone edges, a low view);
+- `v_cu.png` (close-ups of the chips, petioles, O2 from both sides, the T1 end, the junction, the underside and a leaf tip).
+
+**Verdict: FAIL, 6/10.** The pile reads like the sheet, and the topology, budget, contact chain and bury checks are all
+clean. Two things fail: four petioles are cut off from their leaves (broken construction, also in two exported parts),
+and the pinecone's crown reads as a lid.
+
+### Re-measured: passes
+
+- **Tris.** Hero 2102 (ceiling 2200): leaves 1076, petioles 96, twigs 260, cone core 78 + 56 scales × 8 = 448, stones 76,
+  chips 68. Parts: LeafLarge 168, LeafMedium 168, LeafSmall 120, LeafVariant 128, TwigLarge 108, TwigSmall 76,
+  **Pinecone 526** (≤ 600), StoneLarge 42, StoneSmall 34.
+- **Hero size.** 4.566 × 3.795 × 1.127, inside decision 1's tolerances. The depth is 0.055 under its 3.85 limit.
+  - Pinecone 0.94 × 0.94 × 1.04, including the 5° lean and the 0.02 sunk foot.
+  - T1 is 3.59 long with a 0.254 section (0.30 at the knot). T2 is 1.85 long, 0.22 square, pitched 27.0°, top z 1.107.
+  - Ts is 1.10 long, 0.17 square.
+- **Every object** (hero and 9 parts):
+  - 0 non-manifold edges, bowtie verts, boundary, wire or loose elements, zero-area faces and n-gons;
+  - 0 winding errors and 0 self-intersections in any shell, every shell with positive volume;
+  - smallest corner 3.13°;
+  - transforms applied (rot 0, scale 1), origin at the bbox bottom centre (offset 0, 0, 0), no modifiers, no custom
+    normals, flat shading;
+  - collision none, except StoneLarge hull.
+  - Build-frame offset (−0.167, +0.067, −0.020).
+- **UV.** One layer per object, 0 overlapping pairs, 0 flipped, minimum gap 0.016, border 0.008, density 1/1/1. Hero
+  conformal stretch p95 1.026, 661 islands.
+- **Contact** (82 shells; a contact is a triangle overlap or a vertex within 0.03; ground at build z ≤ 0.03):
+  - floating 0, unchained 0;
+  - all 56 scales touch the core (worst gap 0.0);
+  - T2–T1 0.0 (T1 is 0.009 inside T2), O2–T1 0.0, Ts–T1 0.0, T1–L2 0.0, T1–L1 0.0.
+- **Bury** (ray parity, three directions, vertex depth): 0 shells more than 0.05 inside another. Deepest:
+  - scale in core 0.035;
+  - V1 in S1 0.034;
+  - Y petiole in its leaf 0.033;
+  - O1 in S2 0.032;
+  - G2 in S2 0.028;
+  - Y1 in L2 0.022;
+  - Ts in T1 0.020.
+  Lowest vertex z −0.020 (stones and the cone foot); leaves sit at −0.006.
+- **Colour code.** The builder chooses no colour by face normal:
+  - leaves take radial bands from the hub per outline segment;
+  - twigs take the caps, end bands and knot bands by station index;
+  - scales take the root facets `fan[0]` / `fan[4]` by vertex order;
+  - stones take a 3-D noise field;
+  - chips take one key each.
+- **Colours.**
+  - Stones render `#958C85` (front S median), R > G > B, h 26°, s 0.11: warm grey, never lavender.
+  - Greens are not olive: front G `#709D34`, h 87° (sheet `#7DB031`, 87°); large-leaf part `#73A435`.
+  - Orange, rust and yellow stay apart: medium part `#DC7834`, variant `#9E5730`, small `#CEA339`.
+- **Eight azimuths** (ray grid at e 25): leaves 47–52 %, twigs 14–22 %, cone 13–15 %, stones 10–19 %.
+  - 9–10 leaves are seen from every side.
+  - Leaf hits on side or bevel bands (more than 70° off the view) are 16–24 %; the rest land on the slab tops. Those
+    bands belong to 0.06–0.08 slabs, not cards.
+  - Every frame reads as leaves + twig X + pinecone + stone.
+  - The twig X reads from every side, with T2 resting on T1.
+- **Content of the rear, r34 and side views.** Each shows the twig X, the pinecone, both stones, and green and orange
+  leaves. No underside shows.
+
+### Blockers
+
+1. **Four petioles are cut off from their leaves** (true breakage; spec §6 says "petiole (welded to its leaf)").
+   - Leaf-to-petiole gap in the hero: **L1 0.108, L2 0.098, O1 0.061, O2 0.033**. Y1 and Y2 overlap (0.0).
+   - The same gap is in the exported parts: **ForestLitterLeafLarge 0.122, ForestLitterLeafMedium 0.061**. Each is a
+     second shell lying loose beside the leaf.
+   - Each loose stem lies on the ground, so the floating count misses it. On the renders the stems read as loose green
+     or orange sticks:
+     - L2's stem lies alone between L2 and the cone (`v_cu.png`, petiole close-ups);
+     - the large-leaf part shows its stem detached at the left (`v_parts.png`);
+     - O2's stem hangs under the propped leaf like a stake (spin 180 / 225).
+   - **Cause.** `place_leaf` and `prop_leaf` start the stem at `rear_x + 0.10`. `rear_x` is the outline's minimum x, which
+     for the `large` and `maple` kinds is the basal-lobe tips (±124° / ±114°), not the base sinus (−0.08 R). So the stem
+     starts in the open notch between the basal lobes. `maple_small` happens to reach.
+   - **Fix.** Start every stem inside the leaf base, at about the hub (`KINDS[kind]["hub"] * R`) or at the base sinus
+     x + 0.05, and lengthen it by the difference. Re-aim L1's stem from that start. Then require a leaf-to-petiole gap
+     of 0 in `contact_report`.
+2. **The pinecone's crown reads as a lid** (the second focal silhouette; visible against the sheet).
+   - In the part shot (−20, 35) and from above (0, 60), the crown reads as a lidded pot: the crown ring of 9 scales
+     lifted 12° plus the near-flat 6-scale cap form a rosette with a central hole over a dark collar.
+   - At e 25 in all eight azimuths, and at front_sheet, it reads as a jagged crown above a dark band.
+   - The sheet (`z_cone_part.png`, `z_cone_f34.png`) shows an egg whose rounded top carries the same shingles, getting
+     smaller.
+   - **Fix.** Close the top with the downward shingle pattern continued (a sixth, smaller ring plus a 3–4-scale cap lying
+     on the core, no lifted ring), so no dark collar shows.
+   - The body passes: it reads as shingled scales, not cubes or a ball.
+
+### Minors (measured; each says whether it shows against the sheet)
+
+- **Chips perch on leaf edges** (visible in close-up; a minor read at the sheet cameras).
+  - C1 bottom z 0.157, C2 0.108, C3 0.118. All three sit rigidly on a lobe edge.
+  - 38–62 % of their undersides hang more than 0.10 above what lies below them.
+  - The 0.03 contact rule passes, but they read as balanced on the edge (`v_cu.png`, C2).
+  - Fix: tilt each chip onto its support (two-point settle) or move it onto bare ground.
+- **T1 never touches the ground** (visible from the low side azimuths).
+  - Its lowest point is z 0.111; the gap under its underside has a median of 0.13 and a maximum of 0.25.
+  - It is carried on lobe tips of L1, L2 and V1 (spec: bottom 0.00 at the front end).
+  - Numeric only at the sheet cameras.
+- **O2 propped at 46.5°, tilt 47°** (visible).
+  - From front_sheet and f34 its face is near edge-on: a thin orange strip lying on T1 in place of the sheet's orange
+    maple face behind the crossing. At az 45 / 315, 50–53 % of its hits are edge-on.
+  - From the rear its stem reads as a stake (blocker 1).
+- **Visible piece centroids** (ray-cast per piece; x from the left, h from the bottom; within 0.05 of §1.2):
+  - front 9 / 14, f34 7 / 14, top 7 / 14;
+  - P, L1, O1, O2, S2 and G1 are within 0.05 in front and f34.
+  - Misses:
+    - T1's back-left end h −0.08 (front), −0.13 (f34), −0.07 (top): it doesn't reach as high or as far back as on the
+      sheet;
+    - T2's top end x −0.08 in the f34 (0.66 vs 0.74);
+    - L2 x −0.085 (f34);
+    - S1 h −0.09 (front);
+    - L1 h −0.07 (front);
+    - Y1 −0.04 to −0.07;
+    - O1 x +0.08 (top).
+  - Mildly visible: the X sits a little left and low in the f34.
+  - **G3 is 0.2 % visible from the front** (0.7 % in the f34), hidden by S1 and T1, where the sheet shows a distinct small
+    green leaf at the right edge. Visible.
+- **Fill** (visible: a looser pile with gaps between the leaves).
+  - Front 0.519, f34 0.519, top 0.556, against the sheet's 0.598 / 0.593 / 0.641 (±0.05): misses by 0.03 / 0.02 / 0.04.
+  - With every non-background pixel counted, the fill is 0.546 / 0.549 / 0.589 against the sheet's 0.663 / 0.645 / 0.717.
+- **Shares outside tolerance** (numeric only, except top Y, which is mildly visible):
+  - front B 45.5 (≤ 44.6);
+  - f34 S 7.8 (≥ 8.6);
+  - top O 10.9 (≥ 11.9);
+  - top Y 4.6 (≤ 2.5): the olive and amber bases and the olive stems also fall in the Y mask.
+  - In tolerance: front G 34.6, Y 2.7, O 9.1, S 8.1; f34 G 37.6, Y 3.3, O 9.7, B 41.5; top G 41.9, B 34.9, S 7.8.
+- **W : H** (soft, numeric).
+  - Front 1.80 (OK), f34 1.56 (1.65–1.80), top W : D 1.31 (1.15–1.28).
+  - Top profile: front f .7 0.99 vs 0.81 (the lifted end sits one column right); f34 f .7 0.70 vs 0.99, f .1 0.71 vs 0.61.
+- **Colour against the sheet** (front medians, sheet in brackets):
+  - G `#709D34` (`#7DB031`): 19 dark in G. Numeric; it reads a touch darker.
+  - B `#8B5834` (`#77401F`): 20–24 light. Mild.
+  - S `#958C85` (`#B0A6A5`): 26–32 dark and warmer (h 26° vs 5°). Visible but mild.
+  - **The yellow part renders `#CEA339`** against the cell's `#F0BE40` (target ±12): the amber/olive centre covers about
+    half the leaf. Visible: a mustard centre.
+  - **Pinecone contrast is low.** Shade quartile `#55321A` against the cell's `#2A1004`, body `#8E5530` against `#703C1B`.
+    Visible: no near-black gaps between the scales.
+- **56 eight-tri scales** in place of 36–40 lozenge plates.
+  - The budget holds (526).
+  - Visible: the scales read as pointed pyramids, not the sheet's flat lozenge plates, which adds to the low contrast above.
+- **Pieces 6–20 % larger** (numeric). L1 spans 1.94 in plan against the pinecone's 0.94 (ratio 2.06; the sheet's f34
+  ratio is 1.89). The hero is inside tolerance.
+- **Twig sections 0.24 / 0.22** against 0.25 / 0.23 (numeric).
+- **L1's petiole** is 0.435 long and rises 6.6° (numeric; see blocker 1).
+
+### For the fix round
+
+- Blocker 1: stem starts.
+- Blocker 2: close the cone top.
+- Then, cheaply:
+  - settle C1–C3 onto bare ground or tilt them onto their support;
+  - lower O2's prop or swing it so its face shows from the front;
+  - reveal G3;
+  - pull the yellow amber band in to under 0.30;
+  - darken the cone's root facets (or `cone_core`) toward the sheet's gaps.
+- Keep everything that passes: topology, contact, bury and colour-by-role.
+
+## Fix round 1 (modeller, 2026-11-01)
+
+Fresh fix modeller, background session on port 9877, `art/blender/assets/kit/wip/M062.blend` (saved after the final
+build). A fix round had been half done in `m062.py` before a pause; this round re-ran it, kept what worked and finished
+the list. Scratch scripts (cone loop, O2 pose search, visible-piece shares, colour masks) are in `<temp>\...\m062f\`.
+
+### Blocker 1: petioles cut off from their leaves (fixed)
+- Every stem now starts inside its own leaf base: `place_leaf` starts it `PET_SEAT` (0.04) behind the base notch
+  (`notch_x`), not at `rear_x` (the basal-lobe tips), and runs it back between the basal lobes. L1's stem is re-aimed
+  from that start onto the pinecone foot (`_aim_petiole`; now 0.66 long, rising 5.5°).
+- O2 has no petiole (spec 2.2 lists none); its old stub was the "stake" seen from the rear.
+- New check `petiole_report` in `build()`: every stem's gap to its own leaf must be 0 (triangles intersect), in the hero
+  by piece name and in each leaf part that has a stem. Result: **Y1, Y2, L1, L2, O1 0.0; the LeafLarge, LeafMedium and
+  LeafSmall stems 0.0** (round 1: L1 0.108, L2 0.098, O1 0.061, O2 0.033; LeafLarge 0.122, LeafMedium 0.061). L1's
+  stem also touches the cone (0.0).
+
+### Blocker 2: the pinecone's top read as a lid (fixed; cone rebuilt)
+- **Core:** a rounded egg with 8 sides. Profile r 0.12 / 0.30 / 0.425 / 0.435 / 0.35 / 0.18 at z −0.02 / 0.14 / 0.36 /
+  0.58 / 0.76 / 0.88, apex 0.93: widest at 0.4–0.6 H with a broad domed top. The old core ended in a near-flat cone
+  under a lifted crown ring and a flat cap; that was the lid and the dark collar.
+- **Scales:** 58 faceted lozenge scales lying **on** the egg (`scale_gem`), tiled in rings like the sheet's
+  (`z_cone_f34`, the part cell):
+  - a 4-scale cap whose roots meet over the apex, then rings of 8, 8, 8, 8, 8, 8 and 6;
+  - each ring's roots sit at the side corners of the ring above, half a scale round, so the rings interlock with no
+    holes;
+  - each scale is its tile shrunk to 0.93, so the dark core shows only as thin diamond lines (the sheet's near-black
+    gaps);
+  - two crest verts across each scale fold it into a lit upper facet and a lower facet turning down to the tip; the tip
+    is lifted 0.008–0.026 off the egg (a shadow line under each); 6 verts, 8 tris per scale.
+- Tried and dropped on the way: flat shingle plates (the paused round: tiles standing off the egg, a flat top), blunt
+  10-tri pads (a geodesic ball), wide-root pointed shingles (dark wedge holes).
+- **Result.** The part shot (−20, 35), the view from above and every spin frame read as a round scaled pinecone with a
+  domed top of small scales and no lid or collar.
+  - Pinecone part **558 tris** (cap 600), Ø 0.90 × 0.96 tall.
+  - Rendered part: lit quartile `#CD844F` (cell `#C47B44`–`#CD824D`), shade quartile `#30150A` (cell `#2A1004`), median
+    `#AC6B3E`.
+  - Root facets take `cone_mid→scale 50 %` and the underside `cone_mid`, by position on the scale. `K.check`
+    baked-shading correlation 0.17 (limit 0.5). `CONE_C` is `#2A1206` (was `#40230E`), so the gaps read near-black.
+
+### Minors
+- **Chips (fixed).** Each chip now lies flat on bare ground near its plan point (the nearest spot with no leaf under its
+  footprint and no cut into a stone or the cone), then settles. New `chip_report`: C1–C4 hang **0.0** over what is
+  below them (round 1: 38–62 % of their undersides more than 0.10 up).
+- **T1 on the ground (fixed).** L1 is turned 12° and moved 0.06, so its side lobe no longer holds T1's front end up.
+  T1's front stations are now at z 0.0 (round 1: lowest point 0.111). Its middle still rides on V1 (0.23 at 0.44 L).
+- **O2 (fixed).** Propped on the back of T1 it could only face the back, so it was edge-on from the front.
+  - New `tilt_leaf`: O2 (span 1.02, the spec's 1.05) is tilted 26° with its face toward az 320 and dropped onto what is
+    under it. It rests on **T1 (gap 0.004) and Y2 (0.011)**, caught behind the crossing with its face to the front; tip
+    z 0.60.
+  - The pose came from a search over plan point, tip az, tilt az and tilt that kept two supports and the hero depth
+    inside 3.85.
+  - Visible share of O2: front 3.6 %, f34 3.9 % (round 1: a thin strip).
+- **G3 (fixed).** Moved out to (1.85, 0.60), span 0.64, from behind S1 and T1. Front visible share 1.0 → 1.5 % (the
+  sheet's ~1.9 %); centroid (0.94, 0.49) in the front view.
+- **Yellow (fixed).** Amber hub at half a step, amber only inside 0.18 L, amber→yellow to 0.30, then yellow. The yellow
+  part renders median `#EDB33B`, lit `#FFCD46` (cell `#F0BE40`; round 1 `#CEA339`).
+- **Stones.** Lighter red-warm greys `#9A9493` / `#8C8685` (R > G > B). Front S median `#B4A79E` (sheet `#AEA5A4`;
+  round 1 `#958C85`).
+- **Height.** T2 shortened 1.82 → 1.72: it pitches 33° now that T1 lies lower, and its top had reached 1.18. Top z
+  1.123, hero H 1.14.
+- **V1** keeps its curl on lobes 0 / 4 (16° / 18°); it is not what lifts T1 (tested 0–18°, no change).
+
+### Measured (final `build()`)
+- `problems: []`.
+- **Tris.** Hero **2118** (ceiling 2200): leaves 1076, petioles 80 (5), twigs 260, cone core 94 + 58 scales × 8 = 464,
+  stones 76, chips 68. Parts: LeafLarge 168, LeafMedium 168, LeafSmall 120, LeafVariant 128, TwigLarge 108,
+  TwigSmall 76, **Pinecone 558**, StoneLarge 42, StoneSmall 34.
+- **Hero size 4.57 × 3.75 × 1.14** (decision 1: 4.4 ± 0.25, 3.6 ± 0.25, 1.1 ± 0.10). Build-frame offset
+  (−0.165, +0.039, −0.020).
+- **Every object:**
+  - 0 non-manifold edges and verts (bowties), 0 boundary, wire, loose, zero-area faces and n-gons; normals outward;
+  - **0 winding errors and 0 self-intersections in every shell**; smallest corner 3.13° (pinecone 18.2°);
+  - origin at the bbox bottom centre;
+  - UV: 0 overlaps, 0 flipped, minimum gap 0.016, hero stretch p95 1.028.
+- **Contact:** 83 shells, **floating 0, unchained 0** (also 0 at the 0.1 chain tolerance). T2 on T1 0.0, O2 on T1 0.0,
+  L1's stem on the cone 0.0, Ts on L1 / T1 / V1. Every scale touches the core or a scale. Lowest vertex −0.020.
+- **Bury:** 0 shells more than 0.05 inside another. Deepest: a scale in the core 0.033, O1 in S2 0.032, chip C3 in C2
+  0.030, L1's stem in a scale 0.025, Ts in T1 0.021.
+- **Eight azimuths** (ray grid, e 25): leaves 47.5–51.5 %, twigs 15.5–21.9, cone 11.4–13.7, stones 11.5–19.2. 9–10
+  leaves seen in every view; 77–81 % of leaf hits on the slab tops.
+- **5° azimuth sweep** (new `sweep_report`; e 25; whole leaves within 15° of edge-on by their mean top normal): worst
+  **5.8 %** of the leaf area (az 165, O2 seen from behind). Only O2 ever turns edge-on; every other leaf lies within
+  0.9–7.6° of flat.
+- **Sheet views.** The study's masks, re-implemented in `<temp>\...\m062f\meas.py`, give the sheet front G 37.3 / Y 1.2
+  / O 10.6 / B 40.3 / S 10.6 (the spec's 38.8 / 1.3 / 11.0 / 38.6 / 10.4). Sheet values in brackets:
+
+| View | W : H | fill | G | Y | O | B | S |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| front_sheet | 1.84 (1.88) | 0.57 (0.61) | 34.3 | 2.4 | 11.0 | 41.1 | 11.3 |
+| f34_sheet | 1.60 (1.72) | 0.57 (0.60) | 36.6 | 2.9 | 11.6 | 38.2 | 10.6 |
+| top_sheet | 1.26 (1.20) | 0.57 (0.67) | 40.1 | 3.5 | 12.1 | 34.6 | 9.8 |
+
+- Medians (front): G `#729D33` (sheet `#7DB031`), O `#DA7732` (`#CC6F35`), B `#905C37` (`#7A4522`), S `#B4A79E`
+  (`#AEA5A4`).
+
+### Renders
+`art/blender/renders/models/M062/`: `M062_views.png`, `M062_spin.png`, `*_sheet.png`, `part_*.png`, `cone_cu.png`,
+`junction_cu.png`, `twig_x.png`, `leaf_edge*.png`, `underside_cu.png`, `thumb.png`, `scale.png`, `exploded.png` and
+`compare_sheet.png` (regenerated: the sheet cell beside our render for front, f34, top and rear). The `fix1/` folder
+holds the paused round's intermediate renders (the flat-plate cone); they are superseded.
+
+### Left for the verifier
+- **Top Y 3.5 %** (spec 1.0 ± 1.5): Y1, Y2 and their olive stems read from above more than on the sheet.
+- **Fill** 0.57 in every view: the front is within 0.05, the top 0.10 under the sheet's. The painted pile overlaps its
+  leaves more densely.
+- **f34 W : H 1.60** (soft check, 1.65–1.80); front 1.84 and top 1.26 are in range.
+- **Front B median** about 20 lighter than the sheet's (the twigs' lit tops).
+- O2 shows its underside or edge from the rear (az 135–200), within the sweep target.
+- The pinecone is near-round (0.90 × 0.96) where the cell's egg is slightly taller. Its scales are diamonds with a
+  cross crest, crisper than the sheet's soft painted lozenges.
+
+## Stage 7 verification (round 2)
+
+Fresh verifier, read-only. Background session on port 9877 on `art/blender/assets/kit/wip/M062v.blend` (the kit copy
+taken after the main session built 062; not saved, `build()` not run). Every number below is my own measurement with my
+own scripts and renders in `<temp>\...\v2\` (topology, shell contact / chain / ray-parity bury, petiole and scale
+gaps, a 5° azimuth sweep, an eight-azimuth ray grid, the study's HSV masks re-implemented on the sheet cells and on my
+renders at the decided cameras, part shots at (−20, 35) beside the part-list and exploded cells, close-ups of every
+stem joint and of the pinecone from nine directions).
+
+**Verdict: PASS, 8/10.** Both round-1 blockers are fixed, and every technical, contact and foliage check passes. What
+is left are visible-but-mild style differences (pinecone scale pattern, rounder stones, a looser pile), listed below.
+
+### Round-1 blockers, re-checked
+1. **Petioles join their leaves: fixed.**
+   - Hero: Y1, Y2, L1, L2 and O1 stems each intersect their own leaf (gap 0.0; 2–3 of each stem's 10 verts lie inside
+     the leaf slab). O2 has no stem now, so the rear "stake" is gone.
+   - Parts: the LeafLarge, LeafMedium and LeafSmall stems each intersect their leaf (gap 0.0).
+   - Close-ups of each part from above (0, 80) and low (200, 12) show the stem running into the base notch, under the
+     slab. In the hero front / f34, L1's stem runs from the leaf to the cone foot (gap 0.009 to the core, 0.0 to a
+     scale), and L2's and O1's stems run from their leaf bases toward the cone.
+2. **Pinecone lid: fixed.**
+   - Hero close-ups at (0 / 90 / 180 / 270, 20), (45, 60) and (0, 85), and the part at (−20, 35), (0, 0) and (0, 70):
+     a closed scaly dome from every side, with no lifted ring, no collar and no dark band under the top.
+   - Profile (part): Ø 0.67 at 0.1 H, 0.84 at 0.3, 0.94 at 0.5, 0.95 at 0.7, 0.80 at 0.85 and 0.55 at 0.95 H.
+     Projected W : H at the cell camera 0.99 (cells 1.00 / 1.11).
+   - 58 scales, all 58 touching the core (gap 0.0) in the hero and in the part.
+
+### Re-measured: passes
+- **Tris.** Hero 2118 (ceiling 2200). Parts: LeafLarge 168, LeafMedium 168, LeafSmall 120, LeafVariant 128,
+  TwigLarge 108, TwigSmall 76, Pinecone 558 (≤ 600), StoneLarge 42, StoneSmall 34.
+- **Sizes.** Hero 4.571 × 3.746 × 1.143 (4.4 ± 0.25, 3.6 ± 0.25, 1.1 ± 0.10). Pinecone part 0.90 × 0.90 × 0.96;
+  T2 top z 1.123.
+- **Every object** (hero and 9 parts):
+  - triangulated; 0 non-manifold edges, 0 bowtie verts, 0 boundary, wire or loose elements, 0 zero-area faces, 0 n-gons,
+    0 duplicate verts;
+  - 0 winding errors, every shell with positive volume; smallest corner 3.13° (pinecone 18.2°);
+  - origin at the bbox bottom centre (0, 0, 0), rotation 0, scale 1, no modifiers, no custom normals, flat shading;
+  - one UV layer, 0 overlapping pairs, 0 flipped, minimum gap 0.016, border 0.008; hero stretch p95 1.028;
+  - only `FB_m062_*` materials; collision `none` everywhere except `ForestLitterStoneLarge` `hull`.
+- **Contact** (83 shells, my own BVH pairwise gaps): floating 0, unchained 0. T2–T1 0.0, O2–T1 0.0 and O2–Y2 0.011,
+  Ts–T1 0.0. Lowest vertex −0.020 (stones, cone foot); leaves −0.006 to 0.0.
+- **Bury** (ray parity in three directions, vertex depth): nothing over 0.05. Deepest: O1 in S2 0.032, V1 in S1 0.028,
+  G2 in S2 0.028, C2 in C3 0.026, L1's stem in a scale 0.025, G3 in S1 0.023, Y1 in L2 0.022, scale in scale 0.021,
+  Ts in T1 0.021.
+- **Foliage.**
+  - 5° sweep over 72 azimuths at e 25: worst 6.5 % of leaf area in whole leaves within 15° of edge-on (az 165, O2 only;
+    target about 10 %). At e 35 also 6.5 %. Every other leaf lies 0.9–7.6° from flat.
+  - Eight azimuths at e 25 (ray grid, step 0.02): leaves 47.5–51.4 %, twigs 15.4–22.3, cone 11.5–13.7, stones
+    11.3–19.2; 9–10 leaves seen in every view. Slab-top facets within 15° of edge-on 4.7–9.9 % of leaf hits; slab
+    rims 11–14 %. Every spin frame reads as leaves + twig X + pinecone + stones.
+- **Sheet views** (study masks on the sheet cell and on my render, same code; sheet in brackets):
+
+| View | W : H | fill | G | Y | O | B | S |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| front_sheet (0, 30) | 1.84 (1.89) | 0.57 (0.65) | 34.1 (35.7) | 2.4 (1.2) | 11.1 (10.1) | 38.4 (35.6) | 11.3 (10.1) |
+| f34_sheet (−5, 38) | 1.60 (1.72) | 0.58 (0.63) | 36.4 (34.9) | 2.9 (1.9) | 11.7 (10.5) | 35.6 (36.1) | 10.6 (11.3) |
+| top_sheet (0, 68) | 1.26 (1.20) | 0.58 (0.70) | 39.8 (34.6) | 3.5 (0.9) | 12.1 (14.4) | 32.1 (31.5) | 9.8 (9.9) |
+
+  - Front medians: G `#729C33` (`#7DB031`), O `#DA7732` (`#CC6F35`), S `#B6A9A0` (`#AEA5A4`), B `#8F5C35`
+    (`#77401F`).
+  - Parts at (−20, 35), medians against the cell: large leaf `#70A132` (`#80B131`), medium `#D27131` (`#DD742F`),
+    small `#EDB338` (`#F0BE42`), variant `#9D552E` (`#A2562B`), twig `#8D5D39` (`#94623C`), stones `#B4A69F` /
+    `#BBADA4` (`#B1A6A1` / `#A19795`). Pinecone lit quartile `#CC834E` (`#D0955B`), shade quartile `#2F150A`
+    (`#2F1205`): the near-black gaps now match.
+  - The front, f34 and top compositions match the sheet piece for piece: the twig X with its lifted end the top, the
+    pinecone in front of it, L1 front-right, L2 back-left, O1 front-left, O2 behind the crossing, S1 back-right, S2
+    left, G1 front-centre.
+
+### Blockers
+None.
+
+### Minors (measured; each says whether it shows against the sheet)
+1. **Pinecone scale style** (visible, mild). The cone reads as a scaled pinecone from every view, but as a round ball
+   covered in about 7 small pointed diamond scales across the front, with a criss-cross lattice of dark gaps. The sheet
+   (part cell, exploded, f34) shows about 4–5 broad, rounded lozenge shingles across the front in down-pointing rows on
+   a slightly tapered egg. Fix if touched again: fewer, broader scales (about 6 rings of 6–7), rounded or blunt tips,
+   and a slightly narrower foot.
+2. **Stones rounder and lighter than the cells** (visible, mild). At the cell camera, StoneLarge projects W : H 1.17
+   and StoneSmall 1.21 (cells 1.39 / 1.43): domed boulders, where the sheet has squat stones with broad sloping tops.
+   Shade quartiles are `#988D85` / `#8B807A` (cells `#6C6667` / `#6D6768`).
+3. **Looser pile** (visible). Fill is 0.57 front, 0.58 f34 and 0.58 top, against 0.65 / 0.63 / 0.70 measured the same
+   way on the sheet. Floor shows between the leaves, most of all from the top.
+4. **Yellow share from above** (mildly visible). Top Y is 3.5 % (sheet 0.9; tolerance ≤ 2.5): Y1 / Y2 and their
+   olive stems show more than on the sheet.
+5. **Wood lighter and flatter** (mild). Front B median `#8F5C35` against `#77401F` (24–28 per channel; target 15). The
+   TwigLarge part's lit quartile is `#976844` against the cell's `#BE8556`: less lit-top / dark-side contrast. There are
+   no knot or grain facets like the cell's.
+6. **Green a touch dark** (numeric). Front G median `#729C33` against `#7DB031` (G channel 20 lower); the hue is right
+   (not olive).
+7. **f34 W : H 1.60** (soft check 1.65–1.80; numeric). The lifted twig end peaks at about f 0.6 of the width, against
+   the sheet's 0.7.
+8. **Rear, r34** (content only; visible in those redrawn cells). T2 points toward the back-right, so from 155–180° it is
+   foreshortened to a stub, and the X reads weakly. O2 shows its underside from behind.
+9. **Ts parallel under T1** (mild, visible in the front and f34). The small twig reads as a second beam beside T1, right
+   of the cone, where the sheet shows the rust leaf V1. V1 is mostly hidden.
+10. **G1 reads cupped** (mild). The pale front leaf, draped over L1's edge and a chip (top z 0.207), shows an olive
+    centre in a lighter rim, so it reads a little like a small bowl. The sheet's G1 is a flat pale ivy leaf.
+11. **Facet-level edge-on** (numeric). 30 % of the leaf top-facet area is within 15° of edge-on at az 350, e 25 (the
+    folded lobe facets). The STAGES whole-leaf measure passes at 6.5 %.
+
+### For the main session
+Ready to commit with minors 1–11 noted. None is broken construction, and the defining pieces (the twig X, the
+pinecone, the big lobed leaves) read like the sheet.
