@@ -6,17 +6,14 @@
 -- attacks. Neutral creatures (§54) only hunt players who hurt them or their group,
 -- until they calm down; Passive ones never hunt and run from nearby players.
 
+local Geometry = require(script.Parent.Parent.Core.Geometry)
+
 local AggroRules = {}
 
 -- How long one hit keeps an enemy hunting its attacker.
 AggroRules.PROVOKE_SECONDS = 10
 -- Effective bow range: attackers this far past the leash still provoke.
 AggroRules.BOW_RANGE = 150
-
-local function flatDistance(a: Vector3, b: Vector3): number
-	local dx, dz = a.X - b.X, a.Z - b.Z
-	return math.sqrt(dx * dx + dz * dz)
-end
 
 -- True while a hit at `provokedAt` still makes an enemy homed at `home` hunt an
 -- attacker standing at `attackerPosition`.
@@ -29,7 +26,7 @@ function AggroRules.Provoked(
 ): boolean
 	return provokedAt ~= nil
 		and now - provokedAt <= AggroRules.PROVOKE_SECONDS
-		and flatDistance(attackerPosition, home) <= leash + AggroRules.BOW_RANGE
+		and Geometry.FlatDistance(attackerPosition, home) <= leash + AggroRules.BOW_RANGE
 end
 
 -- `goal` pulled back (horizontally) to within `leash` of `home`.
@@ -121,7 +118,7 @@ function AggroRules.FleeGoal(position: Vector3, threats, home: Vector3, leash: n
 			),
 			leash
 		)
-		local gain = flatDistance(goal, position)
+		local gain = Geometry.FlatDistance(goal, position)
 		if gain >= AggroRules.FLEE_STEP * 0.5 then
 			return goal
 		elseif gain > bestGain then
@@ -134,7 +131,7 @@ end
 -- An idle creature's next amble: a spot near home, or a pause where it stands
 -- (when it is already near home).
 function AggroRules.WanderGoal(home: Vector3, position: Vector3, rng): Vector3
-	if flatDistance(position, home) <= AggroRules.WANDER_RADIUS and rng:NextNumber() < 0.4 then
+	if Geometry.FlatDistance(position, home) <= AggroRules.WANDER_RADIUS and rng:NextNumber() < 0.4 then
 		return position
 	end
 	local angle = rng:NextNumber(0, math.pi * 2)

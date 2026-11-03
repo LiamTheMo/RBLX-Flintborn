@@ -12,6 +12,7 @@
 -- where only a full backpack deletes. Unique gear is never multiplied.
 
 local GameConstants = require(script.Parent.Parent.GameConstants)
+local Geometry = require(script.Parent.Parent.Core.Geometry)
 local InventoryRules = require(script.Parent.Parent.Inventory.InventoryRules)
 local ItemCatalog = require(script.Parent.Parent.Items.ItemCatalog)
 local ProgressionRules = require(script.Parent.Parent.Progression.ProgressionRules)
@@ -30,8 +31,8 @@ function ExtractionRules.Qualifies(candidate): boolean
 end
 
 function ExtractionRules.InZone(playerPosition, center, radius: number): boolean
-	local dx, dz = playerPosition.X - center.X, playerPosition.Z - center.Z
-	return math.sqrt(dx * dx + dz * dz) <= radius and math.abs(playerPosition.Y - center.Y) <= radius + 10
+	return Geometry.FlatDistance(playerPosition, center) <= radius
+		and math.abs(playerPosition.Y - center.Y) <= radius + 10
 end
 
 function ExtractionRules.Multiplier(kind: string): number

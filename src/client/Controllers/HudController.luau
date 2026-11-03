@@ -17,6 +17,7 @@ local RunService = game:GetService("RunService")
 
 local ExtractionRules = require(ReplicatedStorage.Shared.Extraction.ExtractionRules)
 local GameConstants = require(ReplicatedStorage.Shared.GameConstants)
+local Geometry = require(ReplicatedStorage.Shared.Core.Geometry)
 local HudModel = require(ReplicatedStorage.Shared.UI.HudModel)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local PoiCatalog = require(ReplicatedStorage.Shared.World.PoiCatalog)
@@ -127,11 +128,6 @@ local hotbarBound = false
 local function rootPart(): BasePart?
 	local character = player.Character
 	return character and character:FindFirstChild("HumanoidRootPart") :: BasePart?
-end
-
-local function flatDistance(a: Vector3, b: Vector3): number
-	local dx, dz = a.X - b.X, a.Z - b.Z
-	return math.sqrt(dx * dx + dz * dz)
 end
 
 -- Scale and top inset ----------------------------------------------------------
@@ -430,7 +426,7 @@ local function nearestExtraction(position: Vector3?)
 	local now = workspace:GetServerTimeNow()
 	local best, bestDistance = nil, math.huge
 	for _, event in ExtractionController.Events do
-		local distance = flatDistance(position, event.position)
+		local distance = Geometry.FlatDistance(position, event.position)
 		if distance < bestDistance then
 			bestDistance = distance
 			best = {
@@ -449,7 +445,7 @@ local function nearestExtraction(position: Vector3?)
 		return best
 	end
 	for part in portals do
-		local distance = flatDistance(position, part.Position)
+		local distance = Geometry.FlatDistance(position, part.Position)
 		if distance < bestDistance then
 			bestDistance = distance
 			local kind = part:GetAttribute("PortalKind")

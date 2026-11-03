@@ -16,6 +16,7 @@
 -- at most MAX_TOTEMS_PER_OWNER totems.
 
 local GameConstants = require(script.Parent.Parent.GameConstants)
+local Geometry = require(script.Parent.Parent.Core.Geometry)
 local StructureCatalog = require(script.Parent.StructureCatalog)
 
 local BuildRules = {}
@@ -407,8 +408,7 @@ end
 function BuildRules.WithinTotem(structures, totem)
 	local list = {}
 	for _, structure in structures do
-		local dx, dz = structure.position.X - totem.position.X, structure.position.Z - totem.position.Z
-		if math.sqrt(dx * dx + dz * dz) <= totem.radius then
+		if Geometry.FlatDistance(structure.position, totem.position) <= totem.radius then
 			table.insert(list, structure)
 		end
 	end
@@ -416,8 +416,7 @@ function BuildRules.WithinTotem(structures, totem)
 end
 
 function BuildRules.Covers(totem, position: Vector3): boolean
-	local dx, dz = position.X - totem.position.X, position.Z - totem.position.Z
-	return totem.hp > 0 and math.sqrt(dx * dx + dz * dz) <= totem.radius
+	return totem.hp > 0 and Geometry.FlatDistance(position, totem.position) <= totem.radius
 end
 
 -- A standing totem of the structure's own owner that covers it, if any.

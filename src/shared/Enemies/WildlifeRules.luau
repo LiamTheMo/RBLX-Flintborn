@@ -7,6 +7,8 @@
 -- a while make room. Creature events (EventCatalog) are separate. Counts and
 -- timings are placeholders.
 
+local Geometry = require(script.Parent.Parent.Core.Geometry)
+
 local WildlifeRules = {}
 
 -- The world's habitat tags (IslandLayout.RandomPointIn ignores unknown ones).
@@ -188,16 +190,11 @@ function WildlifeRules.ExpectedCreatures(): number
 	return total
 end
 
-local function flatDistance(a: Vector3, b: Vector3): number
-	local dx, dz = a.X - b.X, a.Z - b.Z
-	return math.sqrt(dx * dx + dz * dz)
-end
-
 -- True when `position` is at least `radius` (horizontally) from every player.
 function WildlifeRules.ClearOfPlayers(position: Vector3, playerPositions, radius: number?): boolean
 	local clearance = radius or WildlifeRules.PLAYER_CLEARANCE
 	for _, other in playerPositions do
-		if flatDistance(position, other) < clearance then
+		if Geometry.FlatDistance(position, other) < clearance then
 			return false
 		end
 	end
@@ -208,7 +205,7 @@ end
 function WildlifeRules.AnyNear(positions, others, radius: number): boolean
 	for _, position in positions do
 		for _, other in others do
-			if flatDistance(position, other) <= radius then
+			if Geometry.FlatDistance(position, other) <= radius then
 				return true
 			end
 		end
