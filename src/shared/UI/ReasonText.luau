@@ -22,6 +22,7 @@ ReasonText.TEXT = {
 	Cooldown = "wait a moment before doing that again",
 	Duplicate = "that request was already handled",
 	Busy = "something is already in progress — wait for it to finish",
+	Interrupted = "you stopped before finishing",
 	InProgress = "that is already under way",
 	Unavailable = "that isn't available right now — try again shortly",
 	ShuttingDown = "this server is closing — try again in a moment",

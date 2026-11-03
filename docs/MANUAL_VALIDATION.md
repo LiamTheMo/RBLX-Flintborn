@@ -49,7 +49,7 @@ Studio and live checks (until crafting arrives in v0.05, a Studio run starts wit
 
 - [ ] Hold Shift (or L3 / the touch Sprint button): sprint lasts about 3 s, the bar holds for 3 s after the sprint ends, then refills in about 5 s (GDD §47); melee and standing still never drain it.
 - [ ] Food drains to 0 in 60 minutes (half after 30); below 25% the HUD shows "! slowed" and movement is 10% slower; nothing else happens at 0%.
-- [ ] Medicine heals instantly; spamming it during the animation heals once and consumes one item.
+- [ ] Medicine heals instantly; spamming it during the animation heals once and consumes one item (since GDD §59 it is held first and the attack input drinks it).
 - [ ] Eat while taking hits: pending food healing halves per hit and stops at 10 HP or less; health never regenerates on its own.
 - [ ] The HUD is readable on desktop, touch and gamepad.
 
@@ -64,7 +64,7 @@ Studio and live checks:
 - [ ] From a fresh spawn with nothing, gather by hand and craft a wooden spear, bow, arrows and bandage in under 10 minutes.
 - [ ] Harvest prompts work with E, gamepad X and touch; a stone axe gives more wood than bare hands; iron needs a pickaxe.
 - [ ] A depleted node disappears and regrows after about 2 minutes; two players hitting the same node never get its last yield twice.
-- [ ] Hotbar keys 1–6 (six slots, GDD §56) equip tools and weapons, use medicine and food, and place a workbench; B (or gamepad Y) opens the backpack (rebindable, GDD §46); tap two slots to move or swap.
+- [ ] Hotbar keys 1–6 (six slots, GDD §56) equip tools and weapons, hold medicine and food (the attack input then uses them, GDD §59), and place a workbench; B (or gamepad Y) opens the backpack (rebindable, GDD §46); tap two slots to move or swap.
 - [ ] Advanced recipes only craft next to a workbench, and their gear shows a quality roll of at most ±5%; the craft menu (V or D-pad up) shows Owned/Needed counts.
 - [ ] A full inventory refuses a craft or harvest without consuming anything.
 
@@ -455,7 +455,7 @@ Studio and live checks:
 - [ ] Eat a Sunberry, then drink a Sunberry Draught: the boost rises to +25% with a new 10:00 timer.
 - [ ] At Crafting mastery 0, smelting 10 ore gives exactly 10 bars. At a high level, some smelts give an extra bar (the count rises by 2 for one ore).
 - [ ] Crafting speed is the same at every Crafting level (one craft per second).
-- [ ] On a phone or tablet (or Studio's device emulator): the HUD hotbar shows each item's name and count. Tapping a weapon equips it (the ring moves there), tapping food eats it, tapping a Workbench places it, and tapping a Fire Bomb readies it.
+- [ ] On a phone or tablet (or Studio's device emulator): the HUD hotbar shows each item's name and count. Tapping a weapon equips it (the ring moves there), tapping food holds it (the attack button then eats it, GDD §59), tapping a Workbench places it, and tapping a Fire Bomb readies it.
 - [ ] Pressing a number key moves the ring to that slot and uses it, as a tap does.
 - [ ] With the backpack open, the HUD hotbar hides and the backpack's own strip still moves items.
 
@@ -671,3 +671,30 @@ Studio and live checks (desktop, touch and controller unless stated):
 - [ ] **Creatures and bosses:** every animal, skeleton and wisp has its own model, faces where it walks and what it attacks, stands on the ground (also in Emberhollow Cave) and never on another body; alphas are larger; name labels sit above heads, horns and antlers; arrows and swings hit them; bosses, the Guardian's pillars and its shield bubble show and the boss bar still tracks them.
 - [ ] **Events:** each event kind (rare node, cache, meteor, creature group, ruin / fort / camp structure, boss) spawns with its model, is announced in the event feed, map and compass, can be claimed or fought, and is cleaned up completely when claimed or expired; cache, rare-node, altar and extraction prompts keep the kit look.
 - [ ] **Performance:** a full server with the island built holds at least 30 FPS on a mid-range phone and a 50 Hz server heartbeat with wildlife and events active.
+
+## Hold a consumable and click to use it (GDD §59)
+
+How it's built: `ConsumeRules` (shared) holds the use times, the pose, the interruption rule and the texts; `HealingService` is the authority (one use per player at a time, applied at the end for food and boosts and at once for medicine, interrupted by its Heartbeat check); `ConsumeController` sends the request, draws the progress bar and poses every consuming character's right arm from the `ConsumeItem` / `ConsumeStart` / `ConsumeEnd` player attributes; `CombatController` routes the attack input and the touch button's icon; `InventoryController` holds a consumable on its hotbar key and the window's USE holds then uses it. No animation asset: the pose is built in code.
+
+Automated (`consume.spec.luau`, `survival.spec.luau`; capture scenes `world_hud_flow` page 1 for the progress bar and `inventory_world` for the key and USE):
+- Food and boosts are used only when the 1.2 s animation has run, exactly one item per accepted request; medicine heals at once and its animation is the lock.
+- A request during the animation is refused as Busy and consumes nothing; a replayed request ID is refused as Duplicate.
+- Putting the item away, switching slots, going down, dying or leaving stops food with nothing used; interrupting medicine only stops its animation (the heal stays, the lock runs on).
+- A draught refused when its time is up (a stronger boost started meanwhile) stays in the hotbar.
+- The pose rests at both ends of the use and holds the item up in between.
+
+Placeholders: food and boost use time 1.2 s (`GameConstants.CONSUME_SECONDS`); the pose angles in `ConsumeRules.POSE`; movement stays at full speed while eating.
+
+Studio and live checks (desktop, touch and controller unless stated):
+
+- [ ] **Holding:** pressing a food, medicine or draught slot's key (or tapping it, or picking it with the gamepad) puts the pouch or flask in the right hand with the arm held out, the HUD ring moves to that slot, and the first time a toast says how to eat or drink it for the input in use. Pressing the same key again puts it away. Nothing is eaten by the key alone.
+- [ ] **Animation look:** clicking while holding Cooked Meat raises the hand to the mouth with small nibbles for about 1.2 s, then the arm comes back down; a Healing Potion is tilted up to the mouth for 1.5 s. The item ends up at the face, not inside the head or behind it; walking while eating keeps the legs walking and the arm at the mouth. Another player watching sees the same animation.
+- [ ] **Progress bar:** "Eating Cooked Meat" (drumstick icon) or "Drinking Healing Potion" (heart) fills under the screen centre for the use time and disappears when it ends or stops.
+- [ ] **Effect timing:** food fills hunger and starts its heal (with the usual toast) when the bar completes, not at the click; medicine heals at the click; one item is used per click.
+- [ ] **No spamming:** clicking repeatedly, or holding the button, during a use does nothing more (no toast, no extra item); the next click after the bar ends starts the next one.
+- [ ] **Interruptions:** switching slot or pressing the key again mid-bite stops the animation and keeps the item; being downed mid-bite does too. Taking damage does not stop it.
+- [ ] **Touch:** with food held the attack button shows a drumstick (a heart for medicine, lightning for a draught) and tapping it eats; the node plaque does not appear while food is held.
+- [ ] **Gamepad:** with food held, RT eats; the right bumper still only steps the hotbar ring.
+- [ ] **Inventory window:** USE on a hotbar food holds it and plays the same animated use (the window's buttons wait until it ends); USE on a draught when a stronger boost runs is refused with the usual reason and the draught stays.
+- [ ] **Refusals:** a draught while a stronger boost runs says "a boost at least as strong is already running"; medicine during its lock (after switching slots mid-drink) says to wait.
+

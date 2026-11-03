@@ -19,13 +19,17 @@ GameConstants.FOOD_SLOW_MULTIPLIER = 0.9
 
 -- Healing (GDD §4.5, Q64-65, Q135, Q137) ----------------------------------------
 
--- Medicine heals immediately; the animation that follows is the only cooldown.
+-- Medicine heals immediately; the drinking animation that follows is the only
+-- cooldown (§59: consumables are used from the hand).
 GameConstants.MEDICINE = {
 	Basic = { heal = 10, animationSeconds = 0.5 },
 	Advanced = { heal = 25, animationSeconds = 1.0 },
 	Potion = { heal = 50, animationSeconds = 1.5 },
 }
 GameConstants.FOOD_HEAL_SECONDS = 10
+-- How long eating food and drinking a boost draught take from the hand (§59,
+-- launch starting values): the item is used when the animation ends.
+GameConstants.CONSUME_SECONDS = { Food = 1.2, Boost = 1.2 }
 GameConstants.FOOD_HIT_CUTOFF = 10
 -- Accepted starter examples (Q137); the full food catalog is still Open.
 GameConstants.FOOD = {
