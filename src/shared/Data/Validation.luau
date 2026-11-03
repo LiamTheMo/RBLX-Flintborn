@@ -17,6 +17,11 @@ function Validation.IsQuantity(value: any, minimum: number?, maximum: number?): 
 	return value >= (minimum or 0) and value <= (maximum or Validation.MAX_QUANTITY)
 end
 
+-- True for a number that is neither NaN nor infinite.
+function Validation.IsFinite(value: any): boolean
+	return type(value) == "number" and value == value and value ~= math.huge and value ~= -math.huge
+end
+
 -- Operation, item and receipt IDs: non-empty, bounded, URL-safe characters only.
 function Validation.IsId(value: any): boolean
 	return type(value) == "string" and #value >= 1 and #value <= 64 and string.match(value, "^[%w%-_:]+$") ~= nil

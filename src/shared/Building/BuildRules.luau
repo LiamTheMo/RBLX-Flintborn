@@ -18,6 +18,7 @@
 local GameConstants = require(script.Parent.Parent.GameConstants)
 local Geometry = require(script.Parent.Parent.Core.Geometry)
 local StructureCatalog = require(script.Parent.StructureCatalog)
+local Validation = require(script.Parent.Parent.Data.Validation)
 
 local BuildRules = {}
 
@@ -57,19 +58,18 @@ BuildRules.WORLD_HALF = 2304
 BuildRules.WORLD_MIN_Y = -40
 BuildRules.WORLD_MAX_Y = 1000
 
-local function finite(value: any): boolean
-	return type(value) == "number" and value == value and value ~= math.huge and value ~= -math.huge
-end
-
 -- True when a Vector3's components are all finite numbers (no NaN or infinity).
 function BuildRules.FiniteVector(position: any): boolean
-	return position ~= nil and finite(position.X) and finite(position.Y) and finite(position.Z)
+	return position ~= nil
+		and Validation.IsFinite(position.X)
+		and Validation.IsFinite(position.Y)
+		and Validation.IsFinite(position.Z)
 end
 
 -- A requested yaw in degrees as the angle in [0, 360) it names, or nil when it is
 -- not a finite number on a ROTATE_STEP multiple (or absurdly large).
 function BuildRules.ParseYaw(yaw: any): number?
-	if not finite(yaw) or math.abs(yaw) > 3600 then
+	if not Validation.IsFinite(yaw) or math.abs(yaw) > 3600 then
 		return nil
 	end
 	local steps = yaw / BuildRules.ROTATE_STEP
