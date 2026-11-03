@@ -610,7 +610,16 @@ Art.WHITE_GLYPHS = { lk_glyph_play = true, lk_glyph_check_white = true, lk_icon_
 -- art at no more than this many design px per pixel of the art that draws at
 -- that size, centred in the rect: Art.Capped). Before upload, or while its
 -- uploaded image is not served, it is its glyph in ink.
+-- The stand-in for an item's own icon (lk_item_<id>): its kind's glyph, never a
+-- letter of the sprite's name.
+local ITEM_KIND_GLYPH = { hammer = "⚒", backpack = "▤", chest = "◇" }
+
 local function glyphLabel(parent: Instance, sprite: string?, id: string, rect, opts, z: number): TextLabel
+	local itemId = sprite and string.match(sprite, "^lk_item_(.+)$")
+	if itemId then
+		sprite = nil
+		id = string.gsub(Art.KindGlyph(itemId), "^ink:", "")
+	end
 	local short = if sprite then string.gsub(string.gsub(sprite, "^lk_icon_", ""), "^lk_glyph_", "") else id
 	short = string.gsub(short, "^%a+_", function(prefix)
 		return if prefix == "ink_" or prefix == "white_" then "" else prefix
@@ -621,7 +630,9 @@ local function glyphLabel(parent: Instance, sprite: string?, id: string, rect, o
 		BackgroundTransparency = 1,
 		Position = UDim2.fromOffset(rect[1], rect[2]),
 		Size = UDim2.fromOffset(rect[3], rect[4]),
-		Text = Art.GLYPHS[short] or string.upper(string.sub(short, 1, 1)),
+		Text = (if itemId then ITEM_KIND_GLYPH[short] else nil) or Art.GLYPHS[short] or string.upper(
+			string.sub(short, 1, 1)
+		),
 		TextColor3 = Tokens.Color(opts.tint or "ink"),
 		TextScaled = true,
 		ZIndex = z,
