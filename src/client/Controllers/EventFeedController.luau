@@ -37,8 +37,6 @@ EventFeedController.ICONS = {
 	Boss = "tusk",
 }
 
-local COMPASS = { "E", "NE", "N", "NW", "W", "SW", "S", "SE" }
-
 local player = Players.LocalPlayer
 local ui = {}
 local events = {}
@@ -65,9 +63,8 @@ local function bearing(position: Vector3): string
 		return ""
 	end
 	local offset = position - root.Position
-	-- Roblox's -Z is north on the placeholder island.
-	local angle = math.deg(math.atan2(-offset.Z, offset.X)) % 360
-	local direction = COMPASS[math.floor((angle + 22.5) / 45) % 8 + 1]
+	-- The compass letter (HudModel: -Z is north, as on the HUD compass).
+	local direction = HudModel.HeadingLetter(HudModel.Heading(offset.X, offset.Z))
 	return ("%s, %d studs"):format(direction, math.floor(Vector3.new(offset.X, 0, offset.Z).Magnitude))
 end
 
