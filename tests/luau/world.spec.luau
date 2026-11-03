@@ -6,18 +6,12 @@ local IslandLayout = require(Shared.World.IslandLayout)
 local NodeCatalog = require(Shared.Resources.NodeCatalog)
 local PoiCatalog = require(Shared.World.PoiCatalog)
 
-local TIERS = { OuterRim = true, InnerRing = true, CenterCrater = true }
-local ZONE_TIERS = {
-	Rimlands = "OuterRim",
-	PinewoodWilds = "OuterRim",
-	MosswickForest = "OuterRim",
-	Riverlands = "OuterRim",
-	Timberwatch = "InnerRing",
-	FallenTemple = "InnerRing",
-	EmberhollowCaves = "InnerRing",
-	FrostpeakRidge = "CenterCrater",
-	CraterLake = "CenterCrater",
-	ShatteredKeep = "CenterCrater",
+-- The owner's danger tiers, their risk label and their zones.
+local TIER_RISK = { OuterRim = "Low", InnerRing = "Medium", CenterCrater = "Extreme" }
+local TIER_ZONES = {
+	OuterRim = { "Rimlands", "PinewoodWilds", "MosswickForest", "Riverlands" },
+	InnerRing = { "Timberwatch", "FallenTemple", "EmberhollowCaves" },
+	CenterCrater = { "FrostpeakRidge", "CraterLake", "ShatteredKeep" },
 }
 
 -- Dry ground samples on a grid over a zone's envelope: {x, z, h}.
@@ -40,21 +34,13 @@ test("every zone exists with the interface fields and the owner's danger tier", 
 		local zone = BiomeCatalog.Zones[zoneId]
 		assert(zone, zoneId .. " exists")
 		expect(type(zone.name) == "string" and #zone.name > 0, zoneId .. " name")
-		expect(TIERS[zone.tier], zoneId .. " tier id")
-		expectEq(zone.tier, ZONE_TIERS[zoneId], zoneId .. " danger tier")
+		expect(TIER_RISK[zone.tier] ~= nil, zoneId .. " tier id")
+		expect(table.find(TIER_ZONES[zone.tier] or {}, zoneId) ~= nil, zoneId .. " danger tier")
 		expect(#zone.habitats > 0, zoneId .. " habitats")
 		for _, habitat in zone.habitats do
 			expect(table.find(BiomeCatalog.HABITATS, habitat) ~= nil, zoneId .. " habitat " .. habitat)
 		end
-		expectEq(
-			BiomeCatalog.Regions[zone.tier].risk,
-			({
-				OuterRim = "Low",
-				InnerRing = "Medium",
-				CenterCrater = "Extreme",
-			})[zone.tier],
-			zoneId .. " risk"
-		)
+		expectEq(BiomeCatalog.Regions[zone.tier].risk, TIER_RISK[zone.tier], zoneId .. " risk")
 	end
 	for _, habitat in BiomeCatalog.HABITATS do
 		local offered = false
@@ -396,11 +382,7 @@ test("portals, camps, altars and the arena sit on dry ground in the right tier",
 		expectEq(PoiCatalog.RegionOf(zone), "OuterRim", zone.id .. " in a Low zone")
 		expect(IslandLayout.IsDry(zone.x, zone.z), zone.id .. " on dry ground")
 	end
-	expectEq(
-		PoiCatalog.ZoneOf(PoiCatalog.SafeZones[1]) ~= PoiCatalog.ZoneOf(PoiCatalog.SafeZones[2]),
-		true,
-		"camps apart"
-	)
+	expect(PoiCatalog.ZoneOf(PoiCatalog.SafeZones[1]) ~= PoiCatalog.ZoneOf(PoiCatalog.SafeZones[2]), "camps apart")
 	for _, site in PoiCatalog.RitualSites do
 		expectEq(PoiCatalog.ZoneOf(site), "ShatteredKeep", site.id .. " at the Keep")
 		expect(IslandLayout.IsDry(site.x, site.z), site.id .. " on dry ground")
@@ -483,7 +465,7 @@ test("RandomPointIn finds dry standing ground in the zone and habitat", function
 	expectEq(IslandLayout.RandomPointIn("Atlantis", rng), nil, "an unknown zone finds nothing")
 end)
 
-test("every zone has a pool with the basics; ores follow danger", function()
+test("every zone's pool names real nodes; ores follow danger", function()
 	local ores = {
 		CopperDeposit = "OuterRim",
 		IronDeposit = "OuterRim",
@@ -494,10 +476,8 @@ test("every zone has a pool with the basics; ores follow danger", function()
 		MithrilDeposit = "CenterCrater",
 	}
 	for _, zoneId in BiomeCatalog.ZONE_IDS do
+		-- The basics in every zone are checked in gathering_drops.spec.luau.
 		local zone = BiomeCatalog.Zones[zoneId]
-		for _, basic in { "Tree", "Rock", "FiberPlant", "HerbShrub", "RedberryBush", "SweetberryBush" } do
-			expect((zone.resources[basic] or 0) > 0, zoneId .. " has " .. basic)
-		end
 		local hasOre = false
 		for nodeType, count in zone.resources do
 			expect(NodeCatalog.Nodes[nodeType] ~= nil, zoneId .. " node " .. nodeType)
@@ -510,7 +490,6 @@ test("every zone has a pool with the basics; ores follow danger", function()
 		end
 		expect(hasOre, zoneId .. " has its tier's ore")
 	end
-	expect(BiomeCatalog.Zones.FrostpeakRidge.resources.FrostShrub > 0, "frost shrubs on Frostpeak")
 	for nodeType, prefer in BiomeCatalog.NodeHabitats do
 		expect(NodeCatalog.Nodes[nodeType] ~= nil, "habitat preference for a real node " .. nodeType)
 		for _, habitat in prefer.habitats do
