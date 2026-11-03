@@ -326,7 +326,7 @@ function InventoryWindow:SetToolbar(buttons: { Action })
 	local right = 840
 	for index = #buttons, 1, -1 do
 		local spec = buttons[index]
-		local bw = math.max(120, math.ceil(Kit.Text.Width(spec.label, "buttonS")) + 44)
+		local bw = Kit.Button.Width(spec.label, 120, 44)
 		right -= bw
 		local button = Kit.Button.new(self.visual, {
 			name = "Tool" .. spec.id,

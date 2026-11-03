@@ -210,8 +210,6 @@ test("small windows on phones stay near the big windows' scale", function()
 end)
 
 test("key caps, small caps and the toast column", function()
-	expectEq(KitModel.KeyCapWidth(10, 56), 56, "single keys stay square")
-	expectEq(KitModel.KeyCapWidth(60, 56), 88, "words widen by the padding")
 	expectEq(
 		KitModel.SmallCaps("Ancestral Forge", 46, 40),
 		'<font size="46">A</font><font size="40">NCESTRAL</font> <font size="46">F</font><font size="40">ORGE</font>',

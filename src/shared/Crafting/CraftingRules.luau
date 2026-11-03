@@ -65,10 +65,6 @@ function CraftingRules.BatchInputs(recipe, count: number)
 	return inputs
 end
 
-function CraftingRules.TotalSeconds(recipe, count: number): number
-	return (recipe.seconds or 0) * count
-end
-
 -- A new smelting job; `station` is the station part it is bound to.
 function CraftingRules.NewJob(recipe, count: number, now: number, station: any, character: any)
 	return {
@@ -167,24 +163,6 @@ end
 function CraftingRules.Tier(recipe): string?
 	local def = ItemCatalog.Get(recipe.output)
 	return def and def.tier or tierOfMaterial[recipe.output]
-end
-
--- The ladder tiers that have at least one recipe, in ladder order.
-function CraftingRules.TiersIn(list): { string }
-	local present = {}
-	for _, recipe in list do
-		local tier = CraftingRules.Tier(recipe)
-		if tier then
-			present[tier] = true
-		end
-	end
-	local tiers = {}
-	for _, tier in Tiers.Ladder do
-		if present[tier.id] then
-			table.insert(tiers, tier.id)
-		end
-	end
-	return tiers
 end
 
 -- True when the recipe can be crafted with the stations in `nearby` (a set).

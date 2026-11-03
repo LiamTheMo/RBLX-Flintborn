@@ -20,18 +20,26 @@ on:
 permissions:
   contents: read
 
-# Shares the script sync's lock for this branch, so a deploy and a map build
-# never save the lobby place at the same time.
-concurrency:
-  group: roblox-script-sync-${{ github.ref }}
-  cancel-in-progress: false
-
 jobs:
   lobby-map:
     runs-on: ubuntu-latest
     timeout-minutes: 120
+    # Modes that save the lobby place take main's script sync lock (deploy.yml's
+    # group on main), so a deploy and a map build never save it at the same time.
+    # Upload and read-only modes keep this branch's lock.
+    concurrency:
+      group: ${{ contains(fromJSON('["place", "lighting", "all"]'), inputs.mode) && 'roblox-script-sync-refs/heads/main' || format('roblox-script-sync-{0}', github.ref) }}
+      cancel-in-progress: false
     steps:
-      - uses: actions/checkout@v4
+      # Saving a live place is a deploy: only from main. Uploads may run from any branch.
+      - name: Place saves only from main
+        if: github.ref != 'refs/heads/main' && contains(fromJSON('["place", "lighting", "all"]'), inputs.mode)
+        env:
+          MODE: ${{ inputs.mode }}
+        run: |
+          echo "::error::mode $MODE saves the live lobby place; run it from main"
+          exit 1
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
           persist-credentials: false
       - name: Lobby map
@@ -73,7 +81,7 @@ jobs:
           fi
       - name: Return asset ids
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: lobby-asset-ids
           path: art/roblox/lobby/asset_ids.json

@@ -3,27 +3,13 @@
 -- verdicts themselves are BuildRules' pure functions; this module only casts the
 -- rays and reads the structure parts around a spot.
 
-local Players = game:GetService("Players")
-
 local BuildRules = require(script.Parent.BuildRules)
+local Characters = require(script.Parent.Parent.World.Characters)
 
 local PlacementProbe = {}
 
 -- The folder that holds every player-built piece (BuildingService creates it).
 PlacementProbe.FOLDER_NAME = "PlayerStructures"
-
-local function characters(extra: { Instance }?): { Instance }
-	local list = {}
-	for _, player in Players:GetPlayers() do
-		if player.Character then
-			table.insert(list, player.Character)
-		end
-	end
-	for _, instance in extra or {} do
-		table.insert(list, instance)
-	end
-	return list
-end
 
 -- Support samples for a piece (own half-size `half`, turned `yaw`) whose base
 -- sits at `base`: one downward ray from above each SupportPoints point, ignoring
@@ -31,7 +17,7 @@ end
 function PlacementProbe.SupportSamples(base: Vector3, half: Vector3, yaw: number, ignore: { Instance }?)
 	local params = RaycastParams.new()
 	params.FilterType = Enum.RaycastFilterType.Exclude
-	params.FilterDescendantsInstances = characters(ignore)
+	params.FilterDescendantsInstances = Characters.All(ignore)
 	params.RespectCanCollide = true
 	params.IgnoreWater = true
 	local probe = BuildRules.SUPPORT_PROBE

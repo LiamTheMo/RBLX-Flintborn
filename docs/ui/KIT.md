@@ -38,11 +38,11 @@ python3 art/ui/capture/capture.py kit_gallery_flow   # behaviour checks + leak c
 | `Kit/Art.luau` | Roles to art: `Plate`, `Sprite`, `Icon`, `IconSprite`, `ItemIcon`, `KindGlyph`, `SizeOf`, `SliceScale`, `Missing`, stand-ins |
 | `Kit/Core.luau` | `Make`, `Size`, `Place`, `Root`, `Label`, `SetText`, `Style`, `TextWidth`, `TextFloor`, `Dim` (also `Kit.Dim`), `SetRestFade`, `Signal`, `Maid` |
 | `Kit/Interact.luau` | The shared state machine (`attach`) |
-| `Kit/Motion.luau` | `Play(inst, key, goal, onDone?)`, `Set`, `Stop`, `Pulse`, `Reduced()` |
+| `Kit/Motion.luau` | `Play(inst, key, goal, onDone?)`, `Set`, `Pulse`, `Reduced()` |
 | `Kit/Sound.luau` | `Play(key)` (silent while the token id is empty, D14) |
-| `Kit/Scale.luau` | `TopInset(gui)`, `WindowTop(gui)`, `Hud(gui, root, opts)`, `WindowFit(...)` (small windows capped on phones, §16), `Window(screen)`, `IsSmallTouch(h)` |
+| `Kit/Scale.luau` | `TopInset(gui)`, `TopbarInset()`, `WindowTop(gui)`, `HudGui(name, order)` (a whole-screen HUD gui and its root), `Hud(gui, root, opts)`, `WindowFit(...)` (small windows capped on phones, §16), `Window(screen)`, `IsSmallTouch(h)` |
 | `Kit/Modal.luau` | One window at a time, dialogs above, Escape / B, selection save and restore (a window's ✕ gives way to its first content control), blur, Roblox touch controls hidden while open |
-| `Kit/Debug.luau` | `Each(root, fn)`, `Force(root, state)`, `Find(root, role)` |
+| `Kit/Debug.luau` | `Each(root, fn)`, `Force(root, state)` |
 | Components | `Screen Window Panel SectionHeader Button IconButton Tab (TabGroup) Slot Bar Checkbox Toggle Slider Dropdown SearchBox Stepper KeyCap Divider ListRow PlayerRow Badge CurrencyPill Portrait Picture Icon ItemIcon Text Scroll Toast ConfirmDialog Tooltip` |
 
 ## 2. Conventions
@@ -336,7 +336,8 @@ local party = Kit.Panel.new(body, { rect = { 0, 0, 360, 445 }, title = "Your Par
 `Kit.Button.new(parent, {rect | size, label, variant = "primary" | "secondary" | "play" | "playSecondary" | "flat", sizeClass = "s" | "m" | "l", icon?, textRole?, textSize?, onPress})`;
 `:SetLabel`, `:SetVariant`, `:SetEnabled`, `:SetBusy`. Heights s 42 / m 58 /
 l 76. Icons sit left of the label, centred together; white glyphs
-(`play`, `check_white`) are tinted ink on paper.
+(`play`, `check_white`) are tinted ink on paper. `Kit.Button.Width(label, min,
+pad)` sizes a small button to its label (text width + `pad`, at least `min`).
 **Invited (D18)**: `b:SetVariant("secondary"); b:SetLabel("Invited"); b:SetEnabled(false)`.
 ```lua
 Kit.Button.new(footer, { rect = { 600, 0, 420, 76 }, label = "Play", icon = "play", variant = "play", sizeClass = "l", onPress = play })
@@ -375,7 +376,10 @@ group:Select("Gameplay")
 `:SetHotkey(text | nil)`, `:SetState("normal" | "locked" | "disabled")`,
 `:SetSelected`, `:SetEnabled`. Count bottom-right (hidden for 1), Permanent star
 top-right, leather number badge top-left. `icon` shows an icon id when the item
-has no art of its own yet.
+has no art of its own yet. `Kit.Slot.WatchHotkeys(slots, label?)` shows a row's
+badges (`label(index)`, default the slot's number) only while
+`Kit.Input.ShowsKeys()` and returns a stop function; `Kit.Slot.ShowHotkeys`
+applies them once.
 ```lua
 local slot = Kit.Slot.new(grid, { size = { 92, 99 }, layoutOrder = i, onPress = function(s) select(s.item) end })
 slot:SetItem({ catalogId = item.catalogId, quantity = item.quantity, permanent = item.permanent })
@@ -789,8 +793,8 @@ faces at custom sizes); a count is placed after the measured width.
 have no rose).
 
 **Tokens**: `emptyDot` #CC9F77, `photoBackdrop` #C9B19B, `rarityCommon` …
-`rarityExclusive`, `phoneText` (scale 1.2 and the roles it applies to),
-`scale.phoneHudMin` 0.5.
+`rarityExclusive`, `phoneText` (scale 1.2 and the roles it applies to), and
+a 0.5 HUD floor on phones (now `phoneFloor.hud`, below).
 
 **Phones** (short touch screens: height < 500, no keyboard):
 - The HUD scale never drops below 0.5 (was 0.373 at 844 × 390); the regions
@@ -828,7 +832,7 @@ items read "(Permanent)" and a rebind note reads "Sprint is now LeftShift".
   window's title band and below `Kit.Toast.Avoid(guiObject)` (the notice card).
   `Kit.Modal.OnChanged(fn)` tells listeners when layers open or close.
 - **Input** (`Kit.Input`): `Type()` ("mouse" | "keyboard" | "touch" |
-  "gamepad"), `IsGamepad()`, `IsTouch()`, `Hint(keyboardText, gamepadKey)`
+  "gamepad"), `IsGamepad()`, `IsTouch()`, `ShowsKeys()` (keyboard or mouse), `Hint(keyboardText, gamepadKey)`
   (nil on touch), `Watch(fn)`, `GAMEPAD_NAMES`, `SetHudDefault(guiObject)` (registers the HUD's navigation target; never selects on its own), `EnterHud()` (selects it on an explicit menu action)
   (selection lands there when a gamepad is picked up with nothing selected).
   KeyCap `gamepadKey` / `hideOnTouch` switch by themselves.

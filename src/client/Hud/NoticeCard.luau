@@ -26,10 +26,12 @@ local BUTTON_H = 46
 local BUTTON_W = 160
 local KEY_H = 34
 
--- How many lines `text` wraps to in `width` design px in a type role.
-function NoticeCard.Lines(text: string, role: string, width: number, size: number?): number
+-- How many lines `text` wraps to in `width` design px in a type role (greedy,
+-- by words, with the kit's measured widths). A space counts at least
+-- `minSpace` px when given.
+function NoticeCard.Lines(text: string, role: string, width: number, size: number?, minSpace: number?): number
 	local count = 0
-	local space = Kit.Text.Width(" ", role, size)
+	local space = math.max(Kit.Text.Width(" ", role, size), minSpace or 0)
 	for line in string.gmatch(text .. "\n", "(.-)\n") do
 		local lines, used = 1, 0
 		for word in string.gmatch(line, "%S+") do

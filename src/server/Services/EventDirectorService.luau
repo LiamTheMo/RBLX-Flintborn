@@ -11,7 +11,6 @@
 
 local CollectionService = game:GetService("CollectionService")
 local HttpService = game:GetService("HttpService")
-local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 
@@ -32,6 +31,7 @@ local CacheService = require(script.Parent.CacheService)
 local DropService = require(script.Parent.DropService)
 local ExtractionService = require(script.Parent.ExtractionService)
 local GuardianService = require(script.Parent.GuardianService)
+local InteractionService = require(script.Parent.InteractionService)
 local InventoryService = require(script.Parent.InventoryService)
 local MeteorService = require(script.Parent.MeteorService)
 local ModifierService = require(script.Parent.ModifierService)
@@ -70,29 +70,13 @@ local function activeFootprints()
 end
 
 -- Map ground only: structures, bodies, bosses and other events are see-through.
+-- Trunks, boulders and logs (the scenery) are solid and queryable: events never
+-- stand on them either.
 local function groundParams()
-	local ignore = { folder }
-	for _, name in { BuildingService.FOLDER_NAME, "EventEnemies", "Bosses", "GuardianArena", "Arrows" } do
-		local other = workspace:FindFirstChild(name)
-		if other then
-			table.insert(ignore, other)
-		end
-	end
-	-- Trunks, boulders and logs are solid and queryable: events never stand on them.
-	local scenery = WorldState.Scenery()
-	if scenery then
-		table.insert(ignore, scenery)
-	end
-	for _, player in Players:GetPlayers() do
-		if player.Character then
-			table.insert(ignore, player.Character)
-		end
-	end
-	local params = RaycastParams.new()
-	params.FilterType = Enum.RaycastFilterType.Exclude
-	params.FilterDescendantsInstances = ignore
-	params.RespectCanCollide = true
-	return params
+	return WorldState.GroundParams(
+		{ BuildingService.FOLDER_NAME, "EventEnemies", "Bosses", "GuardianArena", "Arrows" },
+		folder
+	)
 end
 
 -- The ground under (x, z), cast down from `fromY` (default: above the whole map;
@@ -129,7 +113,7 @@ end
 -- ground (the cave floor for cave events, which a raycast from above would miss);
 -- an authored map falls back to a distance band and a raycast.
 local function place(entry): Vector3?
-	local mapRadius = workspace:GetAttribute("FlintbornMapRadius") or EventDirectorService.DEFAULT_MAP_RADIUS
+	local mapRadius = WorldState.MapRadius(EventDirectorService.DEFAULT_MAP_RADIUS)
 	local generated = WorldState.IsGenerated()
 	local footprints = activeFootprints()
 	local zones = keepOut()
@@ -167,12 +151,6 @@ local function finish(event)
 	end
 	event.model:Destroy()
 	AnnouncementService.End(event.id)
-end
-
-local function spill(loot, position: Vector3, luck: number?)
-	for _, item in EventRules.RollLoot(loot, rng, luck) do
-		DropService.Spawn(item, position + Vector3.new(rng:NextNumber(-3, 3), 0, rng:NextNumber(-3, 3)))
-	end
 end
 
 -- The hitbox of each node look: size, whether it blocks walking, and the prompt's action.
@@ -235,12 +213,12 @@ local function spawnNode(event, loot, position: Vector3, minRank: number?, onCla
 	end)
 	local site = {}
 	prompt.Triggered:Connect(function(player)
-		if not CacheService.CanInteract(player, part, 10) or notice(player) then
+		if not InteractionService.CanInteract(player, part, 10) or notice(player) then
 			return
 		end
 		if EventRules.Claim(site) then
 			part:Destroy()
-			spill(loot, position, ModifierService.Sum(player, "Luck"))
+			DropService.Scatter(EventRules.RollLoot(loot, rng, ModifierService.Sum(player, "Luck")), position, rng)
 			ProgressionService.GrantXp(player, "RareNode", event.entry.name)
 			onClaimed()
 		end

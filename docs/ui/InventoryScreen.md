@@ -5,8 +5,8 @@ Reference: `art/reference/ui/lobby/02_inventory.png` (Backpack tab). Kit:
 Design resolution: 1672 × 941 (the image size). Every bound below is design px
 from the top-left of the screen, measured from the image (±1–2 px); "rel" is
 relative to the window's top-left (243, 150).
-Status: Draft (measured spec for the lobby UI rebuild). Source of truth for build:
-the reference image. The old parchment inventory spec this file replaces
+Status: Built (`src/client/Hud/Screens/InventoryWindow.luau`); this is the measured
+spec it was built from. Source of truth for build: the reference image. The old parchment inventory spec this file replaces
 described `08_inventory_vault.png`, which has been removed.
 
 ## Overview
@@ -153,7 +153,7 @@ Helpers live in `art/ui/kit/analysis/inventory/tools/` (run from the repo root);
 `measure_inventory_settings.sh` re-runs everything below and writes
 `art/ui/kit/analysis/inventory/measurements.txt`, `dim_overlay.txt` and
 `kit_parts.txt`. The skill's `ref_tools.py` (info, grid, crop) was used for size,
-overlay grids and 4–6× crops.
+overlay grids and 4–6× crops. `ref_tools.py` is an external reference-measuring helper from the UI modelling skill, not part of this repo; the repo's own measuring scripts are the ones in `art/ui/kit/analysis/`.
 
 - Size: `ref_tools.py info` → 1672 × 941 RGB for 01/02/03.
 - Window outline: `px.py 02 row 500 236 275` (dark 243–247, parchment from 248),

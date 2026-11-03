@@ -51,8 +51,8 @@ background = within 18 of the paper):
   under-count. Use the same scripts on both images.
 
 **Scratch study material** (no Blender), in
-`<temp>\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m025_study\`.
-Run with the scratch venv `...\scratchpad\venv22\Scripts\python.exe` (Pillow + numpy).
+`<temp>/m025_study/`.
+Run with the scratch venv `<temp>/venv22/Scripts/python.exe` (Pillow + numpy).
 - **Helpers:** `m.py` (masks, view boxes `V`, `stats`), `bb.json` (silhouette boxes), `zoom.py`, `crops.py`,
   `grid.py`.
 - **Measurements:** `measure.py` → `measure_out.txt` (bboxes, shares, top profiles, width per height, region extents,

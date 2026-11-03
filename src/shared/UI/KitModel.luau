@@ -777,11 +777,6 @@ function KitModel.WindowScale(
 	return math.clamp(scale, opts.minScale or 0.3, opts.maxScale or 1.4)
 end
 
--- A key cap's width for a label `textWidth` px wide: at least square.
-function KitModel.KeyCapWidth(textWidth: number, height: number, pad: number?): number
-	return math.max(height, math.ceil(textWidth + (pad or 14) * 2))
-end
-
 -- RichText fake small caps: the first letter of each word at `big` px, the
 -- rest upper-cased at `small` px ("Ancestral Forge" in M06).
 function KitModel.SmallCaps(text: string, big: number, small: number): string

@@ -272,18 +272,43 @@ function TradeRules.Settle(tradeId: string, a, b, now: number)
 	b.profile.trades.pending[tradeId] = { counterpart = a.userId, gave = fromB, received = fromA, at = now }
 end
 
+-- Records a trade's outcome, keeping the newest TradeRules.HISTORY records. A
+-- counterpart that still has the trade pending reconciles against this record, and
+-- it cannot trade with this profile again until it has, so the newest record with
+-- each counterpart is always kept and older records make room instead: trades with
+-- anyone else never push it out. (Records saved before they named their
+-- counterpart are trimmed by age alone.)
 local function record(profile, tradeId: string, outcome: string, now: number)
+	local history = profile.trades.history
+	local pending = profile.trades.pending[tradeId]
+	local previous = history[tradeId]
 	profile.trades.pending[tradeId] = nil
-	profile.trades.history[tradeId] = { outcome = outcome, at = now }
-	local ids = {}
-	for id in profile.trades.history do
+	history[tradeId] = {
+		outcome = outcome,
+		at = now,
+		counterpart = if pending then pending.counterpart else previous and previous.counterpart,
+	}
+	local ids, newest = {}, {}
+	for id, entry in history do
 		table.insert(ids, id)
+		local counterpart = entry.counterpart
+		if counterpart ~= nil and (newest[counterpart] == nil or newest[counterpart] < entry.at) then
+			newest[counterpart] = entry.at
+		end
 	end
 	table.sort(ids, function(x, y)
-		return profile.trades.history[x].at < profile.trades.history[y].at
+		return history[x].at < history[y].at
 	end)
-	for index = 1, #ids - TradeRules.HISTORY do
-		profile.trades.history[ids[index]] = nil
+	local excess = #ids - TradeRules.HISTORY
+	for _, id in ids do
+		if excess <= 0 then
+			break
+		end
+		local entry = history[id]
+		if entry.counterpart == nil or newest[entry.counterpart] ~= entry.at then
+			history[id] = nil
+			excess -= 1
+		end
 	end
 end
 

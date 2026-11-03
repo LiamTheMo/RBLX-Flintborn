@@ -5,11 +5,16 @@ Game modules are written for Roblox: they `require(script.Parent.X)` and use
 datatypes like Color3 and Vector3. The CLI has neither, so each spec runs in a
 generated bundle: prelude.luau (minimal datatype stubs, a fake `script`/`game`
 instance tree, and a require that resolves it) followed by every module under
-src/shared as a loader function (a JSON file as a module returning its
-table, as Rojo builds it), followed by the spec itself.
+src/shared, src/server and tests/luau/support (MOUNTS) as a loader function (a
+JSON file as a module returning its table, as Rojo builds it), followed by the
+spec itself. support/ holds helpers several specs share (a fake clock and task
+scheduler, engine signals); specs require them from ServerStorage.TestSupport.
 
 Only pure-logic modules are testable this way -- anything touching Instances,
-services, or the network still needs a Studio playtest.
+services, or the network still needs a Studio playtest. Server services are
+testable when a spec injects fakes for the Roblox services they use.
+
+    python3 tests/luau/run.py       # every *.spec.luau here, one bundle each
 """
 import json
 import shutil
@@ -21,6 +26,10 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 HERE = Path(__file__).resolve().parent
+sys.path.insert(0, str(ROOT / "scripts"))
+# The release scripts' JSON -> Luau converter, so specs see JSON modules exactly
+# as they are published (ASCII-only, with \u{...} escapes the luau CLI accepts).
+from roblox_cloud_sync import json_to_luau  # noqa: E402
 
 # Rojo mount points for the modules a spec may require, keyed by the
 # instance path the game code sees.
@@ -28,23 +37,10 @@ MOUNTS = {
     ("ReplicatedStorage", "Shared"): ROOT / "src" / "shared",
     # Server modules are testable when their Roblox services are injected (fakes in specs).
     ("ServerScriptService", "Server"): ROOT / "src" / "server",
+    # Shared spec helpers (fake clock and scheduler, engine signals); test-only,
+    # not part of the game.
+    ("ServerStorage", "TestSupport"): HERE / "support",
 }
-
-
-def lua_literal(value):
-    """A JSON value as a Luau table constructor."""
-    if value is None:
-        return "nil"
-    if isinstance(value, bool):
-        return "true" if value else "false"
-    if isinstance(value, (int, float)):
-        return repr(value)
-    if isinstance(value, str):
-        return json.dumps(value)
-    if isinstance(value, list):
-        return "{" + ", ".join(lua_literal(v) for v in value) + "}"
-    items = ", ".join("[%s] = %s" % (json.dumps(k), lua_literal(v)) for k, v in value.items())
-    return "{" + items + "}"
 
 
 def module_entries():
@@ -63,7 +59,7 @@ def module_entries():
             path = list(prefix) + parts
             if file.suffix == ".json":
                 # Rojo turns a JSON file into a module returning its table.
-                source = "return " + lua_literal(json.loads(file.read_text(encoding="utf-8")))
+                source = json_to_luau(file.read_text(encoding="utf-8"))
             else:
                 source = file.read_text(encoding="utf-8")
             entries.append((path, source))
@@ -146,10 +142,10 @@ def main() -> int:
         print("No specs found", file=sys.stderr)
         return 1
 
-    failed = 0
-    for cycle in require_cycles():
+    cycles = require_cycles()
+    for cycle in cycles:
         print(f"REQUIRE CYCLE: {cycle}")
-        failed += 1
+    failed = 0
     with tempfile.TemporaryDirectory() as tmp:
         for spec in specs:
             bundle = Path(tmp) / (spec.stem + ".bundle.luau")
@@ -161,7 +157,9 @@ def main() -> int:
                 failed += 1
 
     print(f"{len(specs) - failed}/{len(specs)} spec files passed")
-    return 1 if failed else 0
+    if cycles:
+        print(f"{len(cycles)} require cycle(s) found")
+    return 1 if failed or cycles else 0
 
 
 if __name__ == "__main__":

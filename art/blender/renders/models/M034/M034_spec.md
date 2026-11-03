@@ -62,7 +62,7 @@ masks are `cls()` in `m.py` (HSV, h in degrees):
   as background: measure renders made with `FB_Ground.hide_render = True` (§2.6).
 
 **Scratch study material** (no Blender), in
-`<temp>\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m034_study\`.
+`<temp>/m034_study/`.
 Run with the scratch venv `..\venv22\Scripts\python.exe` (Pillow + numpy).
 - **Helpers:** `m.py` (masks `cls()`, view boxes `V`, exploded / parts / close-up boxes `X`, `preview()`), `lab.py`
   (connected components), `zoom.py` (crop + upscale), `grid.py` → `g_*.png` (10 % grids over each view's silhouette,
@@ -1000,7 +1000,7 @@ f .45-.60).
 ## Verification round 1 (verifier, 2026-10-29)
 
 Fresh verifier and read-only. Background session on port 9880 using `wip/M034_verify.blend`. Nothing was built, edited or saved. Renders are in
-`<temp>\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m034_verify\`.
+`<temp>/m034_verify/`.
 They cover the six `*_sheet` cameras (floor hidden, with and without VFX), the kit views, the exploded view, the six parts, `junc_cu`, `sect_cu` and `under_cu`.
 Side-by-side images are `cmp_f34.png`, `cmp_r34.png`, `cmp_top.png`, `cmp_expl.png`, `cmp_rocks.png`, `cmp_cu.png` and `cmp_ortho.png`.
 All views were measured with the study's `measure_render.py`.
@@ -1163,8 +1163,8 @@ These reproduce the modeller's table, so the modeller's numbers are confirmed.
 Fresh fix modeller. Background session on port 9880 using `wip/M034.blend`. The builder `m034.py` is the source of truth, and the final build ran in a freshly restarted session. Nothing was committed or exported. The `StreambedPatch*` objects were not touched.
 Measurements:
 - Renders are floor-hidden `*_sheet` shots, measured with the study masks.
-- The share columns come from the no-VFX renders in `scratchpad/m034_fix/novfx/`. The kit renders in `renders/models/M034/` carry the VFX preview.
-- Measurement scripts are in `scratchpad/m034_fix/`:
+- The share columns come from the no-VFX renders in `<temp>/m034_fix/novfx/`. The kit renders in `renders/models/M034/` carry the VFX preview.
+- Measurement scripts are in `<temp>/m034_fix/`:
   - `mf.py`: shares, water tones and colour medians;
   - `gaps.py`: water / foam to land;
   - `shards.py`: lone sand / bed triangles;
@@ -1300,7 +1300,7 @@ Measurements:
 ## Verification round 2 (verifier, 2026-10-29)
 
 Fresh verifier, read-only. Background session on port 9880 using `wip/M034_verify.blend`, which was not saved (its timestamp is unchanged). I built nothing and edited no `.py`; `m034.py` was only read and its read-only helpers called (`_inverted`, `flow_clearance`, `render_close`, and `_bed_finish`, which is preview only).
-- **Renders** are in `<temp>\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m034_verify2\`:
+- **Renders** are in `<temp>/m034_verify2/`:
   - `novfx/`: the six `*_sheet` cameras with the floor hidden, the kit views, the six parts, `junc_cu`, `sect_cu` and `under_cu`;
   - `vfx/`: f34, r34 and top with the flow-strip preview;
   - `big/`: f34, r34 and top at 1200 × 1000;

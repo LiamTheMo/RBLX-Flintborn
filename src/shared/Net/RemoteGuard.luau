@@ -3,6 +3,8 @@
 -- bounded data: finite numbers, short strings, booleans, finite Vector3s and small
 -- shallow tables. Anything else is dropped before a handler sees it.
 
+local Validation = require(script.Parent.Parent.Data.Validation)
+
 local RemoteGuard = {}
 
 RemoteGuard.RATE = 20
@@ -27,21 +29,17 @@ function RemoteGuard.Take(bucket, now: number): boolean
 	return true
 end
 
-local function finite(value: number): boolean
-	return value == value and value ~= math.huge and value ~= -math.huge
-end
-
 -- True for plain, bounded data.
 function RemoteGuard.Sane(value: any, depth: number?): boolean
 	local kind = typeof(value)
 	if kind == "nil" or kind == "boolean" then
 		return true
 	elseif kind == "number" then
-		return finite(value)
+		return Validation.IsFinite(value)
 	elseif kind == "string" then
 		return #value <= RemoteGuard.MAX_STRING
 	elseif kind == "Vector3" then
-		return finite(value.X) and finite(value.Y) and finite(value.Z)
+		return Validation.IsFinite(value.X) and Validation.IsFinite(value.Y) and Validation.IsFinite(value.Z)
 	elseif kind == "table" then
 		depth = (depth or 0) + 1
 		if depth > RemoteGuard.MAX_DEPTH or getmetatable(value) ~= nil then

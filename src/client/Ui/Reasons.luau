@@ -8,8 +8,6 @@ local ReasonText = require(ReplicatedStorage.Shared.UI.ReasonText)
 
 local Reasons = {}
 
-Reasons.FALLBACK = ReasonText.FALLBACK
-
 -- True when `code` has its own line (screens with their own wording for some
 -- codes ask before falling back to the generic one).
 function Reasons.Has(code: any): boolean

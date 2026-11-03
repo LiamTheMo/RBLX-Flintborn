@@ -1,6 +1,6 @@
 # Lobby hub — map design
 
-> **Status:** Draft 0.2 (2026-10-23). The station list and flow follow confirmed GDD rules, including owner answers Q166–Q169 (GDD §48). **The geometry is provisional** until the owner supplies a reference image.
+> **Status:** Draft 0.2 (2026-10-23). The station list and flow follow confirmed GDD rules, including owner answers Q166–Q169 (GDD §48). The owner's reference image has since arrived (`art/reference/lobby_map.png`) and the lobby is built from it (`art/blender/lobby/LAYOUT.md`, see Authoring and tags); the draft plan below is the original proposal.
 > **GDD sources:** §2.1, §9.1–9.2, §10, §16.1–16.2, §16.8, §25.1–25.2, §25.4.1, §31, §33, §36.3–36.5, §45, §46, §48, Q24, Q80, Q98, Q105, Q155, Q161c, Q163, Q164
 
 The GDD is the source of truth. If this document disagrees with it, the GDD wins and this document must be corrected.
@@ -79,7 +79,7 @@ A walled camp around a central **bonfire plaza**. North is the Deploy gate; sout
 
 ## Authoring and tags
 
-Lobby geometry is built in Blender (`art/blender/lobby/FlintbornLobby.blend`) and exported for Roblox by `art/blender/scripts/export_lobby_roblox.py`. The manual **Upload and place the lobby map** workflow (`.github/workflows/lobby-map.yml`) uploads the meshes and builds `Workspace.LobbyMap` in the lobby place. It replaces only that model and never deletes anything else: the template's Baseplate and spawn move to `ServerStorage.DisabledByLobbyMap`, and other spawn locations are disabled. The script deploy still ships scripts only (`docs/roblox-live-deployment.md`). The map adds a `LobbyArrival` spawn on the arrival rune stone, a `DeployGate` marker and `LobbyNPCSpot` markers (attribute `Role`); station prompt parts are still to come.
+Lobby geometry is built in Blender (`art/blender/lobby/FlintbornLobby.blend`) and exported for Roblox by `art/blender/scripts/export_lobby_roblox.py`. The manual **Upload and place the lobby map** workflow (`.github/workflows/lobby-map.yml`) uploads the meshes and builds `Workspace.LobbyMap` in the lobby place. It replaces only that model and never deletes anything else: the template's Baseplate and spawn move to `ServerStorage.DisabledByLobbyMap`, and other spawn locations are disabled. Its `place`, `lighting` and `all` modes save the lobby place, so they run only from `main`; uploads and the read-only modes run from any branch. The script deploy still ships scripts only (`docs/ops/DEPLOYMENT.md`). The map adds a `LobbyArrival` spawn on the arrival rune stone, a `DeployGate` marker and `LobbyNPCSpot` markers (attribute `Role`); station prompt parts are still to come.
 
 The workflow's `lighting` step sets the lobby's Lighting to match the Blender scene: a warm afternoon sun about 40° up in the west-southwest, ambient light, atmosphere, bloom for the Neon flames, a colour grade and sun rays. The map's fire and torch PointLights are tagged `FlickerLight`, and `LightFlickerController` animates them on each client; they hold steady with Reduced Motion. Gameplay finds the stations through CollectionService tags, the same way world services find theirs:
 
@@ -112,5 +112,5 @@ A walk-up prompt opens the same panel as the hub menu; it adds no new server pat
 
 ## Next steps
 
-1. Owner supplies the reference image. Redraw the plan to match it and resolve Q170.
+1. ~~Owner supplies the reference image. Redraw the plan to match it and resolve Q170.~~ Done: `art/reference/lobby_map.png`, laid out in `art/blender/lobby/LAYOUT.md`.
 2. Greybox the hub in Studio with the tags above, publish it to the lobby place, then walk the timings on desktop and mobile.

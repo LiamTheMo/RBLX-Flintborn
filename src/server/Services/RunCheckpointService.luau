@@ -32,10 +32,6 @@ RunCheckpointService.CLEAR_RETRY_SECONDS = 2
 local runs = {}
 local clearing = {}
 
-function RunCheckpointService.JobId(): string
-	return CheckpointStore.JobId()
-end
-
 -- The run ID ProgressionService recorded for this run (the key of its receipt).
 local function currentRunId(player: Player): string?
 	local profile = ProfileService.GetProfile(player)
@@ -85,13 +81,16 @@ local function write(player: Player)
 	run.writing = true
 	run.dirty = false
 	run.runId = run.runId or currentRunId(player) or HttpService:GenerateGUID(false)
-	local checkpoint = CrashRecoveryRules.Checkpoint(
-		run.runId,
-		CheckpointStore.JobId(),
-		InventoryService.Items(player),
-		run.transferred,
-		os.time()
-	)
+	local items = InventoryService.Items(player)
+	-- An item picked up again (or taken back from a chest) is carried once more, so
+	-- it is recovered like any other until it is let go again.
+	for _, item in items do
+		if item.instanceId then
+			run.transferred[item.instanceId] = nil
+		end
+	end
+	local checkpoint =
+		CrashRecoveryRules.Checkpoint(run.runId, CheckpointStore.JobId(), items, run.transferred, os.time())
 	CheckpointStore.Write(player.UserId, checkpoint)
 	run.writing = false
 	if not run.checkpointed then

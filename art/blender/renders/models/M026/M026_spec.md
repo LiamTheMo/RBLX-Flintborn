@@ -43,8 +43,8 @@ close-ups cut end (15,1290,370,1520), junction (375,1290,700,1520), underside (7
 - **O, other:** ground shadow, dark bark slits, text; not counted in the shares.
 
 **Scratch study material** (pure Python, numpy + Pillow, no Blender), in
-`<temp>\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m026_study\`.
-Run with `...\scratchpad\venv22\Scripts\python.exe`.
+`<temp>/m026_study/`.
+Run with `<temp>/venv22/Scripts/python.exe`.
 - **Helpers:** `m.py` (masks, view boxes `V`, `label()` connected components), `bb.json` (silhouette boxes).
 - **Measurements:** `measure.py` (bboxes, shares, mask previews `cls_*.png`); `comps.py` (cut-face and clump
   components per view); `prof.py` (top/bottom profiles, width per height); `rings.py` (radial ring bands on every cut
@@ -891,7 +891,7 @@ vfx=True (nothing to realize).
 ## Stage 7 — Verification (round 1)
 
 Fresh verifier, read-only, in a background session on port 9882 with `wip/M026_verify.blend`. Nothing was saved and
-`build()` was not called. Fresh renders went to the scratchpad (`.../scratchpad/v026/renders/M026/`, high-res extras
+`build()` was not called. Fresh renders went to the scratchpad (`<temp>/v026/renders/M026/`, high-res extras
 in `.../v026/renders/big/`). Colours were sampled on both images with the study's masks (`m026.measure()`), a
 component pass (`v026/comp.py`), radial ring bands (`v026/rings.py`) and box samples (`v026/samp.py`).
 
@@ -1206,7 +1206,7 @@ face_light #DCBF99, face_ring #D4AA79, face_edge #E2CBA8.
 
 Fresh verifier (did no other stage, not the round-1 verifier). Read-only background session on port 9882 with
 `wip/M026_verify.blend`; nothing saved, `build()` not called. Fresh renders went to the scratchpad
-(`.../scratchpad/v026r2/renders/M026/`, high-res extras in `.../v026r2/renders/big/`, sheet-vs-ours pairs
+(`<temp>/v026r2/renders/M026/`, high-res extras in `.../v026r2/renders/big/`, sheet-vs-ours pairs
 `.../v026r2/renders/cmp_*.png`). Colours were sampled on both images with the study's masks (`m026.measure()`) and the
 round-1 component pass (`v026r2/comp.py`).
 

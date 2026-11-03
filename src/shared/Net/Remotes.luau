@@ -134,6 +134,18 @@ function Remotes.Get(name: string)
 	return parent:WaitForChild(name)
 end
 
+-- Client: invokes a RemoteFunction and returns everything the server answered.
+-- When the call itself fails (transport error, the server handler threw) it
+-- answers `false, "Request failed"` instead of raising.
+function Remotes.Invoke(name: string, ...: any): ...any
+	local remote = Remotes.Get(name)
+	local result = table.pack(pcall(remote.InvokeServer, remote, ...))
+	if not result[1] then
+		return false, "Request failed"
+	end
+	return table.unpack(result, 2, result.n)
+end
+
 -- Server: guarded handlers. Every request passes the per-player rate limit and
 -- argument sanitising (RemoteGuard) before `handler(player, ...)` runs; rejects
 -- are reported to Remotes.OnViolation(player, name, reason).

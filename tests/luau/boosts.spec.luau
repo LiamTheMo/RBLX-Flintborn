@@ -1,4 +1,4 @@
--- Berry and draught boosts (GDD §51, Q162, docs/ITEM_CATALOG.md §3): one timed
+-- Berry and draught boosts (GDD §51, Q162, docs/design/ITEM_CATALOG.md §3): one timed
 -- boost per kind that never weakens (only a stronger one takes over), XP that adds
 -- to Premium and the paid booster, and luck that raises rare-drop chances only.
 local Shared = game:GetService("ReplicatedStorage").Shared

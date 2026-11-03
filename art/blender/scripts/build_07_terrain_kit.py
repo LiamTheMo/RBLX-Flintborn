@@ -31,11 +31,11 @@ import numpy as np
 from mathutils import Matrix, Vector
 from mathutils.geometry import delaunay_2d_cdt
 
-sys.path.insert(0, r"D:/Projects/Roblox/RBLX-Flintborn/art/blender/lib")
+ROOT = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
+sys.path.insert(0, os.path.join(ROOT, "lib"))
 import flintkit as fk  # noqa: E402
 import vfx  # noqa: E402
 
-ROOT = r"D:/Projects/Roblox/RBLX-Flintborn/art/blender"
 PI = math.pi
 GRASS = "grass_ground"         # the sheet's yellow-green tops
 GRASS_T = 1.0
@@ -1160,11 +1160,6 @@ def ground(a, poly, z=0.35, seed=0, mat=(DIRT, 0.95), patches=6, spacing=3.0, sk
     grass_patches(a, H, lambda x, y: poly.sdist(x, y) > 0.3, (x0, x1, y0, y1), patches, rad=(1.2, 2.6),
                   seed=seed + 5, light=0.5)
     skirt(a, poly.p, z, 0.0, closed=True, mat=skirt_mat, lumpy=0.25)
-
-
-def mound_skirt(a, poly, H, seed, mat="earth", zmax=1.2):
-    """Low rounded dirt skirt round a mound's outline (no tall slab sides)."""
-    skirt(a, poly.p, lambda p: min(H(p.x, p.y), zmax), 0.0, closed=True, mat=mat, lumpy=0.35)
 
 
 # ---------------------------------------------------------------------------

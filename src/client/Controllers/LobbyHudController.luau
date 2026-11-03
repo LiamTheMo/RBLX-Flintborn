@@ -118,20 +118,10 @@ local function showStatus()
 end
 
 local function build()
-	gui = Instance.new("ScreenGui")
-	gui.Name = "FlintbornLobbyHud"
-	gui.ResetOnSpawn = false
-	gui.DisplayOrder = Kit.Tokens.Order("hud")
-	gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 	-- The layout uses the HUD grid on the whole screen and keeps clear of the
 	-- top bar (LobbyHud:SetTopInset) and of notches (LobbyHud:SetScreen, D30)
 	-- itself.
-	Kit.Scale.FullScreen(gui)
-	root = Instance.new("Frame")
-	root.Name = "Root"
-	root.BackgroundTransparency = 1
-	root.Size = UDim2.fromScale(1, 1)
-	root.Parent = gui
+	gui, root = Kit.Scale.HudGui("FlintbornLobbyHud", Kit.Tokens.Order("hud"))
 	hud = LobbyHud.new(root, {
 		onCurrency = function()
 			WalletController.Open("Shop")
@@ -171,10 +161,8 @@ function LobbyHudController.BarReachesRight(
 	safeRight: number?,
 	margin: number?
 ): boolean
-	local ok, bar = pcall(function()
-		return GuiService.TopbarInset
-	end)
-	if not ok or typeof(bar) ~= "Rect" or bar.Max.Y <= 0 or bar.Max.X <= bar.Min.X then
+	local bar = Kit.Scale.TopbarInset()
+	if bar == nil or bar.Max.Y <= 0 or bar.Max.X <= bar.Min.X then
 		return false
 	end
 	return bar.Max.X - originX < math.min(width - (margin or 24) * k, width - (safeRight or 0)) - 0.5

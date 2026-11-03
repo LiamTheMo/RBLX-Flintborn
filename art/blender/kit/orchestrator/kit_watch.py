@@ -16,7 +16,7 @@ import re
 import sys
 import time
 
-REPO = "D:/Projects/Roblox/RBLX-Flintborn"
+REPO = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "..", "..")).replace("\\", "/")
 # workflow journals from every orchestrator session of this project (history carries across sessions)
 WF = os.environ.get("KIT_WORKFLOW_JOURNALS", "")
 REF = f"{REPO}/art/reference/kit"
@@ -223,6 +223,9 @@ def checklist():
         rows.append(f"- [{box}] **{sid}** {title.replace('_', ' ').title()} — {status}")
     head = [
         "# World kit checklist",
+        "",
+        "> **History:** written by `art/blender/kit/orchestrator/kit_watch.py` for the 2026-10-26 world-kit pilot; "
+        "current status is in [docs/art/MODEL_PROGRESS.md](../../../docs/art/MODEL_PROGRESS.md).",
         "",
         f"{done_sheets}/34 sheets done · {done_models}/136 models passed verification.",
         "",

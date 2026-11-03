@@ -7,7 +7,7 @@ import math
 import os
 import sys
 
-ROOT = "D:/Projects/Roblox/RBLX-Flintborn/art/blender"
+ROOT = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 sys.path.insert(0, os.path.join(ROOT, "lib"))
 
 import bmesh  # noqa: E402

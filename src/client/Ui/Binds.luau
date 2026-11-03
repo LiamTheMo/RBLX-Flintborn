@@ -108,11 +108,6 @@ function Binds.Overrides(): { [string]: string }
 	return table.clone(overrides)
 end
 
--- The full action → key-name map in force.
-function Binds.Map(): { [string]: string }
-	return table.clone(map)
-end
-
 -- Prompts are authored on E (Roblox's default). Those follow the Interact key; a
 -- prompt offering a second choice on another key (a planter's other crops on R
 -- and F) keeps its own, unless that is the Interact key, in which case it takes

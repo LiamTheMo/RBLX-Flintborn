@@ -28,6 +28,15 @@ function Scale.TopInset(gui: GuiBase2d): number
 	return math.max(0, bar - (gui.AbsolutePosition.Y + guiInset))
 end
 
+-- GuiService.TopbarInset (the top bar's free area), or nil on an engine
+-- without it.
+function Scale.TopbarInset(): Rect?
+	local ok, value = pcall(function()
+		return GuiService.TopbarInset
+	end)
+	return if ok and typeof(value) == "Rect" then value else nil
+end
+
 -- The top inset a window keeps clear of: the bar, never less than topInsetMin.
 function Scale.WindowTop(gui: GuiBase2d): number
 	return math.max(Scale.TopInset(gui), Tokens.Space("topInsetMin", 52))
@@ -186,6 +195,24 @@ function Scale.FullScreen(gui: ScreenGui)
 	pcall(function()
 		(gui :: any).ClipToDeviceSafeArea = false
 	end)
+end
+
+-- A HUD ScreenGui named `name` at DisplayOrder `order`, on the whole screen
+-- (Scale.FullScreen), and its transparent full-size "Root" frame. The caller
+-- parents the gui.
+function Scale.HudGui(name: string, order: number): (ScreenGui, Frame)
+	local gui = Instance.new("ScreenGui")
+	gui.Name = name
+	gui.ResetOnSpawn = false
+	gui.DisplayOrder = order
+	gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+	Scale.FullScreen(gui)
+	local root = Instance.new("Frame")
+	root.Name = "Root"
+	root.BackgroundTransparency = 1
+	root.Size = UDim2.fromScale(1, 1)
+	root.Parent = gui
+	return gui, root
 end
 
 -- Two hidden probe guis, one on the whole screen and one inside the device

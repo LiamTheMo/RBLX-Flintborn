@@ -26,6 +26,7 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local BuildRules = require(ReplicatedStorage.Shared.Building.BuildRules)
+local Characters = require(ReplicatedStorage.Shared.World.Characters)
 local CraftingRules = require(ReplicatedStorage.Shared.Crafting.CraftingRules)
 local InventoryRules = require(ReplicatedStorage.Shared.Inventory.InventoryRules)
 local ItemCatalog = require(ReplicatedStorage.Shared.Items.ItemCatalog)
@@ -36,6 +37,7 @@ local QualityRoll = require(ReplicatedStorage.Shared.Crafting.QualityRoll)
 local Recipes = require(ReplicatedStorage.Shared.Crafting.Recipes)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local Validation = require(ReplicatedStorage.Shared.Data.Validation)
+local RequestLedger = require(script.Parent.Parent.Infrastructure.RequestLedger)
 local BuildingService = require(script.Parent.BuildingService)
 local DownedService = require(script.Parent.DownedService)
 local DropService = require(script.Parent.DropService)
@@ -67,7 +69,9 @@ local STOP_TEXT = {
 }
 
 local rng = Random.new()
-local seenRequests = {}
+local requests = RequestLedger.new(function()
+	return CraftingService.REMEMBERED_REQUESTS
+end)
 local lastCraft = {}
 local jobs = {}
 
@@ -75,14 +79,9 @@ local function now(): number
 	return workspace:GetServerTimeNow()
 end
 
-local function rootOf(player: Player)
-	local character = player.Character
-	return character and character:FindFirstChild("HumanoidRootPart")
-end
-
 -- The closest standing tagged station part in range, or nil.
 local function nearestStation(player: Player, tag: string)
-	local root = rootOf(player)
+	local root = Characters.RootOf(player)
 	if root == nil then
 		return nil
 	end
@@ -96,23 +95,6 @@ local function nearestStation(player: Player, tag: string)
 		end
 	end
 	return best
-end
-
-local function firstTime(player: Player, requestId: string): boolean
-	local seen = seenRequests[player]
-	if seen == nil then
-		seen = { set = {}, order = {} }
-		seenRequests[player] = seen
-	end
-	if seen.set[requestId] then
-		return false
-	end
-	seen.set[requestId] = true
-	table.insert(seen.order, requestId)
-	if #seen.order > CraftingService.REMEMBERED_REQUESTS then
-		seen.set[table.remove(seen.order, 1)] = nil
-	end
-	return true
 end
 
 local function craftingMastery(player: Player): number
@@ -194,7 +176,7 @@ local function grantBonusBar(player: Player, inventory, job, carried: boolean)
 		InventoryService.Publish(player)
 		return
 	end
-	local root = rootOf(player)
+	local root = Characters.RootOf(player)
 	if root then
 		DropService.Spawn(bonus, root.Position - Vector3.new(0, 2.5, 0))
 	end
@@ -232,7 +214,7 @@ end
 local function interruption(player: Player, job): string?
 	local character = player.Character
 	local humanoid = character and character:FindFirstChildOfClass("Humanoid")
-	local root = rootOf(player)
+	local root = Characters.RootOf(player)
 	local station = job.station
 	return CraftingRules.Interruption({
 		atRisk = player.Parent ~= nil and WorldAdmissionService.IsAtRisk(player),
@@ -327,7 +309,7 @@ local function craft(player: Player, requestId: any, recipeId: any, count: any)
 	if lastCraft[player] and at - lastCraft[player] < CraftingService.CRAFT_SECONDS then
 		return false, "TooFast"
 	end
-	if not firstTime(player, requestId) then
+	if not requests:FirstTime(player, requestId) then
 		return false, "Duplicate"
 	end
 
@@ -369,7 +351,7 @@ local function place(player: Player, hotbarIndex: any)
 	if def == nil or def.placeable ~= "Workbench" then
 		return false, "NotPlaceable"
 	end
-	local root = rootOf(player)
+	local root = Characters.RootOf(player)
 	if root == nil then
 		return false, "NoCharacter"
 	end
@@ -401,7 +383,7 @@ function CraftingService.Start()
 	end)
 	Players.PlayerRemoving:Connect(function(player)
 		jobs[player] = nil
-		seenRequests[player] = nil
+		requests:Forget(player)
 		lastCraft[player] = nil
 	end)
 	task.spawn(function()

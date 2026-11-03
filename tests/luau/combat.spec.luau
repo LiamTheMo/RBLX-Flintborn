@@ -135,7 +135,9 @@ test("armor equips into its slot, swaps, and still counts as carried", function(
 	expectEq(inv.armor.Head, nil, "nothing worn")
 	local spear = { instanceId = "s1", catalogId = "StoneSpear", ownerId = 1, location = "Carried", qualityRoll = 0 }
 	InventoryRules.Add(inv, spear)
-	local area, index = InventoryRules.FindInstance(inv, "s1")
+	-- A weapon prefers the hotbar: the spear lands in its first slot.
+	local area, index = "hotbar", 1
+	expectEq(InventoryRules.At(inv, area, index).instanceId, "s1", "the spear is on the hotbar")
 	expect(not InventoryRules.EquipArmor(inv, area, index), "weapons cannot be worn")
 	expectEq(InventoryRules.At(inv, area, index).instanceId, "s1", "the spear stays put")
 end)

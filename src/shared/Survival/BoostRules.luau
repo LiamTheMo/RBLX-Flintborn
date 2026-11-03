@@ -13,6 +13,7 @@
 
 local GameConstants = require(script.Parent.Parent.GameConstants)
 local Consumables = require(script.Parent.Parent.Items.Consumables)
+local Validation = require(script.Parent.Parent.Data.Validation)
 
 local BoostRules = {}
 
@@ -100,10 +101,6 @@ function BoostRules.Modifiers(boosts, now: number)
 	return list
 end
 
-local function finite(value: any): boolean
-	return type(value) == "number" and value == value and value ~= math.huge and value ~= -math.huge
-end
-
 -- The running boosts with their remaining seconds, to save between runs.
 function BoostRules.Pause(boosts, now: number): { Paused }
 	local saved = {}
@@ -126,9 +123,9 @@ function BoostRules.Sanitize(saved: any): { Paused }
 			if
 				type(entry) == "table"
 				and BoostRules.STATS[entry.kind] ~= nil
-				and finite(entry.amount)
+				and Validation.IsFinite(entry.amount)
 				and entry.amount > 0
-				and finite(entry.remaining)
+				and Validation.IsFinite(entry.remaining)
 				and entry.remaining > 0
 				and entry.remaining <= BoostRules.MAX_SECONDS
 			then

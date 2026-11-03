@@ -27,8 +27,8 @@ All pixel boxes are sheet pixels `(x0, y0, x1, y1)`, top-left origin. Paper is `
 - **O:** other non-paper (ground shadow, dark edges). Not counted in the shares.
 
 Scratch study material (pure Python, no Blender), in the session scratchpad
-`<temp>\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m018_study\`
-(run with `C:/Users/Orang/.local/bin/python3.14.exe`):
+`<temp>/m018_study/`
+(run with `python3.14`):
 - `png.py` (reader, `crop`); `m.py` (masks, view boxes `V`); `bb.json` (silhouette boxes, written by `measure.py`);
 - `measure.py` (bboxes, shares, top / leaf-bottom profiles, width per height), `buds.py` (bud components),
   `stems.py` (green runs per height: stem widths), `polar.py` (top-view radius per azimuth, leaf tips), `expl.py`
@@ -1251,7 +1251,7 @@ I would expect round 2 to score about 6–7/10.
 Fresh verifier (did no other stage, not the round-1 verifier), read-only. Background session on port 9880 with
 `wip/M018_verify.blend` (the kit copy after the main session's rebuild); not saved, `build()` not called. Fresh renders
 through `m018.render_views` (long-lens `*_sheet` cameras) with `M.MODEL_RENDERS` redirected to the verifier's
-scratchpad (`…/scratchpad/v18r2/renders/M018/`, with `cmp_0..5.png`: sheet cell | our render for front, side_left,
+scratchpad (`<temp>/v18r2/renders/M018/`, with `cmp_0..5.png`: sheet cell | our render for front, side_left,
 rear, top, f34, r34 flipped). Every number below was re-measured: `M.audit`, own BVH self-intersection and ray-parity
 checks, own UV rasteriser at 1024², `K.check`, `m018.measure()` and an own colour script (same masks on both images).
 
@@ -1579,7 +1579,7 @@ I would expect round 3 to score about 7–8/10.
 Fresh verifier (did no other stage and was neither earlier verifier), read-only. Background session on port 9881 with
 `wip/M018_verify.blend` (the kit copy saved after the main session's round-3 rebuild). The file was not saved, `build()`
 was not called, and the session is stopped. Fresh renders came from `m018.render_views` (long-lens `*_sheet` cameras)
-with `M.MODEL_RENDERS` redirected to the verifier's scratchpad (`…/scratchpad/v18r3/renders/M018/`). The scratchpad
+with `M.MODEL_RENDERS` redirected to the verifier's scratchpad (`<temp>/v18r3/renders/M018/`). The scratchpad
 also holds `cmp_<view>.png` (sheet cell | ours, cropped to the object at the same height; r34 flipped) and
 `cmpp_f34/r34.png` (sheet hero | our perspective hero). The repo renders were not touched.
 

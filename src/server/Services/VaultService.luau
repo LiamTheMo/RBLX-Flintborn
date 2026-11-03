@@ -25,11 +25,10 @@ VaultService.Deposited = Signal.new()
 VaultService.OVERFLOW_NOTICE_SECONDS = 24 * 60 * 60
 
 local function itemView(item)
-	local def = ItemCatalog.Get(item.catalogId)
 	return {
 		catalogId = item.catalogId,
-		name = def and def.name or item.catalogId,
-		rarity = def and def.rarity or "Common",
+		name = ItemCatalog.NameOf(item.catalogId),
+		rarity = ItemCatalog.RarityOf(item.catalogId),
 		quantity = item.quantity,
 		qualityRoll = item.qualityRoll,
 		permanent = item.permanent,
@@ -52,10 +51,9 @@ local function snapshot(player: Player)
 		backpackCapacity = 50,
 	}
 	for catalogId, quantity in profile.vault.materials do
-		local def = ItemCatalog.Get(catalogId)
 		table.insert(view.materials, {
 			catalogId = catalogId,
-			name = def and def.name or catalogId,
+			name = ItemCatalog.NameOf(catalogId),
 			quantity = quantity,
 			tradeable = TradeRules.IsTradeable({ catalogId = catalogId, quantity = quantity }),
 		})
@@ -66,10 +64,9 @@ local function snapshot(player: Player)
 	if type(overflow) == "table" and os.time() - (overflow.at or 0) < VaultService.OVERFLOW_NOTICE_SECONDS then
 		view.overflow = {}
 		for catalogId, quantity in overflow.deleted or {} do
-			local def = ItemCatalog.Get(catalogId)
 			table.insert(
 				view.overflow,
-				{ catalogId = catalogId, name = def and def.name or catalogId, quantity = quantity }
+				{ catalogId = catalogId, name = ItemCatalog.NameOf(catalogId), quantity = quantity }
 			)
 		end
 	end

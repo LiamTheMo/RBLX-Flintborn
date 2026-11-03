@@ -6,22 +6,9 @@ local Server = game:GetService("ServerScriptService").Server
 
 -- Fake Roblox services -------------------------------------------------------------
 
-local function engineSignal()
-	local handlers = {}
-	return {
-		Connect = function(_, fn)
-			table.insert(handlers, fn)
-			return { Disconnect = function() end }
-		end,
-		Fire = function(_, ...)
-			for _, fn in table.clone(handlers) do
-				fn(...)
-			end
-		end,
-	}
-end
+local EngineSignal = require(game:GetService("ServerStorage").TestSupport.EngineSignal)
 
-local Players = { PlayerAdded = engineSignal(), PlayerRemoving = engineSignal(), _list = {} }
+local Players = { PlayerAdded = EngineSignal.new(), PlayerRemoving = EngineSignal.new(), _list = {} }
 function Players.GetPlayers(self)
 	return table.clone(self._list)
 end

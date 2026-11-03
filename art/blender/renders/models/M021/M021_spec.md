@@ -41,8 +41,8 @@ paper < 16):
 - **O, other:** ground shadow, dark edges and text; not counted.
 
 **Scratch study material** (pure Python with Pillow and numpy installed to `pylib/`; no Blender), in
-`<temp>\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m021_study\`.
-Run with `C:/Users/Orang/.local/bin/python3.14.exe` from that folder (the scripts add `pylib` to the path).
+`<temp>/m021_study/`.
+Run with `python3.14` from that folder (the scripts add `pylib` to the path).
 - **Helpers:** `m.py` (loader, HSV, view boxes `V`, hex), `m_cls.py` (masks, preview colours), `bb.json` (silhouette
   boxes).
 - **Measurements:** `measure.py` → `measure_out.txt` (bbox, shares, top and root-top profiles, width per height,

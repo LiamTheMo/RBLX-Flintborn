@@ -7,6 +7,7 @@
 
 local BiomeCatalog = require(script.Parent.Parent.World.BiomeCatalog)
 local GameConstants = require(script.Parent.Parent.GameConstants)
+local Geometry = require(script.Parent.Parent.Core.Geometry)
 local IslandLayout = require(script.Parent.Parent.World.IslandLayout)
 local Rarity = require(script.Parent.Parent.Items.Rarity)
 
@@ -119,8 +120,7 @@ end
 -- True when a footprint at `position` overlaps none of the active ones.
 function EventRules.Separated(position: Vector3, radius: number, active): boolean
 	for _, other in active do
-		local dx, dz = position.X - other.position.X, position.Z - other.position.Z
-		if math.sqrt(dx * dx + dz * dz) < radius + other.radius then
+		if Geometry.FlatDistance(position, other.position) < radius + other.radius then
 			return false
 		end
 	end
@@ -131,8 +131,7 @@ end
 -- (extraction auras, safe zones, the Guardian arena, totem cover).
 function EventRules.ClearOf(position: Vector3, radius: number, zones): boolean
 	for _, zone in zones do
-		local dx, dz = position.X - zone.center.X, position.Z - zone.center.Z
-		if math.sqrt(dx * dx + dz * dz) < radius + zone.radius then
+		if Geometry.FlatDistance(position, zone.center) < radius + zone.radius then
 			return false
 		end
 	end

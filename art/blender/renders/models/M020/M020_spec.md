@@ -40,8 +40,8 @@ Sheet text:
 - **O, other:** ground shadow and dark edges; not counted in the shares.
 
 **Scratch study material** (pure Python, no Blender), in
-`<temp>\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m020_study\`.
-Run with `C:/Users/Orang/.local/bin/python3.14.exe`.
+`<temp>/m020_study/`.
+Run with `python3.14`.
 - **Helpers:** `png.py` (reader, `crop`), `m.py` (masks, view boxes `V`), `bb.json` (silhouette boxes).
 - **Measurements:** `measure.py` → `measure_out.txt` (shares, profiles, width per height); `comps2.py` (cut-face and
   clump components per view); `barkprof.py` (bark-only top/bottom profiles); `trunkw.py` (trunk width per height);

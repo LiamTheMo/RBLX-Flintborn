@@ -1,7 +1,7 @@
 # Numbered-model stage procedure
 
 **Agent grouping (user decision, 2026-10-28, revised the same day to speed things up):**
-- **Two new-model modellers at a time** (user decision, 2026-10-28, down from three). Fix modellers and verifiers come on top of that, but never more than **4 Blender agents in all**. Each agent is Opus 5.5 at high effort and starts with a fresh context. A modeller does stages 1–6 (modelling, optimisation and cleanup, UV, materials/colour/texture, lighting, VFX) for one model in its own background Blender (see "Parallel sessions").
+- **Two new-model modellers at a time** (user decision, 2026-10-28, down from three). Fix modellers and verifiers come on top of that, but never more than **4 Blender agents in all**. Each agent runs on the high-effort model and starts with a fresh context. A modeller does stages 1–6 (modelling, optimisation and cleanup, UV, materials/colour/texture, lighting, VFX) for one model in its own background Blender (see "Parallel sessions").
 - **A separate verifier per model, with a fresh context, does stage 7.** It didn't do any other stage. The user wants clean context, because context bloat hurts the modelling. It works read-only in its own background Blender, on a copy of the kit file taken after the model has been put into it.
 - **The main session is the hub.** It:
   - starts every agent;
@@ -25,7 +25,7 @@ running session holds; check with `Get-CimInstance Win32_Process -Filter "Name='
 same tris, sizes and renders as the GUI, mean pixel difference 0.02/255.
 
 ```bash
-PY=C:/Users/Orang/.local/bin/python3.14.exe   # or Blender's own: "<blender dir>/5.2/python/bin/python.exe"
+PY=python3                                     # the owner's uv Python on Windows, or Blender's own: "<blender dir>/5.2/python/bin/python.exe"
 export BLENDER_PATH=...                         # if blender.exe is not at D:/Steam/steamapps/common/Blender/
 $PY art/blender/kit/mcp/bgmcp.py start <port> art/blender/assets/kit/wip/MNNN.blend   # once, at the start
 $PY art/blender/kit/mcp/bgmcp.py run <port> <code.py>       # or `run <port> -` with a heredoc; prints the JSON response
@@ -41,8 +41,8 @@ $PY art/blender/kit/mcp/bgmcp.py stop <port>                # when your stages a
 - **Into the kit file.** When a model passes, the main session runs `mNNN.build()` in the GUI kit file (the builder is the source of truth), saves it, checks that the renders match, then exports and commits.
 
 How every numbered model (`art/blender/assets/references/NNN.png`, builders `mNNN.py`) is built. It follows the
-`roblox-blender-model` skill (`art/blender/skills/roblox-blender-model/SKILL.md`) and `WorldModeling.md` (read §1, §2,
-§5, §12, §17 and §18). Agents run on Opus 5.5 at high effort and are grouped as described above. Each Blender
+`roblox-blender-model` skill (`art/blender/skills/roblox-blender-model/SKILL.md`) and `docs/art/WorldModeling.md` (read §1, §2,
+§5, §12, §17 and §18). Agents run on the high-effort model and are grouped as described above. Each Blender
 session (the GUI or a background one) is driven by only one agent at a time.
 
 ## Rules for every stage

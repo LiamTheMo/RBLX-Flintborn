@@ -29,7 +29,6 @@ import random
 import sys
 import time
 
-import bmesh
 import bpy
 import numpy as np
 from mathutils import Euler, Matrix, Vector

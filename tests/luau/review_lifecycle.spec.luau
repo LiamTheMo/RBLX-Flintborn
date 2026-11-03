@@ -8,97 +8,21 @@ local Server = game:GetService("ServerScriptService").Server
 
 -- Fake clock and task scheduler ---------------------------------------------------
 
-local clock = 0
-local queue = {}
-local sequence = 0
-local threadErrors = {}
-
-local function resume(thread, ...)
-	local ok, err = coroutine.resume(thread, ...)
-	if not ok then
-		table.insert(threadErrors, tostring(err))
-	end
-end
-
-local function enqueue(at: number, thread, args)
-	sequence += 1
-	table.insert(queue, { at = at, sequence = sequence, thread = thread, args = args })
-end
-
-task = {}
-function task.spawn(fn, ...)
-	local thread = if type(fn) == "thread" then fn else coroutine.create(fn)
-	resume(thread, ...)
-	return thread
-end
-function task.defer(fn, ...)
-	local thread = coroutine.create(fn)
-	enqueue(clock, thread, table.pack(...))
-	return thread
-end
-function task.delay(seconds, fn, ...)
-	local thread = coroutine.create(fn)
-	enqueue(clock + (seconds or 0), thread, table.pack(...))
-	return thread
-end
-function task.wait(seconds)
-	enqueue(clock + (seconds or 0), coroutine.running(), table.pack())
-	coroutine.yield()
-	return seconds
-end
-
-warn = function() end
+local TestSupport = game:GetService("ServerStorage").TestSupport
+local EngineSignal = require(TestSupport.EngineSignal)
+local scheduler = require(TestSupport.Scheduler).new():Install()
+local threadErrors = scheduler.threadErrors
 
 -- Runs everything due within the next `seconds`, in time order.
 local function advance(seconds: number)
-	local target = clock + seconds
-	while true do
-		local best = nil
-		for index, entry in queue do
-			if entry.at <= target then
-				local current = best and queue[best]
-				if
-					current == nil
-					or entry.at < current.at
-					or (entry.at == current.at and entry.sequence < current.sequence)
-				then
-					best = index
-				end
-			end
-		end
-		if best == nil then
-			break
-		end
-		local entry = table.remove(queue, best)
-		clock = math.max(clock, entry.at)
-		resume(entry.thread, table.unpack(entry.args, 1, entry.args.n))
-	end
-	clock = target
+	scheduler:Advance(seconds)
 end
 
 -- Fake Roblox services ------------------------------------------------------------
 
 -- Roblox runs every connection of an engine event in its own thread.
 local function engineSignal()
-	local handlers = {}
-	return {
-		Connect = function(_, fn)
-			table.insert(handlers, fn)
-			return {
-				Disconnect = function()
-					local index = table.find(handlers, fn)
-					if index then
-						table.remove(handlers, index)
-					end
-				end,
-			}
-		end,
-		Fire = function(_, ...)
-			for _, fn in table.clone(handlers) do
-				task.spawn(fn, ...)
-			end
-		end,
-	}
+	return EngineSignal.new(true)
 end
 
 local InMemoryDataStore = require(Server.Infrastructure.InMemoryDataStore)

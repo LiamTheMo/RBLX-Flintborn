@@ -25,10 +25,9 @@ local ProfileSchema = require(ReplicatedStorage.Shared.Data.ProfileSchema)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local Signal = require(ReplicatedStorage.Shared.Core.Signal)
 local AntiExploitService = require(script.Parent.AntiExploitService)
-local DownedService = require(script.Parent.DownedService)
+local InteractionService = require(script.Parent.InteractionService)
 local InventoryService = require(script.Parent.InventoryService)
 local ProfileService = require(script.Parent.ProfileService)
-local WorldAdmissionService = require(script.Parent.WorldAdmissionService)
 
 local DropService = {}
 
@@ -39,23 +38,10 @@ DropService.ORDINARY_SECONDS = GameConstants.CORPSE_SECONDS
 
 local drops = {}
 
-local function canAct(player: Player): boolean
-	local humanoid = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
-	return WorldAdmissionService.IsAtRisk(player)
-		and humanoid ~= nil
-		and humanoid.Health > 0
-		and not DownedService.IsDowned(player)
-end
-
-local function itemName(item): string
-	local def = ItemCatalog.Get(item.catalogId)
-	return def and def.name or item.catalogId
-end
-
 -- The prompt's line: "Stone Axe (Permanent)", "Wood ×20" (plain words: the
 -- game's fonts have no star glyph).
 local function label(item): string
-	return itemName(item)
+	return ItemCatalog.NameOf(item.catalogId)
 		.. (if item.permanent then " (Permanent)" else "")
 		.. (item.quantity and (" ×" .. item.quantity) or "")
 end
@@ -101,7 +87,7 @@ function DropService.FinishClaim(player: Player, copy, previousOwnerId: number?)
 		profile.permanentItems[copy.instanceId] = PermanentRules.LedgerEntry(copy, os.time())
 	end)
 	if previousOwnerId ~= player.UserId then
-		InventoryService.Notify(player, "You now own this Permanent " .. itemName(copy) .. ".")
+		InventoryService.Notify(player, "You now own this Permanent " .. ItemCatalog.NameOf(copy.catalogId) .. ".")
 	end
 end
 
@@ -171,10 +157,18 @@ function DropService.Spawn(item, position: Vector3, gathered: { ownerId: number,
 	end
 end
 
+-- Spills `items` (rolled loot) as ordinary drops, each up to 3 studs off
+-- `position` on both horizontal axes, jittered with the caller's `rng`.
+function DropService.Scatter(items, position: Vector3, rng: Random)
+	for _, item in items do
+		DropService.Spawn(item, position + Vector3.new(rng:NextNumber(-3, 3), 0, rng:NextNumber(-3, 3)))
+	end
+end
+
 -- `walked` is a walk-over pickup of a gathered drop: it fails silently.
 function pickUp(player: Player, id: string, walked: boolean)
 	local drop = drops[id]
-	if drop == nil or not canAct(player) then
+	if drop == nil or not InteractionService.CanAct(player) then
 		return
 	end
 	if drop.rules then
@@ -221,7 +215,7 @@ local function dropItem(player: Player, area: any, index: any)
 	if type(area) ~= "string" or type(index) ~= "number" then
 		return false, "BadRequest"
 	end
-	if not canAct(player) then
+	if not InteractionService.CanAct(player) then
 		return false, "NotInRun"
 	end
 	local root = player.Character and player.Character:FindFirstChild("HumanoidRootPart")

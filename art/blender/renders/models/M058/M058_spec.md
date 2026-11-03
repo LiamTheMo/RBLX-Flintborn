@@ -71,7 +71,7 @@ x 277, 503, 767–768; exploded frame y 761 / 1262, x 10 / 638–639; parts fram
   - **Canopy and ground green.** Canopy = G at h ≥ .15; ground green = G below h .15.
 
 **Scratch study material** (no Blender) in
-`<temp>\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m058_study\`.
+`<temp>/m058_study/`.
 Run with the scratch venv `..\venv22\Scripts\python.exe`.
 - **Helpers:** `m.py` (masks, boxes, `cls8`, `sil8`, `fill_holes`), `zoom.py` (`zoom.py x0 y0 x1 y1 scale out.png [grid]`),
   `comps_053.py` (`label()`), `woodmap.py` (wood-only maps `w_*.png`), `tonemap.py` (leaf tones light / mid / dark at
@@ -1265,7 +1265,7 @@ Renders are in `renders/models/M058/verify/`:
 - parts: `parts.png` against `sheet_parts.png`;
 - close-ups: flowers (`flowers.png`) and the rest (`cus.png`).
 
-The measuring scripts are in `scratchpad/m058v1/`:
+The measuring scripts are in `<temp>/m058v1/`:
 - `s1.py`: topology;
 - `s2.py`: contact and bury;
 - `vis.py`: ray-grid visibility;
@@ -1451,7 +1451,7 @@ The measuring scripts are in `scratchpad/m058v1/`:
 
 A fresh fix modeller worked from the round 1 FAIL. The builder `m058.py` was rebuilt in the background session on port
 9877, the work file `wip/M058.blend` was saved after the final build, and `build()` was re-run with renders. The
-measuring scripts are in `scratchpad/m058fix/`:
+measuring scripts are in `<temp>/m058fix/`:
 - `v2.py`: the verifier's `vis.py` ray grid, plus a separate class for the new body lumps and a grazing-facet share;
 - `vs.py`: the verifier's `vis.py` unchanged;
 - `meas.py`: the study masks;
@@ -1619,7 +1619,7 @@ saved. Renders are in `renders/models/M058/verify2/`:
 - `parts.png` (each LeafClump at az 0 / 90 / 200, side-on and from the top) against `sheet_parts.png`;
 - close-ups `cu_*.png` and `cus.png`.
 
-The scripts are in `scratchpad/m058v2/`:
+The scripts are in `<temp>/m058v2/`:
 - `vis.py`: ray grid with puff, body-lump and inner classes, a dark-tone share, a grazing share and a thin-path share;
 - `pin.py`: puffs inside bodies or neighbours;
 - `fl.py`: flowers;

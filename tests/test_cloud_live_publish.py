@@ -123,6 +123,42 @@ class CloudPublishSafetyTests(unittest.TestCase):
             seen += re.findall(r'"(Mod\d{3})"', batch["publish"])
         self.assertEqual(sorted(seen), sorted("Mod%03d" % i for i in range(120)))
 
+    def test_entry_scripts_publish_after_every_library(self):
+        # Every batch publishes the place, so a server can start between two
+        # batches. The modules the Loader runs (Services, Controllers) and the
+        # entry scripts go last, together, so they never run against libraries
+        # older than the ones they were written for.
+        libraries = [(("ReplicatedStorage", "Shared", "Lib%03d" % i), "ModuleScript", "return " + "1" * 20000)
+                     for i in range(60)]
+        libraries.append((("StarterPlayer", "StarterPlayerScripts", "Client", "Hud", "Kit"), "ModuleScript",
+                          "return " + "1" * 20000))
+        entries = [
+            (("ServerScriptService", "Server"), "Script", "-- server entry"),
+            (("ServerScriptService", "Server", "Services", "AlphaService"), "ModuleScript", "return {}"),
+            (("StarterPlayer", "StarterPlayerScripts", "Client"), "LocalScript", "-- client entry"),
+            (("StarterPlayer", "StarterPlayerScripts", "Client", "Controllers", "AlphaController"), "ModuleScript",
+             "return {}"),
+        ]
+        plan = cloud.plan_batches(sorted(libraries + entries))
+        self.assertGreater(len(plan), 1)
+        last = plan[-1]["publish"]
+        self.assertEqual(plan[-1]["count"], len(entries))
+        for name in ("AlphaService", "AlphaController", "server entry", "client entry"):
+            self.assertIn(name, last)
+        for batch in plan[:-1]:
+            for name in ("AlphaService", "AlphaController", "server entry", "client entry"):
+                self.assertNotIn(name, batch["publish"])
+
+    def test_the_repository_runners_fit_one_batch(self):
+        # The guarantee above holds only while every script that runs on its own
+        # fits one task. If this fails, the Services and Controllers outgrew one
+        # batch: split them by dependency, or publish only the last batch.
+        specs = cloud.spec_list()
+        runners = [spec for spec in specs if cloud.runs_on_its_own(spec[0], spec[1])]
+        plan = cloud.plan_batches(specs)
+        self.assertEqual(plan[-1]["count"], len(runners),
+                         "the entry scripts, Services and Controllers no longer fit one deploy batch")
+
     def test_rate_limits_back_off(self):
         # The longer of Retry-After and an exponential backoff, capped.
         self.assertEqual(cloud.retry_delay(0, "7"), 7.0)

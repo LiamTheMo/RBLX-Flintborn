@@ -21,6 +21,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 
 local AggroRules = require(ReplicatedStorage.Shared.Enemies.AggroRules)
+local Characters = require(ReplicatedStorage.Shared.World.Characters)
 local CreatureModels = require(ReplicatedStorage.Shared.Visuals.CreatureModels)
 local DamageRules = require(ReplicatedStorage.Shared.Combat.DamageRules)
 local EnemyCatalog = require(ReplicatedStorage.Shared.Enemies.EnemyCatalog)
@@ -32,11 +33,10 @@ local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local Signal = require(ReplicatedStorage.Shared.Core.Signal)
 local WildlifeRules = require(ReplicatedStorage.Shared.Enemies.WildlifeRules)
 local WorldState = require(ReplicatedStorage.Shared.World.WorldState)
-local DownedService = require(script.Parent.DownedService)
 local DropService = require(script.Parent.DropService)
+local InteractionService = require(script.Parent.InteractionService)
 local ModifierService = require(script.Parent.ModifierService)
 local SafeZoneService = require(script.Parent.SafeZoneService)
-local WorldAdmissionService = require(script.Parent.WorldAdmissionService)
 
 local NpcService = {}
 
@@ -64,28 +64,7 @@ local rng = Random.new()
 -- characters and resource nodes are see-through, so nobody stands on a tree, a
 -- wall or another body (a boss's hitbox would otherwise lift a wolf onto its head).
 local function groundParams()
-	local params = RaycastParams.new()
-	params.FilterType = Enum.RaycastFilterType.Exclude
-	params.RespectCanCollide = true
-	local ignore = { folder }
-	for _, name in NOT_GROUND do
-		local other = workspace:FindFirstChild(name)
-		if other then
-			table.insert(ignore, other)
-		end
-	end
-	-- Solid island scenery (trunks, boulders, logs) is queryable but never ground.
-	local scenery = WorldState.Scenery()
-	if scenery then
-		table.insert(ignore, scenery)
-	end
-	for _, player in Players:GetPlayers() do
-		if player.Character then
-			table.insert(ignore, player.Character)
-		end
-	end
-	params.FilterDescendantsInstances = ignore
-	return params
+	return WorldState.GroundParams(NOT_GROUND, folder)
 end
 
 -- Creatures walk on the bed of knee-deep water, 30% slower (GDD §55).
@@ -225,23 +204,13 @@ local function kill(npc)
 	NpcService.Died:Fire(npc)
 end
 
-local function rootOf(player: Player)
-	return player.Character and player.Character:FindFirstChild("HumanoidRootPart")
-end
-
--- True when `player` stands inside a safe zone, where nobody deals damage.
-local function inSafeZone(player: Player): boolean
-	local root = rootOf(player)
-	return root ~= nil and SafeZoneService.Contains(root.Position)
-end
-
 -- `attacker` (optional) is remembered for kill credit and provokes the enemy.
 function NpcService.Damage(npc, amount: number, attacker: Player?)
 	if not npcs[npc] or amount <= 0 or npc.invulnerable then
 		return
 	end
 	if attacker then
-		if inSafeZone(attacker) then
+		if SafeZoneService.ContainsPlayer(attacker) then
 			return
 		end
 		npc.lastAttacker = attacker
@@ -322,19 +291,14 @@ end
 
 -- Living, at-risk, standing players outside safe zones can be hunted.
 function NpcService.CanTarget(player: Player): boolean
-	local humanoid = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
-	return humanoid ~= nil
-		and humanoid.Health > 0
-		and WorldAdmissionService.IsAtRisk(player)
-		and not DownedService.IsDowned(player)
-		and not inSafeZone(player)
+	return InteractionService.CanAct(player) and not SafeZoneService.ContainsPlayer(player)
 end
 local canTarget = NpcService.CanTarget
 
 -- The attacker a recent hit provoked `npc` into hunting, and their root, if any.
 function NpcService.Provoker(npc, leash: number, now: number)
 	local attacker = npc.lastAttacker
-	local root = attacker and rootOf(attacker)
+	local root = attacker and Characters.RootOf(attacker)
 	if root and canTarget(attacker) and AggroRules.Provoked(npc.provokedAt, now, npc.home, root.Position, leash) then
 		return attacker, root
 	end
@@ -398,7 +362,7 @@ local function step(dt: number)
 	local now = os.clock()
 	local roots, rootPositions = {}, {}
 	for _, player in Players:GetPlayers() do
-		local root = rootOf(player)
+		local root = Characters.RootOf(player)
 		if root then
 			roots[player] = root
 			table.insert(rootPositions, root.Position)

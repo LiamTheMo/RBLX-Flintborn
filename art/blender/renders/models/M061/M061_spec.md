@@ -82,8 +82,8 @@ ortho title bar y 463–495, cells y 495–756, dividers x 275, 511, 760; explod
     for content only (§3.3).
 
 **Scratch study material** (no Blender) in
-`<temp>\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m061_study\`.
-Run with `C:/Users/Orang/.local/bin/uv.exe run --no-project --with pillow --with numpy --with scipy python <script> < /dev/null`.
+`<temp>/m061_study/`.
+Run with `uv run --no-project --with pillow --with numpy --with scipy python <script> < /dev/null`.
 - **Helpers:** `m.py` (boxes, `masks`, `petal_cand`, `cls`, `tones`, `clsimg`), `zoom.py` (`zoom.py x0 y0 x1 y1 scale
   out.png [grid]`), `probe2.py` (`probe2.py x,y …` → hex and HSV), `lines2.py` (frame rules), `sw.py` (swatches).
 - **Measurements:** `measure.py` → `measure_out.txt` (bbox, W : H, shares, fill, tones, top profile, widths per height,
@@ -1041,7 +1041,7 @@ a Studio-side choice (decision 11).
   - `thumb_sheet` (about 120 px: three five-petal stars with yellow dots over a rosette of separate tips);
   - `scale` (5.5-stud markers on either side; the herb is 0.40 of them).
 - **Scratch scripts** in
-  `<temp>\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m061w\`:
+  `<temp>/m061w/`:
   - `meas.py`: the sheet masks on our renders (`uv run --no-project --with pillow --with numpy --with scipy python meas.py
     front_sheet sheet:front …`);
   - `pm.py` (colours), `pscore.py` (camera probes);
@@ -1083,7 +1083,7 @@ a Studio-side choice (decision 11).
 
 Fresh verifier, read-only. Background Blender on port 9880 on `art/blender/assets/kit/wip/M061_verify.blend` (not
 saved; two session-only tests below were restored before stopping). Renders in `art/blender/renders/models/M061/verify/`;
-scripts in `<temp>\...\scratchpad\m061v\` (`geo.py`, `contact.py`, `bury2.py`, `ren*.py`, `lt.py`, `ptest.py`; the
+scripts in `<temp>/m061v/` (`geo.py`, `contact.py`, `bury2.py`, `ren*.py`, `lt.py`, `ptest.py`; the
 modeller's `meas.py` and `vis.py` re-run unchanged after reading them).
 
 **Verdict: PASS, 8 / 10.** No blockers. The herb reads like the sheet: three chunky five-petal daisies at three heights

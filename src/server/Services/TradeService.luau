@@ -144,23 +144,21 @@ local function describe(profile, offer)
 	for _, entry in offer.items do
 		local catalogId = TradeRules.MaterialOf(entry.key)
 		if catalogId then
-			local def = ItemCatalog.Get(catalogId)
 			table.insert(list, {
 				key = entry.key,
 				catalogId = catalogId,
-				name = def and def.name or catalogId,
+				name = ItemCatalog.NameOf(catalogId),
 				quantity = entry.quantity,
 			})
 			continue
 		end
 		for _, item in profile.lobbyBackpack.slots do
 			if keyOf(item) == entry.key then
-				local def = ItemCatalog.Get(item.catalogId)
 				table.insert(list, {
 					key = entry.key,
 					catalogId = item.catalogId,
 					-- The plain name: screens mark Permanent items with the star art.
-					name = def and def.name or item.catalogId,
+					name = ItemCatalog.NameOf(item.catalogId),
 					quantity = entry.quantity,
 					permanent = item.permanent,
 				})

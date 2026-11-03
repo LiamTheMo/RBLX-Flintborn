@@ -7,6 +7,7 @@
 -- limit is a teleport and is pulled back at once; smaller overruns get STRIKES
 -- chances first.
 
+local Geometry = require(script.Parent.Parent.Core.Geometry)
 local SurvivalRules = require(script.Parent.Parent.Survival.SurvivalRules)
 
 local MovementRules = {}
@@ -47,26 +48,16 @@ function MovementRules.Limit(dt: number, maxSpeed: number): number
 	return maxSpeed * dt * MovementRules.TOLERANCE + MovementRules.ALLOWANCE
 end
 
-local function horizontal(from: Vector3, to: Vector3): number
-	local dx, dz = to.X - from.X, to.Z - from.Z
-	return math.sqrt(dx * dx + dz * dz)
-end
-
--- True when moving from `from` to `to` in `dt` seconds is physically plausible.
-function MovementRules.Plausible(from: Vector3, to: Vector3, dt: number, maxSpeed: number): boolean
-	return horizontal(from, to) <= MovementRules.Limit(dt, maxSpeed)
-end
-
 -- True when a client-owned `live` position is horizontally within `slack` studs of
 -- the last server-validated one (nil: untracked, so nothing to compare). A client
 -- that teleports, acts and teleports back between two samples fails this.
 function MovementRules.NearValidated(live: Vector3, validated: Vector3?, slack: number): boolean
-	return validated == nil or horizontal(validated, live) <= slack
+	return validated == nil or Geometry.FlatDistance(validated, live) <= slack
 end
 
 -- True for a move so far over the limit that it can only be a teleport ("blink").
 function MovementRules.Blink(from: Vector3, to: Vector3, dt: number, maxSpeed: number): boolean
-	return horizontal(from, to) > MovementRules.Limit(dt, maxSpeed) * MovementRules.BLINK_FACTOR
+	return Geometry.FlatDistance(from, to) > MovementRules.Limit(dt, maxSpeed) * MovementRules.BLINK_FACTOR
 end
 
 -- Judges one sample against the latency budget `slack` (start at ALLOWANCE).
@@ -75,8 +66,10 @@ function MovementRules.Judge(slack: number, from: Vector3, to: Vector3, dt: numb
 	if MovementRules.Blink(from, to, dt, maxSpeed) then
 		return "Blink", slack
 	end
-	local remaining =
-		math.min(MovementRules.ALLOWANCE, slack + maxSpeed * dt * MovementRules.TOLERANCE - horizontal(from, to))
+	local remaining = math.min(
+		MovementRules.ALLOWANCE,
+		slack + maxSpeed * dt * MovementRules.TOLERANCE - Geometry.FlatDistance(from, to)
+	)
 	if remaining < 0 then
 		return "Over", slack
 	end

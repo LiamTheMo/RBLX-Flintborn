@@ -2194,7 +2194,7 @@ def colour_all(objs=None):
 
 
 # ---- stage 4 measurement: our renders against the sheet, with the study's masks (measure.py cls) -------------------
-SHEET_PATH = "D:/Projects/Roblox/RBLX-Flintborn/art/blender/assets/references/015.png"
+SHEET_PATH = K.REPO + "/art/blender/assets/references/015.png"
 SHEET_PAPER = (242, 237, 230)
 SHEET_BOX = {"f34": (20, 130, 460, 445), "r34": (470, 150, 845, 445), "front": (20, 508, 270, 716),
              "side": (276, 508, 510, 716), "rear": (516, 508, 767, 716), "top": (773, 508, 1003, 716)}

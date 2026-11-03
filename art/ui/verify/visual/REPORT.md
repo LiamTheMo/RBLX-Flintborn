@@ -1,4 +1,7 @@
 # Visual Verifier — all screens — round 1
+
+> Round 1 (history); current state: [docs/ui/UI_PROGRESS.md](../../../../docs/ui/UI_PROGRESS.md).
+
 Result: FAIL (2 High, 13 Medium, 12 Low). Viewport 1672×941 (phone 844×390, wide 2560×1080).
 Positions: frames, tabs, grids, buttons and rules within ±2 px everywhere except the last inventory slot right edge (3 px) and the Play window bottom border (1–5 px).
 

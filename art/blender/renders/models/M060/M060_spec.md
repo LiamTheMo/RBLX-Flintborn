@@ -84,8 +84,8 @@ ortho frame y 466 / 725, cell dividers x 262, 512, 762; exploded frame x 11–71
     two sage rocks; a little rock creeps into O.
 
 **Scratch study material** (no Blender) in
-`<temp>\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m060_study\`.
-Run with `C:/Users/Orang/.local/bin/uv.exe run --no-project --with pillow --with numpy python <script> < /dev/null` (the
+`<temp>/m060_study/`.
+Run with `uv run --no-project --with pillow --with numpy python <script> < /dev/null` (the
 plain `python3.14.exe` has no Pillow or numpy).
 - **Helpers:** `m.py` (boxes, `background`, `cls`, `hsv`, `clsimg`), `zoom.py` (`zoom.py x0 y0 x1 y1 scale out.png
   [grid]`), `probe.py` (`probe.py x,y …`), `comps.py` (`label()`; importing it also prints its blob table).
@@ -1424,7 +1424,7 @@ hidden.
 A fresh verifier, read-only, in a background Blender on port 9881 on `wip/M060_verify.blend` (the main session's build
 of the fixed `m060.py`; not saved). Renders and comparisons: `renders/models/M060/verify2/` (`cmp_0..2.png` and
 `big_cmp_*.png` put each sheet cell beside ours, `spin_row0/1.png` the eight azimuths, `big_*.png` at 900 × 700,
-`cmp_parts.png` the parts row). Scripts: `<temp>\...\scratchpad\m060_verify2\` (`audit.py`, `contact.py`, `bur2.py`,
+`cmp_parts.png` the parts row). Scripts: `<temp>/m060_verify2/` (`audit.py`, `contact.py`, `bur2.py`,
 `uvov.py`, `vis.py`, `vis_rock2.py`, `notch.py`, `col.py`); shares use the study's masks through the fix round's
 `meas.py`. My renders measure the same as `fix1/` to within 0.2 points, so the kit-file build matches the fix build.
 

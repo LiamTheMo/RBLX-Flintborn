@@ -20,6 +20,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local ModifierRules = require(ReplicatedStorage.Shared.Progression.ModifierRules)
 local BiomeCatalog = require(ReplicatedStorage.Shared.World.BiomeCatalog)
+local Characters = require(ReplicatedStorage.Shared.World.Characters)
 local HarvestRules = require(ReplicatedStorage.Shared.Resources.HarvestRules)
 local IslandLayout = require(ReplicatedStorage.Shared.World.IslandLayout)
 local NodeCatalog = require(ReplicatedStorage.Shared.Resources.NodeCatalog)
@@ -45,11 +46,6 @@ ResourceService.NODES_PER_FRAME = 40
 local nodes = {}
 local lastHit = {}
 local rng = Random.new()
-
-local function rootOf(player: Player)
-	local character = player.Character
-	return character and character:FindFirstChild("HumanoidRootPart")
-end
 
 local function setActive(node, active: boolean)
 	node.active = active
@@ -125,7 +121,7 @@ local function harvest(player: Player, node)
 		return
 	end
 	-- Range is to the hitbox's surface, so a big node is reached at its side.
-	local root = rootOf(player)
+	local root = Characters.RootOf(player)
 	if
 		root == nil
 		or HarvestRules.SurfaceDistance(root.Position, node.center, node.half) > NodeCatalog.HARVEST_RANGE
@@ -315,7 +311,7 @@ local function scatter()
 	folder.Name = "ResourceNodes"
 	folder.Parent = workspace
 	local generated = WorldState.IsGenerated()
-	local radius = workspace:GetAttribute("FlintbornMapRadius") or ResourceService.DEFAULT_MAP_RADIUS
+	local radius = WorldState.MapRadius(ResourceService.DEFAULT_MAP_RADIUS)
 	local scale = radius / BiomeCatalog.MAP_RADIUS
 	local made = 0
 	for _, zoneId in BiomeCatalog.ZONE_IDS do

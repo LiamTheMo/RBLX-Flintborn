@@ -44,20 +44,12 @@ local amount = 10
 local sortIndex = 1
 local busy = false
 
-local function invoke(name: string, ...)
-	local ok, success, reason, detail = pcall(Remotes.Get(name).InvokeServer, Remotes.Get(name), ...)
-	if not ok then
-		return false, "Request failed"
-	end
-	return success, reason, detail
-end
-
 local function notify(kind: string, title: string, text: string?)
 	Kit.Toast.Show({ kind = kind, title = title, text = text, duration = if kind == "warn" then 5 else 3 })
 end
 
 local function refused(reason: any)
-	notify("warn", "Not possible", (Reasons.Text(reason):gsub("^%l", string.upper)) .. ".")
+	notify("warn", "Not possible", Reasons.Sentence(reason))
 end
 
 local function nameOf(entry): string
@@ -198,7 +190,7 @@ end
 -- Fetches the backpack and vault and draws them. `opening`: also tells of
 -- material deliveries the vault had no room for (once per opening).
 local function refresh(opening: boolean?)
-	local latest = invoke("VaultSnapshot")
+	local latest = Remotes.Invoke("VaultSnapshot")
 	if type(latest) ~= "table" then
 		notify("warn", "Still loading", "Your data is still loading. Try again in a moment.")
 		return
@@ -246,7 +238,7 @@ local function deposit(index: number)
 	local store = math.clamp(amount, 1, owned)
 	local overflow = nil
 	hold(function()
-		local ok, reason, lost = invoke("VaultDeposit", index, nil, nil, store)
+		local ok, reason, lost = Remotes.Invoke("VaultDeposit", index, nil, nil, store)
 		if ok then
 			notify("info", "Stored", name .. " is safe in your vault.")
 		elseif reason == "VaultWouldOverflow" and type(lost) == "number" then
@@ -265,13 +257,13 @@ local function deposit(index: number)
 		danger = true,
 		onConfirm = function()
 			hold(function()
-				local latest = invoke("VaultSnapshot")
+				local latest = Remotes.Invoke("VaultSnapshot")
 				local now = type(latest) == "table" and latest.backpack[index] or nil
 				if type(now) ~= "table" or now.catalogId ~= item.catalogId or now.quantity ~= item.quantity then
 					notify("warn", "Nothing stored", "Your backpack changed, so nothing was deposited.")
 					return
 				end
-				local stored, why = invoke("VaultDeposit", index, item.catalogId, overflow, store)
+				local stored, why = Remotes.Invoke("VaultDeposit", index, item.catalogId, overflow, store)
 				if stored then
 					notify("info", "Stored", name .. " is in your vault.")
 				else
@@ -287,10 +279,10 @@ local function withdraw(choice)
 	hold(function()
 		local ok, reason
 		if choice.kind == "item" then
-			ok, reason = invoke("VaultWithdrawItem", choice.index)
+			ok, reason = Remotes.Invoke("VaultWithdrawItem", choice.index)
 		else
 			local take = math.clamp(amount, 1, choice.entry.quantity or 1)
-			ok, reason = invoke("VaultWithdrawMaterial", choice.entry.catalogId, take)
+			ok, reason = Remotes.Invoke("VaultWithdrawMaterial", choice.entry.catalogId, take)
 		end
 		if ok then
 			notify("info", "In your backpack", name .. " goes with you on Play.")
@@ -313,7 +305,7 @@ local function storeAll()
 	hold(function()
 		local stored, held, refusal = 0, 0, nil
 		for index = count, 1, -1 do
-			local ok, reason = invoke("VaultDeposit", index)
+			local ok, reason = Remotes.Invoke("VaultDeposit", index)
 			if ok then
 				stored += 1
 			elseif reason == "VaultWouldOverflow" then
@@ -394,8 +386,7 @@ end
 local function listOf(map): string
 	local parts = {}
 	for catalogId, quantity in map do
-		local def = ItemCatalog.Get(catalogId)
-		table.insert(parts, ("%s ×%d"):format(def and def.name or catalogId, quantity))
+		table.insert(parts, ("%s ×%d"):format(ItemCatalog.NameOf(catalogId), quantity))
 	end
 	table.sort(parts)
 	return if #parts > 0 then table.concat(parts, ", ") else "nothing"

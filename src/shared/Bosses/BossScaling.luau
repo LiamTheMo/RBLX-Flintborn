@@ -7,13 +7,14 @@
 local ItemCatalog = require(script.Parent.Parent.Items.ItemCatalog)
 local Rarity = require(script.Parent.Parent.Items.Rarity)
 local Tiers = require(script.Parent.Parent.Items.Tiers)
+local LevelCurve = require(script.Parent.Parent.Progression.LevelCurve)
 
 local BossScaling = {}
 
 BossScaling.MIN = 0.75
 BossScaling.MAX = 2.0
 BossScaling.PER_SCORE = 0.25
-BossScaling.MAX_LEVEL = 50
+BossScaling.MAX_LEVEL = LevelCurve.MAX_LEVEL
 
 -- Armor tiers ranked in ladder order (GDD §51); higher tiers score more.
 local ARMOR_TIERS = {}

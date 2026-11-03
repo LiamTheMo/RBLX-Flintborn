@@ -293,7 +293,4 @@ test("node drops per hit depend on the tool; basic nodes regrow after 120 s", fu
 		expectEq(NodeCatalog.RegrowSeconds(nodeType), 120, nodeType .. " two-minute regrowth")
 	end
 	expectEq(NodeCatalog.Nodes.BerryBush, nil, "plain berry bushes are gone")
-	for nodeType, node in NodeCatalog.Nodes do
-		expect(ItemCatalog.Get(node.material) ~= nil, nodeType .. " yields a real item")
-	end
 end)

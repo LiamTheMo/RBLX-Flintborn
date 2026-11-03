@@ -17,12 +17,11 @@ local ModifierRules = require(ReplicatedStorage.Shared.Progression.ModifierRules
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local StructureCatalog = require(ReplicatedStorage.Shared.Building.StructureCatalog)
 local BuildingService = require(script.Parent.BuildingService)
-local DownedService = require(script.Parent.DownedService)
 local DropService = require(script.Parent.DropService)
+local InteractionService = require(script.Parent.InteractionService)
 local InventoryService = require(script.Parent.InventoryService)
 local ModifierService = require(script.Parent.ModifierService)
 local ProgressionService = require(script.Parent.ProgressionService)
-local WorldAdmissionService = require(script.Parent.WorldAdmissionService)
 
 local FarmingService = {}
 
@@ -55,19 +54,10 @@ local function now(): number
 	return workspace:GetServerTimeNow()
 end
 
-local function canAct(player: Player): boolean
-	local humanoid = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
-	return WorldAdmissionService.IsAtRisk(player)
-		and humanoid ~= nil
-		and humanoid.Health > 0
-		and not DownedService.IsDowned(player)
-end
-
 local function seedText(seed): string
 	local parts = {}
 	for catalogId, quantity in seed do
-		local def = ItemCatalog.Get(catalogId)
-		table.insert(parts, ("%d %s"):format(quantity, def and def.name or catalogId))
+		table.insert(parts, ("%d %s"):format(quantity, ItemCatalog.NameOf(catalogId)))
 	end
 	return table.concat(parts, ", ")
 end
@@ -111,7 +101,7 @@ end
 
 local function plant(player: Player, planter, cropId: string)
 	local crop = StructureCatalog.Crops[cropId]
-	if crop == nil or planter.cropId or not canAct(player) then
+	if crop == nil or planter.cropId or not InteractionService.CanAct(player) then
 		return
 	end
 	local paid, carried = InventoryService.RemoveAll(player, crop.seed)
@@ -135,7 +125,11 @@ end
 
 local function harvest(player: Player, planter)
 	local crop = planter.cropId and StructureCatalog.Crops[planter.cropId]
-	if crop == nil or not canAct(player) or BuildRules.CropRemaining(crop, planter.plantedAt, now()) > 0 then
+	if
+		crop == nil
+		or not InteractionService.CanAct(player)
+		or BuildRules.CropRemaining(crop, planter.plantedAt, now()) > 0
+	then
 		return
 	end
 	local carried = planter.carried or 0

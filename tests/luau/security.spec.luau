@@ -253,14 +253,12 @@ end)
 
 test("§24 impossible movement is caught; sprinting and falling are not", function()
 	local from = Vector3.new(0, 50, 0)
-	expect(MovementRules.Plausible(from, Vector3.new(6, 0, 0), 0.25, MovementRules.MaxSpeed(false)), "sprint")
-	expect(
-		MovementRules.Plausible(from, Vector3.new(0, -200, 0) + from, 0.25, MovementRules.MaxSpeed(false)),
-		"a long fall"
-	)
-	expect(not MovementRules.Plausible(from, Vector3.new(80, 50, 0), 0.25, MovementRules.MaxSpeed(false)), "teleport")
-	expect(
-		not MovementRules.Plausible(from, Vector3.new(12, 50, 0), 0.25, MovementRules.MaxSpeed(true)),
-		"downed crawl"
-	)
+	-- One sample judged from a full latency budget.
+	local function ok(to, maxSpeed)
+		return (MovementRules.Judge(MovementRules.ALLOWANCE, from, to, 0.25, maxSpeed)) == "Ok"
+	end
+	expect(ok(Vector3.new(6, 0, 0), MovementRules.MaxSpeed(false)), "sprint")
+	expect(ok(Vector3.new(0, -200, 0) + from, MovementRules.MaxSpeed(false)), "a long fall")
+	expect(not ok(Vector3.new(80, 50, 0), MovementRules.MaxSpeed(false)), "teleport")
+	expect(not ok(Vector3.new(12, 50, 0), MovementRules.MaxSpeed(true)), "downed crawl")
 end)

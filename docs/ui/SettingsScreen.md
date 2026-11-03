@@ -5,10 +5,10 @@ Reference: `art/reference/ui/lobby/03_settings.png` (Gameplay tab). Kit:
 Design resolution: 1672 × 941 (the image size). Every bound below is design px
 from the top-left of the screen, measured from the image (±1–2 px); "rel" is
 relative to the window's top-left (287, 150).
-Status: Draft (measured spec for the lobby UI rebuild). Source of truth for build:
-the reference image. The old parchment spec this file replaces described
-`10_settings.png`, which has been removed; the live code it describes
-(`src/client/Hud/SettingsPanel.luau`) is mapped below.
+Status: Built (`src/client/Hud/Screens/SettingsWindow.luau`); this is the measured
+spec it was built from. Source of truth for build: the reference image. The old
+parchment spec this file replaces described `10_settings.png`, which has been
+removed, and so has the parchment window (`Hud/SettingsPanel.luau`, ARCHITECTURE §9).
 
 ## Overview
 
@@ -139,7 +139,7 @@ Slider knob positions in the mock (knob centre along the 286 px track): Camera
 Helpers in `art/ui/kit/analysis/inventory/tools/` (run from the repo root);
 `measure_inventory_settings.sh` re-runs all of these into
 `art/ui/kit/analysis/settings/measurements.txt`. Crops and overlays from
-`ref_tools.py grid/crop` are in `art/ui/kit/analysis/settings/`.
+`ref_tools.py grid/crop` are in `art/ui/kit/analysis/settings/`. `ref_tools.py` is an external reference-measuring helper from the UI modelling skill, not part of this repo; the repo's own measuring scripts are the ones in `art/ui/kit/analysis/`.
 
 - Window: `px.py 03 row 450 280 300` (dark 286/287–290), `row 450 1370 1392`
   (1379/1380–1383), `col 800 140 160` (149/150–154), `col 800 790 812` (800–805).
@@ -176,14 +176,14 @@ Helpers in `art/ui/kit/analysis/inventory/tools/` (run from the repo root);
 | Value box | shows value | — | — | — | — | — | display only in the mock (open question 6) |
 | Checkbox | on: gold fill + tick | gold rim | — | off: kit 09 empty box (27, 469) | — | gold rim | mock (on) + kit 09 (off) |
 | Dropdown | closed, chevron down | kit 09 hover row style | opens a list below (or above near the bottom); rows kit 09 list rows | open: chevron up (not in kit) | — | gold rim | implied; list not in mock |
-| Key cap | key text | gold rim | capturing: text "…" (current code) | — | fixed keys (Move, Jump: not rebindable) and no keyboard: muted (open question 3) | gold rim | implied + `SettingsPanel` |
+| Key cap | key text | gold rim | capturing: text "…" (current code) | — | fixed keys (Move, Jump: not rebindable) and no keyboard: muted (open question 3) | gold rim | implied + `SettingsWindow` |
 | RESET | parchment | kit 03 parchment hover | kit 03 parchment pressed | — | kit 03 parchment disabled (1146, 200) | — | kit 03 |
-| APPLY | leather | kit 03 leather hover (409, 63) | kit 03 leather pressed (774, 63) | — | kit 03 leather disabled (1146, 63): nothing to save | — | kit 03 + `SettingsPanel:SetDirty` |
+| APPLY | leather | kit 03 leather hover (409, 63) | kit 03 leather pressed (774, 63) | — | kit 03 leather disabled (1146, 63): nothing to save | — | kit 03 + `SettingsWindow:SetDirty` |
 | Close | kit 03 close | kit 03 hover | kit 03 pressed | — | — | — | kit 03 |
 
 ## Motion and effects
 
-None shown. The current window opens instantly (`Parchment.Screen`).
+None shown. The parchment window it replaced opened instantly (`Parchment.Screen`, removed).
 
 ## Data and behavior
 
@@ -191,8 +191,8 @@ Real settings: `src/shared/Settings/SettingsRules.luau` (values, ranges,
 defaults), `src/shared/Settings/Keybinds.luau` (rebindable keys),
 `src/client/Controllers/SettingsController.luau` (draft, APPLY via `SaveSettings`
 / `SaveKeybinds`, RESET of the open tab, close discards the draft) and
-`src/client/Hud/SettingsPanel.luau` (current view: five tabs Gameplay, Audio,
-Graphics, Controls, Accessibility).
+`src/client/Hud/Screens/SettingsWindow.luau` (the view: four tabs Gameplay, Audio,
+Graphics, Controls; the accessibility settings live in Graphics and Audio, D1).
 
 ### Mockup controls → real settings
 
@@ -208,7 +208,7 @@ Graphics, Controls, Accessibility).
 | Key: Interact · E | `Interact` (default **E**) | matches (defaults changed in GDD 1.24) |
 | Key: Open Backpack · B | `Backpack` (default **B**) | matches |
 | Key: Open Map · M | `Map` (default **M**) | matches |
-| Key: Sprint · Left Shift | `Sprint` (default LeftShift) | matches; display text differs: `Keybinds.Display` → "Shift", `SettingsPanel.KeyText` → "SHIFT", mock "Left Shift" |
+| Key: Sprint · Left Shift | `Sprint` (default LeftShift) | matches; `SettingsWindow.KeyText` shows "Left Shift" like the mock (`Keybinds.Display` → "Shift" elsewhere) |
 | Key: Crouch · Left Ctrl | **removed** (GDD 1.24: the game has no crouch) | row dropped; the key list ends at Sprint |
 | RESET / APPLY | `SettingsController` reset (open tab) / apply | match |
 

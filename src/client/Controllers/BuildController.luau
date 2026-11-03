@@ -27,6 +27,7 @@ local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
 
 local BuildRules = require(ReplicatedStorage.Shared.Building.BuildRules)
+local HudModel = require(ReplicatedStorage.Shared.UI.HudModel)
 local ItemCatalog = require(ReplicatedStorage.Shared.Items.ItemCatalog)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local PlacementProbe = require(ReplicatedStorage.Shared.Building.PlacementProbe)
@@ -78,14 +79,7 @@ local ROW_HEIGHT = 46
 local TIER_W = 190
 local SNAP_W, TURN_W, PLACE_W = 156, 88, 136
 
-local function make(className: string, props, parent)
-	local instance = Instance.new(className)
-	for key, value in props do
-		instance[key] = value
-	end
-	instance.Parent = parent
-	return instance
-end
+local make = Theme.Make
 
 -- The tier the current piece is built in: the chosen ladder tier when the piece
 -- comes in it (the choice survives picking a chest in between), else its only one.
@@ -110,9 +104,8 @@ end
 local function costLine(cost): string
 	local parts = {}
 	for catalogId, quantity in cost do
-		local def = ItemCatalog.Get(catalogId)
 		local owned = InventoryController.Count(catalogId)
-		local text = ("%s %d/%d"):format(def and def.name or catalogId, math.min(owned, quantity), quantity)
+		local text = ("%s %d/%d"):format(ItemCatalog.NameOf(catalogId), math.min(owned, quantity), quantity)
 		if owned < quantity then
 			text = ('<font color="%s">%s</font>'):format(Kit.Tokens.Data.colors.short, text)
 		end
@@ -205,8 +198,7 @@ local function describeHover(target: Instance?): string
 	end
 	local decayAt = part:GetAttribute("DecayAt")
 	if decayAt then
-		local left = math.max(0, math.floor(decayAt - workspace:GetServerTimeNow()))
-		text ..= ("  · decays in %d:%02d"):format(left // 60, left % 60)
+		text ..= "  · decays in " .. HudModel.FormatTimer(decayAt - workspace:GetServerTimeNow())
 	end
 	return text
 end

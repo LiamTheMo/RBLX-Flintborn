@@ -56,7 +56,7 @@ in `m.py`). Masks are `cls()` in `m.py` (HSV, h in degrees):
   1303 / 1351 / 1399 (`m.SW`).
 
 **Scratch study material** (no Blender), in
-`<temp>\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m044_study\`.
+`<temp>/m044_study/`.
 Run with the scratch venv `..\venv22\Scripts\python.exe` (Python 3.14, Pillow, numpy).
 - **Helpers:** `m.py` (masks, boxes `V` / `X` / `SW` / `TITLES`, `label`, `main_obj`), `zoom.py` (crop with sheet grid),
   `px.py` (pixel probe), `blendall.py` (name search in every `.blend`), `lines.py` (cell borders).
@@ -1101,7 +1101,7 @@ precise, path precise, wedge hull, cliffs hull, borders none (decision 13).
 
 I worked fresh and read-only in a background Blender on port 9880, using `wip/M044_verify.blend`. Nothing was built,
 saved, edited or exported. I used my own scripts for every measurement (bmesh, BVH ray casts and numpy masks per §1.1):
-`scratchpad/m044_verify/audit.py`, `contact.py`, `cap.py`, `walk.py`, `meas.py`, `hue.py`. I re-measured the sheet with
+`<temp>/m044_verify/audit.py`, `contact.py`, `cap.py`, `walk.py`, `meas.py`, `hue.py`. I re-measured the sheet with
 the same masks: f34 R 36.3 / P 30.7 / L 20.5 / F 11.8, which reproduces §1.2.
 
 ### Measured
@@ -1455,8 +1455,8 @@ I worked fresh and read-only in a background Blender on port 9877, using `wip/M0
 saved, and its timestamp is unchanged. Nothing was built, edited or exported.
 
 Every number below comes from my own scripts (bmesh, BVH ray casts, and numpy masks per the study's `cls()` rules) in
-`scratchpad/m044_verify2/`: `audit.py`, `parity.py`, `fold.py`, `contact.py`, `cap.py`, `walk.py`, `seam.py`, `bush.py`,
-`colour.py`, `render.py` / `render2.py`, `meas.py` and `fifths.py`. Renders are in `scratchpad/m044_verify2/r/`.
+`<temp>/m044_verify2/`: `audit.py`, `parity.py`, `fold.py`, `contact.py`, `cap.py`, `walk.py`, `seam.py`, `bush.py`,
+`colour.py`, `render.py` / `render2.py`, `meas.py` and `fifths.py`. Renders are in `<temp>/m044_verify2/r/`.
 
 Re-measuring the sheet with the same masks gives f34 R 37.1 / P 30.3 / L 20.3 / F 11.7, which reproduces §1.2 within
 0.7.

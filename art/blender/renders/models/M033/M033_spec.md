@@ -61,8 +61,8 @@ masks are `cls()` in `m.py` (HSV; background = within 14 of the paper):
   - a few lit moss pixels on the clump crowns next to sprout B (hue 72–73°, v 0.68–0.70) fall into L (< 0.3 points).
 
 **Scratch study material** (no Blender), in
-`<temp>\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m033_study\`.
-Run with the scratch venv `...\scratchpad\venv22\Scripts\python.exe` (Pillow + numpy).
+`<temp>/m033_study/`.
+Run with the scratch venv `<temp>/venv22/Scripts/python.exe` (Pillow + numpy).
 - **Helpers:** `m.py` (masks `cls()`, view boxes `V`, label blanking, `stats`), `comps.py` (connected components
   `label()`), `bb.json` (silhouette boxes), `crop.py`, `gridcrop.py` (crop with a sheet-pixel grid), `grid.py`.
 - **Measurements:** `measure.py` → `measure_out.txt` (bboxes, shares, top / bottom / rock-top / green-bottom profiles,
@@ -72,7 +72,7 @@ Run with the scratch venv `...\scratchpad\venv22\Scripts\python.exe` (Pillow + n
 - **Colour:** `sw.py` (swatches), `samp.py` → `samp_out.txt` (views, regions, exploded parts, close-ups), `grad.py` →
   `grad_out.txt` (bottom → top along clumps, sprouts and rocks), `hist.py`, `probe.py`, `probe2.py` (mask tuning).
 - **Names:** `blendall.py` (every sheet, kit and wip `.blend`, zstd-decompressed; run with
-  `C:/Users/Orang/.local/bin/python3.14.exe`).
+  `python3.14`).
 - **Crops:** `f34.png`, `r34.png`, `row2.png`, `expl.png`, `cu.png`, `pal.png`; grids `g_*.png` (10 % grid on the
   silhouette bbox, red = centre lines); mask previews `cls_*.png`, `cls_row2.png` (left the cell, right the mask: dark
   green M, yellow L, grey R, pink O).
@@ -900,7 +900,7 @@ assembled strictly from them.
   `_floor_cut` at z 0 (triangle-filled cap). Contacts (BVH): MC–RB, MC–ML, ML–SL/RB, MR–SR/RB, every small rock–RB.
   MR does not intersect MC (a visible crease between them; sprout B sits in it).
 
-**Front_sheet (0, 12) against the front cell** (study masks, `scratchpad/m033_mod/meas.py`):
+**Front_sheet (0, 12) against the front cell** (study masks, `<temp>/m033_mod/meas.py`):
 
 | | Sheet | Ours | Target |
 | --- | --- | --- | --- |
@@ -1005,7 +1005,7 @@ Skipped (decision 7): no glow, spores, dust or sparkle on the sheet. The hero ha
 - **Build:** `m033.build()` ≈ 13–15 s build + 17–20 s renders; `problems` is empty. Renders in this folder:
   `front_sheet` (compare with both the front and the f34 cells, and flipped with the r34), `side_sheet`, `rear_sheet`,
   `top_sheet` (long lens, floor hidden), the kit views, `exploded`, `part_*`, close-ups `sprout_cu`, `rockmoss_cu`,
-  `under_cu`. Measuring script: `scratchpad/m033_mod/meas.py` (the study's `m.py` masks on both images).
+  `under_cu`. Measuring script: `<temp>/m033_mod/meas.py` (the study's `m.py` masks on both images).
 - **Known misses / near-limits:**
   - side and rear cells are front redraws (§3.3) and the top cell lacks MC (§3.4); our side shows the blades edge-on
     (sprout share 4 % against the redraw's 18 %);
@@ -1024,7 +1024,7 @@ Skipped (decision 7): no glow, spores, dust or sparkle on the sheet. The hero ha
 
 A fresh verifier, read-only, in a background Blender (port 9881) on `wip/M033_verify.blend`, with the model as the
 main session integrated it (no `build()` run). Renders were made with `m033.render_views` (vfx=True), with
-`M.MODEL_RENDERS` pointed at the scratchpad (`scratchpad/m033_verify/M033/`). The sheet and the renders were measured with
+`M.MODEL_RENDERS` pointed at the scratchpad (`<temp>/m033_verify/M033/`). The sheet and the renders were measured with
 the study's masks (`m033_verify/meas_v.py`, a copy of `m033_mod/meas.py` reading those renders) and with
 `M.sample` / `M.raw_sample`. My numbers reproduce the modeller's front figures exactly (W : H 1.439, shares 42.7 / 11.6
 / 45.6, top profile 0.041 / 0.19).

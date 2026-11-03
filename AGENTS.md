@@ -1,11 +1,16 @@
 # Working in this repo
 
-**Game UI** (screens, the Kit, UI art): start with [`docs/ui/STYLE_GUIDE.md`](docs/ui/STYLE_GUIDE.md).
+**Game UI** (screens, the Kit, UI art): start with [`docs/ui/STYLE_GUIDE.md`](docs/ui/STYLE_GUIDE.md). Every other document is listed in [`docs/README.md`](docs/README.md).
+
+## Code changes
+- Run the checks in [README → Checks](README.md#checks) before committing; CI runs the same list.
+- **Deleting or moving a Luau module:** add its old instance path to `RETIRED` in `scripts/roblox_live_publish.py`. The release never deletes scripts on its own, so the old copy would keep running in the places (the Loader runs everything in `Services/` and `Controllers/`). See [`docs/ops/DEPLOYMENT.md`](docs/ops/DEPLOYMENT.md#deleting-or-moving-a-script-retired).
+- Never run `roblox_live_publish.py --deploy` or the upload scripts with real credentials locally; only the workflows deploy or upload.
 
 ## Shell commands (Bash tool)
 - **Never run a command that reads stdin without input.** A bare `cat > file`, `read`, or a tool that waits for input blocks forever: the shell's stdin stays open, so the command hits the timeout and is killed. Write files with the Write/Edit tools or a heredoc (`cat > file <<'EOF' ... EOF`). Add `< /dev/null` to anything that might prompt.
 - **Give long commands a long timeout.** The Bash default is 120 s. Blender builds and renders often take longer: pass `timeout: 600000` (10 min), or run with `run_in_background: true` and wait for the completion notification. Don't stop a backgrounded Blender run just because it is slow; check its output file first.
-- There is no system Python on this machine. Use Blender's Python for scripts (`blender --background --factory-startup --python <script>`), or the uv-installed `C:/Users/Orang/.local/bin/python3.14.exe` for plain Python such as `tests/test_cloud_live_publish.py`.
+- Run plain Python (the scripts in `scripts/`, the tests) with `python3`; on the owner's Windows machine, which has no system Python, that is the uv-installed Python. Blender scripts run through `art/blender/run.sh` (below).
 
 ## Blender art pipeline
 See [`art/blender/README.md`](art/blender/README.md). **Always run Blender builds through the wrapper:**
@@ -21,7 +26,7 @@ Why: bare `blender --python` exits 0 even when the script crashes, and a trailin
 - prints a short summary;
 - exits 2 if the expected output (`assets/<sheet>.blend` by default) was not rewritten by this run.
 
-Pass extra script arguments with `BLENDER_ARGS="--audit <dir>"`, and environment flags (for example `FB_ONLY=Name`) as usual. Don't pipe its output through `grep`.
+Pass extra script arguments with `BLENDER_ARGS="--audit <dir>"`, and environment flags (for example `FB_ONLY=Name`) as usual. Set `BLENDER_PATH` to the Blender executable when it is not at the default in `run.sh`. Don't pipe its output through `grep`.
 
 **Never write tool scratch or temp-folder paths into committed files** (specs, docs, scripts). Write `<temp>/...` for a scratch file, or keep the script in the repo. Commit messages and committed files never name the coding assistant or its vendor.
 

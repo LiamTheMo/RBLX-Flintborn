@@ -11,6 +11,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local PartyRules = require(ReplicatedStorage.Shared.Admission.PartyRules)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
+local Cooldown = require(script.Parent.Parent.Infrastructure.Cooldown)
 
 local PartyService = {}
 
@@ -19,7 +20,9 @@ PartyService.MAP_NAME = "FlintbornPartyDeploys"
 PartyService.STORE_ATTEMPTS = 2
 
 local state = PartyRules.NewState()
-local lastRequest = {}
+local requests = Cooldown.new(function()
+	return PartyService.REQUEST_COOLDOWN_SECONDS
+end)
 -- The view each player was last sent, so only players whose view changed hear again.
 local lastSent = setmetatable({}, { __mode = "k" })
 local deployMap = nil
@@ -205,11 +208,9 @@ function PartyService.DeployGroup(player: Player)
 end
 
 local function handle(player: Player, action: any, argument: any)
-	local now = os.clock()
-	if lastRequest[player] and now - lastRequest[player] < PartyService.REQUEST_COOLDOWN_SECONDS then
+	if not requests:Try(player) then
 		return false, "TooFast"
 	end
-	lastRequest[player] = now
 	local ok, reason
 	if action == "invite" and type(argument) == "number" then
 		if Players:GetPlayerByUserId(argument) == nil then
@@ -243,7 +244,7 @@ function PartyService.Start()
 	end)
 	Players.PlayerRemoving:Connect(function(player)
 		PartyRules.Forget(state, player.UserId)
-		lastRequest[player] = nil
+		requests:Forget(player)
 		broadcast()
 		lastSent[player] = nil
 	end)

@@ -57,7 +57,7 @@ in degrees; assigned in this order):
   x 856–882, y 143 / 194 / 245 / 296 / 347 / 398 (`m.SW`).
 
 **Scratch study material** (no Blender), in
-`<temp>\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m042_study\`.
+`<temp>/m042_study/`.
 Run with the scratch venv `..\venv22\Scripts\python.exe` (Python 3.14, Pillow, numpy).
 - **Helpers:** `m.py` (masks `cls()`, `silhouette()`, boxes `V` / `X` / `SW`), `zoom.py` (crop with a 10-px sheet grid),
   `px.py` (pixel probe), `rows.py` (per-row class extents), `blendall.py` (name search in every `.blend`).
@@ -1187,7 +1187,7 @@ No commits, pushes or exports were made. The work file `art/blender/assets/kit/w
 ## Verification round 1 (verifier, 2026-10-29)
 
 A fresh verifier ran this round, read-only, on port 9882 with `wip/M042_verify.blend`. Nothing was built, edited or
-saved. The renders went to the scratchpad (`…/scratchpad/m042_verify/M042/`), made with `m042.render_views` and
+saved. The renders went to the scratchpad (`<temp>/m042_verify/M042/`), made with `m042.render_views` and
 `M.MODEL_RENDERS` redirected there. Every number below was measured again, using the verifier's own per-shell and
 contact code, `M.audit`, `K.check`, and the study masks (`measure_render.py`, `colr.py`) on both images.
 

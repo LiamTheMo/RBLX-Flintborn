@@ -13,9 +13,10 @@ local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+local BuildRules = require(ReplicatedStorage.Shared.Building.BuildRules)
+local Characters = require(ReplicatedStorage.Shared.World.Characters)
 local CrashRecoveryRules = require(ReplicatedStorage.Shared.Recovery.CrashRecoveryRules)
 local ExtractionRules = require(ReplicatedStorage.Shared.Extraction.ExtractionRules)
-local GameConstants = require(ReplicatedStorage.Shared.GameConstants)
 local InventoryRules = require(ReplicatedStorage.Shared.Inventory.InventoryRules)
 local ItemCatalog = require(ReplicatedStorage.Shared.Items.ItemCatalog)
 local ModelBuilder = require(ReplicatedStorage.Shared.Visuals.ModelBuilder)
@@ -51,15 +52,6 @@ local rng = Random.new()
 
 local function now(): number
 	return workspace:GetServerTimeNow()
-end
-
-local function rootOf(player: Player)
-	return player.Character and player.Character:FindFirstChild("HumanoidRootPart")
-end
-
-local function aliveHumanoid(player: Player): Humanoid?
-	local humanoid = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
-	return humanoid and humanoid.Health > 0 and humanoid or nil
 end
 
 local function eventView(event)
@@ -148,7 +140,7 @@ local function extractPlayer(player: Player, event)
 		return
 	end
 	WorldAdmissionService.Extract(player)
-	local root = rootOf(player)
+	local root = Characters.RootOf(player)
 	if root then
 		root.Anchored = true
 	end
@@ -168,11 +160,11 @@ local function resolve(event)
 	end
 	Remotes.Get("ExtractionEnded"):FireAllClients(event.id)
 	for _, player in Players:GetPlayers() do
-		local root = rootOf(player)
+		local root = Characters.RootOf(player)
 		-- Presence counts at the last server-validated position, not a teleport.
 		local position = root and (AntiExploitService.ValidatedPosition(player) or root.Position)
 		local candidate = {
-			alive = aliveHumanoid(player) ~= nil,
+			alive = Characters.AliveHumanoid(player) ~= nil,
 			downed = DownedService.IsDowned(player),
 			atRisk = WorldAdmissionService.IsAtRisk(player),
 			inZone = position ~= nil and ExtractionRules.InZone(position, event.center, event.radius),
@@ -213,7 +205,7 @@ end
 
 local function canStart(player: Player): boolean
 	return WorldAdmissionService.IsAtRisk(player)
-		and aliveHumanoid(player) ~= nil
+		and Characters.AliveHumanoid(player) ~= nil
 		and not DownedService.IsDowned(player)
 end
 
@@ -292,7 +284,7 @@ local function setupSites()
 		end
 	end
 	if center == nil and #candidates == 0 then
-		local radius = (workspace:GetAttribute("FlintbornMapRadius") or ExtractionService.DEFAULT_MAP_RADIUS) * 0.6
+		local radius = WorldState.MapRadius(ExtractionService.DEFAULT_MAP_RADIUS) * 0.6
 		local origin = groundAt(0, 0)
 		if origin then
 			center = { position = origin, kind = "Center", radius = 8, name = "Center Crater Portal" }
@@ -339,7 +331,7 @@ local function placeRune(player: Player, hotbarIndex: any)
 	if def == nil or def.placeable ~= "ExtractionRune" then
 		return false, "NotARune"
 	end
-	local root = rootOf(player)
+	local root = Characters.RootOf(player)
 	local params = RaycastParams.new()
 	params.FilterType = Enum.RaycastFilterType.Exclude
 	params.FilterDescendantsInstances = { player.Character }
@@ -374,7 +366,7 @@ end
 
 -- No-build auras (GDD §3.1): every active fixed portal plus every running rune.
 function ExtractionService.Auras()
-	local radius = GameConstants.PORTAL_NO_BUILD_METERS * GameConstants.STUDS_PER_METER
+	local radius = BuildRules.AURA_RADIUS
 	local auras = {}
 	for _, site in sites do
 		table.insert(auras, { center = site.center, radius = radius })

@@ -55,28 +55,14 @@ end
 
 -- Map ground only: creatures, events, bosses and characters are see-through.
 local function groundParams()
-	local ignore = {}
-	for _, name in { "EventEnemies", "WorldEvents", "Bosses", "GuardianArena", "Arrows", "ResourceNodes" } do
-		local other = workspace:FindFirstChild(name)
-		if other then
-			table.insert(ignore, other)
-		end
-	end
-	-- Solid island scenery (trunks, boulders, logs) is queryable but never ground.
-	local scenery = WorldState.Scenery()
-	if scenery then
-		table.insert(ignore, scenery)
-	end
-	for _, player in Players:GetPlayers() do
-		if player.Character then
-			table.insert(ignore, player.Character)
-		end
-	end
-	local params = RaycastParams.new()
-	params.FilterType = Enum.RaycastFilterType.Exclude
-	params.FilterDescendantsInstances = ignore
-	params.RespectCanCollide = true
-	return params
+	return WorldState.GroundParams({
+		"EventEnemies",
+		"WorldEvents",
+		"Bosses",
+		"GuardianArena",
+		"Arrows",
+		"ResourceNodes",
+	})
 end
 
 -- The ground (or bed, under shallow water) below `position`, and whether it is
@@ -213,11 +199,6 @@ function WildlifeService.Tick()
 			end
 		end
 	end
-end
-
--- Roaming creatures alive now.
-function WildlifeService.Count(): number
-	return alive
 end
 
 function WildlifeService.Start()

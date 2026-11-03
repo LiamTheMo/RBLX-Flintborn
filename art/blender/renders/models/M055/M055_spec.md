@@ -61,7 +61,7 @@ x 12 / 513 / 1012; ortho dividers x 251 / 541 / 747; exploded | close-ups x 731โ
   - **O, other:** the dark bore, deep grooves, outlines.
 
 **Scratch study material** (no Blender) in
-`<temp>\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m055_study\`.
+`<temp>/m055_study/`.
 Run with the scratch venv `..\venv22\Scripts\python.exe` (Python 3.14, Pillow, numpy).
 - **Helpers:** `m.py` (masks, boxes, swatches, `label()`, `silhouette()`, `preview()`), `zoom.py` (`zoom.py x0 y0 x1 y1
   scale out.png [grid]`).
@@ -984,7 +984,7 @@ All the governing numbers are within the ยง2.7 tolerances. These are not:
 A fresh stage-7 verifier worked read-only on port 9877 (`wip/M055_verify.blend`, the integrated model). Every number
 below was re-measured with the verifier's own code: a bmesh audit, a shell contact graph, ray-parity burial and lobe-tip
 tests, and the study masks (`m055_study/m.py`) applied to new renders of the sheet cells and to our renders. Nothing was
-rebuilt, edited or saved. Scratch files are in `scratchpad/m055_verify/`.
+rebuilt, edited or saved. Scratch files are in `<temp>/m055_verify/`.
 
 ### Mesh
 

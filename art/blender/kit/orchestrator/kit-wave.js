@@ -1,7 +1,7 @@
 export const meta = {
   name: 'kit-wave',
   description: 'Build a wave of world-kit sheets: plan each sheet, one goal-driven builder per model, independent goal-based verifier, fix loop',
-  whenToUse: 'Pass args.sheets = [{id, ref}] (4 sheets per wave). existing:true re-verifies modules that are already built.',
+  whenToUse: 'Pass args.sheets = [{id, ref}] (4 sheets per wave). existing:true re-verifies modules that are already built. Optional args.lightModel: the model for planners and verifiers.',
   phases: [
     { title: 'Plan', detail: 'one planner per sheet: 4 model specs, names, scale, palette, VFX' },
     { title: 'Build', detail: 'one goal-driven builder agent per model' },
@@ -10,10 +10,12 @@ export const meta = {
   ],
 }
 
-const REPO = 'D:/Projects/Roblox/RBLX-Flintborn'
+// Planners and verifiers may run on a lighter model: pass args.lightModel. Left
+// unset, they run on the session's default model.
+const LIGHT = args.lightModel ? { model: args.lightModel } : {}
 
 const COMMON = `
-You are working on Flintborn's world kit: reusable low-poly Blender models for a Roblox game, each built to match a master reference image as closely as possible. Repo: ${REPO} (git branch feat/kit-pilot; do NOT commit, push or switch branches). Work only from the shell running Blender headless; do NOT use the Blender MCP / GUI tools.
+You are working on Flintborn's world kit: reusable low-poly Blender models for a Roblox game, each built to match a master reference image as closely as possible. Repo: the current working directory (git branch feat/kit-pilot; do NOT commit, push or switch branches). Work only from the shell running Blender headless; do NOT use the Blender MCP / GUI tools.
 
 Read art/blender/kit/BUILDER_GUIDE.md first: it is the whole API, the module contract and every rule, and it is all you need.
 TOKEN BUDGET RULES (enforced; the user is hitting usage limits):
@@ -189,7 +191,7 @@ function feedbackText(v) {
 async function modelLoop(sheet, plan, m) {
   const tag = `${sheet.id}/${m.module}`
   if ((sheet.skip || []).includes(m.module)) return { model: tag, subject: m.subject, skipped: 'already passed' }
-  const VOPTS = { phase: 'Verify', schema: VERDICT_SCHEMA, model: 'sonnet', effort: 'medium' }
+  const VOPTS = { phase: 'Verify', schema: VERDICT_SCHEMA, ...LIGHT, effort: 'medium' }
   let built = null
   if ((sheet.rework || []).includes(m.module)) {
     built = await agent(builderPrompt(sheet, plan, m, REWORK_NOTE), { label: `rework:${tag}`, phase: 'Fix', schema: BUILD_SCHEMA, effort: 'medium' })
@@ -223,7 +225,7 @@ async function modelLoop(sheet, plan, m) {
 const sheets = args.sheets
 const results = await pipeline(
   sheets,
-  sheet => agent(planPrompt(sheet), { label: `plan:${sheet.id}`, phase: 'Plan', schema: PLAN_SCHEMA, model: 'sonnet', effort: 'medium' }),
+  sheet => agent(planPrompt(sheet), { label: `plan:${sheet.id}`, phase: 'Plan', schema: PLAN_SCHEMA, ...LIGHT, effort: 'medium' }),
   (plan, sheet) => {
     log(`${sheet.id} planned: ${plan.models.map(m => m.subject).join(', ')}`)
     return parallel(plan.models.map(m => () => modelLoop(sheet, plan, m)))

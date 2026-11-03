@@ -22,9 +22,9 @@ local PropModels = require(ReplicatedStorage.Shared.Visuals.PropModels)
 local WorldState = require(ReplicatedStorage.Shared.World.WorldState)
 local AnnouncementService = require(script.Parent.AnnouncementService)
 local BossService = require(script.Parent.BossService)
-local CacheService = require(script.Parent.CacheService)
 local CombatService = require(script.Parent.CombatService)
 local DropService = require(script.Parent.DropService)
+local InteractionService = require(script.Parent.InteractionService)
 local InventoryService = require(script.Parent.InventoryService)
 
 local RitualService = {}
@@ -44,8 +44,7 @@ local summoning = {}
 local function offeringText(ritual): string
 	local parts = {}
 	for catalogId, quantity in ritual.offering do
-		local def = ItemCatalog.Get(catalogId)
-		table.insert(parts, ("%d %s"):format(quantity, def and def.name or catalogId))
+		table.insert(parts, ("%d %s"):format(quantity, ItemCatalog.NameOf(catalogId)))
 	end
 	table.sort(parts)
 	return table.concat(parts, ", ")
@@ -95,7 +94,7 @@ local function begin(player: Player, site)
 		InventoryService.Notify(player, "This altar is already in use.")
 		return
 	end
-	if not CacheService.CanInteract(player, site.part, 12) then
+	if not InteractionService.CanInteract(player, site.part, 12) then
 		return
 	end
 	-- Consumed once, here, on the server.
@@ -118,7 +117,7 @@ local function begin(player: Player, site)
 			if site.summoner ~= player then
 				return
 			end
-			if not CacheService.CanInteract(player, site.part, RitualService.STAY_RADIUS) then
+			if not InteractionService.CanInteract(player, site.part, RitualService.STAY_RADIUS) then
 				RitualService.Interrupt(player)
 				return
 			end
@@ -213,7 +212,7 @@ function RitualService.Start()
 		end
 		if #tagged == 0 then
 			-- Placeholder altars in the inner ring until the island arrives (v0.15).
-			local radius = (workspace:GetAttribute("FlintbornMapRadius") or RitualService.DEFAULT_MAP_RADIUS) * 0.45
+			local radius = WorldState.MapRadius(RitualService.DEFAULT_MAP_RADIUS) * 0.45
 			for index = 1, RitualService.PLACEHOLDER_SITES do
 				local angle = (index / RitualService.PLACEHOLDER_SITES) * math.pi * 2 + 0.6
 				local hit = workspace:Raycast(

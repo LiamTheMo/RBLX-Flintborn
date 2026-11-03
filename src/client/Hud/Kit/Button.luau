@@ -38,6 +38,12 @@ local function onLeather(variant: string): boolean
 	return variant == "primary" or variant == "play"
 end
 
+-- The width of a small button ("buttonS" text) that fits `label`: the label's
+-- width plus `pad`, never less than `min`.
+function Button.Width(label: string, min: number, pad: number): number
+	return math.max(min, math.ceil(Text.Width(label, "buttonS")) + pad)
+end
+
 -- props: rect | size, label, variant, sizeClass ("s" | "m" | "l"), icon,
 -- textRole, textSize, iconSize (px, default half the height), iconGap (12),
 -- contentOffset ({x, y}: moves icon and label together, e.g. up off a lip),

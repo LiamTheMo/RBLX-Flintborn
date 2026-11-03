@@ -434,14 +434,4 @@ function JournalModel.First(page)
 	return nil
 end
 
--- The id of the first quest waiting to be claimed, or nil.
-function JournalModel.FirstReady(quests): string?
-	for _, quest in quests or {} do
-		if JournalModel.Status(quest) == "ready" then
-			return quest.id
-		end
-	end
-	return nil
-end
-
 return JournalModel

@@ -37,7 +37,6 @@ for --upload, and ROBLOX_UNIVERSE_ID with ROBLOX_PLACE_ID (the lobby) for
 --inspect and --place.
 """
 import argparse
-import hashlib
 import json
 import struct
 import os
@@ -46,7 +45,9 @@ import threading
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
+import roblox_common as common
 import roblox_upload_ui_assets as uploader
+from roblox_common import lua_str, lua_value, sha1, show
 from roblox_live_publish import SAVE_PLACE, Cloud as PlaceCloud
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -85,15 +86,8 @@ PARTICLE_GLOW = 0.6  # every emitter's LightEmission
 GLOW_DIM = 0.25  # Neon flame colours darkened toward black, which softens their glow
 
 
-def sha1(path):
-    return hashlib.sha1(path.read_bytes()).hexdigest()
-
-
 def load_ids():
-    data = uploader.load_json(IDS_FILE)
-    data.setdefault("images", {})
-    data.setdefault("models", {})
-    return data
+    return common.load_ids(IDS_FILE)
 
 
 def save_ids(data):
@@ -194,25 +188,6 @@ def upload(m, ids):
 
 
 # --- Luau -----------------------------------------------------------------------
-
-def lua_str(text):
-    return json.dumps(text, ensure_ascii=True)
-
-
-def lua_value(value):
-    """JSON-compatible data as a Luau literal."""
-    if isinstance(value, dict):
-        return "{" + ",".join(f"[{lua_str(k)}]={lua_value(v)}" for k, v in value.items()) + "}"
-    if isinstance(value, list):
-        return "{" + ",".join(lua_value(v) for v in value) + "}"
-    if isinstance(value, bool):
-        return "true" if value else "false"
-    if value is None:
-        return "nil"
-    if isinstance(value, str):
-        return lua_str(value)
-    return repr(value)
-
 
 INSPECT = r'''
 local HttpService = game:GetService("HttpService")
@@ -939,18 +914,6 @@ def glb_stats(path):
 
 DIAGNOSE_PARTS = ["Ground_Plateau_01", "Ground_DirtPlazaPaths_01", "VaultHall", "DeployGate", "CliffSection",
                   "Barrel", "PalisadeSection", "LogBench"]
-
-
-def show(task):
-    """Prints a task's JSON return value (or the raw output if it is not JSON)."""
-    output = task.get("output") or {}
-    values = output.get("results") or []
-    value = values[0] if values else output
-    try:
-        value = json.loads(value)
-    except (TypeError, ValueError):
-        pass
-    print(json.dumps(value, indent=1), flush=True)
 
 
 def main():

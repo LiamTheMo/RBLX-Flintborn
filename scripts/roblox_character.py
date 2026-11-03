@@ -29,7 +29,6 @@ Environment: ROBLOX_API_KEY, ROBLOX_CREATOR_GROUP_ID (or _USER_ID) for --upload,
 ROBLOX_UNIVERSE_ID and ROBLOX_PLACE_ID for --install.
 """
 import argparse
-import hashlib
 import json
 import os
 import sys
@@ -37,7 +36,9 @@ import threading
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
+import roblox_common as common
 import roblox_upload_ui_assets as uploader
+from roblox_common import lua_value, sha1, show
 from roblox_live_publish import SAVE_PLACE, Cloud as PlaceCloud
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -48,19 +49,12 @@ UPLOAD_WORKERS = 4
 STUDIO_SCRIPT = ROOT / "scripts" / "studio" / "character_materials.luau"
 
 
-def sha1(path):
-    return hashlib.sha1(path.read_bytes()).hexdigest()
-
-
 def manifest():
     return json.loads(MANIFEST.read_text(encoding="utf-8"))
 
 
 def load_ids():
-    data = uploader.load_json(IDS_FILE)
-    data.setdefault("images", {})
-    data.setdefault("models", {})
-    return data
+    return common.load_ids(IDS_FILE)
 
 
 def mesh_files(m):
@@ -140,24 +134,6 @@ def upload(m, ids):
         jobs += [pool.submit(send_mesh, item) for item in mesh_files(m).items()]
         for job in jobs:
             job.result()
-
-
-def lua_str(text):
-    return json.dumps(text, ensure_ascii=True)
-
-
-def lua_value(value):
-    if isinstance(value, dict):
-        return "{" + ",".join(f"[{lua_str(k)}]={lua_value(v)}" for k, v in value.items()) + "}"
-    if isinstance(value, list):
-        return "{" + ",".join(lua_value(v) for v in value) + "}"
-    if isinstance(value, bool):
-        return "true" if value else "false"
-    if value is None:
-        return "nil"
-    if isinstance(value, str):
-        return lua_str(value)
-    return repr(value)
 
 
 INSTALL = r'''
@@ -451,17 +427,6 @@ def studio_script(m, ids):
     first, last = text.index("-- BEGIN IDS"), text.index("-- END IDS") + len("-- END IDS")
     STUDIO_SCRIPT.write_text(text[:first] + block + text[last:], encoding="utf-8", newline="\n")
     print(f"Wrote {STUDIO_SCRIPT.relative_to(ROOT)}")
-
-
-def show(task):
-    output = task.get("output") or {}
-    values = output.get("results") or []
-    value = values[0] if values else output
-    try:
-        value = json.loads(value)
-    except (TypeError, ValueError):
-        pass
-    print(json.dumps(value, indent=1), flush=True)
 
 
 def main():

@@ -13,6 +13,7 @@
 local Art = require(script.Parent.Art)
 local Badge = require(script.Parent.Badge)
 local Core = require(script.Parent.Core)
+local Input = require(script.Parent.Input)
 local Interact = require(script.Parent.Interact)
 local ItemIcon = require(script.Parent.ItemIcon)
 
@@ -155,6 +156,24 @@ function Slot:SetHotkey(text: string?)
 	end
 	self.hotkey:SetText(text)
 	self.hotkey:SetVisible(true)
+end
+
+-- Shows each slot's hotkey badge while keys mean something (Input.ShowsKeys)
+-- as label(index), by default the slot's number, and hides it otherwise.
+function Slot.ShowHotkeys(slots: { any }, label: ((number) -> string)?)
+	local show = Input.ShowsKeys()
+	for index, slot in slots do
+		slot:SetHotkey(if not show then nil elseif label then label(index) else tostring(index))
+	end
+end
+
+-- Slot.ShowHotkeys now and whenever the input in use changes. Returns a
+-- function that stops watching.
+function Slot.WatchHotkeys(slots: { any }, label: ((number) -> string)?): () -> ()
+	Slot.ShowHotkeys(slots, label)
+	return Input.Watch(function()
+		Slot.ShowHotkeys(slots, label)
+	end)
 end
 
 -- "normal" | "locked" | "disabled": the slot's standing state.

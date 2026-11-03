@@ -532,6 +532,27 @@ test("a take names its entry by key, so a double press or stale index takes noth
 	expectEq(held(taker, "Wood"), nil, "the Wood in index 1 is untouched")
 end)
 
+test("a take that fits nothing reports NoRoom, from a body as from a chest", function()
+	local alt = inRun({ stack("IronBar", 50, 30) })
+	stubs.WorldAdmissionService.Death:Fire(alt, Vector3.new(0, 5, 0))
+	local bodyId = lastGuid
+	local main = inRun({ stack("IronBar", 1000) })
+	local ok, reason = handlers.CorpseTake(main, bodyId, 1, "stack:IronBar")
+	expect(not ok and reason == "NoRoom", "a full stack takes nothing from the body: " .. tostring(reason))
+	expectEq(held(main, "IronBar").quantity, 1000, "nothing fit under the cap")
+	local other = inRun({})
+	expect(handlers.CorpseTake(other, bodyId, 1, "stack:IronBar"), "the bars are still on the body")
+	expectEq(held(other, "IronBar").quantity, 50, "all 50 of them")
+	expectEq(held(other, "IronBar").carried, 30, "with their carried units")
+
+	local part = { Position = Vector3.new(3, 5, 0) }
+	stubs.BuildingService.Placed:Fire({ id = "chest-full", pieceId = "Chest", part = part, position = part.Position })
+	local storer = inRun({ stack("IronBar", 50) })
+	expect(handlers.ChestPut(storer, "chest-full", slotOf(storer, "IronBar")), "stored")
+	ok, reason = handlers.ChestTake(main, "chest-full", 1, "stack:IronBar")
+	expect(not ok and reason == "NoRoom", "a full stack takes nothing from the chest: " .. tostring(reason))
+end)
+
 test("no service handler errored", function()
 	expectEq(#errors, 0, "errors: " .. table.concat(errors, " | "))
 end)
