@@ -86,6 +86,10 @@ class CloudPublishSafetyTests(unittest.TestCase):
         ], verify=True)
         self.assertIn("LIVE PUBLISH verification failed", script)
         self.assertNotIn("SavePlaceAsync", script)
+        # A small release is one batch, verified the same way.
+        plan = cloud.plan_batches([(("ReplicatedStorage", "Shared", "Sample"), "ModuleScript", "return 1")])
+        self.assertEqual(len(plan), 1)
+        self.assertIn("LIVE PUBLISH verification failed", plan[0]["verify"])
 
     def test_reject_oversized_release(self):
         with self.assertRaisesRegex(ValueError, "too large"):
@@ -170,11 +174,6 @@ class CloudPublishSafetyTests(unittest.TestCase):
         self.assertEqual(cloud.retry_delay(4, "1"), 48)
         total = sum(cloud.retry_delay(r) for r in range(cloud.RETRIES - 1))
         self.assertGreaterEqual(total, 120, "rides out a couple of minutes of rate limiting")
-
-    def test_small_release_stays_one_batch(self):
-        plan = cloud.plan_batches([(("ReplicatedStorage", "Shared", "Sample"), "ModuleScript", "return 1")])
-        self.assertEqual(len(plan), 1)
-        self.assertIn("LIVE PUBLISH verification failed", plan[0]["verify"])
 
 
 _TOKEN = re.compile(r'''\s+|--[^\n]*|(?P<str>"(?:[^"\\\n]|\\.)*")|(?P<num>-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?)'''

@@ -36,8 +36,9 @@ class JsonModuleTests(unittest.TestCase):
         return entries[0][1]
 
     @unittest.skipIf(shutil.which("luau") is None, "luau CLI not on PATH")
-    def test_non_ascii_strings_survive_luau(self):
+    def test_non_ascii_strings_are_escaped_and_survive_luau(self):
         source = self.module_source(self.VALUE)
+        self.assertTrue(source.isascii(), source)
         script = (
             "local value = (function()\n" + source + "\nend)()\n"
             "local function hex(s) return (s:gsub('.', function(c) return string.format('%02X', c:byte()) end)) end\n"
@@ -56,9 +57,6 @@ class JsonModuleTests(unittest.TestCase):
         self.assertEqual(lines[1], "\t".join([
             "\u00fcber".encode("utf-8").hex().upper(), "\u2014".encode("utf-8").hex().upper(),
             "1", "2.5", "true", "nil"]))
-
-    def test_source_is_ascii(self):
-        self.assertTrue(self.module_source(self.VALUE).isascii())
 
 
 @unittest.skipIf(shutil.which("luau") is None, "luau CLI not on PATH")
