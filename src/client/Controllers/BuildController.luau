@@ -27,6 +27,7 @@ local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
 
 local BuildRules = require(ReplicatedStorage.Shared.Building.BuildRules)
+local HudModel = require(ReplicatedStorage.Shared.UI.HudModel)
 local ItemCatalog = require(ReplicatedStorage.Shared.Items.ItemCatalog)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local PlacementProbe = require(ReplicatedStorage.Shared.Building.PlacementProbe)
@@ -198,8 +199,7 @@ local function describeHover(target: Instance?): string
 	end
 	local decayAt = part:GetAttribute("DecayAt")
 	if decayAt then
-		local left = math.max(0, math.floor(decayAt - workspace:GetServerTimeNow()))
-		text ..= ("  · decays in %d:%02d"):format(left // 60, left % 60)
+		text ..= "  · decays in " .. HudModel.FormatTimer(decayAt - workspace:GetServerTimeNow())
 	end
 	return text
 end

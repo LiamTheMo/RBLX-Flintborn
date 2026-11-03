@@ -11,6 +11,7 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local SoundService = game:GetService("SoundService")
 
+local HudModel = require(ReplicatedStorage.Shared.UI.HudModel)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Rarity = require(ReplicatedStorage.Shared.Items.Rarity)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
@@ -129,10 +130,13 @@ local function refreshList()
 	local now = workspace:GetServerTimeNow()
 	local lines = {}
 	for _, event in events do
-		local left = math.max(0, math.floor(event.view.endsAt - now))
 		table.insert(
 			lines,
-			("%s — %s · %d:%02d"):format(title(event.view), bearing(event.view.position), left // 60, left % 60)
+			("%s — %s · %s"):format(
+				title(event.view),
+				bearing(event.view.position),
+				HudModel.FormatTimer(event.view.endsAt - now)
+			)
 		)
 	end
 	table.sort(lines)
