@@ -2,7 +2,7 @@
 
 > **Purpose:** A self-contained art specification for an LLM building Blender models and preparing them for Roblox.  
 > **Scope:** The shared R6 survivor, hair and primitive clothing, regular wildlife, passive wildlife and event-creature concept designs.  
-> **Authority:** [GDD.md](GDD.md) governs gameplay; [visuals.md](visuals.md) governs the wider world; [art/blender/README.md](art/blender/README.md) describes the existing production pipeline.  
+> **Authority:** [GDD.md](../design/GDD.md) governs gameplay; [visuals.md](visuals.md) governs the wider world; [art/blender/README.md](../../art/blender/README.md) describes the existing production pipeline.  
 > **Status:** Character direction and creature reference vocabulary, with proposed modeling recipes. Animal concepts are not an approved spawn catalog, balance table or completed runtime implementation.
 
 ## 1. Read this before generating geometry

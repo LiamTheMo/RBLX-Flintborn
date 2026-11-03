@@ -4,7 +4,7 @@ Everything the game needs modelled or given an effect, taken from the game's own
 
 - the catalogs in `src/shared` (nodes, biomes and POIs, build pieces, items and tiers, creatures, bosses, events);
 - the placeholder model modules in `src/shared/Visuals` (`NodeModels`, `SceneryModels`, `PropModels`, `CreatureModels`, `GearModels`) and the services that spawn things;
-- the art trackers: [`MODEL_PROGRESS.md`](../../MODEL_PROGRESS.md), [`art/blender/assets/references/INDEX.md`](../../art/blender/assets/references/INDEX.md), [`art/vfx/`](../../art/vfx/README.md) and the lobby export in `art/roblox/lobby/`.
+- the art trackers: [`MODEL_PROGRESS.md`](MODEL_PROGRESS.md), [`art/blender/assets/references/INDEX.md`](../../art/blender/assets/references/INDEX.md), [`art/vfx/`](../../art/vfx/README.md) and the lobby export in `art/roblox/lobby/`.
 
 State as of 2026-11-03 (branch v0.19).
 

@@ -1,4 +1,4 @@
--- Owner-confirmed Flintborn rules from GDD.md, shared by server and client.
+-- Owner-confirmed Flintborn rules from docs/design/GDD.md, shared by server and client.
 -- Values marked "starting target" are confirmed playtest baselines, not final
 -- balance. Anything the GDD still lists as Open does not belong here yet.
 

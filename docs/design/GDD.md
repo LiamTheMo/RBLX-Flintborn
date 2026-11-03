@@ -6,7 +6,7 @@
 > **Project:** Roblox / RBLX-Flintborn  
 > **Genre:** Primitive-fantasy survival sandbox / PvPvE extraction  
 > **Primary references:** Rust-style building and raiding, Booga Booga-style primitive progression, tactical extraction risk/reward  
-> **Implementation status:** Every phase v0.01–v0.18 is implemented, CI-verified and deployed from `main`; the launch release checklist (`docs/RELEASE_CHECKLIST.md`) and manual Studio checks (`docs/MANUAL_VALIDATION.md`) remain before v1.00.
+> **Implementation status:** Every phase v0.01–v0.18 is implemented, CI-verified and deployed from `main`; the launch release checklist (`docs/release/RELEASE_CHECKLIST.md`) and manual Studio checks (`docs/release/MANUAL_VALIDATION.md`) remain before v1.00.
 
 ## Document conventions
 
@@ -32,7 +32,7 @@
 
 **Owner answers Q159–161 (2026-10-22):** Totems upgrade through **three levels with 500 → 1,000 → 2,500 HP** and a growing radius; **no structure can be taken over while a covering tribe totem stands**. **Anyone can revive** a downed player, **one reviver at a time**, and **damage to the reviver does not stop the revive**; downed players **crawl very slowly and cannot heal**; **no protection after revive**. **No friendly fire** and **no spawn protection**, but spawns must be **away from other players**. **0% food has no extra effect** beyond the below-25% slow, and **food heals stack** with each other and with instant medicine. Safe POIs are specific locations to be designed later. Event items are handled **per item**, marked with an **"event" tag**. **Admin kick commands only ever perform a safe kick.** A dead player cannot rejoin that server, so the **whole tribe extracts, parties up in the lobby and starts a new run**. See §42.
 
-**Owner answers Q165–169 (2026-10-23):** The island is designed around **~2,400 studs across**. A lobby server holds **20 players**, a **hub menu opens any lobby station from anywhere**, **trades can be started anywhere** in the lobby, and **weapons work in the lobby but deal no damage: every lobby player is invulnerable**. Map designs live in [`docs/maps`](docs/maps/README.md). See §48.
+**Owner answers Q165–169 (2026-10-23):** The island is designed around **~2,400 studs across**. A lobby server holds **20 players**, a **hub menu opens any lobby station from anywhere**, **trades can be started anywhere** in the lobby, and **weapons work in the lobby but deal no damage: every lobby player is invulnerable**. Map designs live in [`docs/maps`](../maps/README.md). See §48.
 
 **Owner confirmation (2026-10-22):** All recorded interpretations in §41.2 and §42.2 are **Confirmed**, and later answers supersede the older "Open" labels they resolved (boss scaling, center Coin/Gem multiplier, currency trading, medical animations, post-revive HP, attack cadence, armor multipliers, decay semantics and Permanent stat-roll preservation).
 
@@ -46,7 +46,7 @@ This GDD is the source of truth for gameplay intent. Engineering contracts, tuni
 - **Implementation:** [Inventory state transitions](#22-detailed-inventory-extraction-and-death-state-transitions), [Roblox architecture](#23-proposed-roblox-luau-services-and-persistence-model), [threat model](#24-economy-abuse-cases-and-anti-duplication-tests), [UX requirements](#25-ux-specifications-and-interface-inventory), [tuning plan](#26-quantitative-tuning-and-live-analytics-plan), [QA](#27-detailed-verification-matrix-and-qa-plan), [production phases](#28-production-milestones-and-documentation-maintenance).
 - **Critical onboarding/world systems:** [10-minute corpses](#29-ordinary-departure-death-and-lootable-bodies), [admin update kicks](#30-administrator-update-kicks-and-maintenance-safe-preservation), [protected Play menu](#31-protected-play-world-main-menu-and-teleport-safety-design), [world ecology/takeover](#32-world-ecology-procedural-rare-spawns-and-structure-takeover), [masteries](#33-five-permanent-masteries-levels-and-milestone-buffs), [final economy/rebirth decisions](#36-owner-approved-economy-appearance-and-monetization-decisions-q3-q23-q4960).
 
-**Development phases:** The GDD is split into ordered, buildable versions in [`docs/phases`](docs/phases/README.md) (`v0.01` → `v0.18`). The GDD stays the source of truth; when a phase document disagrees, the GDD wins.
+**Development phases:** The GDD is split into ordered, buildable versions in [`docs/phases`](../phases/README.md) (`v0.01` → `v0.18`). The GDD stays the source of truth; when a phase document disagrees, the GDD wins.
 
 **Navigation links follow GitHub Markdown heading anchors; section numbers are stable only within this revision.**
 
@@ -145,7 +145,7 @@ This GDD is the source of truth for gameplay intent. Engineering contracts, tuni
 - **Confirmed world lifetime:** A public world persists while **any players remain**. When the last player leaves, that instance resets/ends; all bases, raidable structures, world loot, nodes, mobs and other live-world changes disappear. New servers initialize clean worlds.
 - **Confirmed extraction POIs:** Candidate locations are fixed and recognizable across maps, but only a server-specific subset has an available extraction in each instance.
 - **Confirmed same-world rejoin:** Players can return to their earlier still-running public instance if they have **not died and been kicked/excluded** and the server remains open/capacity permits. Ordinary active disconnect still leaves a 10-minute corpse and forfeits unsecured items; rejoining must not restore them.
-- **Confirmed Q165 (2026-10-23):** The island is designed around **~2,400 studs across** (`BiomeCatalog.MAP_RADIUS = 1200`), roughly 75 seconds of walking from the edge to the centre and 150 seconds across at Roblox's default 16 studs/s. Ring radii stay starting values. Map designs live in [`docs/maps`](docs/maps/README.md).
+- **Confirmed Q165 (2026-10-23):** The island is designed around **~2,400 studs across** (`BiomeCatalog.MAP_RADIUS = 1200`), roughly 75 seconds of walking from the edge to the centre and 150 seconds across at Roblox's default 16 studs/s. Ring radii stay starting values. Map designs live in [`docs/maps`](../maps/README.md).
 - **Open:** Exact travel times after movement tuning, server list/rejoin UX, spawn distribution, exact active-site selection/reveal, and anti-reentry after death implementation.
 - **Confirmed Q3 resolution:** When a world empties, **all temporary island objects reset**. **All previously extracted items/materials in the protected vault are ALWAYS saved**, no matter their rarity or Permanent status. Account currencies, levels/masteries and cosmetic entitlements are unaffected.
 
@@ -2193,7 +2193,7 @@ NPC shop stock/prices, opt-in auto-sell and safe settlement; Gem trade level/lim
 | **1.20** | 2026-10-28 | Owner set the play-world layout (§54): a 4,096-stud island in a 6,144-stud ocean with ten named regions, Crater Lake and the Shattered Keep at the centre, Frostpeak's peaks to 600 studs; replaced the creature roster with wildlife (passive, neutral and hostile animals plus creature events and the Crater Gorilla boss), kept Skeletons, Ember Wisps and the Minotaur, removed Bandits; light roaming wildlife. Supersedes Q165's ~2,400-stud scale. |
 | **1.19** | 2026-10-28 | Owner resource decisions (§53): materials may be carried back into runs again (reverses §45), but the carried-in amount never gets the Center 2× or any other extraction multiplier; boosts pause at extraction and resume next run; every gathering hit drops material on the ground, with better tools taking more node health per hit; tiered regrowth; basics in every region; new no-use gatherables; creature ore drops by region; Fiber planters. |
 | **1.18** | 2026-10-28 | Owner decisions (§52): a running consumable boost never weakens (only a stronger one of its kind takes over); Crafting mastery now gives only better quality rolls and a bonus-bar chance when smelting, and every crafting-speed effect is removed (replaces Q77's four benefits); the HUD hotbar shows its items and a tap uses the slot like its key; Roblox's player list is hidden and Tab opens the inventory in both places. |
-| **1.17** | 2026-10-27 | Owner defined the item and material catalog (§51, full tables in `docs/ITEM_CATALOG.md`): the Wood → Stone → Copper → Iron → Silver → Cobalt → Mithril → Adamantine ladder at about 25% per tier (armor too), smelted bars, previous-tier pickaxe gates, ores by danger, restricted gem-class materials (daggers and spears only; Flint the only arrow tip), Hide → Bone → metal armor, axes and pickaxes only (no sickles), Anvil and Cauldron stations, berry varieties with XP and luck boosts, Fire Bomb and Breaching Charge, any gear Permanent with tier-scaled costs, the elite/cache/meteor/rare-shrub material groups, per-type rare event rolls, and a Guardian's Fang above Adamantine. Supersedes the material examples in §18.1 and the Q104 starting catalog. |
+| **1.17** | 2026-10-27 | Owner defined the item and material catalog (§51, full tables in `docs/design/ITEM_CATALOG.md`): the Wood → Stone → Copper → Iron → Silver → Cobalt → Mithril → Adamantine ladder at about 25% per tier (armor too), smelted bars, previous-tier pickaxe gates, ores by danger, restricted gem-class materials (daggers and spears only; Flint the only arrow tip), Hide → Bone → metal armor, axes and pickaxes only (no sickles), Anvil and Cauldron stations, berry varieties with XP and luck boosts, Fire Bomb and Breaching Charge, any gear Permanent with tier-scaled costs, the elite/cache/meteor/rare-shrub material groups, per-type rare event rolls, and a Guardian's Fang above Adamantine. Supersedes the material examples in §18.1 and the Q104 starting catalog. |
 | **1.16** | 2026-10-25 | Owner set the default player character: every player spawns as one R6 character (bald, peach skin, smile face, tan hide wrap, ragged shorts), with no Roblox avatar loaded on top. The shorts take the player's tribe colour. Added §50. |
 | **1.15** | 2026-10-24 | Owner changed the food drain: a full meter now empties in **60 minutes** instead of 5. HUD feedback fixed (bars fill at max, hotbar number keys select slots, master-sized slots with the glowing selected frame, rounded Fredoka One text, true reference colours). Added §49 and updated §1, §4, §5, §21 and §37 (Q63). |
 | **1.14** | 2026-10-23 | Owner answered Q165–169: the Shattered Crater is designed around **~2,400 studs across**; lobby servers hold **20 players**; a hub menu opens any lobby station from anywhere; trades start anywhere in the lobby; weapons work in the lobby but deal no damage and every lobby player is invulnerable. Started map design documents in `docs/maps` with a draft lobby hub. Added §48, updated §3.3 and §40.3. (Drafted in parallel with 1.11–1.13 as 1.11/§46; renumbered on merge.) |
@@ -2205,7 +2205,7 @@ NPC shop stock/prices, opt-in auto-sell and safe settlement; Gem trade level/lim
 
 ## 44. Launch starting values (v0.18)
 
-Every number this document marks as a proposal or placeholder ships as a **deliberate starting value**, listed per phase under "Placeholders" in `docs/MANUAL_VALIDATION.md` and held in the shared catalogs (`src/shared/**/…Catalog.luau`, `GameConstants`, `EventRules`, `BossScaling`, `EconomyRules`, `TradeRules`). They stay until playtests or the owner change them; any change to a confirmed rule goes through this document first. Values the owner should confirm or replace before v1.00:
+Every number this document marks as a proposal or placeholder ships as a **deliberate starting value**, listed per phase under "Placeholders" in `docs/release/MANUAL_VALIDATION.md` and held in the shared catalogs (`src/shared/**/…Catalog.luau`, `GameConstants`, `EventRules`, `BossScaling`, `EconomyRules`, `TradeRules`). They stay until playtests or the owner change them; any change to a confirmed rule goes through this document first. Values the owner should confirm or replace before v1.00:
 
 - Developer product IDs for the four Robux offers (`OfferCatalog`) and the redemption codes (`src/server/Config/Codes.luau`).
 - Merchant and shop prices, quest roster and Gem trade limits (§10, §38–39).
@@ -2271,7 +2271,7 @@ Every number this document marks as a proposal or placeholder ships as a **delib
 
 ## 48. Owner answers Q165–169: map scale and lobby hub (2026-10-23)
 
-Map layouts are designed in [`docs/maps`](docs/maps/README.md); the lobby draft is [`docs/maps/lobby-hub.md`](docs/maps/lobby-hub.md).
+Map layouts are designed in [`docs/maps`](../maps/README.md); the lobby draft is [`docs/maps/lobby-hub.md`](../maps/lobby-hub.md).
 
 | # | Decision | Consequences |
 | --- | --- | --- |
@@ -2318,7 +2318,7 @@ Roblox avatars (accessories, clothing, body colours) are not loaded on top.
 
 ## 51. Item and material catalog (2026-10-27)
 
-The owner defined the launch item and material catalog in a question round on 2026-10-27. **The full tables, recipes and numbers live in [`docs/ITEM_CATALOG.md`](docs/ITEM_CATALOG.md)**; the data is generated from `src/shared/Items/Tiers.luau`. Summary of the decisions:
+The owner defined the launch item and material catalog in a question round on 2026-10-27. **The full tables, recipes and numbers live in [`docs/design/ITEM_CATALOG.md`](ITEM_CATALOG.md)**; the data is generated from `src/shared/Items/Tiers.luau`. Summary of the decisions:
 
 1. **Ladder:** Wood → Stone → Copper → Iron → Silver → Cobalt → Mithril → Adamantine, expandable later. Each tier is about **25% stronger** than the last (damage, tool yield, building HP and armor above Iron), anchored on the confirmed wooden spear 15, stone spear 25, Hide armor ×1.2 and Iron armor ×2.0.
 2. **Weapons:** spears, daggers, swords and bows only. Bows go Wooden, then a metal-reinforced bow per metal.

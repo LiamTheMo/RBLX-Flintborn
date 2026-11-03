@@ -672,7 +672,7 @@ One owner per file. Ask the owner for a change; never edit another agent's file.
 | **I1 Integration / server** | `src/shared/Net/Remotes.luau`, `src/shared/Admission/PartyRules.luau`, `src/server/Services/PartyService.luau`, `DeployService.luau`, `Controllers/LobbyController.luau`, `Hud/HudMode.luau`, `tests/luau/party_ready.spec.luau`, `tests/luau/followup_party.spec.luau` |
 | **Reference analysts** | `docs/ui/<Screen>.md` specs (replacing the old ones) |
 | **Architect** | `docs/ui/ARCHITECTURE.md` |
-| **Orchestrator / owner** | `GDD.md` (decision log for Ready, Play and Vault-as-tab), `docs/ui/UI_PROGRESS.md`, `src/shared/UI/UiAssetIds.json` and `art/ui/uploaded_decals.json` (written only by the manual upload workflow), git |
+| **Orchestrator / owner** | `docs/design/GDD.md` (decision log for Ready, Play and Vault-as-tab), `docs/ui/UI_PROGRESS.md`, `src/shared/UI/UiAssetIds.json` and `art/ui/uploaded_decals.json` (written only by the manual upload workflow), git |
 
 Read-only for everyone except the owner: `src/shared/Items/ItemCatalog.luau`,
 `src/shared/Inventory/InventoryRules.luau` and every other gameplay module.

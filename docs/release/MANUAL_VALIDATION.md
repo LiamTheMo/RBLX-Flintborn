@@ -261,7 +261,7 @@ Studio and live checks:
 
 Automated: 3 release specs cover loading a profile saved by the earliest phase into the final schema with every later group filled, refusing profiles from a newer schema, and catalog completeness (every item has a source; every weapon has combat stats — this found and fixed Cooked Meat having no source: creatures now drop Raw Meat, cooked at a built Furnace). The full CI suite (20 spec files including the §24 security suite) passes on `main`. Deployed and verified on both places (2026-10-23).
 
-Everything still manual before `v1.00` is in [`docs/RELEASE_CHECKLIST.md`](RELEASE_CHECKLIST.md).
+Everything still manual before `v1.00` is in [`docs/release/RELEASE_CHECKLIST.md`](RELEASE_CHECKLIST.md).
 
 - [ ] Hunt a wolf or boar, build a Furnace (X), and cook Raw Meat into Cooked Meat (V, "furnace" recipes).
 
@@ -396,7 +396,7 @@ Studio and live checks:
 
 ## Item and material catalog (GDD §51)
 
-Owner-defined catalog, with full tables in [`docs/ITEM_CATALOG.md`](ITEM_CATALOG.md).
+Owner-defined catalog, with full tables in [`docs/design/ITEM_CATALOG.md`](../design/ITEM_CATALOG.md).
 
 Automated (new specs):
 - `gathering_tiers`, 13 cases: the pickaxe gate, Resin and Flint bonuses, ores by region, the rare shrub event, per-type event rolls.
@@ -711,7 +711,7 @@ Studio and live checks (desktop, touch and controller unless stated):
 
 ## Overhead health bars
 
-How it's built: `src/client/Hud/OverheadHealth.luau` (started by `HudController`, world place only) puts a kit `Bar` in a BillboardGui over each other player's head while they are below full health; the rules (when it shows, lingers, fades and hides, the downed look, sizes) are pure in `src/shared/UI/OverheadHealthModel.luau`. It follows the replicated Humanoid `Health` / `MaxHealth` and the `Downed` / `DownedHealth` player attributes through their change signals. Spec: [HudScreen](ui/HudScreen.md#overhead-health-bars).
+How it's built: `src/client/Hud/OverheadHealth.luau` (started by `HudController`, world place only) puts a kit `Bar` in a BillboardGui over each other player's head while they are below full health; the rules (when it shows, lingers, fades and hides, the downed look, sizes) are pure in `src/shared/UI/OverheadHealthModel.luau`. It follows the replicated Humanoid `Health` / `MaxHealth` and the `Downed` / `DownedHealth` player attributes through their change signals. Spec: [HudScreen](../ui/HudScreen.md#overhead-health-bars).
 
 Automated (`overhead_health.spec.luau`, `settings.spec.luau`; capture scene `overhead_health` for the look, `settings` / `settings_phone` for the new row):
 - No bar at full health, for dead characters, for your own character, or with Show Health Bars off; a bar from the first missing whole point of health.

@@ -4,7 +4,7 @@ Phase v0.18 (release candidate) ships the automated part: the complete CI suite 
 
 ## 1. Regression lists on the published place
 
-Run every Studio and live check in `docs/MANUAL_VALIDATION.md` (v0.01–v0.17) on the published places. These cover the GDD regression lists in §27.1, §31.7, §34.4, §35.4, §36.6, §37.4, §38.4, §39.6, §41.3 and §42.3.
+Run every Studio and live check in `docs/release/MANUAL_VALIDATION.md` (v0.01–v0.17) on the published places. These cover the GDD regression lists in §27.1, §31.7, §34.4, §35.4, §36.6, §37.4, §38.4, §39.6, §41.3 and §42.3.
 
 - [ ] All manual checks pass on the published lobby and world places.
 - [ ] The post-release hardening checks in [`MANUAL_VALIDATION.md`](MANUAL_VALIDATION.md#post-release-hardening-after-v018) pass, especially movement rubber-banding on a real network.

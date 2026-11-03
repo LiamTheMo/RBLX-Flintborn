@@ -3,7 +3,7 @@
 > **Status:** Approved art direction with production guidance  
 > **Established:** 2026-10-23  
 > **Scope:** Environment art, map composition, models, materials, lighting and visual readability  
-> **Gameplay authority:** [GDD.md](GDD.md)
+> **Gameplay authority:** [GDD.md](../design/GDD.md)
 
 ## 1. Purpose and approval boundary
 
@@ -220,7 +220,7 @@ Use geometry where it changes silhouette or explains a function. Evaluate whethe
 
 Keep collision simple and intentional. Decorative branches and roof fibers should not unexpectedly snag movement. Ensure cave and building openings fit the intended character and camera.
 
-Preserve category organization described in [src/assets/README.md](src/assets/README.md). Models belong under the existing model structure; world layouts belong in `src/maps`. Concept renders are reference art, not runtime models or collision assets.
+Preserve category organization described in [src/assets/README.md](../../src/assets/README.md). Models belong under the existing model structure; world layouts belong in `src/maps`. Concept renders are reference art, not runtime models or collision assets.
 
 The repository's automated release publishes scripts; non-script art assets require the existing Studio asset workflow. Adding this document does not apply a visual overhaul to the live game.
 

@@ -1,4 +1,4 @@
--- Siege items (GDD §6.3, §51; docs/ITEM_CATALOG.md §5; numbers in SiegeRules).
+-- Siege items (GDD §6.3, §51; docs/design/ITEM_CATALOG.md §5; numbers in SiegeRules).
 -- Fire Bomb: with one equipped, the attack input (CombatService.SiegeAttack) throws
 -- it from the head on a slow arc (ProjectileService); the burst burns structures by
 -- material, scorches other players under the usual PvP rules (never the thrower)

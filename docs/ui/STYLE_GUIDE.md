@@ -13,7 +13,7 @@ is the authority, this guide summarises it and links to it:
 | [`art/ui/kit/CATALOG.md`](../../art/ui/kit/CATALOG.md) | Every `lk_` sprite: source sheet and box, size, 9-slice insets, atlas, role (generated) |
 | [`art/reference/ui/lobby/README.md`](../../art/reference/ui/lobby/README.md) | The reference images (mockups and kit sheets) |
 | [UI_PROGRESS.md](UI_PROGRESS.md) | Status of every screen and the verification rounds |
-| [MANUAL_VALIDATION.md](../MANUAL_VALIDATION.md#rebuilt-ui-the-shared-kit-and-the-seven-lobby-screens) | Checks that need a real device |
+| [MANUAL_VALIDATION.md](../release/MANUAL_VALIDATION.md#rebuilt-ui-the-shared-kit-and-the-seven-lobby-screens) | Checks that need a real device |
 
 Contents:
 1. [Visual identity](#1-visual-identity)
@@ -1171,4 +1171,4 @@ For every screen or change:
 
 Blur, motion, safe areas, the toast lane, real touch, gamepad focus and how the
 uploaded art draws on phones need a device: the list is in
-[MANUAL_VALIDATION.md](../MANUAL_VALIDATION.md#rebuilt-ui-the-shared-kit-and-the-seven-lobby-screens).
+[MANUAL_VALIDATION.md](../release/MANUAL_VALIDATION.md#rebuilt-ui-the-shared-kit-and-the-seven-lobby-screens).

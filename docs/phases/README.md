@@ -1,8 +1,8 @@
 # Flintborn development phases
 
-[`GDD.md`](../../GDD.md) is the source of truth for gameplay intent. These phase documents split it into ordered, buildable versions. Each phase names the GDD rules it implements, the code it adds, how it is validated, and what it deliberately leaves for later. If a phase document and the GDD disagree, the GDD wins and the phase document must be corrected.
+[`GDD.md`](../design/GDD.md) is the source of truth for gameplay intent. These phase documents split it into ordered, buildable versions. Each phase names the GDD rules it implements, the code it adds, how it is validated, and what it deliberately leaves for later. If a phase document and the GDD disagree, the GDD wins and the phase document must be corrected.
 
-**Finished phases** are marked ✅. Their documents are deleted once the phase's CI, deployment and tests pass; any Studio checks still to run move to [`docs/MANUAL_VALIDATION.md`](../MANUAL_VALIDATION.md). Phases v0.01–v0.18 are shipped and v0.19 (the first fully playable build) is in progress; promotion to `v1.00` follows [`docs/RELEASE_CHECKLIST.md`](../RELEASE_CHECKLIST.md).
+**Finished phases** are marked ✅. Their documents are deleted once the phase's CI, deployment and tests pass; any Studio checks still to run move to [`docs/release/MANUAL_VALIDATION.md`](../release/MANUAL_VALIDATION.md). Phases v0.01–v0.18 are shipped and v0.19 (the first fully playable build) is in progress; promotion to `v1.00` follows [`docs/release/RELEASE_CHECKLIST.md`](../release/RELEASE_CHECKLIST.md).
 
 ## Branch and release model
 

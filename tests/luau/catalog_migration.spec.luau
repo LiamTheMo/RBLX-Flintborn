@@ -1,4 +1,4 @@
--- The rebuilt item catalog (GDD §51, docs/ITEM_CATALOG.md): pre-release saves lose
+-- The rebuilt item catalog (GDD §51, docs/design/ITEM_CATALOG.md): pre-release saves lose
 -- every item whose catalogId no longer exists, wherever the profile holds it, and
 -- the cleanup is safe on every load. Also covers the generated Permanent
 -- conversions (cost, unlock gates, tier browsing), the starter shop's prices

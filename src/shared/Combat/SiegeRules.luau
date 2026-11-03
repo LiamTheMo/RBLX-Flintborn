@@ -1,4 +1,4 @@
--- Siege items (GDD §6.3, §51; docs/ITEM_CATALOG.md §5). Optional raid
+-- Siege items (GDD §6.3, §51; docs/design/ITEM_CATALOG.md §5). Optional raid
 -- accelerators, never a requirement: ordinary weapons and tools still break every
 -- tier. The Fire Bomb is thrown on a slow, visible arc and bursts in a small
 -- radius; fire burns Wood ×3, Stone ×1 and every metal ×0.25 of the base burst.

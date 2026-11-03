@@ -4,14 +4,14 @@
 
 ## Project documentation
 
-- **[Game Design Document (GDD.md)](GDD.md)** — the source of truth for gameplay intent: pillars, core loop, systems, owner decisions and change log.
+- **[Game Design Document (GDD.md)](docs/design/GDD.md)** — the source of truth for gameplay intent: pillars, core loop, systems, owner decisions and change log.
 - **[Development phases (docs/phases)](docs/phases/README.md)** — the GDD split into ordered versions `v0.01` → `v0.18`, each with rules, modules, validation and exit criteria.
-- **[Roblox live deployment](docs/roblox-live-deployment.md)** and **[cloud sync safety](docs/ROBLOX_CLOUD_SYNC.md)** — how `main` publishes scripts to the live place.
+- **[Roblox live deployment](docs/ops/DEPLOYMENT.md)** and **[cloud sync safety](docs/ops/CLOUD_SYNC.md)** — how `main` publishes scripts to the live place.
 - **[Map designs (docs/maps)](docs/maps/README.md)** — layout specs for the lobby hub and the Shattered Crater: zones, stations, flows, tags and open owner questions.
-- **[Manual validation](docs/MANUAL_VALIDATION.md)** — Studio and live checks for each shipped phase, with its placeholder values.
-- **[Release checklist](docs/RELEASE_CHECKLIST.md)** — what remains before the permanent `v1.00` branch.
+- **[Manual validation](docs/release/MANUAL_VALIDATION.md)** — Studio and live checks for each shipped phase, with its placeholder values.
+- **[Release checklist](docs/release/RELEASE_CHECKLIST.md)** — what remains before the permanent `v1.00` branch.
 
-**Current phase:** v0.19, the first fully playable build: placeholder models for every item, node, creature, event and structure, and click to chop, mine and gather (GDD §58). Phases v0.01–v0.18 are shipped and deployed. Next: the manual [release checklist](docs/RELEASE_CHECKLIST.md), then the permanent `v1.00` branch. Finished phases are listed in the [phase index](docs/phases/README.md); their documents are removed once CI, deployment and tests pass.
+**Current phase:** v0.19, the first fully playable build: placeholder models for every item, node, creature, event and structure, and click to chop, mine and gather (GDD §58). Phases v0.01–v0.18 are shipped and deployed. Next: the manual [release checklist](docs/release/RELEASE_CHECKLIST.md), then the permanent `v1.00` branch. Finished phases are listed in the [phase index](docs/phases/README.md); their documents are removed once CI, deployment and tests pass.
 
 ## Repository layout
 

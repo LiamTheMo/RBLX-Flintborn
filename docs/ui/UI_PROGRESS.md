@@ -44,7 +44,7 @@ Legend: ✅ done · 🔄 in progress · ⏳ not started or waiting · — not ap
   the game's UI code headlessly (`gui_env.luau`) and renders it (`render.py`). The
   headless environment has no layout pass, blur, rotation or RichText sizes
   (ARCHITECTURE §7); those, device safe areas, real touch and gamepad focus are
-  manual checks in [MANUAL_VALIDATION.md](../MANUAL_VALIDATION.md).
+  manual checks in [MANUAL_VALIDATION.md](../release/MANUAL_VALIDATION.md).
 - **Verification.** Round 1: visual FAIL (2 High, 13 Medium), responsive FAIL
   (7 High, 11 Medium), code PASS. Round 2 (after fix round 3), whole-screen mean ΔE2000 / SSIM
   against the mockups: HUD 1.63 / 0.937, Inventory 7.07 / 0.898, Settings
@@ -59,7 +59,7 @@ Legend: ✅ done · 🔄 in progress · ⏳ not started or waiting · — not ap
   docs, D23).
 - **Device-only checks** (toast lane, SearchBox touch growth, top-bar and jump
   clearance, thumbstick vs tribe frames, lobby gamepad entry, party view on join,
-  blur and motion) are listed in [MANUAL_VALIDATION.md](../MANUAL_VALIDATION.md).
+  blur and motion) are listed in [MANUAL_VALIDATION.md](../release/MANUAL_VALIDATION.md).
 - **Old specs.** `HudScreen.md`, `ListWindows.md`, `CraftingScreen.md` and parts of
   the screen specs still describe the parchment build or name removed modules; the
   analysts replace them (ARCHITECTURE §9).

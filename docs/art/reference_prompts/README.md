@@ -13,7 +13,7 @@ Four copy-paste prompts for an image generator. Each one makes production refere
 
 1. Open a **new chat** for each prompt, and paste everything inside the box.
 2. It makes the first sheet. Type `next` for the following sheet, or `redo: <what to fix>` to remake the current one.
-3. Save each image as its page number (`173.png`, `174.png` and so on) in `art/blender/assets/references/`, then add a row to `INDEX.md` and `MODEL_PROGRESS.md`.
+3. Save each image as its page number (`173.png`, `174.png` and so on) in `art/blender/assets/references/`, then add a row to `INDEX.md` and `docs/art/MODEL_PROGRESS.md`.
 4. Check every sheet before saving it. It should show the same model in every view, the whole model in frame, solid colours with no texture, the parchment background, and the right page number. Generated sheets are visual targets, not exact drawings (see `WorldModeling.md` §1.1).
 
 Each prompt carries the same house style: the palette, tier colours, rarity colours and sheet layout, taken from `WorldModeling.md` §1.2 and §5, `Modeling.md` §2, §6 and §11, `GearModels.luau` and `Rarity.luau`. Every prompt also tells the generator what is already finished and what already has a reference, so it matches them instead of redrawing them.
