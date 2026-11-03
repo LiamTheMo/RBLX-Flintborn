@@ -592,7 +592,7 @@ Full island art, every biome, weather, extensive equipment and premium offers, *
 - [x] Proposed mechanics explicitly differentiated from confirmed design.
 - [x] Extracted-material special crafting and costly Permanent conversion documented as Confirmed concepts.
 - [ ] Permanent death rules, recipes, costs and caps approved and validated in gameplay.
-- [ ] Prototype tests and runtime/CI validation — **not applicable yet; no game source exists**.
+- [ ] Prototype tests and runtime/CI validation — **not applicable yet; no game source exists**. *(Historical: written before implementation. The game source, its Luau specs and CI exist since v0.01; see §44.)*
 - [ ] Design-owner decisions for outstanding systems — **pending**.
 
 ## 14. Decision backlog (priority order)
@@ -1216,6 +1216,8 @@ Record server-side structured events for: run start/end, first harvest/craft, or
 | 9. Launch readiness | Full server profiling, accessibility, persistence faults, anti-exploit | Reviewed CI, manual playtests and publish-from-main gates |
 
 **Current actual status:** Design only. The GitHub repository contains Markdown documentation, not a playable Roblox implementation. Costs, health/food/stamina tuning, revival mechanics, damage/protection boundaries and weighted event probabilities need implementation and playtest validation.
+
+*Historical: the status line above predates implementation. Phases v0.01–v0.18 are implemented and deployed and v0.19 is in progress (header, §44, §58); playtest validation remains.*
 
 ## 29. Ordinary departure, death and lootable bodies
 
@@ -2314,7 +2316,7 @@ Roblox avatars (accessories, clothing, body colours) are not loaded on top.
 
 **Tribe colours:** players outside a tribe wear **Earth** (the reference's brown). A tribe's members all wear one of nine other colours, picked from the tribe's public id so every server agrees: Ember, Clay, Ochre, Moss, Tide, River, Dusk, Ash and Bone. Joining or leaving a tribe recolours the shorts immediately. Two tribes can share a colour. Letting a tribe choose its own colour is Open.
 
-**Source:** art in `art/blender/scripts/build_09_character.py`; installed by the **Upload and install the player character** workflow; colours in `src/shared/Character/CharacterLook.luau`; applied by `OutfitService`.
+**Source:** art in `art/blender/scripts/build_09_character.py`; installed by the **Upload and install the player character** workflow (its install modes save the places, so they run only from `main`); colours in `src/shared/Character/CharacterLook.luau`; applied by `OutfitService`.
 
 **QA:** a new player spawns as the default character in the lobby and the world, with no avatar items; walking, jumping and idle use the R6 animations with the clothing following the limbs; a tribeless player wears brown shorts; creating or joining a tribe changes them to that tribe's colour, and leaving changes them back.
 
@@ -2449,7 +2451,7 @@ Approximate regional envelopes with shared transition areas, not rectangles pack
 
 ## 57. Owner decision: the parchment Settings screen and its new settings (2026-10-28)
 
-The Settings window is rebuilt from the parchment reference (`art/reference/ui/parchment/10_settings.png`, spec `docs/ui/SettingsScreen.md`) with five tabs, and the owner asked for the reference's new settings to be real features, not decoration:
+The Settings window is rebuilt from the parchment reference (`art/reference/ui/parchment/10_settings.png`, since removed; now `art/reference/ui/lobby/03_settings.png`, spec `docs/ui/SettingsScreen.md`) with five tabs, and the owner asked for the reference's new settings to be real features, not decoration:
 
 1. **Music** and **Effects** volumes, 0–100 (defaults 75 and 80). Sounds play through two sound groups: sounds tagged `Music` go to Music, every other sound without a group of its own to Effects.
 2. **Camera Sensitivity**, 10–100 (default 50 = Roblox's own; 10 is a fifth of it, 100 twice it).
