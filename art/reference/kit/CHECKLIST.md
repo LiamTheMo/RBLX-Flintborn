@@ -1,5 +1,7 @@
 # World kit checklist
 
+> **History:** written by `art/blender/kit/orchestrator/kit_watch.py` for the 2026-10-26 world-kit pilot; current status is in [docs/art/MODEL_PROGRESS.md](../../../docs/art/MODEL_PROGRESS.md).
+
 0/34 sheets done · 27/136 models passed verification.
 
 ✅ passed · 🔍 built, awaiting verification · 🔁 failed a check, fix pending · ⚠️ still failing after 2 fixes, set aside for review (runs move on to new sheets) · 🎨 needs rework (one colour per material; water, mist and smoke as VFX) · 🔨 building · ⏸️ stopped (usage limit), resumes automatically · 🗺️ planned · ⬜ queued. The score is the latest verifier's resemblance out of 10.

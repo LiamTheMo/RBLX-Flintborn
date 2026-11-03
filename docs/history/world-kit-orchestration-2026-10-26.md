@@ -1,5 +1,7 @@
 # World kit orchestration handoff
 
+> **History:** the 2026-10-26 world-kit pilot handoff, kept for the record; current status is in [docs/art/MODEL_PROGRESS.md](../art/MODEL_PROGRESS.md) and the procedure in [art/blender/kit/mcp/STAGES.md](../../art/blender/kit/mcp/STAGES.md).
+
 This is how the 34-sheet world kit is built and how to keep it going. Read it top to bottom before starting a run.
 
 ## Goal

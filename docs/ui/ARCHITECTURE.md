@@ -653,6 +653,8 @@ side-by-side and a 50 % overlay next to the capture for verifiers.
 
 ## 8. File ownership
 
+> **History:** the agent ownership for the rebuild, which is finished (§9); kept for the record. Current state: [UI_PROGRESS.md](UI_PROGRESS.md).
+
 One owner per file. Ask the owner for a change; never edit another agent's file.
 
 | Agent | Owns (create, edit, delete) |
@@ -713,6 +715,8 @@ that is harmless, and `--resolve` skips names the manifest no longer lists.
 ---
 
 ## 10. Ordered build plan
+
+> **History:** the order the finished rebuild followed; kept for the record. Current state: [UI_PROGRESS.md](UI_PROGRESS.md).
 
 | Step | Who | Work | Gate |
 |---|---|---|---|

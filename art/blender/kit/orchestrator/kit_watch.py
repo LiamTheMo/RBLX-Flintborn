@@ -224,6 +224,9 @@ def checklist():
     head = [
         "# World kit checklist",
         "",
+        "> **History:** written by `art/blender/kit/orchestrator/kit_watch.py` for the 2026-10-26 world-kit pilot; "
+        "current status is in [docs/art/MODEL_PROGRESS.md](../../../docs/art/MODEL_PROGRESS.md).",
+        "",
         f"{done_sheets}/34 sheets done · {done_models}/136 models passed verification.",
         "",
         "✅ passed · 🔍 built, awaiting verification · 🔁 failed a check, fix pending · ⚠️ still failing after "

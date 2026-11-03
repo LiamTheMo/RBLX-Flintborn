@@ -1,4 +1,7 @@
 # Responsive & Platform QA — round 1
+
+> Round 1 (history); current state: [docs/ui/UI_PROGRESS.md](../../../../docs/ui/UI_PROGRESS.md).
+
 Result: FAIL (7 High, 11 Medium, 6 Low). 13 scenes × 11 profiles (1920×1080, 1366×768, 2560×1080, 1280×800, 1024×768, 2532×1170, 1334×750, 844×390, 667×375, 5120×1440, console 1080p). Nothing off-screen anywhere.
 
 | # | Finding | Sev | Owner |
