@@ -3,19 +3,14 @@
 -- when the server stops. `failNext` makes the next N calls error, to exercise
 -- retry and pending-save paths.
 
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local ProfileSchema = require(ReplicatedStorage.Shared.Data.ProfileSchema)
+
 local InMemoryDataStore = {}
 InMemoryDataStore.__index = InMemoryDataStore
 
-local function copy(value)
-	if type(value) ~= "table" then
-		return value
-	end
-	local result = {}
-	for key, child in value do
-		result[key] = copy(child)
-	end
-	return result
-end
+local copy = ProfileSchema.DeepCopy
 
 function InMemoryDataStore.new()
 	return setmetatable({ _data = {}, failNext = 0, calls = 0 }, InMemoryDataStore)
