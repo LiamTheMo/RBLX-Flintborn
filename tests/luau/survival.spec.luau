@@ -262,3 +262,20 @@ test("natural regeneration: 1% of max HP each whole second, never past max", fun
 	expectEq(SurvivalRules.StepRegen(state, 0.5, 90, 200), 0, "the clock restarts after full health")
 	expectEq(SurvivalRules.StepRegen(state, 0.5, 90, 200), 2, "1% of a bigger max HP")
 end)
+
+test("damage pauses natural regeneration for 5 s, then it steps again a second later", function()
+	local state = SurvivalRules.NewState()
+	SurvivalRules.OnDamaged(state)
+	local healed = 0
+	run(function(dt)
+		healed += SurvivalRules.StepRegen(state, dt, 50 + healed, 100)
+	end, 5.9, 0.1)
+	expectEq(healed, 0, "nothing during the pause or the first second after it")
+	run(function(dt)
+		healed += SurvivalRules.StepRegen(state, dt, 50 + healed, 100)
+	end, 1, 0.1)
+	expect(math.abs(healed - 1) < 1e-9, ("1 HP once the pause is over (got %s)"):format(tostring(healed)))
+	-- A pause that ends part-way through a frame counts the rest of the frame.
+	SurvivalRules.OnDamaged(state)
+	expectEq(SurvivalRules.StepRegen(state, 6.5, 50, 100), 1, "5 s pause, then 1.5 s: one step")
+end)
