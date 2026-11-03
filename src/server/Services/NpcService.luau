@@ -225,19 +225,13 @@ local function kill(npc)
 	NpcService.Died:Fire(npc)
 end
 
--- True when `player` stands inside a safe zone, where nobody deals damage.
-local function inSafeZone(player: Player): boolean
-	local root = Characters.RootOf(player)
-	return root ~= nil and SafeZoneService.Contains(root.Position)
-end
-
 -- `attacker` (optional) is remembered for kill credit and provokes the enemy.
 function NpcService.Damage(npc, amount: number, attacker: Player?)
 	if not npcs[npc] or amount <= 0 or npc.invulnerable then
 		return
 	end
 	if attacker then
-		if inSafeZone(attacker) then
+		if SafeZoneService.ContainsPlayer(attacker) then
 			return
 		end
 		npc.lastAttacker = attacker
@@ -318,7 +312,7 @@ end
 
 -- Living, at-risk, standing players outside safe zones can be hunted.
 function NpcService.CanTarget(player: Player): boolean
-	return InteractionService.CanAct(player) and not inSafeZone(player)
+	return InteractionService.CanAct(player) and not SafeZoneService.ContainsPlayer(player)
 end
 local canTarget = NpcService.CanTarget
 

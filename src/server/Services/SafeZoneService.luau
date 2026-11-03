@@ -7,6 +7,7 @@ local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local BuildRules = require(ReplicatedStorage.Shared.Building.BuildRules)
+local Characters = require(ReplicatedStorage.Shared.World.Characters)
 
 local SafeZoneService = {}
 
@@ -26,6 +27,12 @@ function SafeZoneService.Contains(position: Vector3): boolean
 		end
 	end
 	return false
+end
+
+-- True when `player`'s character stands inside a zone, where nobody deals damage.
+function SafeZoneService.ContainsPlayer(player: Player): boolean
+	local root = Characters.RootOf(player)
+	return root ~= nil and SafeZoneService.Contains(root.Position)
 end
 
 -- True when any part of an axis-aligned box (centre, half-size) touches a zone:

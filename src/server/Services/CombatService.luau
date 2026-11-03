@@ -66,11 +66,10 @@ local lastSequence = {}
 local runStartedAt = {}
 
 local function actor(player: Player)
-	local root = Characters.RootOf(player)
 	return {
 		state = WorldAdmissionService.GetState(player),
 		tribeId = player:GetAttribute("TribeId"),
-		inSafeZone = root ~= nil and SafeZoneService.Contains(root.Position),
+		inSafeZone = SafeZoneService.ContainsPlayer(player),
 	}
 end
 
@@ -168,11 +167,6 @@ function CombatService.ClearLine(from: Vector3, to: Vector3, ignore, target: Ins
 	params.IgnoreWater = true
 	local hit = workspace:Raycast(from, to - from, params)
 	return hit == nil or (target ~= nil and (hit.Instance == target or hit.Instance:IsDescendantOf(target)))
-end
-
-local function inSafeZone(player: Player): boolean
-	local root = Characters.RootOf(player)
-	return root ~= nil and SafeZoneService.Contains(root.Position)
 end
 
 -- The closest player in reach and arc this swing could actually hurt.
@@ -274,7 +268,7 @@ local function melee(player: Player, sequence: any, direction: any)
 		end,
 	}
 	local isWeapon = profile ~= WeaponCatalog.Hand
-	local order = HarvestRules.TargetOrder(isWeapon, inSafeZone(player))
+	local order = HarvestRules.TargetOrder(isWeapon, SafeZoneService.ContainsPlayer(player))
 	for index, kind in order do
 		structureNext = table.find(order, "Structure", index) ~= nil
 		if targets[kind]() then
@@ -303,7 +297,7 @@ local function shoot(player: Player, sequence: any, drawSeconds: any, direction:
 	if type(drawSeconds) ~= "number" or drawSeconds ~= drawSeconds or not WorldAdmissionService.IsAtRisk(player) then
 		return
 	end
-	if inSafeZone(player) then
+	if SafeZoneService.ContainsPlayer(player) then
 		return
 	end
 	-- The arrow leaves from the client-owned head: it must be near the validated spot.
