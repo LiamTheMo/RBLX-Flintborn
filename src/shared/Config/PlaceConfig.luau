@@ -1,7 +1,7 @@
--- Which Flintborn place this server or client is running in (GDD Q163). The deploy
--- job generates `Shared/Generated/PlaceIds` from the ROBLOX_LOBBY_PLACE_ID and
--- ROBLOX_MAIN_PLACE_ID secrets. Studio sessions without it use the workspace
--- attribute `FlintbornPlaceRole` ("Lobby" or "World"), defaulting to "World".
+-- Which Flintborn place this server or client is running in (GDD Q163), by its
+-- place ID in `Config/PlaceIds`. A place with another ID (an unpublished Studio
+-- file, a test copy) uses the workspace attribute `FlintbornPlaceRole` ("Lobby"
+-- or "World"), and Studio defaults to "World".
 
 local RunService = game:GetService("RunService")
 
@@ -30,8 +30,7 @@ function PlaceConfig.Resolve(placeIds, placeId: number, attribute: any, isStudio
 end
 
 local function loadPlaceIds()
-	local generated = script.Parent.Parent:FindFirstChild("Generated")
-	local module = generated and generated:FindFirstChild("PlaceIds")
+	local module = script.Parent:FindFirstChild("PlaceIds")
 	return module and require(module) or nil
 end
 
@@ -49,8 +48,11 @@ function PlaceConfig.Role(): string
 	return cachedRole
 end
 
--- Place IDs for teleports; nil outside a deployed universe.
+-- Place IDs for teleports; nil in Studio, where TeleportService cannot travel.
 function PlaceConfig.PlaceIds()
+	if RunService:IsStudio() then
+		return nil
+	end
 	return loadPlaceIds()
 end
 

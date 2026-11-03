@@ -4,7 +4,7 @@ Writes art/roblox/lobby/:
 
 - meshes/<Part>.glb  one file per UNIQUE mesh piece. The lobby places 2,400+
   objects, but only ~150 different meshes, so Roblox downloads each shape once
-  and the place clones it (scripts/roblox_lobby_map.py).
+  and the place clones it.
 - palette.png        one small texture shared by every mesh: a cell per palette
   colour and Tint level, so faces keep their flat colour and hand-painted
   brightness variation with no per-asset textures.
@@ -59,7 +59,7 @@ PALETTE_KEYS = list(flintkit.PALETTE)
 TINT_LEVELS = 32
 CELL = 16
 
-# Collision and render profiles (applied by scripts/roblox_lobby_map.py).
+# Collision and render profiles (applied when the meshes are placed in the lobby).
 PLANTS = {"FernLeafy", "GrassTuftLarge", "GrassClumpSmall", "WildflowerWhite", "BroadLeafHerb",
           "ShrubLowWide", "ShrubTallDense", "BerryBush", "Ground_GrassTufts", "Ground_Pebbles"}
 TREES = {"BroadleafTreeStout", "BroadleafTreeTall", "BroadleafTreeWideOld", "BroadleafTreeLeaning",

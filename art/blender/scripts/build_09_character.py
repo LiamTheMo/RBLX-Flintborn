@@ -1158,7 +1158,7 @@ def export_roblox(parts, clothing, texture_paths):
                 "note": ("Meshes are centred on their bounding box. Offsets are in the export frame, "
                          "which faces +Z; Roblox's glTF import turns each mesh half a turn about Y, so "
                          "the imported meshes face -Z like a Roblox rig, and an offset (x, y, z) becomes "
-                         "(-x, y, -z) there (scripts/roblox_character.py)."),
+                         "(-x, y, -z) there."),
                 "parts": {}, "clothing": {}, "motors": {}, "colors": {}, "textures": {}}
     for name in PARTS:
         info = export_piece(parts[name], name, scene)

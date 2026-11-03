@@ -13,13 +13,13 @@ When documents disagree, the [GDD](design/GDD.md) wins on gameplay intent and th
 | Document | Status | What it is |
 | --- | --- | --- |
 | [README.md](../README.md) | Current | Overview, repository layout, tools, the checks CI runs, branches |
-| [AGENTS.md](../AGENTS.md) | Current | Working rules: shell commands, the Blender wrapper, the `RETIRED` rule |
+| [AGENTS.md](../AGENTS.md) | Current | Working rules: code changes and releasing, shell commands, the Blender wrapper |
 | [design/GDD.md](design/GDD.md) | Current | Game Design Document: the source of truth for gameplay, owner decisions and change log |
 | [design/ITEM_CATALOG.md](design/ITEM_CATALOG.md) | Current | Item and material tables behind GDD §51 |
 | [phases/README.md](phases/README.md) | Current | Phase index (`v0.01`–`v0.19`) and the branch and release model |
 | [release/RELEASE_CHECKLIST.md](release/RELEASE_CHECKLIST.md) | Current | What remains before the permanent `v1.00` branch |
 | [release/MANUAL_VALIDATION.md](release/MANUAL_VALIDATION.md) | Current | Studio and live checks per shipped phase, with their placeholder values |
-| [ops/DEPLOYMENT.md](ops/DEPLOYMENT.md) | Current | The main-only script release, `RETIRED`, the script mapping and the manual asset workflows |
+| [ops/DEPLOYMENT.md](ops/DEPLOYMENT.md) | Current | Releasing through VS Code → Rojo → Studio, the place IDs, importing art, the script mapping |
 | [maps/README.md](maps/README.md) | Current | Map documents and shared map conventions (scale, tags, authoring) |
 | [maps/lobby-hub.md](maps/lobby-hub.md) | Design record | The lobby hub's station list, flow and tags; the built layout is in [art/blender/lobby/LAYOUT.md](../art/blender/lobby/LAYOUT.md) |
 | [../src/assets/README.md](../src/assets/README.md) | Current | What lives in `src/assets` and how it reaches the game |
