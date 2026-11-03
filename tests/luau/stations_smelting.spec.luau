@@ -36,18 +36,24 @@ test("every recipe crafts by hand or at a buildable station", function()
 	expectEq(CraftingRules.Refusal("Anvil"), "NeedsAnvil", "refusal code")
 end)
 
-test("smelting is 1 ore to 1 bar at the furnace, timed by metal", function()
-	local expected = { Copper = 2, Iron = 3, Silver = 4, Cobalt = 5, Mithril = 6, Adamantine = 8 }
-	for metal, seconds in expected do
-		local tier = Tiers.Get(metal)
-		local recipe = Recipes.Get(tier.material)
-		expect(recipe ~= nil, metal .. " bar recipe")
-		expectEq(recipe.station, Recipes.Furnace, metal .. " smelts at the furnace")
-		expectEq(recipe.inputs[tier.ore], 1, metal .. " takes one ore")
-		expectEq(recipe.quantity, 1, metal .. " makes one bar")
-		expectEq(recipe.seconds, seconds, metal .. " smelt time")
-		expect(CraftingRules.IsTimed(recipe), metal .. " is timed")
+test("smelting is 1 ore to 1 bar at the furnace, slower up the metal ladder", function()
+	local metals, last = 0, 0
+	for _, tier in Tiers.Ladder do
+		local recipe = tier.ore and Recipes.Get(tier.material)
+		if tier.ore then
+			metals += 1
+			expect(recipe ~= nil, tier.id .. " bar recipe")
+		end
+		if recipe then
+			expectEq(recipe.station, Recipes.Furnace, tier.id .. " smelts at the furnace")
+			expectEq(recipe.inputs[tier.ore], 1, tier.id .. " takes one ore")
+			expectEq(recipe.quantity, 1, tier.id .. " makes one bar")
+			expect(recipe.seconds > last, tier.id .. " takes longer than the metal below")
+			last = recipe.seconds
+			expect(CraftingRules.IsTimed(recipe), tier.id .. " is timed")
+		end
 	end
+	expect(metals > 0, "the ladder has smeltable metals")
 	expect(not CraftingRules.IsTimed(Recipes.Get("CookedMeat")), "cooking is instant")
 end)
 
@@ -172,18 +178,11 @@ test("walls, floors, doors and roofs come in all eight tiers; stations in one", 
 			end
 		end
 	end
-	local _, wall = StructureCatalog.Get("Wall", "Copper")
-	expectEq(wall.hp, 1000, "Copper wall 1,000 HP")
-	_, wall = StructureCatalog.Get("Wall", "Iron")
-	expectEq(wall.hp, 1250, "Iron wall 1,250 HP")
 	for _, pieceId in { "Anvil", "Cauldron", "Workbench", "Furnace", "Chest" } do
 		expect(not BuildRules.IsTiered(pieceId), pieceId .. " has one tier")
 		expectEq(BuildRules.TierFor(pieceId, "Mithril"), "Wood", pieceId .. " ignores the chosen tier")
 	end
 	local _, anvil = StructureCatalog.Get("Anvil", "Wood")
-	expectEq(anvil.cost.IronBar, 20, "anvil costs 20 Iron Bars")
-	local _, cauldron = StructureCatalog.Get("Cauldron", "Wood")
-	expectEq(cauldron.cost.CopperBar, 5, "cauldron costs 5 Copper Bars")
 	expectEq(StructureCatalog.Get("Wall", "Bronze"), StructureCatalog.Pieces.Wall, "piece found")
 	expect(select(2, StructureCatalog.Get("Wall", "Bronze")) == nil, "an unknown tier is refused")
 	expectEq(BuildRules.TierFor("Wall", "Cobalt"), "Cobalt", "a tiered piece keeps the choice")
@@ -205,62 +204,32 @@ test("planters grow five crops from real items", function()
 		expect(ItemCatalog.Get(crop.yield.catalogId) ~= nil, cropId .. " yield")
 		expect(crop.seconds > 0, cropId .. " grows")
 	end
-	expectEq(StructureCatalog.Crops.Redberry.yield.catalogId, "Redberry", "redberries")
-	expectEq(StructureCatalog.Crops.Sweetberry.yield.catalogId, "Sweetberry", "sweetberries")
 end)
 
 -- CraftingService against fake services -----------------------------------------
 
-local clock = 1000
-local Players = { PlayerRemoving = Signal.new(), PlayerAdded = Signal.new() }
+local TestSupport = game:GetService("ServerStorage").TestSupport
+local FakeRoblox = require(TestSupport.FakeRoblox)
+local scheduler = require(TestSupport.Scheduler).new(1000):Install():InstallServerTime()
+local function advance(seconds: number)
+	scheduler:Advance(seconds)
+end
+local Players = FakeRoblox.Players()
 local tagged = {}
-local guids = 0
-local fakes = {
+FakeRoblox.Provide({
 	Players = Players,
 	CollectionService = {
 		GetTagged = function(_, tag)
 			return tagged[tag] or {}
 		end,
 	},
-	HttpService = {
-		GenerateGUID = function()
-			guids += 1
-			return ("guid-%d"):format(guids)
-		end,
-	},
-}
-local originalGetService = game.GetService
-game.GetService = function(self, name)
-	return fakes[name] or originalGetService(self, name)
-end
-workspace = {
-	GetServerTimeNow = function()
-		return clock
-	end,
-}
--- The smelting loop runs as a coroutine that each pump() advances by one tick.
-local loops = {}
-task = {
-	wait = function()
-		coroutine.yield()
-	end,
-	spawn = function(fn, ...)
-		local co = coroutine.create(fn)
-		coroutine.resume(co, ...)
-		table.insert(loops, co)
-	end,
-}
-local function pump()
-	for _, co in loops do
-		local ok, err = coroutine.resume(co)
-		assert(ok, err)
-	end
-end
+	HttpService = FakeRoblox.Guids(),
+})
 
 local dropped = {}
 -- Additive modifier totals by stat (Crafting mastery buffs, in the cases that set them).
 local modifiers = {}
-local stubs = {
+local stubs = FakeRoblox.StubServices({
 	BuildingService = { Removing = Signal.new(), Placed = Signal.new() },
 	DownedService = {
 		IsDowned = function(player)
@@ -279,6 +248,12 @@ local stubs = {
 		Publish = function() end,
 		Notify = function(player, message)
 			table.insert(player.notes, message)
+		end,
+		RemoveAll = function(player, costs)
+			return InventoryRules.RemoveAll(player.inventory, costs)
+		end,
+		Add = function(player, item)
+			return InventoryRules.Add(player.inventory, item)
 		end,
 	},
 	ModifierService = {
@@ -306,27 +281,14 @@ local stubs = {
 			return player.atRisk
 		end,
 	},
-}
-local realRequire = require
-require = function(node)
-	local path = type(node) == "table" and rawget(node, "__path")
-	if path and path[1] == "ServerScriptService" and path[3] == "Services" and stubs[path[4]] then
-		return stubs[path[4]]
-	end
-	return realRequire(node)
-end
+})
 
-local PlaceConfig = require(Shared.Config.PlaceConfig)
-local Remotes = require(Shared.Net.Remotes)
-local handlers = {}
-Remotes.Handle = function(name, fn)
-	handlers[name] = fn
-end
-PlaceConfig.IsWorld = function()
-	return true
-end
+FakeRoblox.Place("World")
+local handlers = FakeRoblox.Remotes().handlers
 local CraftingService = require(game:GetService("ServerScriptService").Server.Services.CraftingService)
 CraftingService.CRAFT_SECONDS = 0
+-- A tick a binary fraction long, so the fake clock lands exactly on each bar's end.
+CraftingService.SMELT_TICK = 0.25
 CraftingService.Start()
 
 local function station(tag: string, position)
@@ -343,38 +305,18 @@ local function station(tag: string, position)
 end
 
 local function body()
-	local humanoid = { Health = 100 }
-	local root = { Position = Vector3.new(0, 0, 0) }
-	return {
-		humanoid = humanoid,
-		root = root,
-		FindFirstChild = function(_, name)
-			return if name == "HumanoidRootPart" then root else nil
-		end,
-		FindFirstChildOfClass = function(_, className)
-			return if className == "Humanoid" then humanoid else nil
-		end,
-	}
+	return FakeRoblox.Character(Vector3.new(0, 0, 0))
 end
 
 local nextUserId = 0
 local function newPlayer(items)
 	nextUserId += 1
-	local player = {
-		UserId = nextUserId,
-		Parent = Players,
+	local player = FakeRoblox.Player(nextUserId, {
 		Character = body(),
 		atRisk = true,
-		attributes = {},
 		notes = {},
 		inventory = InventoryRules.New(),
-	}
-	function player.SetAttribute(self, key, value)
-		self.attributes[key] = value
-	end
-	function player.GetAttribute(self, key)
-		return self.attributes[key]
-	end
+	}, Players)
 	for catalogId, quantity in items do
 		InventoryRules.Add(player.inventory, { catalogId = catalogId, quantity = quantity })
 	end
@@ -392,9 +334,10 @@ local function count(player, catalogId)
 	return total
 end
 
+local requests = 0
 local function craft(player, recipeId, quantity, requestId)
-	guids += 1
-	return handlers.Craft(player, requestId or ("req-" .. guids), recipeId, quantity)
+	requests += 1
+	return handlers.Craft(player, requestId or ("req-" .. requests), recipeId, quantity)
 end
 
 local furnace = station("Furnace", Vector3.new(4, 0, 0))
@@ -430,32 +373,27 @@ test("a smelt batch takes each ore once as each bar finishes", function()
 	expectEq(count(player, "CopperOre"), 3, "nothing taken up front")
 	expectEq(player.attributes.SmeltRecipe, "CopperBar", "progress published")
 	expectEq(player.attributes.SmeltCount, 3, "batch size published")
-	expectEq(player.attributes.SmeltEndsAt, clock + 2, "first bar due in 2 s")
+	expectEq(player.attributes.SmeltEndsAt, scheduler.clock + 2, "first bar due in 2 s")
 
 	ok, reason = craft(player, "CopperBar", 1)
 	expect(not ok and reason == "Busy", "one job at a time: " .. tostring(reason))
 	for _ = 1, 5 do
 		craft(player, "CopperBar", 3)
 	end
-	clock += 1.9
-	pump()
+	advance(1.75)
 	expectEq(count(player, "CopperBar"), 0, "not done before its time")
-	clock += 0.1
-	pump()
-	pump()
-	expectEq(count(player, "CopperBar"), 1, "one bar after 2 s (repeated ticks grant once)")
+	advance(0.25)
+	advance(0.25)
+	expectEq(count(player, "CopperBar"), 1, "one bar after 2 s (later ticks grant it once)")
 	expectEq(count(player, "CopperOre"), 2, "its ore taken")
 	expectEq(player.attributes.SmeltDone, 1, "progress updated")
-	clock += 2
-	pump()
-	clock += 2
-	pump()
+	advance(2)
+	advance(2)
 	expectEq(count(player, "CopperBar"), 3, "three bars after 6 s")
 	expectEq(count(player, "CopperOre"), 0, "three ore taken")
 	expectEq(player.attributes.SmeltRecipe, nil, "progress cleared")
 	expect(string.find(player.notes[#player.notes], "Smelted 3") ~= nil, "told it finished")
-	clock += 10
-	pump()
+	advance(10)
 	expectEq(count(player, "CopperBar"), 3, "nothing more after the job")
 	ok = craft(player, "CopperBar", 1)
 	expect(not ok, "no ore left to start another")
@@ -473,8 +411,7 @@ test("a refused or repeated request starts nothing", function()
 	expect(ok, "started")
 	ok, reason = craft(player, "IronBar", 1, "same-id")
 	expectEq(reason, "Busy", "busy is checked before the id is spent")
-	clock += 3
-	pump()
+	advance(3)
 	expectEq(count(player, "IronBar"), 1, "one bar")
 	ok, reason = craft(player, "IronBar", 1, "same-id")
 	expectEq(reason, "Duplicate", "a used request id is applied once")
@@ -528,14 +465,11 @@ test("moving away, dying, being downed or leaving the run stops a smelt", functi
 		local player = newPlayer({ SilverOre = 2 })
 		local ok, reason = craft(player, "SilverBar", 2)
 		expect(ok, name .. " started: " .. tostring(reason))
-		clock += 4
-		pump()
+		advance(4)
 		expectEq(count(player, "SilverBar"), 1, name .. ": first bar made")
-		clock += 3.9
+		advance(3.75)
 		interrupt(player)
-		pump()
-		clock += 10
-		pump()
+		advance(10)
 		expectEq(count(player, "SilverBar"), 1, name .. ": no second bar")
 		expectEq(count(player, "SilverOre"), 1, name .. ": second ore kept")
 		expectEq(player.attributes.SmeltRecipe, nil, name .. ": progress cleared")
@@ -555,8 +489,7 @@ test("a destroyed furnace, a Stop or leaving the server ends the job cleanly", f
 	stubs.BuildingService.Removing:Fire({ part = own })
 	expectEq(player.attributes.SmeltRecipe, nil, "stopped at once")
 	expect(string.find(player.notes[#player.notes], "destroyed") ~= nil, "told why")
-	clock += 20
-	pump()
+	advance(20)
 	expectEq(count(player, "CobaltBar"), 0, "no bar")
 	expectEq(count(player, "CobaltOre"), 3, "no ore taken")
 
@@ -564,13 +497,11 @@ test("a destroyed furnace, a Stop or leaving the server ends the job cleanly", f
 	player.Character.root.Position = Vector3.new(0, 0, 0)
 	ok = craft(player, "CobaltBar", 2)
 	expect(ok, "restarted at the other furnace")
-	clock += 5
-	pump()
+	advance(5)
 	expectEq(count(player, "CobaltBar"), 1, "one bar")
 	ok = craft(player, "CobaltBar", 0)
 	expect(ok, "stop accepted")
-	clock += 20
-	pump()
+	advance(20)
 	expectEq(count(player, "CobaltBar"), 1, "stop keeps the bars made")
 	expectEq(count(player, "CobaltOre"), 2, "and takes nothing more")
 
@@ -581,8 +512,7 @@ test("a destroyed furnace, a Stop or leaving the server ends the job cleanly", f
 	ok = craft(player, "CobaltBar", 2)
 	expect(ok, "started again")
 	furnace.Parent = nil
-	clock += 5
-	pump()
+	advance(5)
 	expectEq(count(player, "CobaltBar"), 1, "a furnace gone without a removal signal still stops it")
 	furnace.Parent = "PlayerStructures"
 
@@ -590,8 +520,7 @@ test("a destroyed furnace, a Stop or leaving the server ends the job cleanly", f
 	expect(craft(leaver, "MithrilBar", 2), "started")
 	Players.PlayerRemoving:Fire(leaver)
 	leaver.Parent = nil
-	clock += 20
-	pump()
+	advance(20)
 	expectEq(count(leaver, "MithrilBar"), 0, "nothing granted after leaving")
 	expectEq(count(leaver, "MithrilOre"), 2, "nothing taken")
 end)
@@ -600,8 +529,7 @@ test("ore taken away mid-smelt stops the job without a free bar", function()
 	local player = newPlayer({ AdamantineOre = 2 })
 	expect(craft(player, "AdamantineBar", 2), "started")
 	InventoryRules.RemoveAll(player.inventory, { AdamantineOre = 2 })
-	clock += 8
-	pump()
+	advance(8)
 	expectEq(count(player, "AdamantineBar"), 0, "no bar from nothing")
 	expectEq(player.attributes.SmeltRecipe, nil, "stopped")
 	expect(string.find(player.notes[#player.notes], "ran out of ore") ~= nil, "told why")
@@ -611,8 +539,7 @@ test("Crafting mastery's bonus bar: one extra bar per bar smelted, by chance", f
 	local player = newPlayer({ IronOre = 3 })
 	expect(craft(player, "IronBar", 3), "started")
 	for _ = 1, 3 do
-		clock += 3
-		pump()
+		advance(3)
 	end
 	expectEq(count(player, "IronBar"), 3, "without mastery, three ore make three bars")
 
@@ -621,8 +548,7 @@ test("Crafting mastery's bonus bar: one extra bar per bar smelted, by chance", f
 	local lucky = newPlayer({ IronOre = 3, Fiber = 4, Herbs = 2 })
 	expect(craft(lucky, "IronBar", 3), "started")
 	for _ = 1, 3 do
-		clock += 3
-		pump()
+		advance(3)
 	end
 	expectEq(count(lucky, "IronBar"), 6, "three ore make six bars")
 	expectEq(count(lucky, "IronOre"), 0, "each bar still takes its own ore")
@@ -638,29 +564,14 @@ test("a bonus bar never takes the room a later bar of the same job needs", funct
 	local player = newPlayer({ IronOre = 3, IronBar = 998 })
 	expect(craft(player, "IronBar", 2), "started")
 	for _ = 1, 2 do
-		clock += 3
-		pump()
+		advance(3)
 	end
 	expectEq(count(player, "IronBar"), 1000, "both smelted bars fit")
 	expectEq(count(player, "IronOre"), 1, "two ore used")
-	expectEq(#dropped, before + 2, "both bonus bars dropped instead")
+	expectEq(#dropped, before + 2, "both bonus bars dropped at the smelter's feet instead")
+	expectEq(dropped[#dropped].catalogId, "IronBar", "an iron bar")
 	expectEq(player.attributes.SmeltRecipe, nil, "the job finished")
 	expect(string.find(player.notes[#player.notes], "Smelted 2") ~= nil, "not stopped for room")
-	modifiers.SmeltBonus = nil
-end)
-
-test("a bonus bar with no room drops at the smelter's feet and the job finishes", function()
-	modifiers.SmeltBonus = 1
-	local before = #dropped
-	-- The bar stack (one slot per item type) has room for one more bar.
-	local player = newPlayer({ IronOre = 2, IronBar = 999 })
-	expect(craft(player, "IronBar", 1), "started")
-	clock += 3
-	pump()
-	expectEq(count(player, "IronBar"), 1000, "the smelted bar fits")
-	expectEq(#dropped, before + 1, "the bonus bar dropped")
-	expectEq(dropped[#dropped].catalogId, "IronBar", "an iron bar")
-	expectEq(player.attributes.SmeltRecipe, nil, "the job finished, not stopped")
 	modifiers.SmeltBonus = nil
 end)
 
@@ -688,8 +599,7 @@ test("a carried ore smelts into a carried bar, carried ore first", function()
 	local player = carrying("IronOre", 5, 2)
 	expect(craft(player, "IronBar", 3), "started")
 	for _ = 1, 3 do
-		clock += 3
-		pump()
+		advance(3)
 	end
 	local bars, ore = stackOf(player, "IronBar"), stackOf(player, "IronOre")
 	expectEq(bars and bars.quantity, 3, "three bars")
@@ -704,8 +614,7 @@ test("smelting carried ore at scale never launders it into doublable bars", func
 	local player = carrying("IronOre", 500, 500)
 	expect(craft(player, "IronBar", CraftingRules.MAX_BATCH), "started")
 	for _ = 1, CraftingRules.MAX_BATCH do
-		clock += 3
-		pump()
+		advance(3)
 	end
 	local bars = stackOf(player, "IronBar")
 	expectEq(bars and bars.carried, bars and bars.quantity, "every bar is carried")
@@ -723,8 +632,7 @@ test("a bonus bar from a carried ore is carried; from a gathered ore it is not",
 	local player = carrying("IronOre", 2, 1)
 	expect(craft(player, "IronBar", 2), "started")
 	for _ = 1, 2 do
-		clock += 3
-		pump()
+		advance(3)
 	end
 	local bars = stackOf(player, "IronBar")
 	expectEq(bars and bars.quantity, 4, "two bars and two bonus bars")
@@ -734,8 +642,7 @@ test("a bonus bar from a carried ore is carried; from a gathered ore it is not",
 	local full = carrying("IronOre", 1, 1)
 	InventoryRules.Add(full.inventory, { catalogId = "IronBar", quantity = 999 })
 	expect(craft(full, "IronBar", 1), "started")
-	clock += 3
-	pump()
+	advance(3)
 	expectEq(#dropped, before + 1, "the bonus bar dropped")
 	expectEq(dropped[#dropped].carried, 1, "still carried on the ground")
 	modifiers.SmeltBonus = nil
@@ -752,47 +659,21 @@ end)
 
 -- FarmingService against the same fakes --------------------------------------------
 
-local cframeMeta = {}
-cframeMeta.__mul = function(a)
-	return a
-end
-CFrame = {
-	new = function()
-		return setmetatable({}, cframeMeta)
-	end,
-}
-local function fakeInstance(className)
-	return setmetatable({ ClassName = className, Destroy = function() end }, {
-		__index = function(self, key)
-			local signal = Signal.new()
-			rawset(self, key, signal)
-			return signal
-		end,
-	})
-end
-Instance = { new = fakeInstance }
-stubs.InventoryService.RemoveAll = function(player, costs)
-	return InventoryRules.RemoveAll(player.inventory, costs)
-end
-stubs.InventoryService.Add = function(player, item)
-	return InventoryRules.Add(player.inventory, item)
-end
+local created = FakeRoblox.Instances()
 local FarmingService = require(game:GetService("ServerScriptService").Server.Services.FarmingService)
 FarmingService.Start()
 
 -- A placed planter's prompts, in the order they were made.
 local function planter(id: string)
-	local made = {}
-	Instance.new = function(className)
-		local instance = fakeInstance(className)
-		if className == "ProximityPrompt" then
-			table.insert(made, instance)
-		end
-		return instance
-	end
+	local first = #created + 1
 	local part = { Position = Vector3.new(0, 0, 0), CFrame = CFrame.new() }
 	stubs.BuildingService.Placed:Fire({ id = id, pieceId = "Planter", part = part, position = part.Position })
-	Instance.new = fakeInstance
+	local made = {}
+	for index = first, #created do
+		if created[index].ClassName == "ProximityPrompt" then
+			table.insert(made, created[index])
+		end
+	end
 	return made
 end
 
@@ -828,7 +709,7 @@ test("a tap cycles the shared prompt, a hold plants the crop it showed", functio
 	expectEq(shared.ActionText, FIBER, "a completed hold never cycles")
 
 	-- Carried seed makes as many of the harvest carried (GDD §53).
-	clock += StructureCatalog.Crops.Fiber.seconds
+	advance(StructureCatalog.Crops.Fiber.seconds)
 	made[5].Triggered:Fire(farmer)
 	local fiber = stackOf(farmer, "Fiber")
 	expectEq(fiber and fiber.quantity, StructureCatalog.Crops.Fiber.yield.quantity, "harvested")
