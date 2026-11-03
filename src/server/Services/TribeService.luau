@@ -15,6 +15,7 @@ local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local TribeRules = require(ReplicatedStorage.Shared.Admission.TribeRules)
 local Validation = require(ReplicatedStorage.Shared.Data.Validation)
+local Cooldown = require(script.Parent.Parent.Infrastructure.Cooldown)
 local PartyService = require(script.Parent.PartyService)
 local WorldAdmissionService = require(script.Parent.WorldAdmissionService)
 
@@ -25,7 +26,9 @@ TribeService.PREFIX = "tribe:"
 TribeService.PARTY_PREFIX = "tribe:party:"
 
 local state = TribeRules.NewState()
-local lastRequest = {}
+local requests = Cooldown.new(function()
+	return TribeService.REQUEST_COOLDOWN_SECONDS
+end)
 -- Internal tribe id <-> the public handle clients see.
 local handleOf = {}
 local idOfHandle = {}
@@ -111,11 +114,9 @@ local function broadcast()
 end
 
 local function handle(player: Player, action: any, argument: any)
-	local now = os.clock()
-	if lastRequest[player] and now - lastRequest[player] < TribeService.REQUEST_COOLDOWN_SECONDS then
+	if not requests:Try(player) then
 		return false, "TooFast"
 	end
-	lastRequest[player] = now
 	local ok, reason
 	if action == "create" then
 		ok, reason = TribeRules.Create(state, player.UserId, TribeService.PREFIX .. HttpService:GenerateGUID(false))
@@ -189,7 +190,7 @@ function TribeService.Start()
 		for _, tribe in state.tribes do
 			tribe.invites[player.UserId] = nil
 		end
-		lastRequest[player] = nil
+		requests:Forget(player)
 		broadcast()
 	end)
 end
