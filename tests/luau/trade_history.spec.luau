@@ -6,173 +6,37 @@
 -- profiles. Runs the real TradeService session flow against fake Roblox services
 -- and a fake clock.
 
-local Shared = game:GetService("ReplicatedStorage").Shared
-local Server = game:GetService("ServerScriptService").Server
-
--- Fake clock and task scheduler ---------------------------------------------------
-
-local scheduler = require(game:GetService("ServerStorage").TestSupport.Scheduler).new():Install()
-local threadErrors = scheduler.threadErrors
-
+local lobby
 -- os.time follows the fake clock, so trade records are ordered as in a real
 -- session (each trade takes at least the confirm countdown).
 local realOs = os
 os = setmetatable({
 	time = function(date)
-		return if date then realOs.time(date) else scheduler.clock
+		return if date then realOs.time(date) else lobby.scheduler.clock
 	end,
 }, { __index = realOs })
 
--- Runs everything due within the next `seconds`, in time order.
-local function advance(seconds: number)
-	scheduler:Advance(seconds)
-end
+lobby = require(game:GetService("ServerStorage").TestSupport.LobbyTrade).new()
+local advance, join, leave, rejoin, trader = lobby.advance, lobby.join, lobby.leave, lobby.rejoin, lobby.trader
+local profiles, stored, threadErrors = lobby.profiles, lobby.stored, lobby.threadErrors
 
--- Fake Roblox services ------------------------------------------------------------
-
-local Players = { _list = {} }
-local removing = {}
-Players.PlayerRemoving = {
-	Connect = function(_, fn)
-		table.insert(removing, fn)
-	end,
-}
-function Players.GetPlayers(self)
-	return table.clone(self._list)
-end
-function Players.GetPlayerByUserId(self, userId)
-	for _, player in self._list do
-		if player.UserId == userId then
-			return player
-		end
-	end
-	return nil
-end
-
-local guids = 0
-local fakes = {
-	Players = Players,
-	HttpService = {
-		GenerateGUID = function()
-			guids += 1
-			return ("guid-%d"):format(guids)
-		end,
-	},
-}
-local originalGetService = game.GetService
-game.GetService = function(self, name)
-	return fakes[name] or originalGetService(self, name)
-end
-game.JobId = "job-trade"
-workspace = {
-	GetServerTimeNow = function()
-		return scheduler.clock
-	end,
-}
-
-local PlaceConfig = require(Shared.Config.PlaceConfig)
-PlaceConfig.IsLobby = function()
-	return true
-end
-local Remotes = require(Shared.Net.Remotes)
-local handlers = {}
-local pushed = {}
-Remotes.Handle = function(name, fn)
-	handlers[name] = fn
-end
-Remotes.Get = function()
-	return {
-		FireClient = function(_, player, payload)
-			pushed[player] = payload
-		end,
-	}
-end
-
-local ProfileSchema = require(Shared.Data.ProfileSchema)
-local TradeRules = require(Shared.Economy.TradeRules)
-
--- Profiles live in memory; a save copies one into `stored`.
-local ProfileService = require(Server.Services.ProfileService)
-local profiles, stored = {}, {}
-ProfileService.GetProfile = function(player)
-	return profiles[player]
-end
-ProfileService.Mutate = function(player, apply)
-	local profile = profiles[player]
-	if profile == nil then
-		return false
-	end
-	apply(profile)
-	return true
-end
-ProfileService.SaveNow = function(player)
-	stored[player.UserId] = ProfileSchema.DeepCopy(profiles[player])
-	return true
-end
-ProfileService.ReadStored = function(userId)
-	return true, stored[userId]
-end
-local CurrencyService = require(Server.Services.CurrencyService)
-CurrencyService.Publish = function() end
-
-local TradeService = require(Server.Services.TradeService)
-TradeService.Start()
+local TradeRules = require(game:GetService("ReplicatedStorage").Shared.Economy.TradeRules)
+local ProfileService = require(game:GetService("ServerScriptService").Server.Services.ProfileService)
 
 local function sword(id)
 	return { instanceId = id, catalogId = "IronSword", ownerId = 1, location = "LobbyBackpack", qualityRoll = 0 }
 end
 
-local function trader()
-	local profile = ProfileSchema.Default(0)
-	profile.progression.level = 12
-	return profile
-end
-
-local nextUserId = 100
-local function join(profile)
-	nextUserId += 1
-	local player = { UserId = nextUserId, DisplayName = "P" .. nextUserId, Parent = Players }
-	function player.SetAttribute() end
-	table.insert(Players._list, player)
-	profiles[player] = profile
-	stored[player.UserId] = ProfileSchema.DeepCopy(profile)
-	return player
-end
-
--- The player leaves: PlayerRemoving fires, the release save stores the live
--- profile and the server forgets it (ProfileService's PlayerRemoving handler).
-local function leave(player)
-	player.Parent = nil
-	table.remove(Players._list, table.find(Players._list, player))
-	for _, fn in removing do
-		fn(player)
-	end
-	stored[player.UserId] = ProfileSchema.DeepCopy(profiles[player])
-	profiles[player] = nil
-end
-
--- The same account joins again: its saved profile loads and ProfileLoaded fires.
-local function rejoin(player)
-	player.Parent = Players
-	table.insert(Players._list, player)
-	profiles[player] = ProfileSchema.DeepCopy(stored[player.UserId])
-	ProfileService.ProfileLoaded:Fire(player, profiles[player])
-end
-
 -- One full session: invite, accept, offer, lock both, wait out the countdown,
 -- confirm both. Returns TradeConfirm's result for the last confirm.
 local function trade(a, b, keys)
-	local ok, id = handlers.TradeRequest(a, b.UserId)
+	local ok, id = lobby.handlers.TradeRequest(a, b.UserId)
 	assert(ok, "invite: " .. tostring(id))
-	assert(handlers.TradeRespond(b, id, true), "accept")
+	assert(lobby.handlers.TradeRespond(b, id, true), "accept")
 	if keys then
-		assert(handlers.TradeOffer(a, id, keys, 0), "offer")
+		assert(lobby.handlers.TradeOffer(a, id, keys, 0), "offer")
 	end
-	handlers.TradeLock(a, id)
-	handlers.TradeLock(b, id)
-	advance(TradeService.COUNTDOWN_SECONDS)
-	handlers.TradeConfirm(a, id)
-	return handlers.TradeConfirm(b, id)
+	return lobby.lockAndConfirm(a, b, id)
 end
 
 local function holds(profile, instanceId): boolean
@@ -284,7 +148,7 @@ test("a trade the receiver never saved still rolls back, however long its histor
 	-- B's server crashes: B's saved profile is the one from before the trade.
 	profiles[b] = nil
 	b.Parent = nil
-	table.remove(Players._list, table.find(Players._list, b))
+	table.remove(lobby.Players._list, table.find(lobby.Players._list, b))
 	rejoin(b)
 	local alt = join(trader())
 	for _ = 1, TradeRules.HISTORY + 5 do

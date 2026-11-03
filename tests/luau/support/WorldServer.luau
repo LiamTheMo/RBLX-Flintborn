@@ -146,10 +146,7 @@ function WorldServer.new(options)
 
 	-- Fails the spec case with every error a spawned thread raised.
 	function world.expectNoThreadErrors()
-		for _, err in world.threadErrors do
-			print("    thread error: " .. err)
-		end
-		expectEq(#world.threadErrors, 0, "thread errors")
+		scheduler:ExpectNoThreadErrors()
 	end
 
 	return world
