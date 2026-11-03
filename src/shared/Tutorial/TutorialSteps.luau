@@ -34,7 +34,7 @@ TutorialSteps.Steps = {
 	{
 		id = "Heal",
 		title = "Heal up",
-		hint = "Medicine heals instantly; food heals over 10 seconds and is halved if you are hit. Press its hotbar number to use it.",
+		hint = "Press its hotbar number to hold medicine or food, then attack to drink or eat it. Medicine heals instantly; food heals over 10 seconds and is halved if you are hit.",
 		trigger = "Heal",
 	},
 	{

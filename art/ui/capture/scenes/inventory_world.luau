@@ -1,7 +1,7 @@
 -- Drives the run InventoryController and its Inventory window headlessly
 -- through real presses: open, choose, EQUIP to the hotbar, MOVE onto another
--- slot, WEAR armour, the Equipped tab (hotbar keys, armour), TAKE OFF, USE,
--- DROP, search and close. Remotes are mocked; the server's snapshots are pushed
+-- slot, WEAR armour, the Equipped tab (hotbar keys, armour), TAKE OFF, USE (holds
+-- the consumable, then eats it), the hotbar key (holds it), DROP, search and close. Remotes are mocked; the server's snapshots are pushed
 -- through InventoryChanged as in game. Pages: 1 the Backpack tab under All
 -- (everything carried: the backpack's items, the hotbar and worn armour), 2 the
 -- Equipped tab.
@@ -125,9 +125,17 @@ check(window:SlotFor("armor:3") ~= nil, "three armour slots")
 press(window:SlotFor("hotbar:1"))
 check(window:ActionButton("activate").text == "Put Away", "the held tool offers PUT AWAY")
 press(window:SlotFor("hotbar:2"))
+check(window:ActionButton("activate").text == "Use", "a hotbar consumable offers USE")
 press(window:ActionButton("activate"))
 last = calls[#calls]
-check(last[1] == "UseConsumable" and last[3] == "Redberry", "USE eats the berries")
+local before = calls[#calls - 1]
+check(before[1] == "EquipSlot" and before[2] == 2, "USE takes the berries in hand first")
+check(last[1] == "UseConsumable" and last[3] == "Redberry", "then eats them (GDD §59)")
+-- The hotbar key holds a consumable instead of eating it at once.
+local count = #calls
+InventoryController.ActivateHotbar(2)
+last = calls[#calls]
+check(#calls == count + 1 and last[1] == "EquipSlot" and last[2] == 2, "the hotbar key holds the berries")
 press(window:SlotFor("armor:1"))
 check(window:ActionButton("drop") == nil, "worn armour cannot be dropped")
 press(window:ActionButton("takeOff"))
