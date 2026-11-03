@@ -423,52 +423,27 @@ test("a refused or repeated request starts nothing", function()
 end)
 
 test("moving away, dying, being downed or leaving the run stops a smelt", function()
-	local cases = {
-		{
-			"MovedAway",
-			"moved away",
-			function(player)
-				player.Character.root.Position = Vector3.new(40, 0, 0)
-			end,
-		},
-		{
-			"Died",
-			"died",
-			function(player)
-				player.Character.humanoid.Health = 0
-			end,
-		},
-		{
-			"Respawned",
-			"died",
-			function(player)
-				player.Character = body()
-			end,
-		},
-		{
-			"Downed",
-			"downed",
-			function(player)
-				player.downed = true
-			end,
-		},
-		{
-			"NotInRun",
-			"left the run",
-			function(player)
-				player.atRisk = false
-			end,
-		},
-	}
-	for _, case in cases do
-		local name, text, interrupt = case[1], case[2], case[3]
+	-- Each interruption, and the reason the player is told.
+	local told =
+		{ MovedAway = "moved away", Died = "died", Respawned = "died", Downed = "downed", NotInRun = "left the run" }
+	for name, text in told do
 		local player = newPlayer({ SilverOre = 2 })
 		local ok, reason = craft(player, "SilverBar", 2)
 		expect(ok, name .. " started: " .. tostring(reason))
 		advance(4)
 		expectEq(count(player, "SilverBar"), 1, name .. ": first bar made")
 		advance(3.75)
-		interrupt(player)
+		if name == "MovedAway" then
+			player.Character.root.Position = Vector3.new(40, 0, 0)
+		elseif name == "Died" then
+			player.Character.humanoid.Health = 0
+		elseif name == "Respawned" then
+			player.Character = body()
+		elseif name == "Downed" then
+			player.downed = true
+		else
+			player.atRisk = false
+		end
 		advance(10)
 		expectEq(count(player, "SilverBar"), 1, name .. ": no second bar")
 		expectEq(count(player, "SilverOre"), 1, name .. ": second ore kept")

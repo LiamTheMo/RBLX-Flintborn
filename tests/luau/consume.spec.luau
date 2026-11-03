@@ -164,33 +164,17 @@ test("the pose rests at both ends, holds the item up in between and stays bounde
 end)
 
 test("interruption: gone, dead, downed, or no longer holding the item", function()
-	local fine = { present = true, alive = true, downed = false, held = "Redberry" }
-	expectEq(ConsumeRules.Interruption(fine, "Redberry"), nil, "still holding it")
-	expectEq(
-		ConsumeRules.Interruption({ present = false, alive = true, held = "Redberry" }, "Redberry"),
-		"NotInRun",
-		"left"
-	)
-	expectEq(
-		ConsumeRules.Interruption({ present = true, alive = false, held = "Redberry" }, "Redberry"),
-		"NotInRun",
-		"died"
-	)
-	expectEq(
-		ConsumeRules.Interruption({ present = true, alive = true, downed = true, held = "Redberry" }, "Redberry"),
-		"Downed",
-		"downed"
-	)
-	expectEq(
-		ConsumeRules.Interruption({ present = true, alive = true, held = nil }, "Redberry"),
-		"Interrupted",
-		"put away"
-	)
-	expectEq(
-		ConsumeRules.Interruption({ present = true, alive = true, held = "StoneAxe" }, "Redberry"),
-		"Interrupted",
-		"another slot"
-	)
+	local cases = {
+		{ "still holding it", { present = true, alive = true, downed = false, held = "Redberry" }, nil },
+		{ "left", { present = false, alive = true, held = "Redberry" }, "NotInRun" },
+		{ "died", { present = true, alive = false, held = "Redberry" }, "NotInRun" },
+		{ "downed", { present = true, alive = true, downed = true, held = "Redberry" }, "Downed" },
+		{ "put away", { present = true, alive = true, held = nil }, "Interrupted" },
+		{ "another slot", { present = true, alive = true, held = "StoneAxe" }, "Interrupted" },
+	}
+	for _, case in cases do
+		expectEq(ConsumeRules.Interruption(case[2], "Redberry"), case[3], case[1])
+	end
 end)
 
 test("touch icon, bar text and the first-hold hint name the action", function()
@@ -319,62 +303,43 @@ test("the item must be carried and held", function()
 end)
 
 test("putting it away, switching slots, going down, dying or leaving interrupts it", function()
-	local cases = {
-		{
-			"put away",
-			function(p)
-				p.held = nil
-			end,
-			"Interrupted",
-		},
-		{
-			"another slot",
-			function(p)
-				p.held = "StoneAxe"
-			end,
-			"Interrupted",
-		},
-		{
-			"downed",
-			function(p)
-				p:SetAttribute("Downed", true)
-			end,
-			"Downed",
-		},
-		{
-			"died",
-			function(p)
-				p.humanoid.Health = 0
-			end,
-			"NotInRun",
-		},
-		{
-			"left",
-			function(p)
-				p.Parent = nil
-			end,
-			"NotInRun",
-		},
+	-- Each interruption, and the reason the request is refused with.
+	local reasons = {
+		["put away"] = "Interrupted",
+		["another slot"] = "Interrupted",
+		downed = "Downed",
+		died = "NotInRun",
+		left = "NotInRun",
 	}
-	for _, case in cases do
+	for name, expected in reasons do
 		local player = holding("CookedMeat", 2)
 		player.rules.food = 0.5
 		local before = #used
 		local answer = ask(player, "CookedMeat")
 		advance(0.6)
-		case[2](player)
+		if name == "put away" then
+			player.held = nil
+		elseif name == "another slot" then
+			player.held = "StoneAxe"
+		elseif name == "downed" then
+			player:SetAttribute("Downed", true)
+		elseif name == "died" then
+			player.humanoid.Health = 0
+		else
+			player.Parent = nil
+		end
 		advance(0.05)
 		local result = answer()
-		expect(result ~= nil and result[1] == false and result[2] == case[3], case[1] .. " stops it: " .. case[3])
-		expectEq(player.counts.CookedMeat, 2, case[1] .. ": nothing consumed")
-		expectNear(player.rules.food, 0.5, 1e-9, case[1] .. ": not fed")
-		expectEq(#player.rules.foodHeals, 0, case[1] .. ": no food heal")
-		expectEq(#used, before, case[1] .. ": nothing used")
+		expect(result ~= nil and result[1] == false and result[2] == expected, name .. " stops it: " .. expected)
+		expectEq(player.counts.CookedMeat, 2, name .. ": nothing consumed")
+		expectNear(player.rules.food, 0.5, 1e-9, name .. ": not fed")
+		expectEq(#player.rules.foodHeals, 0, name .. ": no food heal")
+		expectEq(#used, before, name .. ": nothing used")
 		if player.Parent then
-			expectEq(player:GetAttribute(ConsumeRules.ITEM_ATTRIBUTE), nil, case[1] .. ": the animation stops")
+			expectEq(player:GetAttribute(ConsumeRules.ITEM_ATTRIBUTE), nil, name .. ": the animation stops")
 		end
 		advance(2)
-		expectEq(player.counts.CookedMeat, 2, case[1] .. ": still nothing later")
+		expectEq(player.counts.CookedMeat, 2, name .. ": still nothing later")
 	end
 end)
 
