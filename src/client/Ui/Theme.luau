@@ -71,8 +71,6 @@ Theme.TopOrder = {
 	Extraction = 5,
 	BossBar = 6,
 	EventBanner = 7,
-	Receipt = 8,
-	Toast = 10,
 	Tutorial = 11,
 }
 
