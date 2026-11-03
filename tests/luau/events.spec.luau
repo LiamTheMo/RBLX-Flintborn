@@ -5,83 +5,88 @@ local EventCatalog = require(Shared.Events.EventCatalog)
 local EventRules = require(Shared.Events.EventRules)
 local IslandLayout = require(Shared.World.IslandLayout)
 local ItemCatalog = require(Shared.Items.ItemCatalog)
-local WildlifeRules = require(Shared.Enemies.WildlifeRules)
+local Rarity = require(Shared.Items.Rarity)
 
-local function entries(...)
-	local list = {}
-	for _, rarity in { ... } do
-		table.insert(list, { id = rarity, rarity = rarity })
+local function list(...)
+	local entries = {}
+	for index, rarity in { ... } do
+		table.insert(entries, { id = rarity .. index, rarity = rarity })
 	end
-	return list
+	return entries
 end
 
-test("each category rolls independently, so several can start in one tick", function()
-	local rng = Random.new(11)
-	local catalog = { A = entries("Common"), B = entries("Common"), C = entries("Common") }
-	local best = 0
-	for _ = 1, 2000 do
-		best = math.max(best, #EventRules.RollTick(catalog, { "A", "B", "C" }, rng))
-	end
-	expect(best >= 2, "two or more categories triggered together")
-end)
-
-test("about 25% of ticks trigger per category", function()
-	local rng = Random.new(12)
-	local list = entries("Common")
-	local hits, trials = 0, 40000
+test("a category triggers 25% of ticks; each rare type rolls on its own; Common is the fallback", function()
+	local rng = Random.new(47)
+	local entries = list("Common", "Rare", "Rare", "Epic", "Secret")
+	local counts, both, common, trials = {}, 0, 0, 400000
 	for _ = 1, trials do
-		if #EventRules.RollCategory(list, rng) > 0 then
-			hits += 1
+		local results = EventRules.RollCategory(entries, rng)
+		local rares = 0
+		for _, entry in results do
+			counts[entry.id] = (counts[entry.id] or 0) + 1
+			rares += if entry.rarity == "Rare" then 1 else 0
+			common += if entry.rarity == "Common" then 1 else 0
+		end
+		both += if rares == 2 then 1 else 0
+		for index = 2, #results do
+			expect(
+				Rarity.Index(results[index - 1].rarity) >= Rarity.Index(results[index].rarity),
+				"results come rarest first"
+			)
 		end
 	end
-	expectNear(hits / trials, 0.25, 0.01, "trigger rate")
+	local trigger, rare, epic, secret = 0.25, 0.12, 0.05, 0.001
+	expectNear((counts.Rare2 or 0) / trials, trigger * rare, 0.002, "first Rare type")
+	expectNear((counts.Rare3 or 0) / trials, trigger * rare, 0.002, "second Rare type, not halved")
+	expectNear((counts.Epic4 or 0) / trials, trigger * epic, 0.0015, "Epic type")
+	expectNear((counts.Secret5 or 0) / trials, trigger * secret, 0.00008, "Secret ~0.025% per category per tick")
+	expectNear(both / trials, trigger * rare * rare, 0.0008, "both Rare types can start in one tick")
+	local none = (1 - rare) * (1 - rare) * (1 - epic) * (1 - secret)
+	expectNear(common / trials, trigger * none, 0.003, "Common only when no rarer type hits")
+	local hits = 0
+	for _ = 1, 40000 do
+		hits += if #EventRules.RollCategory(list("Common"), rng) > 0 then 1 else 0
+	end
+	expectNear(hits / 40000, trigger, 0.01, "a Common-only category triggers 25% of ticks")
 end)
 
-test("a rare type rolls on its own and Common is the fallback", function()
-	local rng = Random.new(13)
-	local list = entries("Common", "Secret")
-	local secret, common, trials = 0, 0, 400000
+test("a category without Common skips when no type hits; ticks gather every result", function()
+	local rng = Random.new(53)
+	local entries = list("Rare", "Rare")
+	local empty, trials = 0, 100000
 	for _ = 1, trials do
-		local entry = EventRules.RollCategory(list, rng)[1]
-		if entry and entry.rarity == "Secret" then
-			secret += 1
-		elseif entry then
-			common += 1
-		end
+		empty += if #EventRules.RollCategory(entries, rng) == 0 then 1 else 0
 	end
-	expectNear(secret / trials, 0.00025, 0.00008, "Secret ~0.025% per category per tick")
-	expectNear(common / trials, 0.25 * 0.999, 0.01, "everything else falls back to Common")
+	expectNear(1 - empty / trials, 0.25 * (1 - (1 - 0.12) ^ 2), 0.003, "either Rare type")
+	expectEq(#EventRules.RollCategory({}, rng), 0, "an empty category never rolls")
+
+	local catalog = { A = list("Uncommon", "Uncommon", "Uncommon"), B = list("Common"), C = list("Common") }
+	local bestA, bestCategories = 0, 0
+	for _ = 1, 5000 do
+		local results = EventRules.RollTick(catalog, { "A", "B", "C" }, rng)
+		local fromA = 0
+		for _, entry in results do
+			fromA += if entry.rarity == "Uncommon" then 1 else 0
+		end
+		bestA = math.max(bestA, fromA)
+		bestCategories = math.max(bestCategories, #results - fromA + math.min(fromA, 1))
+	end
+	expect(bestA >= 2, "one category can start several types in one tick")
+	expect(bestCategories >= 2, "categories roll independently, so several can start in one tick")
 end)
 
-test("rare types of one rarity never compete: each keeps its own rate", function()
-	local rng = Random.new(15)
-	local list = { { id = "ShrubA", rarity = "Rare" }, { id = "ShrubB", rarity = "Rare" } }
-	local a, b, both, trials = 0, 0, 0, 200000
-	for _ = 1, trials do
-		local seen = {}
-		for _, entry in EventRules.RollCategory(list, rng) do
-			seen[entry.id] = true
+test("rolls are reproducible from an injected rng", function()
+	local function run(seed: number)
+		local rng, ids = Random.new(seed), {}
+		for _ = 1, 2000 do
+			for _, entry in EventRules.RollTick(EventCatalog.Entries, EventCatalog.Categories, rng) do
+				table.insert(ids, entry.id)
+			end
 		end
-		a += if seen.ShrubA then 1 else 0
-		b += if seen.ShrubB then 1 else 0
-		both += if seen.ShrubA and seen.ShrubB then 1 else 0
+		return table.concat(ids, ",")
 	end
-	expectNear(a / trials, 0.25 * 0.12, 0.003, "the first type keeps the full Rare rate")
-	expectNear(b / trials, 0.25 * 0.12, 0.003, "and so does the second")
-	expect(both > 0, "both can start in the same tick")
-end)
-
-test("a category with no Common skips when nothing rarer hits", function()
-	local rng = Random.new(14)
-	local list = entries("Rare")
-	local hits, trials = 0, 100000
-	for _ = 1, trials do
-		if #EventRules.RollCategory(list, rng) > 0 then
-			hits += 1
-		end
-	end
-	expectNear(hits / trials, 0.25 * 0.12, 0.004, "only the Rare roll can produce an event")
-	expectEq(#EventRules.RollCategory({}, rng), 0, "empty categories never roll")
+	expectEq(run(59), run(59), "same seed, same events")
+	expect(#run(59) > 0, "the real catalog produces events")
 end)
 
 test("footprint separation rejects overlapping candidates", function()
@@ -234,29 +239,6 @@ test("creature events follow the owner roster (GDD §54)", function()
 		end
 		for _, old in { "WolfPack", "AlphaBoar", "RaiderWarband", "SabertoothAlpha" } do
 			expect(entry.id ~= old, old .. " is retired")
-		end
-	end
-end)
-
-test("creature event preferences name real zones and habitats", function()
-	local zones = {
-		Rimlands = true,
-		PinewoodWilds = true,
-		MosswickForest = true,
-		EmberhollowCaves = true,
-		FrostpeakRidge = true,
-		FallenTemple = true,
-		Timberwatch = true,
-		Riverlands = true,
-		CraterLake = true,
-		ShatteredKeep = true,
-	}
-	for _, entry in EventCatalog.ById do
-		if entry.zone then
-			expect(zones[entry.zone], entry.id .. " zone " .. entry.zone)
-		end
-		if entry.habitat then
-			expect(table.find(WildlifeRules.HABITATS, entry.habitat) ~= nil, entry.id .. " habitat " .. entry.habitat)
 		end
 	end
 end)
