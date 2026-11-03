@@ -3,7 +3,7 @@
 Reference: `art/blender/assets/references/068.png` (1024 × 1536 px). INDEX.md row 68: "Flintborn timber hut model study".
 The sheet's header reads **"PAGE 67/132"** (top right), title **"TIMBER HUT"**, subtitle "INDIVIDUAL MODEL STUDY", footer
 "FLINTBORN — INDIVIDUAL MODEL STUDY" (our number is INDEX's 068, §3.1).
-Builder: `art/blender/kit/mcp/m068.py` → `build()` (not written yet). Procedure: `art/blender/kit/mcp/STAGES.md`. One
+Builder: `art/blender/kit/mcp/m068.py` → `build()` (stages 1–6 recorded at the end of this file). Procedure: `art/blender/kit/mcp/STAGES.md`. One
 modeller does stages 1–6 in a background Blender, then a fresh verifier does stage 7; the main session puts the model
 into the kit file, exports and commits.
 
@@ -1072,3 +1072,507 @@ Stopped on request before any build ran. State for the next modeller:
   4-socket hero check, walk proxy over stairs and doorway). Run `build()` on port 9877 against
   `art/blender/assets/kit/wip/M068.blend`, then fix contact and bury issues, calibrate, render, and record stages 1-6
   here.
+
+## Rulings on the paused deviations (main session, 2026-11-03)
+
+All accepted, because each one keeps parts from piercing or sinking into each other:
+1. **Pitch 32°.** The ridge stays at 16.0, so only the slope changes; the sheet's pitch is read by eye and 2° is within it.
+2. **Canvas eave at |x| 7.45** at plate-top height, with the U ties wrapping canvas and plate.
+3. **Bargeboards** 0.90 × 0.92 at |y| 9.25–10.15, 0.80 proud of the canvas, heels on the plates; plates to |y| 10.20;
+   ridge beam ends at |y| 10.75.
+4. **Corner blocks 1.64 square**, chimney centre y −3.45, banner pole (−9.55, 10.55), door lanterns at x ±4.70.
+5. **No apex rope lashing:** the golden saddle block stands in. Record it as a miss against the sheet's apex wrap; a verifier
+   should not fail the model on it alone.
+
+## Stage 1 — Modelling (2026-11-03)
+
+Built in a background Blender (port 9877, work file `art/blender/assets/kit/wip/M068.blend`, saved after the good
+build). The builder's second half is written: `hero_all` (every part function placed by §2, leaf open 95°), the twelve
+part wrappers, `NOTES` / `COLLISION`, `_new` / `_post` (stage 2–3 pass), the shell, ray-parity winding, contact, bury,
+pierce, rope-end, walk and placement reports, `build()` / `report()`, and the renders (sheet views, mirrored views,
+spin, close-ups, parts, exploded, scale, thumb).
+
+**Changes to the first half, each found by a report or a render:**
+1. **Chimney centre y −3.50** (was −3.45): its +Y face still overlapped the rafter at y −1.94 by 0.04; now 0.01 clear.
+   Canvas cut y −4.83 … −2.17 (0.03 clear).
+2. **Trimmers in the rafters' own band** (0.50 × 0.60, tops 0.015 under the canvas like the rafters) under the
+   chimney's two long edges (x 0.90–1.40 and 3.00–3.50), and the **chimney's lower block cut to the 32° pitch** on
+   them (foot z 15.28 uphill … 13.66 downhill). The old level trimmers at z 12.9–13.6 met the rafters only on the
+   downhill side; the uphill one hung 0.8 under them, held only by the chimney. From inside (`underside_cu`) the stone
+   foot sits flush between the rafters, as close-up C.
+3. **Canvas:** the sagged grid node inside the chimney cut is dropped (it was a loose vertex).
+4. **Ridge beam top edges** lowered by the first panel column's sag (−0.0295 at x ±0.50; 0.01 under the canvas at
+   the apex): its top edges crossed the sagging canvas underside (pierce report 4). Chamfer 0.10 (0.08 left 0.30°
+   slivers on the 21.5-long chamfer faces).
+5. **Crossarm in two pieces** butting the pole's flat −Y / +Y faces (a knobbed stub and the long arm): the single arm
+   was buried 0.255 through the pole. The X lashing still wraps pole and arm.
+6. **Bracket plates z 10.53–11.07** (0.54 tall, spec 0.70): on the plate's flat outer face inside its 0.12 chamfers,
+   so plate and bracket touch face to face (the taller plate met only the chamfers, 0.039 off).
+7. **Floor part:** two short dark feet under every deck plank (the exploded's feet); six feet left the middle planks
+   loose. The hero keeps its two hidden sleepers.
+8. **RoofPanel part ties** are U clips round the canvas edge (the part has no plate to wrap); the hero's ties run on
+   round the plate to the wall.
+9. **`_earclip`** takes the valid ear with the largest smallest corner and refuses a diagonal through another vertex:
+   the crossed bargeboards' lower piece had a 0.0° triangle.
+10. **Bargeboard tips 1.60 out** (was 1.00): tips 1.64 above the apex, the sheet's big X (`apex_cu`).
+11. **Plank chamfers 0.10** (was 0.07): the dark V seams between rows read in the f34, as on the sheet.
+
+**Door leaf.** Decision 3's 95° is kept: hinged at (−1.80, −7.59) on the left jamb, the leaf stands almost square to
+the front wall inside the room, x −1.80 … −2.11, y −7.59 … −4.04 (§2.5's x −1.80 … −5.36 describes a leaf swung flat
+against the wall, about 180°). It is 0.8 clear of the walk proxy.
+
+**Views against the sheet** (`f34_sheet`, `side_sheet`, `rear_sheet`, `r34_sheet`, `front3q_low_sheet`, `top_sheet`,
+`M068_views.png`, `M068_spin.png`, `M068_mirror.png`, close-ups):
+- The read matches: an orange plank cabin on a pale two-course plinth with white corner blocks, a cream gable roof
+  with golden ties and crossed bargeboard tips, the door between tall posts under lintel and collar, two door lanterns
+  and the eave lantern glowing, the grey chimney behind the ridge in the front third, the banner at the back-left,
+  barrel A and the crate along −X, barrel B front-right, the stairs.
+- Close-ups: `junction_cu` (octagonal golden plate end, iron plate with rivets and golden peg, rafter, canvas, U tie,
+  close-up A), `base_cu` (two-tier corner block proud of the course, broken corner, post foot, offset joints,
+  close-up B), `underside_cu` (rafter and purlin grid, canvas underside in the cells, the chimney foot between the
+  trimmers, close-up C; no see-through canvas), `apex_cu` (crossed tips, golden saddle, ridge-beam end with its two
+  rope bands), `door_cu`, `inside_cu` (floor, open leaf, barred window from inside, roof underside), `door_walk` (the
+  proxy on the stairs, in the doorway, inside), `lantern_cu`, `chimney_cu`, `thumb_sheet` (plinth band, rows, door,
+  glow and banner still read at 180 × 150).
+- Spin (az 0 … 315, e 10): nothing floats, no see-through faces.
+- **Mirrored renders (decision 11):** `side_mirror_sheet`, `rear_mirror_sheet`, `r34_mirror_sheet`,
+  `top_mirror_sheet` (and `M068_mirror.png`) render the hero mirrored front-to-back (scale y −1), so the chimney sits
+  at the back and the banner at the front-left as those cells draw them. The whole hero is mirrored, so in these
+  renders the door gable is at the back too (the r34 mirror shows the door; the side mirror shows the door lanterns
+  at the back end): compare only the chimney and dressing in them.
+- **Recorded misses** (each ruled or decided): chimney and dressing mirrored against the side / rear / r34 / top cells
+  (decision 4); the f34's −X window near the front end (§3.8, centred); five plank rows against the side cell's four
+  (§3.13); the stone band 0.23 of the plate height against 0.29 (decision 6); props at kit size (§3.12); no apex rope
+  lashing (ruling 5, the golden saddle stands in); the leaf drawn closed (decision 3); no grass (decision 8); no back
+  gable lantern (decision 5).
+
+## Stage 2 — Optimisation and cleanup (2026-11-03)
+
+`build()` → `report()` problems list: **empty**.
+
+| Object | Tris | Size (studs) | Shells |
+| --- | --- | --- | --- |
+| `TimberCabin` (hero) | **7612** (ceiling 8000; plan 6200–7200) | 20.75 × 26.50 × 19.40 | 340 |
+| `TimberCabinRoofPanel` | 372 | 7.53 × 18.49 × 4.95 | 5 |
+| `TimberCabinRidgeBeam` | 280 | 1.36 × 21.50 × 1.67 | 5 |
+| `TimberCabinChimney` | 52 | 3.00 × 3.00 × 5.74 | 3 |
+| `TimberCabinBanner` | 584 | 1.46 × 4.10 × 15.80 | 16 |
+| `TimberCabinLantern` | 180 | 1.50 × 1.85 × 4.20 | 13 |
+| `TimberCabinWallPanel` | 408 | 14.40 × 1.10 × 8.09 | 12 |
+| `TimberCabinWindowWall` | 520 | 1.20 × 16.40 × 8.09 | 20 |
+| `TimberCabinDoorFrame` | 288 | 6.60 × 2.25 × 10.40 | 16 |
+| `TimberCabinGableFrame` | 152 | 17.38 × 1.80 × 7.24 | 7 |
+| `TimberCabinFloor` | 408 | 13.14 × 17.09 × 0.90 | 34 |
+| `TimberCabinStairs` | 96 | 4.80 × 3.20 × 1.73 | 8 |
+| `TimberCabinFoundation` | 260 | 1.64 × 15.83 × 2.60 | 16 |
+
+- Hero tris by kind: planks 2040 (100 shells), foundation blocks 832 (52), rope 800 (14: 8 ties, 4 ridge bands, 2 X
+  loops), canvas 536 (2), beams 520, lantern iron 396, barrels 408, iron 324, posts 288, pole 240, boards 168, crate
+  84 + corner plates 160, corner blocks 144, emblems 136, frames 96, banner 80, pegs 72, door 72, chimney 52, bars 48,
+  bungs 40, stones 40, glass 36. Over the 7200 plan by 412, under the 8000 ceiling; nothing from the never-cut list was
+  cut. If the main session wants the plan, the cut order (§4.3) starts with the rivets and the crate's inner braces.
+- **Every object:** non-manifold edges 0, **bowties (non-manifold verts) 0**, boundary 0, wire 0, loose 0, zero-area
+  0, n-gons 0 (triangulated), duplicate verts 0, normals outward, **winding errors 0** per shell (edge contiguity)
+  and **0 inward faces by ray parity** per shell, self-intersections 0, every shell closed with positive volume.
+- **Contact:** floating 0, unchained 0 in the hero and every part. Seats (hero, gap): post on corner block 0.003,
+  plates on posts 0.003, collar on lintel 0.003, lintel on door posts 0.003, header to lintel 0.007, bargeboards on
+  plates 0.003, saddle 0.003, ridge to bargeboard 0.025, rafter on plate 0.003, canvas on rafter 0.004, canvas on
+  ridge 0.008, tie to canvas / plate 0.005, bracket plate 0.005, peg 0.005, trimmer to rafter 0.002, chimney on both
+  trimmers 0.003, L1 hook / ring 0.010, L1 strap / plate 0.003, L2 strap / wall 0.029 (plank face jitter), crossarm /
+  pole 0.003, sleeve 0.003, banner 0.000, threshold beam 0.015, deck on sleeper 0.006, open leaf over the deck 0.020,
+  upper tread against the door posts 0.003.
+- **Buried 0.** Worst sinks: banner > banner 0.034 (emblem into the cloth), rope > wood 0.027 (ridge bands), wood >
+  wood 0.005, metal 0.005. **Pierce 0** (no edge crosses the canvas or banner twice). **Rope ends:** all touching.
+- **Thin corners:** hero 544 faces under 3° (long planks, plates and chamfers), smallest 0.38° (floor 0.3).
+- **Walk (§2.10):** the proxy walks from (0, −15) to (0, 0): surface profile ground → 0.87 (y −13.1) → 1.73 (−11.5) →
+  2.60 (−9.9); **risers 0.87 / 0.86 / 0.87**; min clearance **0.40** (to the plinth under the threshold); turning at
+  the centre 1.93. **Door clear 3.60 wide at every height, 7.00 tall** (lintel underside 9.60; header 9.603 in the
+  wall plane). Interior's lowest overhead member the plates, **7.82 above the floor**. Lantern bottoms L1 6.40, L2 /
+  L3 6.20.
+- **Placement:** floor top 2.60; plate tops 11.20; canvas top 16.00 (pitch 32°); canvas eave |x| 7.45; chimney top
+  19.40; walls 14.40 × 16.40; bargeboard tips z 17.64 (1.64 above the apex); ridge beam y ±10.75 (0.60 past the
+  bargeboards); lantern glass centres L1 (−8.30, −6.60, 7.40), L2 / L3 (±4.70, −9.10, 7.20); banner 2.11 wide, top
+  14.15, tip 6.40.
+- **Origin and stored points:** every object's origin at its bbox bottom centre, transforms applied. Hero
+  `m068_offset` (−0.074, 0.55, 0); `m068_centre` (0.074, −0.55, 2.60); `m068_door` threshold (0.074, −8.55, 2.60),
+  facing −Y; `m068_hinge` axis bottom (−1.726, −8.14, 2.62), closed yaw 0, open yaw 95; `m068_chimney` (2.274,
+  −4.05, 19.30) (all object-local). DoorFrame `m068_hinge` (−1.80, 0.817, 2.62); Lantern `m068_hang` (0, −0.174,
+  3.11) and `m068_mount` (0, 0.924, 3.825); Chimney `m068_flue` (0, 0, 5.641); Banner `m068_top` (0, −1.20, 15.80).
+
+## Stage 3 — UV (2026-11-03)
+
+Angle-based unwrap (`M.smart_uv`, margin 0.008), overlapping faces cut free and unwrapped again. Hero: 2815 islands,
+**0 overlaps, 0 flipped**, smallest island gap 0.016, density spread 0.999–1.001, conformal stretch p95 1.00. Every
+part: 0 overlaps, 0 flipped, gaps ≥ 0.0159. The exporter writes its own palette UVs.
+
+## Stage 4 — Materials, colour and texture (2026-11-03)
+
+**How it was measured.** `K.calibrate` on the studio dome for every key (targets in `TARGETS`), then the hero
+re-rendered at the sheet cameras with a transparent film (scratch renders in `<temp>\mr\`) so the alpha drops the
+paper, and every render measured with the §1.2 masks against the same cells of the sheet.
+
+**Calibrated palette** (written into `PALETTE`):
+
+| Key | Hex | Dome render (target) | Note |
+| --- | --- | --- | --- |
+| `m068_timber` | `#9E5A2B` | — | kept: the lit long wall lands within 12 of `#AB5C2A` (below); the dome's `#8A512A` darkens it to about 20 off |
+| `m068_timber_end` | `#C08024` | (`#F9A528`) | the dome's `#CA8B28` clipped R at 255; one step lower keeps cap tops under v 0.98 |
+| `m068_timber_deep` | `#653516` | `#783916` (`#7A3A16`) | dome value |
+| `m068_canvas` | `#EADEBF` | — | tuned on `side_sheet` (M064 ruling 1); the dome asked for a salmon `#FAC5AD`, rejected (§5.4 warning) |
+| `m068_canvas_deep` | `#BAA58F` | `#EBC8A3` (`#E6C8A2`) | dome value |
+| `m068_stone` | `#969295` | — | neutral-warm: the dome's `#858690` rendered B > R |
+| `m068_stone_light` | `#A39A9A` | dome `#9B9599` → `#C1B3B0` (`#C4B6B2`) | the dome value made warmer and a step lighter (the white corner blocks) |
+| `m068_stone_dark` | `#5E5C60` | (`#6C6A70`) | the dome's `#595A64` made warm |
+| `m068_soot` | `#2A2425` | `#2E2524` (`#2A2425`) | |
+| `m068_iron` | `#534E52` | dome `#524F56` → `#585255` (`#585255`) | the dome value with R ≥ B |
+| `m068_glow` | `#EEB406` | Neon (`#FBBD0A`) | |
+| `m068_rope` / `_deep` | `#F2C45E` / `#93712E` | (`#F4BD51`) / `#B6842E` (`#B8862E`) | rope raised from `#DDBB5A`: the f34 ties read 25 dark |
+| `m068_banner` | `#C2191C` | `#D51A1E` (`#D71A1E`) | unchanged |
+| `m068_cloth_white` | `#F0EAE4` | — | unchanged: the dome cannot reach white in its shaded half |
+
+**Chimney tones (by role):** the sheet draws the whole stack a mid grey darker than the plinth (f34 `#887F84`): the
+lower block half way to `stone_dark`, the upper block and the cap a quarter of the way (was `stone` / `stone_light`).
+
+**Re-measured on the final renders** (ours / sheet):
+
+| Region | Ours | Sheet | Δ (R, G, B) | Target |
+| --- | --- | --- | --- | --- |
+| Lit long-wall planks (`rear_sheet`, −X) | `#A35321` | side cell `#AB5C2A` | 8, 9, 9 | ± 12: **pass** |
+| f34 wood, whole cell | `#A85623` | `#90491F` | 24, 13, 4 | ± 15: **miss (lighting)** |
+| `side_sheet` canvas C | `#FEEBC3` | `#FEF0C9` | 0, 5, 6 | ± 10: **pass** |
+| f34 stone S | `#978D8B` | `#93898B` | 4, 4, 0 | ± 15: **pass** |
+| f34 glass Y | `#FFBE04` | `#FBBD0A` | 4, 1, 6 | ± 12: **pass** |
+| f34 rope R | `#F7BC4E` | `#FCC459` | 5, 8, 11 | ± 15: **pass** |
+| f34 banner B | `#CE1617` | `#D71A1E` | 9, 4, 7 | ± 12: **pass** |
+| iron (dome render) | `#585255` | close-up A `#5A575C` | 2, 5, 7 | ± 12: **pass** |
+
+- **Shares, f34:** W 61.5 (59 ± 8), C 19.1, S 13.5 (11 ± 4), K 1.8 (2–6, just under), B 1.8 (2–5, just under), Y 1.5
+  (0.8–2.4), R 0.7; W : H **1.294** (1.25 ± 0.08). **Side:** W 54.7 (53 ± 8), C 23.8 (20 ± 6), S 16.2 (15 ± 5), K 1.0
+  (4–9: under), Y 0.5 (0.5–1.5).
+- **Recorded misses, all lighting, not colour:** the sheet lights its f34 from the front-right (its −X wall is in shade,
+  `#88441C`, the front gable lit), the studio from the front-left, so our f34 wood median is lighter and the value
+  bands are 1 / 79 / 20 against 16 / 37 / 48; the studio key leaves the +X wall of `side_sheet` in shade (`#84441B`;
+  stone `#716D6F`), which is why the lit −X elevation (`rear_sheet`, the sheet's own "rear" cell draws the same planks
+  `#AE5E2A`) carries the wall calibration. Colour is never chosen by facing. The key-lit canvas slope clips to
+  `#FFFFE5` on the f34 / rear views (M064 ruling 1); judged on `side_sheet`. K is low because the sheet's K counts its
+  ink outlines; our dark pieces are the flue, window bars, the room seen through the openings and the lantern frames.
+- **Blends and texture:** per-piece Tint 0.025–0.05 on every plank, post, board and block (`_rt` seeds), `K.texture`
+  mottling per piece; plank-end bands one step toward `timber_deep` on planks over 2.0 long (seeded end), post feet
+  one step deeper, the door leaf one step deeper, the lower plinth course one step toward `stone_dark`, the canvas hem
+  in three steps toward `canvas_deep` along the eave and round the chimney cut; pale golden ends by member role (plate
+  and ridge end faces, bargeboard tips and feet, saddles, door-post caps, pole foot band, lintel ends). Hard edges only
+  where materials meet. Finishes: wood rough 0.85–0.9, canvas 0.95, stone 0.9, iron 0.55 / metal 0.4, glass Neon.
+- `K.check` (facing correlation and the kit checks) passes on every object.
+
+## Stage 5 — Lighting (2026-11-03)
+
+- The three lanterns' glass is `m068_glow` at **emission 1.0** (exports as Neon); `_glow_mats` previews it unshaded in
+  Blender as Roblox shows Neon. No light painted on walls or ground; no window glow (the sheet draws the window dark).
+- **Studio notes (Requires Manual Validation):** the timber should read orange-brown in daylight (not red, not flat
+  orange); the interior reads dark from outside through the door and windows by shadow; at night the door lanterns'
+  PointLights (range 12) light the stairs and door and the eave lantern's (range 10) the −X wall. The hero's `precise`
+  collision must leave the doorway and room open: walk a default character up the 0.87 risers, through the door,
+  turn round inside and walk out (fallback: collision `none` plus Studio colliders, §7).
+
+## Stage 6 — VFX (2026-11-03)
+
+- **Hero: 4 sockets** (export stats): 3 × `heat_glow` at the glass centres L1 (−8.30, −6.60, 7.40) range 10, L2 / L3
+  (±4.70, −9.10, 7.20) range 12, overridden to M064's steady halo (`_fx_spec`); 1 × `chimney_smoke` at the flue
+  (2.20, −3.50, 19.30), thin and pale (`SMOKE`, no light). Glow key on the hero: `m068_glow` only.
+- **Parts:** `TimberCabinLantern` 1 × `heat_glow` (range 12) at its glass; `TimberCabinChimney` 1 × `chimney_smoke`
+  at its flue. Every other part 0.
+- The renders realise the sockets (halo and smoke puffs show in the views, spin and close-ups).
+
+**Left for the verifier / main session:** the hero is 412 tris over the 7200 plan (under the 8000 ceiling); the f34
+wood median and value bands, the side view's shaded +X wall and the low K share are lighting misses recorded above;
+the mirrored renders mirror the door as well.
+
+## Stage 7 verification (round 1)
+
+Independent verifier, read-only, background Blender on a copy of the kit file taken after the main session built 068
+into it (`build()` not called, nothing saved). Every number below was re-measured with the verifier's own bmesh / BVH /
+ray-parity / raster code, and every view was rendered by the verifier into `<temp>\v068\r\` and set beside the matching
+sheet cell (mirrored cells beside a front-to-back mirrored render, decision 11).
+
+**Result: FAIL, 7/10.** One blocker: the walls and gable infill leak light through every plank joint, so the inside of
+the walk-in hut shows bright slits. Everything else is clean or a recorded ruling.
+
+### Technical (all objects)
+
+| Object | Tris | Size (studs) | Shells | Floating / unchained | Deepest sink |
+| --- | --- | --- | --- | --- | --- |
+| `TimberCabin` | 7612 / 8000 | 20.750 × 26.500 × 19.400 | 340 | 0 / 0 | 0.041 (banner hem in its sleeve) |
+| `…RoofPanel` | 372 | 7.534 × 18.494 × 4.949 | 5 | 0 / 0 | 0.000 |
+| `…RidgeBeam` | 280 | 1.360 × 21.500 × 1.674 | 5 | 0 / 0 | 0.020 (rope bands) |
+| `…Chimney` | 52 | 3.000 × 3.000 × 5.741 | 3 | 0 / 0 | 0.000 |
+| `…Banner` | 584 | 1.456 × 4.100 × 15.800 | 16 | 0 / 0 | 0.041 (hem), X lashing 0.029 |
+| `…Lantern` | 180 | 1.500 × 1.847 × 4.197 | 13 | 0 / 0 | 0.005 |
+| `…WallPanel` | 408 | 14.400 × 1.100 × 8.094 | 12 | 0 / 0 | 0.000 |
+| `…WindowWall` | 520 | 1.203 × 16.400 × 8.094 | 20 | 0 / 0 | 0.000 |
+| `…DoorFrame` | 288 | 6.600 × 2.246 × 10.397 | 16 | 0 / 0 | 0.000 |
+| `…GableFrame` | 152 | 17.375 × 1.800 × 7.238 | 7 | 0 / 0 | 0.000 |
+| `…Floor` | 408 | 13.140 × 17.090 × 0.900 | 34 | 0 / 0 | 0.000 |
+| `…Stairs` | 96 | 4.800 × 3.197 × 1.730 | 8 | 0 / 0 | 0.000 |
+| `…Foundation` | 260 | 1.640 × 15.830 × 2.600 | 16 | 0 / 0 | 0.000 |
+
+- Thirteen objects in `M068 Timber Hut`, names as §8. Every object: 0 non-manifold edges, 0 boundary, 0 wire, 0 loose
+  verts, **0 bowtie verts**, 0 zero-area faces, 0 n-gons (all triangles), 0 duplicate verts, **0 winding errors** (edge
+  direction test), 0 negative-volume shells, **0 faces failing the ray-parity test**. Smallest corner 0.377° (hero and
+  ridge beam; 544 hero corners under 3°, ruling M064-2 fails only under 0.3°). Origin at the bbox bottom centre on every
+  object (error 0.0000 on x, y and z), rotation 0, scale 1, no modifiers, no custom normals, no unused material slots.
+- Contact (gap ≤ 0.03, chained to the ground): every shell of every object chains to the ground. Bury (sample points
+  inside another shell by three-ray parity, depth to its surface): nothing over 0.05; the deepest are the stated seats
+  (banner hem 0.041, X lashing 0.029, ridge bands 0.020, emblems, glass, rivets ≤ 0.005).
+- Pierce (edges of one shell crossing another's surface twice): **0 through either canvas slab.** The 75 hero hits are
+  all seats or coplanar touches; a 0.02-grid overlap volume on each pair gives at most 0.012 depth (lashing on the pole,
+  banner in the sleeve) and 0.0006 for the open leaf against the front-wall plank ends.
+- Canvas: 0.120 thick everywhere (2912 samples), sag 0.000–0.078 below the pitch plane, cut clear round the chimney.
+- UV: one `UVMap` per object; 0 overlapping pixels (1024² raster), 0 flipped faces, all islands inside 0.008–0.992.
+- Colour by role, not facing: per-material correlation of the Tint value with the face normal ≤ 0.035 on every big
+  material (timber, canvas, stone, rope); the hero-wide luminance against x / y / z / |z| is 0.00 / 0.00 / 0.00 / 0.03.
+- Sockets: hero 3 × `heat_glow` at L1 (−8.30, −6.60, 7.40) range 10 and L2 / L3 (±4.70, −9.10, 7.20) range 12 with the
+  M064 halo, 1 × `chimney_smoke` at (2.20, −3.50, 19.30) thin and pale, no light; Lantern part 1 `heat_glow`; Chimney
+  part 1 `chimney_smoke`; others 0. Glow key `m068_glow` only, spec emission 1.0 (Neon).
+- Stored points (object space + `m068_offset` (−0.074, 0.55, 0)): centre (0, 0, 2.60); door threshold (0, −8.00, 2.60)
+  facing −Y; hinge axis (−1.80, −7.59, 2.62), closed 0, open 95; chimney flue (2.20, −3.50, 19.30). All correct.
+
+### Sizes and walkability (build frame)
+
+- Floor: every deck and threshold plank top at 2.600. Walls 14.40 × 16.40 (posts' outer faces), plate tops 11.20,
+  canvas ridge 16.00 (pitch 32°, ruling 1), canvas eave |x| 7.45, chimney top 19.40, bargeboard tips 17.64 (1.64 above
+  the apex), ridge-beam ends |y| 10.75 (0.60 past the bargeboards). Planks 0.38–0.40 thick, rows 1.612 tall; posts
+  1.10; bargeboards 0.90 wide. Lantern glass 1.00 × 1.61, centres L1 z 7.40, L2 / L3 z 7.20.
+- Side fractions (chimney top 19.40): plate 0.577, ridge 0.825, wall length 0.845, roof with bargeboards 1.046, window
+  opening z 5.54–8.78 centred at y 0. All in tolerance.
+- **Walk** (own proxy, 2 × 1 body to 4.4 and 1.1 head to 5.5, stepping on the highest surface under its footprint):
+  ground → 0.87 (y −13.15) → 1.73 (−11.55) → 2.60 (−9.95), **risers 0.87 / 0.86 / 0.87**. Above the 1.0 step band
+  the proxy touches nothing from (0, −15) to (0, 0); 0 box intersections. **Door clear 3.60 at every height, 7.00
+  tall** (lintel underside 9.60). Turning at the centre (24 yaws): no intersection, 0.10 clear. Interior lowest overhead
+  member the plates / collars at 10.40 = **7.80 above the floor**. Lantern bottoms L1 6.40, L2 / L3 6.20; door
+  lanterns 1.10 off the door posts. The open leaf stands at x −1.80 … −2.40, y −7.60 … −4.04, out of the path.
+- Hero 20.75 × 26.50 × 19.40 against the builder's 20.7 ± 0.4 × 26.5 ± 0.5 × 19.4 (spec §2.11's 20.6 × 26.1 before
+  the ruled pole move). Hero 7612 tris: under the 8000 ceiling, 412 over the 7200 plan.
+
+### Views against the sheet (masks of §1.2; sheet → ours)
+
+| View | W : H | Wood median | lit / mid / shade % | K % | S % |
+| --- | --- | --- | --- | --- | --- |
+| f34 (−40, 15) | 1.322 (1.245 without far grass) → **1.295** | `#90491F` → `#A85624` | 16/37/48 → 1/80/19 | 2.5 → 1.9 | 11.1 → 13.6 |
+| side (90, 3) | 1.215 → 1.237 | `#A65927` → `#84441C` (+X in shade) | 12/55/33 → 0/18/82 | 4.2 → **1.1** | 14.9 → 16.1 |
+| rear (−90, 3) | 1.301 → 1.352 | `#AA5A26` → `#A35322` | 11/56/33 → 0/77/23 | 3.2 → 1.4 | 13.5 → 12.1 |
+| r34 (−135, 15) | 1.359 → 1.077 (content only) | `#A35421` → `#9E5324` | 11/53/36 → 0/81/19 | 2.1 → 0.7 | 13.5 → 15.1 |
+| front3q_low (−45, 5) | 1.322 → 1.414 (recorded) | `#8E461A` → `#A55523` | 12/39/49 → 1/75/25 | 2.6 → 1.9 | 9.7 → 12.7 |
+| top | 1.209 → 1.297 (turned 90°, content only) | `#A95E26` → `#C4672C` | — | 2.2 → 0.7 | 8.0 → 3.7 |
+
+- Per material (camera rays mapped to faces, f34 unless stated; sheet in brackets): timber `#AB5824`, lit −X wall
+  (`rear_sheet`) `#A45422` (side cell planks `#AB5C2A`, Δ 7, 8, 8: pass); canvas side `#FFF6CD` (`#FDF0C9`, pass;
+  the key-lit slope clips to `#FFFFE5`, M064 ruling 1); course `#918886` / `#A69C99` (`#938A8E`), corner blocks
+  `#B4A49D`, lit `#D1BFB7` (`#AD9E9B` / `#D0BEB9`: lighter than the course, pass); iron `#484141` (`#53484A`, pass);
+  glass `#FFBE03` (`#FBBD0A`, pass); banner `#CE1616` (`#D71A1E`, pass); rope `#FFD75A` (`#FBCA58`, pass); pale ends
+  `#D9861F`, lit `#F59925` (caps `#F9A528`, pass); emblem `#FFF5E4`. Hues stay orange (22–25°), stone R ≥ B.
+- **f34:** the read matches: plank cabin on a pale two-course plinth with lighter corner blocks, cream gable roof with
+  golden ties, crossed bargeboard tips with the golden ridge-beam end, door between tall posts under lintel and
+  collar, the eave lantern by the front-left corner and the two door lanterns glowing, the chimney behind the ridge in
+  the front third, banner back-left, barrel A and the crate along −X, barrel B front-right, the two-tread stairs. W : H
+  in tolerance. The wood median, value bands and the lit / shade quartiles miss (studio key from the front-left, the
+  sheet's from the front-right; recorded at stage 4).
+- **side / rear:** heights, plinth, centred barred window with frame and sill, four ties per eave, bargeboards rising
+  at both ends; chimney and dressing mirrored (decision 4; the mirrored renders put them where the cells draw them).
+  The window reads white, not dark (minor 1).
+- **r34 / front3q_low / top:** content as the cells, with the recorded misses (no back lantern, dressing mirrored, door
+  on the gable, grass, five rows). The r34 sheet camera sits nearer the −X wall than (−135, 15), so its W : H is not
+  comparable (content only).
+- **Close-ups:** B: two-tier corner block proud of the two courses, broken corner, post foot (match). C: rafter and
+  purlin grid, canvas in the cells, the chimney foot between the trimmers, no see-through canvas (match; the underside
+  renders khaki-grey in the studio's shade against the sheet's warm `#C5A37F`). A: octagonal golden plate end, iron
+  plate, rivets and peg are present but sit under the bargeboard heel (minor 3). Apex: crossed tips, saddle, pitched
+  golden ridge-beam end with two rope turns.
+- **Parts against the exploded cell:** roof slab with ties, ridge beam with pale ends and bands, chimney with cap and
+  flue, banner set, lantern on its bracket, plank wall between posts, window wall, door frame with the closed leaf,
+  strap hinges and ring, gable frame, floor on short feet with the threshold tongue, two-tread stairs, foundation run
+  with its corner block: all read as drawn.
+- Spin (eight azimuths, e 10): nothing floats, no see-through canvas. Thumb (180 × 150): plinth, rows, door, glow and
+  banner read.
+
+### Blockers
+
+1. **Light leaks through every wall joint and the gable infill (shows from inside).** Horizontal rays from inside escape
+   through all four walls at every row seam (170 / 174 / 193 / 98 escapes on R / L / B / F at the four seam heights),
+   and `<temp>\v068\r\v_inside_wallL.png` / `v_inside_gable_B.png` show bright lines along the seams and joints. The gaps
+   go straight through the 0.40 planks:
+   - row seams 0.005 (rows end at z 3.915 / 5.535 / 7.155 / 8.775 and the next starts 0.005 higher);
+   - butt joints 0.04 (long walls y −2.62 / −2.58 and 3.38 / 3.42; back wall x −2.02 / −1.98 and 2.58 / 2.62);
+   - gable boards 0.010 at x ±0.50 and 0.030 at ±1.46, ±2.43, ±3.39, ±4.36, ±5.33 (434 escapes below the canvas line);
+   - the outer gable boards' edges (|x| 6.28) to the plates' inner faces (6.30): 0.02, z 11.2 … 11.9.
+
+   §2.4 says "never a step that opens a seam to see through", and pitfall 3 asks that "the inside shows wood". Fix:
+   close every through-gap on the inner face and keep the seam read from the outer chamfers. Make each row's bottom
+   meet the row below (0 gap; the 0.10 V-chamfers still draw the dark seam), and make butt-joint ends touch. Make the
+   gable boards touch edge to edge, or back each joint with a hidden 0.20 batten inside the wall plane. Run the outer
+   boards to the plate faces. Then re-run the inside escape scan (target 0 escapes except the door and the two windows)
+   and the bury report (touching faces, no sinks).
+
+### Minors
+
+1. **Windows read as white holes in the side and rear elevations (shows).** Both windows are real openings at the same
+   y and z, so square-on views look straight through the hut; the sheet draws them dark (`#201717`). Side K 1.1 against
+   the §1.2 tolerance 4–9 (the window alone is about 2.6 % on the sheet); f34 K 1.9 and B 1.9 just under their 2–6 and
+   2–5 floors. A ruling is needed if it should change: for example, a closed inner shutter or a dark board inside one
+   window, or offset the two windows a little along Y so they don't line up.
+2. **No bargeboard cleats (shows slightly).** §2.6 asks for two cleats per bargeboard, and the top cell and f34 draw
+   them; the build has none, and the stage notes don't record the cut. The hero has 388 tris of headroom: about 96 tris
+   for eight cleats, or record the cut.
+3. **Close-up A's projecting beam end reads weakly (shows slightly).** The plate ends (|y| 10.20) stop only 0.05 past
+   the bargeboards' outer faces (10.15). The heel sits over the end, so the golden octagon, iron plate and peg are
+   tucked under it in the f34 and `junction_cu`. The sheet's eave-beam ends stand clear of the gable with the plate on
+   their side. This follows ruling 3. If wanted, the plates could run to about |y| 10.8 with the bracket plate and peg
+   moved out with them.
+4. **f34 value spread (shows; recorded at stage 4).** Wood lit / mid / shade 1/80/19 against 16/37/48. The median is 24
+   off in R and the quartiles 30–37 off: the studio lights the −X wall that the sheet leaves in shade. Colour is by
+   role, not by facing.
+5. **Canvas seam grid faint (shows on top and f34).** The 0.078 sag gives only soft shading. The top cell draws a clear
+   5 × 2 seam grid per slope (§3.17 decided no seam paint). The key-lit slope clips (M064 ruling 1).
+6. **Chimney notches barely read (shows slightly).** The 0.10 step at the joint is lost at sheet distance. The sheet's
+   stack shows two blocks with a notched joint and a dark flue cap.
+7. **Floor gaps (shows slightly from inside).** The 0.06 deck seams and a 0.03 slot between the threshold planks
+   (y −7.62) and the deck (−7.59) across the doorway show the lit studio ground below in `inside_cu`. In Studio the
+   space under the floor is enclosed by the plinth, so it should read dark. Check it during the walk-in validation.
+8. **Hinge straps 0.05 into the door's clear width (does not show).** At x −1.748 inside the room, behind the wall
+   plane; the doorway and walk path are unaffected.
+9. **Budget (does not show).** 7612 is 412 over the 7200 plan and under the 8000 ceiling (decision 2).
+10. **Recorded rulings, not scored:** chimney and dressing mirrored against the side / rear / r34 / top cells, the
+    window centred, five rows, the 0.23 plinth band, kit-size props, no apex lashing, the leaf open, no grass, no back
+    lantern, pitch 32°, chimney y −3.50 (ruling 4 said −3.45; moved 0.05 for rafter clearance at stage 1).
+
+## Main session after round 1 (2026-11-03)
+
+Round 1 failed on the see-through joints. The fix round covers:
+1. **Blocker: close every joint.**
+   - Plank rows meet with no gap, and butt-joint ends touch. The 0.10 chamfers still draw the dark seam outside.
+   - Gable boards touch edge to edge, and the outer boards run to the plate faces.
+   - After the fix, an inside escape scan may find openings only at the door and the two windows.
+2. **Floor:** close the deck seams and the 0.03 threshold slot the same way, so no ground shows from inside.
+3. **Windows read dark (minor 1):** a closed inner shutter of dark boards 0.30 behind the bars, on both windows. The sheet
+   draws the openings dark, and the shutter keeps square-on views from seeing through the hut.
+4. **Bargeboard cleats (minor 2):** add the two cleats per board that the spec asks for (about 96 tris; the hero stays
+   under 8000).
+5. **Eave-beam ends (minor 3):** run the plates out to about |y| 10.8, so the plate end, iron plate and peg project past
+   the bargeboard heel as in close-up A, if that clears every other part. Otherwise record it.
+
+Minors 4–10 stay recorded and are not part of the fix.
+
+## Fixes after round 1
+
+Fix modeller, background Blender (work file `art/blender/assets/kit/wip/M068.blend`, saved after the good build). Only
+`m068.py` changed. Every change is in the builder and was checked by rebuilding with `build()`.
+
+**1. Closed joints (blocker).** The shared overlap is `OVL` = 0.002. Neighbours sink that far into each other, so no
+seam goes straight through and no vertices coincide (an exact touch would leave duplicate verts and coplanar end caps).
+- Plank rows overlap 0.004 at the back (`row_z`). The 0.10 outer chamfers still draw the dark V seams. The top row runs
+  0.002 into the plate (end walls: under the gable boards).
+- Butt joints: the plank ends overlap 0.004 (long walls y −2.60 / +3.40, back wall x −2.00 / +2.60). The door header
+  runs 0.002 into the top rows' ends at the jambs.
+- Corner posts sink 0.002 into the corner blocks and the plates. This closes the 0.003 slits under the feet and over the
+  tops.
+- Gable infill (rewritten):
+  - The boards overlap 0.004 edge to edge. Every other board is 0.01 thinner on both faces, so no faces are coplanar
+    and the boards still read.
+  - Board bottoms sit 0.004 into the top row and the posts. Board tops sit 0.002 into the canvas underside.
+  - A board under the ridge beam runs into its chamfered underside.
+  - A new apex block runs from the ridge's pitched top into the canvas, with its peak in the slabs' apex seam. Its fan
+    is explicit, so no edge crosses a slab twice. It closes the slit over the ridge, which ran out past the gables.
+  - The outer boards wrap the plate's inner chamfers and face, then run over the plate top onto the eave blocking.
+- **End-bay sag 0.05 (`SAG_END`, was 0.08)** at the y ±7.535 nodes only. At 0.08 the sag over the gable plane would
+  have sunk the boards' straight tops 0.055 into the canvas (over BURY). Now the deepest sink is 0.039.
+- **Eave blocking (new, `eave_block`).** One timber on each plate top, x 6.85–7.08, between the gable planes, running
+  0.002 into the plate and the canvas. It closes the slit between plate top and canvas: rays from the roof space left
+  through it, and the inside scan found it. The rafter tails now stop against it at x 6.848, still seated on the
+  plate.
+- **Chimney.** The 0.03 ring between the canvas cut and the stack let light in. The cut is now 0.002 clear, under a
+  flashing collar on the canvas: 0.12 past the stack, 0.10 tall, mortar grey, 0.002 into the canvas and the stack,
+  32 tris. An exact-size cut was tried first and dropped: its rim faces were coplanar with the stack, and the pierce
+  report flagged 7 edges.
+
+**2. Floor.**
+- The deck planks run 0.002 into the walls' inner faces and sit 0.002 into the underlay and courses.
+- The two outer planks are notched round the corner posts and blocks (8-sided, corner at 6.112 / 7.112). They now cover
+  the 0.8 × 0.5 corner holes, which looked down to the ground.
+- New dark underlay board (`floor_under`) at x ±5.40, z 2.20–2.30, running 0.002 into the end courses. It shows in the
+  0.06 deck seams as the dark gap and stops every ray. The sleepers sit under it; in the Floor part, the inner feet do.
+- The threshold planks run 0.002 onto the deck (the 0.03 slot is gone).
+
+**3. Inner shutters (minor 1).**
+- Both windows have a closed shutter of two dark board leaves (`timber_deep` half way to soot) against the planks'
+  inner face, 0.20 past the opening all round. The second leaf is set 0.01 back and is thicker.
+- The windows now read dark in the side and rear views. Square-on views no longer see through the hut.
+- WindowWall part: 544 tris.
+
+**4. Bargeboard cleats (minor 2).**
+- Two per board, eight in all: 0.40 along the board × 0.30 × 1.40, at 1/3 and 2/3 of the way from the foot to the
+  apex, 96 tris.
+- Each lies across the board's top face, 0.002 into it, and overhangs both faces by 0.25. The inner end crosses the
+  canvas edge, as in the top cell.
+- The cleats are 0.80 above the canvas, because the board is that proud of it (ruling 3), so they cannot rest on the
+  canvas. Light timber.
+
+**5. Eave-beam ends (minor 3).**
+- The plates now run to |y| 10.80, with the iron bracket plates and pegs at |y| 10.10.
+- The octagonal end, iron plate and peg project 0.65 past the bargeboard heel, as in close-up A (`junction_cu`).
+- Nothing else is within reach: bargeboard feet over 0.1 off the peg, banner pole 1.9 away.
+
+**Inside escape scan (`escape_report`, in `build()`'s report; problems if any ray leaves other than by the door).**
+- Rays in 320 directions from 602 points inside the room and up into the roof space.
+- Lower-hemisphere rays from 195 points 0.05 over the floor.
+- Seam rays through each wall, both gables and the floor along every vertex coordinate in that plane ± 0.0007, square
+  to the plane and slanted along the seam.
+- Upper-hemisphere rays from a 0.04 grid just under the canvas round the chimney cut.
+- Round-1 model, same scan: 35,424 rays out (walls 16,278, floor 8,702, windows 6,650, gables 3,603, eaves 191).
+- **Now: 823,020 rays, 0 out except the door.**
+
+**Numbers (`build()`, problems list empty).**
+
+| Object | Tris | Shells |
+| --- | --- | --- |
+| `TimberCabin` | **7976** / 8000 | 358 |
+| `…RoofPanel` | 372 | 5 |
+| `…RidgeBeam` | 280 | 5 |
+| `…Chimney` | 84 (collar) | 4 |
+| `…Banner` | 584 | 16 |
+| `…Lantern` | 180 | 13 |
+| `…WallPanel` | 408 | 12 |
+| `…WindowWall` | 544 | 22 |
+| `…DoorFrame` | 288 | 16 |
+| `…GableFrame` | 200 (cleats) | 11 |
+| `…Floor` | 452 | 35 |
+| `…Stairs` | 96 | 8 |
+| `…Foundation` | 260 | 16 |
+
+- **Every object:** 0 non-manifold edges, 0 bowties, 0 boundary edges, 0 duplicate verts, 0 winding errors, 0 ray-parity
+  inward faces, normals outward. Floating 0, unchained 0, buried 0, pierce 0, rope ends all touching. UV: 0 overlaps,
+  0 flipped, gaps ≥ 0.016.
+- **Deepest sinks:** wood > canvas 0.039 (gable boards in the end-bay sag), banner 0.034, rope > wood 0.027, everything
+  else ≤ 0.005.
+- **Walk:**
+  - risers 0.87 / 0.86 / 0.87;
+  - walk clearance 0.40;
+  - turning 1.95;
+  - door 3.60 × 7.00;
+  - overhead 7.82 above the floor.
+- Hero 20.75 × 26.50 × 19.40.
+- Sockets unchanged: hero 3 `heat_glow` + 1 `chimney_smoke`.
+- The hero is 776 over the 7200 plan, 24 under the 8000 ceiling (decision 2). The next cut, if one is wanted, is the
+  eight rivets (96).
+
+**Renders (re-rendered by `build()`).**
+- `inside_cu`: no bright seams in the walls, gable or floor; the floor seams read dark; the shutter is dark.
+- `underside_cu`: the shutter and the chimney foot.
+- `side_sheet` / `rear_sheet`: dark barred windows.
+- `apex_cu`: the cleats on both boards.
+- `junction_cu`: the projecting plate end with its iron plate and peg.
+- `chimney_cu`: the collar.
+
+## Main session after the fix round (2026-11-03)
+
+The extra pieces the fix modeller added to close leaks are accepted: eave blocking on the plate tops, the mortar-grey
+chimney collar, the end bays sagging 0.05, and two-leaf shutters. The hero at 7976 is under the 8000 ceiling (decision
+2), so no rivets are cut. Round 2 goes to a fresh verifier.
