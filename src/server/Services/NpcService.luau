@@ -32,11 +32,10 @@ local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local Signal = require(ReplicatedStorage.Shared.Core.Signal)
 local WildlifeRules = require(ReplicatedStorage.Shared.Enemies.WildlifeRules)
 local WorldState = require(ReplicatedStorage.Shared.World.WorldState)
-local DownedService = require(script.Parent.DownedService)
 local DropService = require(script.Parent.DropService)
+local InteractionService = require(script.Parent.InteractionService)
 local ModifierService = require(script.Parent.ModifierService)
 local SafeZoneService = require(script.Parent.SafeZoneService)
-local WorldAdmissionService = require(script.Parent.WorldAdmissionService)
 
 local NpcService = {}
 
@@ -322,12 +321,7 @@ end
 
 -- Living, at-risk, standing players outside safe zones can be hunted.
 function NpcService.CanTarget(player: Player): boolean
-	local humanoid = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
-	return humanoid ~= nil
-		and humanoid.Health > 0
-		and WorldAdmissionService.IsAtRisk(player)
-		and not DownedService.IsDowned(player)
-		and not inSafeZone(player)
+	return InteractionService.CanAct(player) and not inSafeZone(player)
 end
 local canTarget = NpcService.CanTarget
 

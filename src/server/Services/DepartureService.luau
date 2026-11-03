@@ -19,7 +19,7 @@ local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local ProfileSchema = require(ReplicatedStorage.Shared.Data.ProfileSchema)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local Validation = require(ReplicatedStorage.Shared.Data.Validation)
-local DownedService = require(script.Parent.DownedService)
+local InteractionService = require(script.Parent.InteractionService)
 local InventoryService = require(script.Parent.InventoryService)
 local ProfileService = require(script.Parent.ProfileService)
 local WorldAdmissionService = require(script.Parent.WorldAdmissionService)
@@ -52,12 +52,8 @@ end
 
 local function canLoot(player: Player, body): boolean
 	local root = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
-	local humanoid = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
 	return root ~= nil
-		and humanoid ~= nil
-		and humanoid.Health > 0
-		and WorldAdmissionService.IsAtRisk(player)
-		and not DownedService.IsDowned(player)
+		and InteractionService.CanAct(player)
 		and (root.Position - body.part.Position).Magnitude <= DepartureService.LOOT_RANGE
 end
 

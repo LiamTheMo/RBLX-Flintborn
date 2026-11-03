@@ -26,13 +26,12 @@ local SiegeRules = require(ReplicatedStorage.Shared.Combat.SiegeRules)
 local AntiExploitService = require(script.Parent.AntiExploitService)
 local BuildingService = require(script.Parent.BuildingService)
 local CombatService = require(script.Parent.CombatService)
-local DownedService = require(script.Parent.DownedService)
 local ExtractionService = require(script.Parent.ExtractionService)
+local InteractionService = require(script.Parent.InteractionService)
 local InventoryService = require(script.Parent.InventoryService)
 local NpcService = require(script.Parent.NpcService)
 local ProjectileService = require(script.Parent.ProjectileService)
 local SafeZoneService = require(script.Parent.SafeZoneService)
-local WorldAdmissionService = require(script.Parent.WorldAdmissionService)
 
 local SiegeService = {}
 
@@ -76,14 +75,6 @@ local function characters()
 		end
 	end
 	return list
-end
-
-local function canAct(player: Player): boolean
-	local humanoid = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
-	return WorldAdmissionService.IsAtRisk(player)
-		and humanoid ~= nil
-		and humanoid.Health > 0
-		and not DownedService.IsDowned(player)
 end
 
 local function validDirection(direction: any): Vector3?
@@ -219,7 +210,7 @@ local function throw(player: Player, aim: Vector3): (boolean, string?)
 	local character = player.Character
 	local head = character and character:FindFirstChild("Head")
 	local root = character and character:FindFirstChild("HumanoidRootPart")
-	if head == nil or root == nil or not canAct(player) then
+	if head == nil or root == nil or not InteractionService.CanAct(player) then
 		return false, "NotInRun"
 	end
 	local held = InventoryService.Equipped(player)
@@ -346,7 +337,7 @@ local function placeCharge(player: Player, aim: Vector3): (boolean, string?)
 	local character = player.Character
 	local head = character and character:FindFirstChild("Head")
 	local root = character and character:FindFirstChild("HumanoidRootPart")
-	if head == nil or root == nil or not canAct(player) then
+	if head == nil or root == nil or not InteractionService.CanAct(player) then
 		return false, "NotInRun"
 	end
 	local validated = AntiExploitService.ValidatedPosition(player)

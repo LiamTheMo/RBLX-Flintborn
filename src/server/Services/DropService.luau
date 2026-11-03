@@ -25,10 +25,9 @@ local ProfileSchema = require(ReplicatedStorage.Shared.Data.ProfileSchema)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local Signal = require(ReplicatedStorage.Shared.Core.Signal)
 local AntiExploitService = require(script.Parent.AntiExploitService)
-local DownedService = require(script.Parent.DownedService)
+local InteractionService = require(script.Parent.InteractionService)
 local InventoryService = require(script.Parent.InventoryService)
 local ProfileService = require(script.Parent.ProfileService)
-local WorldAdmissionService = require(script.Parent.WorldAdmissionService)
 
 local DropService = {}
 
@@ -38,14 +37,6 @@ DropService.Released = Signal.new()
 DropService.ORDINARY_SECONDS = GameConstants.CORPSE_SECONDS
 
 local drops = {}
-
-local function canAct(player: Player): boolean
-	local humanoid = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
-	return WorldAdmissionService.IsAtRisk(player)
-		and humanoid ~= nil
-		and humanoid.Health > 0
-		and not DownedService.IsDowned(player)
-end
 
 local function itemName(item): string
 	local def = ItemCatalog.Get(item.catalogId)
@@ -174,7 +165,7 @@ end
 -- `walked` is a walk-over pickup of a gathered drop: it fails silently.
 function pickUp(player: Player, id: string, walked: boolean)
 	local drop = drops[id]
-	if drop == nil or not canAct(player) then
+	if drop == nil or not InteractionService.CanAct(player) then
 		return
 	end
 	if drop.rules then
@@ -221,7 +212,7 @@ local function dropItem(player: Player, area: any, index: any)
 	if type(area) ~= "string" or type(index) ~= "number" then
 		return false, "BadRequest"
 	end
-	if not canAct(player) then
+	if not InteractionService.CanAct(player) then
 		return false, "NotInRun"
 	end
 	local root = player.Character and player.Character:FindFirstChild("HumanoidRootPart")

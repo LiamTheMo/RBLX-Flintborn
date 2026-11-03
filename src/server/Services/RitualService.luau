@@ -22,9 +22,9 @@ local PropModels = require(ReplicatedStorage.Shared.Visuals.PropModels)
 local WorldState = require(ReplicatedStorage.Shared.World.WorldState)
 local AnnouncementService = require(script.Parent.AnnouncementService)
 local BossService = require(script.Parent.BossService)
-local CacheService = require(script.Parent.CacheService)
 local CombatService = require(script.Parent.CombatService)
 local DropService = require(script.Parent.DropService)
+local InteractionService = require(script.Parent.InteractionService)
 local InventoryService = require(script.Parent.InventoryService)
 
 local RitualService = {}
@@ -95,7 +95,7 @@ local function begin(player: Player, site)
 		InventoryService.Notify(player, "This altar is already in use.")
 		return
 	end
-	if not CacheService.CanInteract(player, site.part, 12) then
+	if not InteractionService.CanInteract(player, site.part, 12) then
 		return
 	end
 	-- Consumed once, here, on the server.
@@ -118,7 +118,7 @@ local function begin(player: Player, site)
 			if site.summoner ~= player then
 				return
 			end
-			if not CacheService.CanInteract(player, site.part, RitualService.STAY_RADIUS) then
+			if not InteractionService.CanInteract(player, site.part, RitualService.STAY_RADIUS) then
 				RitualService.Interrupt(player)
 				return
 			end

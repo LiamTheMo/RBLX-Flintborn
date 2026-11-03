@@ -32,6 +32,7 @@ local CacheService = require(script.Parent.CacheService)
 local DropService = require(script.Parent.DropService)
 local ExtractionService = require(script.Parent.ExtractionService)
 local GuardianService = require(script.Parent.GuardianService)
+local InteractionService = require(script.Parent.InteractionService)
 local InventoryService = require(script.Parent.InventoryService)
 local MeteorService = require(script.Parent.MeteorService)
 local ModifierService = require(script.Parent.ModifierService)
@@ -235,7 +236,7 @@ local function spawnNode(event, loot, position: Vector3, minRank: number?, onCla
 	end)
 	local site = {}
 	prompt.Triggered:Connect(function(player)
-		if not CacheService.CanInteract(player, part, 10) or notice(player) then
+		if not InteractionService.CanInteract(player, part, 10) or notice(player) then
 			return
 		end
 		if EventRules.Claim(site) then
