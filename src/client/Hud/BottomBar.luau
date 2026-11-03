@@ -10,7 +10,6 @@
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local HudModel = require(ReplicatedStorage.Shared.UI.HudModel)
 local LobbyHudModel = require(ReplicatedStorage.Shared.UI.LobbyHudModel)
 local Signal = require(ReplicatedStorage.Shared.Core.Signal)
 local Kit = require(script.Parent.Kit)
@@ -18,10 +17,6 @@ local Layout = require(script.Parent.Layout)
 
 local BottomBar = {}
 BottomBar.__index = BottomBar
-
--- Beside the full bar at the level cap (short, so it stays over the hotbar;
--- the Progress window explains rebirth).
-BottomBar.MAX_TEXT = "Max level"
 
 function BottomBar.new(parent: Instance, layout)
 	local cfg = Layout.Section(layout, "bottom")
@@ -112,14 +107,14 @@ end
 
 -- view: the progression snapshot {level, xp, xpToNext}; no xpToNext = level cap.
 function BottomBar:SetProgress(view, instant: boolean?)
+	-- At the cap: the real level ("LV. 100", not "MAX") and "Max level" beside
+	-- the full bar (short, so it stays over the hotbar; the Progress window
+	-- explains rebirth).
 	local progress = LobbyHudModel.Progress(view)
-	local isMax = type(view) == "table" and view.xpToNext == nil
 	local levelledUp = self.level ~= nil and type(view) == "table" and (view.level or 0) > self.level
 	self.level = if type(view) == "table" then view.level else nil
-	-- The real level at the cap too ("LV. 100", not "MAX").
-	local level = if isMax then HudModel.LevelText(view.level) else progress.level
-	self.levelText:SetText(level)
-	self.xpText:SetText(if isMax then BottomBar.MAX_TEXT else progress.text)
+	self.levelText:SetText(progress.level)
+	self.xpText:SetText(progress.text)
 	if levelledUp and not instant then
 		-- Start the new level's bar from empty so the gain reads as a level-up.
 		self.xpBar:Set(0, true)
