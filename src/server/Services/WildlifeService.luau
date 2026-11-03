@@ -215,11 +215,6 @@ function WildlifeService.Tick()
 	end
 end
 
--- Roaming creatures alive now.
-function WildlifeService.Count(): number
-	return alive
-end
-
 function WildlifeService.Start()
 	if not PlaceConfig.IsWorld() then
 		return

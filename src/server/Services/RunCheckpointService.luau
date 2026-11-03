@@ -32,10 +32,6 @@ RunCheckpointService.CLEAR_RETRY_SECONDS = 2
 local runs = {}
 local clearing = {}
 
-function RunCheckpointService.JobId(): string
-	return CheckpointStore.JobId()
-end
-
 -- The run ID ProgressionService recorded for this run (the key of its receipt).
 local function currentRunId(player: Player): string?
 	local profile = ProfileService.GetProfile(player)

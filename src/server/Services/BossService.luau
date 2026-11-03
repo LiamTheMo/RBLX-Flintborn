@@ -408,10 +408,6 @@ function BossService.TopContributor(boss): Player?
 	return best
 end
 
-function BossService.Active()
-	return bosses
-end
-
 function BossService.Start()
 	if not PlaceConfig.IsWorld() then
 		return
