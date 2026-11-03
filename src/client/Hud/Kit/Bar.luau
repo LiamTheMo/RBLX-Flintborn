@@ -164,6 +164,11 @@ function Bar.new(parent: Instance, props)
 	local sliceScale = fillSprite and Art.SliceScale(fillSprite, well[3], well[4])
 	local rightInset = entry and type(entry.slice) == "table" and entry.slice[3] or 12
 	self.capW = math.max(2, math.floor(rightInset * (sliceScale or fillScale) + 0.5))
+	-- A fill that shows at all is at least its two rounded ends wide, so the very
+	-- start of a bar (1 % XP) reads as a small whole pill, not a squashed sliver.
+	local leftInset = entry and type(entry.slice) == "table" and entry.slice[1] or rightInset
+	local leftW = math.floor(leftInset * (sliceScale or fillScale) + 0.5)
+	self.minShown = math.min(well[3], leftW + self.capW)
 	self.cap = Core.Make("Frame", {
 		Name = "FillEnd",
 		BackgroundTransparency = 1,
@@ -206,6 +211,9 @@ function Bar:Set(fraction: number, instant: boolean?)
 	self.root:SetAttribute("KitValue", fraction)
 	local width = KitModel.FillWidth(fraction, self.well[3], self.minWidth)
 	local visible = fraction > 0
+	if visible then
+		width = math.max(width, self.minShown)
+	end
 	-- The end piece shows the plate's last `cw` px, right-aligned to the cut;
 	-- the body stops inside it, so nothing shows past its rounded corners.
 	local cw = math.min(self.capW, width)
