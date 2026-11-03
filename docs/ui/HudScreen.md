@@ -70,7 +70,7 @@ builds every region), `Hud/Vitals`, `BottomBar`, `PartyFrames`, `Compass`,
 | Hotbar | under the XP bar, 6 × `Slot` hotbar 89 × 89 (square) at the lobby's x, y 35 in the bottom group | `Slot` with `ItemIcon` art via itemId, count, Permanent star, leather number badge (keyboard and mouse only), gold glow when selected | run inventory `area == "hotbar"`; badges read `Binds.Label("HotbarN")` and follow `Kit.Input.Watch`; the selection follows the equipped slot |
 | Interaction prompt | BillboardGui over the prompt's part, 230–420 × 64 (touch: × 70, object line 15), at the HUD scale | `Panel` plaque, `KeyCap` (live key: Interact bind, gamepad button or TAP), action `Text` (`rowTitle`), object `Text` (`small`), `Bar` xp hold bar; the plaque widens for the longer line (with `Kit.Core.FIT_SLACK`), so on touch only a text past 420 ends in "…" | ProximityPrompt texts; redrawn on rebinds and text changes |
 | Damage numbers | world billboards | display font (`fonts.display`), `gold` with an `ink` outline | `CombatFeedback` hits, when Show Damage is on |
-| Touch attack | touch only, bottom right (right 300, bottom 60; phones right 220, bottom 30: right of the hotbar, left of the Roblox jump button), 130 × 124 | `IconButton` round with the spear icon; the Kit pads its hit area | press = swing or start the bow draw, release fires |
+| Touch attack | touch only, bottom right (right 300, bottom 60; phones right 220, bottom 30: right of the hotbar, left of the Roblox jump button), 130 × 124 | `IconButton` round with the spear icon (axe or pickaxe while one is held; drumstick, heart or lightning while food, medicine or a draught is, GDD §59); the Kit pads its hit area | press = swing or start the bow draw, release fires; holding a consumable, press = eat or drink it (one item per press) |
 | Settings | the bottom-left corner (D30): M from the left and M from the bottom (desktop x 24–76, y 871–917), 52 × 46 (HudLayout `gear`, the lobby's too); on touch screens the same unless Roblox's thumbstick ring reaches the corner (a phone without a side inset), then above the ring (`HudModel.GearCorner`; see Phones) | `IconButton` settings (`SettingsController`'s own HUD-scaled gui `FlintbornSettingsButton`, `SettingsController.GearSize` / `GearPosition`); gamepad: left of the first hotbar slot, under the bottom-left tile (Map; `SettingsController.LinkGear`) | opens Settings (also the Settings key, O by default) |
 | Hit marker, bow draw | screen centre (−70 / +48) | `Panel` plaque with `Text` ("Hit 12" in ink, "Hurt -8" in `short`); `Bar` well with "Range 60%" | `CombatFeedback`; draw time |
 
@@ -112,10 +112,18 @@ compass letters included).
 - Build mode opens with the current piece selected; B leaves the palette and
   B again goes back into it.
 
-## Behaviour (unchanged)
+## Behaviour
 
 - Hotbar keys (Hotbar1–6 binds) and slot presses select and use a slot
   (`InventoryController.ActivateHotbar`); the right bumper steps the selection.
+  A consumable's slot is held like a tool (GDD §59): the attack input (click,
+  the touch attack button, RT) eats or drinks it, and the same key or tap again
+  puts it away.
+- While the local player eats or drinks, `ConsumeController` shows a kit stat
+  bar (food fill, the item kind's icon, "Eating Cooked Meat") 300 × 46, centred
+  52 px under the screen centre, where the bow draw bar sits (one item is held
+  at a time). It follows the server's `ConsumeItem` / `ConsumeStart` /
+  `ConsumeEnd` attributes (`world_hud_flow` page 1).
   The hotbar stays visible while the backpack is open.
 - Every value is the server's replicated value; bars show the real fraction (D20).
 
@@ -126,7 +134,7 @@ python3 art/ui/capture/capture.py world_hud          # two sample runs (tribe, s
 python3 art/ui/capture/capture.py world_hud_states   # low vitals, forced tile and slot states, done objective
 python3 art/ui/capture/capture.py world_hud_phone    # 844 × 390 notched (47 px side insets), 667 × 375, 2000 × 924 touch: top bar 58 px, jump button and thumbstick drawn
 python3 art/ui/capture/capture.py world_hud_wide     # 2560 × 1080
-python3 art/ui/capture/capture.py world_hud_flow     # HudController.Start driven by real signals (checks, the live placement)
+python3 art/ui/capture/capture.py world_hud_flow     # HudController.Start driven by real signals (checks, the live placement; page 1 the eating bar)
 ```
 
 Every scene runs the layout checks in `art/ui/capture/hud_checks.luau`

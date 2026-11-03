@@ -19,6 +19,9 @@
 -- the hit marker is a Kit plaque and the bow draw a Kit bar, at the HUD's scale.
 -- Clicks on the HUD never swing: Kit buttons and screens sink them before
 -- ContextActionService sees them.
+-- Holding food, medicine or a draught, the same input eats or drinks it instead
+-- (ConsumeController, GDD §59): one item per press, no swing, no node plaque, and
+-- the touch button shows a drumstick, heart or lightning icon.
 
 local ContextActionService = game:GetService("ContextActionService")
 local Players = game:GetService("Players")
@@ -28,6 +31,8 @@ local UserInputService = game:GetService("UserInputService")
 
 local HarvestRules = require(ReplicatedStorage.Shared.Resources.HarvestRules)
 local HudModel = require(ReplicatedStorage.Shared.UI.HudModel)
+local ConsumeRules = require(ReplicatedStorage.Shared.Survival.ConsumeRules)
+local Consumables = require(ReplicatedStorage.Shared.Items.Consumables)
 local ItemCatalog = require(ReplicatedStorage.Shared.Items.ItemCatalog)
 local NodeCatalog = require(ReplicatedStorage.Shared.Resources.NodeCatalog)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
@@ -40,6 +45,7 @@ local InteractionPrompt = require(script.Parent.Parent.Hud.InteractionPrompt)
 local Kit = require(script.Parent.Parent.Hud.Kit)
 local Layout = require(script.Parent.Parent.Hud.Layout)
 local Theme = require(script.Parent.Parent.Ui.Theme)
+local ConsumeController = require(script.Parent.ConsumeController)
 
 local CombatController = {}
 
@@ -84,6 +90,13 @@ end
 local function equippedProfile()
 	local def, catalogId = equippedDef()
 	return WeaponCatalog.For(def and def.family == ItemCatalog.Families.Weapon and catalogId or nil)
+end
+
+-- The held consumable (its Consumables entry) and its catalog id, or nil.
+local function heldConsumable()
+	local catalogId = player:GetAttribute("EquippedItem")
+	local item = Consumables.Get(catalogId)
+	return item, if item then catalogId else nil
 end
 
 -- The held tool ({kind, tier}) or nil, as the server's NodeCatalog checks see it.
@@ -204,9 +217,12 @@ local function inBuildMode(): boolean
 	return ok and type(info) == "table" and info.inputTypes ~= nil
 end
 
--- True when the held item swings (not a bow, not a siege item to throw).
+-- True when the held item swings (not a bow, a siege item to throw or something
+-- to eat or drink).
 local function swingsAtNodes(profile): boolean
-	return profile.kind == "Melee" and SiegeRules.Kind(player:GetAttribute("EquippedItem")) == nil
+	return profile.kind == "Melee"
+		and SiegeRules.Kind(player:GetAttribute("EquippedItem")) == nil
+		and heldConsumable() == nil
 end
 
 local function hideHover()
@@ -416,6 +432,14 @@ end
 -- Input --------------------------------------------------------------------------
 
 function onAttack(_, inputState)
+	-- A held consumable is eaten or drunk, once per press (the server paces it).
+	local consumable, catalogId = heldConsumable()
+	if consumable then
+		if inputState == Enum.UserInputState.Begin then
+			task.spawn(ConsumeController.Use, catalogId)
+		end
+		return Enum.ContextActionResult.Pass
+	end
 	local profile = equippedProfile()
 	if profile.kind == "Bow" then
 		if inputState == Enum.UserInputState.Begin then
@@ -498,10 +522,12 @@ local function makeAttackButton(icon: string)
 	end)
 end
 
--- An axe or pickaxe shows on the touch button while one is held.
+-- An axe or pickaxe shows on the touch button while one is held, and a
+-- drumstick, heart or lightning while something to eat or drink is.
 local function refreshAttackIcon()
 	local tool = equippedTool()
-	local icon = HarvestRules.AttackIcon(tool and tool.kind)
+	local consumable = heldConsumable()
+	local icon = if consumable then ConsumeRules.AttackIcon(consumable) else HarvestRules.AttackIcon(tool and tool.kind)
 	if icon ~= ui.attackIcon then
 		makeAttackButton(icon)
 	end

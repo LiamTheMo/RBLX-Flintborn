@@ -4,8 +4,9 @@
 -- tribe-mate joins, the backpack opens, a hotbar slot and a menu tile are
 -- pressed through their buttons; the live placement follows the owner's
 -- layout (ARCHITECTURE D28, D30) under stand-ins for Roblox's top-bar buttons,
--- and moves with the device safe area its probes measure. Ends
--- with a capture of the whole PlayerGui.
+-- and moves with the device safe area its probes measure; the held Redberry is
+-- eaten (the progress bar, page 1). Ends with a capture of the whole PlayerGui
+-- (page 2).
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 workspace:SetAttribute("FlintbornPlaceRole", "World")
@@ -211,6 +212,50 @@ do
 		k = k,
 		chrome = chrome,
 	})
+end
+
+-- Eating the held Redberry (slot 4, GDD §59): the server's ConsumeItem/Start/End
+-- attributes show the progress bar below the screen centre (ConsumeController).
+do
+	InventoryController.Changed:Fire({
+		slots = {
+			{ area = "hotbar", index = 1, catalogId = "StoneAxe", quantity = 1, permanent = true },
+			{ area = "hotbar", index = 2, catalogId = "StoneSpear", quantity = 1 },
+			{ area = "hotbar", index = 4, catalogId = "Redberry", quantity = 7 },
+		},
+		equipped = 4,
+	})
+	local ConsumeController = require(Controllers.ConsumeController)
+	ConsumeController.Start()
+	local consumeGui = player.PlayerGui:FindFirstChild("Consume")
+	local bar = consumeGui and consumeGui:FindFirstChild("Consume", true)
+	RunService.RenderStepped:Fire(1 / 60)
+	check(bar ~= nil and not bar.Visible, "no eating bar while nothing is eaten")
+	local now = workspace:GetServerTimeNow()
+	player:SetAttribute("ConsumeItem", "Redberry")
+	player:SetAttribute("ConsumeStart", now - 0.6)
+	player:SetAttribute("ConsumeEnd", now + 0.6)
+	RunService.RenderStepped:Fire(1 / 60)
+	-- The arm pose steps after the animations (no R6 torso here: it only walks
+	-- the players without erroring).
+	RunService.Stepped:Fire(0, 1 / 60)
+	local label = bar and bar:FindFirstChild("Progress", true)
+	local text = nil
+	for _, child in if bar then bar:GetDescendants() else {} do
+		if child:IsA("TextLabel") and child.Text ~= "" then
+			text = child.Text
+		end
+	end
+	check(bar ~= nil and bar.Visible and label ~= nil, "the eating bar shows while the berry is eaten")
+	check(text == "Eating Redberry", ("it names the food (%s)"):format(tostring(text)))
+	check(HudController.Selected == 4, "the held berry's slot stays selected")
+	check(ConsumeController.IsBusy(), "a press now does nothing (one item per press)")
+	__dump(player.PlayerGui, 1672, 941, { background = "art/reference/lobby_map.png" })
+	player:SetAttribute("ConsumeItem", nil)
+	player:SetAttribute("ConsumeStart", nil)
+	player:SetAttribute("ConsumeEnd", nil)
+	RunService.RenderStepped:Fire(1 / 60)
+	check(not bar.Visible, "the bar goes when the use ends")
 end
 
 -- Leaving the run hides it again.

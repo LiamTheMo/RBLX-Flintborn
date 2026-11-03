@@ -1,21 +1,23 @@
 -- Hotbar (6 slots, keys 1–6) and backpack (50 slots) for the run inventory
--- (GDD §25.4, §25.4.1). Tapping a hotbar slot (or pressing its key) equips a tool or weapon, uses a
--- consumable, places a workbench, readies a Fire Bomb (the attack input or touch
--- Attack button then throws it) or sets a Breaching Charge on the wall or door in
--- the crosshair (with none in reach it is held instead, and the attack input sets
--- it once one is). The Backpack key (B, Y on a gamepad) opens the Inventory
--- window (Hud/Screens/InventoryWindow) on two tabs: Backpack (everything the
--- player carries: the backpack, the hotbar and worn armour), and Equipped (the
--- hotbar and armour alone; InventoryModel.RunSections). Choose a slot to see it
--- in the detail card: EQUIP puts
--- a backpack item on the hotbar (WEAR for armour), USE / EQUIP / PUT AWAY act on
--- a hotbar slot as its key does, TAKE OFF removes worn armour, MOVE then any
+-- (GDD §25.4, §25.4.1). Tapping a hotbar slot (or pressing its key) equips a tool,
+-- weapon or consumable (food, medicine and draughts are held, and the attack input
+-- or touch Attack button eats or drinks them: ConsumeController, GDD §59), places a
+-- workbench, readies a Fire Bomb (the attack input or touch Attack button then
+-- throws it) or sets a Breaching Charge on the wall or door in the crosshair (with
+-- none in reach it is held instead, and the attack input sets it once one is).
+-- Pressing the held slot's key again puts it away. The Backpack key (B, Y on a
+-- gamepad) opens the Inventory window (Hud/Screens/InventoryWindow) on two tabs:
+-- Backpack (everything the player carries: the backpack, the hotbar and worn
+-- armour), and Equipped (the hotbar and armour alone; InventoryModel.RunSections).
+-- Choose a slot to see it in the detail card: EQUIP puts
+-- a backpack item on the hotbar (WEAR for armour), EQUIP / PUT AWAY act on a
+-- hotbar slot as its key does, USE takes a hotbar consumable in hand and eats or
+-- drinks it as the attack input would, TAKE OFF removes worn armour, MOVE then any
 -- other slot moves or swaps it there (no precise dragging), and DROP drops it.
 -- Server snapshots are the only truth. World place only. With the new HUD
 -- (HudMode) its own hotbar strip draws the slots; the old strip here shows only
 -- with the legacy HUD.
 
-local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local UserInputService = game:GetService("UserInputService")
@@ -35,6 +37,7 @@ local InventoryWindow = require(script.Parent.Parent.Hud.Screens.InventoryWindow
 local Theme = require(script.Parent.Parent.Ui.Theme)
 local Binds = require(script.Parent.Parent.Ui.Binds)
 local Reasons = require(script.Parent.Parent.Ui.Reasons)
+local ConsumeController = require(script.Parent.ConsumeController)
 
 local InventoryController = {}
 
@@ -168,12 +171,7 @@ local function activateHotbar(index: number)
 		return
 	end
 	local def = ItemCatalog.Get(slot.catalogId)
-	if def and def.family == ItemCatalog.Families.Consumable then
-		local ok, reason = invoke("UseConsumable", HttpService:GenerateGUID(false), slot.catalogId)
-		if not ok then
-			toast("Can't use that now: " .. Reasons.Text(reason), "warn")
-		end
-	elseif def and def.siege then
+	if def and def.siege then
 		activateSiege(index, def.siege.kind)
 	elseif def and def.placeable == "ExtractionRune" then
 		local ok, reason = invoke("PlaceRune", index)
@@ -182,8 +180,29 @@ local function activateHotbar(index: number)
 		local ok, reason = invoke("PlaceItem", index)
 		toast(ok and (def.name .. " placed.") or ("Can't place that here (" .. Reasons.Text(reason) .. ")"))
 	else
-		invoke("EquipSlot", index)
+		local equipping = InventoryController.Snapshot.equipped ~= index
+		local ok = invoke("EquipSlot", index)
+		if ok and equipping and def and def.family == ItemCatalog.Families.Consumable then
+			ConsumeController.Hint(slot.catalogId)
+		end
 	end
+end
+
+-- The window's USE on a hotbar consumable: takes it in hand if it isn't, then
+-- eats or drinks it like the attack input (yields until the use ends).
+local function consumeHotbar(index: number)
+	local slot = slotAt("hotbar", index)
+	if slot == nil then
+		return
+	end
+	if InventoryController.Snapshot.equipped ~= index then
+		local ok, reason = invoke("EquipSlot", index)
+		if not ok then
+			toast("Can't hold that (" .. Reasons.Text(reason) .. ")", "warn")
+			return
+		end
+	end
+	ConsumeController.Use(slot.catalogId)
 end
 
 local function sameSlot(a, b): boolean
@@ -436,8 +455,14 @@ local function onAction(id: string)
 		return
 	end
 	if id == "activate" then
+		local def = ItemCatalog.Get(slot.catalogId)
+		local consumable = choice.area == "hotbar" and def and def.family == ItemCatalog.Families.Consumable
 		run(function()
-			activateHotbar(choice.index)
+			if consumable then
+				consumeHotbar(choice.index)
+			else
+				activateHotbar(choice.index)
+			end
 		end)
 	elseif id == "takeOff" then
 		run(function()

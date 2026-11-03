@@ -877,7 +877,7 @@ function HudController.Start()
 
 	-- Hotbar: the run inventory's hotbar items. The Hotbar1–6 binds (keys 1–6 by
 	-- default) and taps select a slot and use it, as InventoryController's keys do
-	-- (equip, eat, place, ready); the right gamepad bumper only steps the
+	-- (equip or hold, place, ready); the right gamepad bumper only steps the
 	-- selection. The mouse wheel stays on camera zoom (GDD Q58). Slot badges name
 	-- the bound keys and follow rebinds.
 	local count = layout.bottom.hotbar.count
