@@ -39,6 +39,16 @@
     "slice": null,
     "w": 1024
   },
+  "atlas_lk_items2_1": {
+    "h": 1024,
+    "slice": null,
+    "w": 1024
+  },
+  "atlas_lk_items2_2": {
+    "h": 1024,
+    "slice": null,
+    "w": 1024
+  },
   "atlas_lk_items_hi_1": {
     "h": 1024,
     "slice": null,
@@ -4506,6 +4516,2886 @@
     "h": 76,
     "slice": null,
     "w": 100
+  },
+  "lk_item_AbyssalShard": {
+    "atlas": "atlas_lk_items2_1",
+    "h": 110,
+    "hi": "lk_item_AbyssalShard__hi",
+    "rect": [
+      0,
+      0,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_AbyssalShard__hi": {
+    "h": 356,
+    "of": "lk_item_AbyssalShard",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_AdamantineAxe": {
+    "atlas": "atlas_lk_items2_2",
+    "h": 110,
+    "hi": "lk_item_AdamantineAxe__hi",
+    "rect": [
+      0,
+      0,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_AdamantineAxe__hi": {
+    "h": 356,
+    "of": "lk_item_AdamantineAxe",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_AdamantineBar": {
+    "atlas": "atlas_lk_items2_1",
+    "h": 110,
+    "hi": "lk_item_AdamantineBar__hi",
+    "rect": [
+      114,
+      0,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_AdamantineBar__hi": {
+    "h": 356,
+    "of": "lk_item_AdamantineBar",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_AdamantineBow": {
+    "atlas": "atlas_lk_items2_2",
+    "h": 110,
+    "hi": "lk_item_AdamantineBow__hi",
+    "rect": [
+      114,
+      0,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_AdamantineBow__hi": {
+    "h": 356,
+    "of": "lk_item_AdamantineBow",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_AdamantineChest": {
+    "atlas": "atlas_lk_items2_2",
+    "h": 110,
+    "hi": "lk_item_AdamantineChest__hi",
+    "rect": [
+      228,
+      0,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_AdamantineChest__hi": {
+    "h": 356,
+    "of": "lk_item_AdamantineChest",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_AdamantineDagger": {
+    "atlas": "atlas_lk_items2_2",
+    "h": 110,
+    "hi": "lk_item_AdamantineDagger__hi",
+    "rect": [
+      342,
+      0,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_AdamantineDagger__hi": {
+    "h": 356,
+    "of": "lk_item_AdamantineDagger",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_AdamantineHead": {
+    "atlas": "atlas_lk_items2_2",
+    "h": 110,
+    "hi": "lk_item_AdamantineHead__hi",
+    "rect": [
+      456,
+      0,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_AdamantineHead__hi": {
+    "h": 356,
+    "of": "lk_item_AdamantineHead",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_AdamantineLegs": {
+    "atlas": "atlas_lk_items2_2",
+    "h": 110,
+    "hi": "lk_item_AdamantineLegs__hi",
+    "rect": [
+      570,
+      0,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_AdamantineLegs__hi": {
+    "h": 356,
+    "of": "lk_item_AdamantineLegs",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_AdamantineOre": {
+    "atlas": "atlas_lk_items2_1",
+    "h": 110,
+    "hi": "lk_item_AdamantineOre__hi",
+    "rect": [
+      228,
+      0,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_AdamantineOre__hi": {
+    "h": 356,
+    "of": "lk_item_AdamantineOre",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_AdamantinePickaxe": {
+    "atlas": "atlas_lk_items2_2",
+    "h": 110,
+    "hi": "lk_item_AdamantinePickaxe__hi",
+    "rect": [
+      684,
+      0,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_AdamantinePickaxe__hi": {
+    "h": 356,
+    "of": "lk_item_AdamantinePickaxe",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_AdamantineSpear": {
+    "atlas": "atlas_lk_items2_2",
+    "h": 110,
+    "hi": "lk_item_AdamantineSpear__hi",
+    "rect": [
+      798,
+      0,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_AdamantineSpear__hi": {
+    "h": 356,
+    "of": "lk_item_AdamantineSpear",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_AdamantineSword": {
+    "atlas": "atlas_lk_items2_2",
+    "h": 110,
+    "hi": "lk_item_AdamantineSword__hi",
+    "rect": [
+      912,
+      0,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_AdamantineSword__hi": {
+    "h": 356,
+    "of": "lk_item_AdamantineSword",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_AdvancedMedicine": {
+    "atlas": "atlas_lk_items2_1",
+    "h": 110,
+    "hi": "lk_item_AdvancedMedicine__hi",
+    "rect": [
+      342,
+      0,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_AdvancedMedicine__hi": {
+    "h": 356,
+    "of": "lk_item_AdvancedMedicine",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_Amethyst": {
+    "atlas": "atlas_lk_items2_1",
+    "h": 110,
+    "hi": "lk_item_Amethyst__hi",
+    "rect": [
+      456,
+      0,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_Amethyst__hi": {
+    "h": 356,
+    "of": "lk_item_Amethyst",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_AncientEmber": {
+    "atlas": "atlas_lk_items2_1",
+    "h": 110,
+    "hi": "lk_item_AncientEmber__hi",
+    "rect": [
+      570,
+      0,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_AncientEmber__hi": {
+    "h": 356,
+    "of": "lk_item_AncientEmber",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_AshenOil": {
+    "atlas": "atlas_lk_items2_1",
+    "h": 110,
+    "hi": "lk_item_AshenOil__hi",
+    "rect": [
+      684,
+      0,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_AshenOil__hi": {
+    "h": 356,
+    "of": "lk_item_AshenOil",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_BasicMedicine": {
+    "atlas": "atlas_lk_items2_1",
+    "h": 110,
+    "hi": "lk_item_BasicMedicine__hi",
+    "rect": [
+      798,
+      0,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_BasicMedicine__hi": {
+    "h": 356,
+    "of": "lk_item_BasicMedicine",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_Bloodroot": {
+    "atlas": "atlas_lk_items2_1",
+    "h": 110,
+    "hi": "lk_item_Bloodroot__hi",
+    "rect": [
+      912,
+      0,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_Bloodroot__hi": {
+    "h": 356,
+    "of": "lk_item_Bloodroot",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_Bone": {
+    "atlas": "atlas_lk_items2_1",
+    "h": 110,
+    "hi": "lk_item_Bone__hi",
+    "rect": [
+      0,
+      114,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_BoneChest": {
+    "atlas": "atlas_lk_items2_1",
+    "h": 110,
+    "hi": "lk_item_BoneChest__hi",
+    "rect": [
+      114,
+      114,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_BoneChest__hi": {
+    "h": 356,
+    "of": "lk_item_BoneChest",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_BoneDagger": {
+    "atlas": "atlas_lk_items2_1",
+    "h": 110,
+    "hi": "lk_item_BoneDagger__hi",
+    "rect": [
+      228,
+      114,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_BoneDagger__hi": {
+    "h": 356,
+    "of": "lk_item_BoneDagger",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_BoneHead": {
+    "atlas": "atlas_lk_items2_2",
+    "h": 110,
+    "hi": "lk_item_BoneHead__hi",
+    "rect": [
+      0,
+      114,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_BoneHead__hi": {
+    "h": 356,
+    "of": "lk_item_BoneHead",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_BoneLegs": {
+    "atlas": "atlas_lk_items2_2",
+    "h": 110,
+    "hi": "lk_item_BoneLegs__hi",
+    "rect": [
+      114,
+      114,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_BoneLegs__hi": {
+    "h": 356,
+    "of": "lk_item_BoneLegs",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_BoneSpear": {
+    "atlas": "atlas_lk_items2_2",
+    "h": 110,
+    "hi": "lk_item_BoneSpear__hi",
+    "rect": [
+      228,
+      114,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_BoneSpear__hi": {
+    "h": 356,
+    "of": "lk_item_BoneSpear",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_Bone__hi": {
+    "h": 356,
+    "of": "lk_item_Bone",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_BreachingCharge": {
+    "atlas": "atlas_lk_items2_1",
+    "h": 110,
+    "hi": "lk_item_BreachingCharge__hi",
+    "rect": [
+      342,
+      114,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_BreachingCharge__hi": {
+    "h": 356,
+    "of": "lk_item_BreachingCharge",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_CaveMushroom": {
+    "atlas": "atlas_lk_items2_1",
+    "h": 110,
+    "hi": "lk_item_CaveMushroom__hi",
+    "rect": [
+      456,
+      114,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_CaveMushroom__hi": {
+    "h": 356,
+    "of": "lk_item_CaveMushroom",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_ChargedCore": {
+    "atlas": "atlas_lk_items2_1",
+    "h": 110,
+    "hi": "lk_item_ChargedCore__hi",
+    "rect": [
+      570,
+      114,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_ChargedCore__hi": {
+    "h": 356,
+    "of": "lk_item_ChargedCore",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_ChestnutMushroom": {
+    "atlas": "atlas_lk_items2_1",
+    "h": 110,
+    "hi": "lk_item_ChestnutMushroom__hi",
+    "rect": [
+      684,
+      114,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_ChestnutMushroom__hi": {
+    "h": 356,
+    "of": "lk_item_ChestnutMushroom",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_Clay": {
+    "atlas": "atlas_lk_items2_1",
+    "h": 110,
+    "hi": "lk_item_Clay__hi",
+    "rect": [
+      798,
+      114,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_Clay__hi": {
+    "h": 356,
+    "of": "lk_item_Clay",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_CobaltAxe": {
+    "atlas": "atlas_lk_items2_2",
+    "h": 110,
+    "hi": "lk_item_CobaltAxe__hi",
+    "rect": [
+      342,
+      114,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_CobaltAxe__hi": {
+    "h": 356,
+    "of": "lk_item_CobaltAxe",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_CobaltBar": {
+    "atlas": "atlas_lk_items2_1",
+    "h": 110,
+    "hi": "lk_item_CobaltBar__hi",
+    "rect": [
+      912,
+      114,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_CobaltBar__hi": {
+    "h": 356,
+    "of": "lk_item_CobaltBar",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_CobaltBow": {
+    "atlas": "atlas_lk_items2_2",
+    "h": 110,
+    "hi": "lk_item_CobaltBow__hi",
+    "rect": [
+      456,
+      114,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_CobaltBow__hi": {
+    "h": 356,
+    "of": "lk_item_CobaltBow",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_CobaltChest": {
+    "atlas": "atlas_lk_items2_2",
+    "h": 110,
+    "hi": "lk_item_CobaltChest__hi",
+    "rect": [
+      570,
+      114,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_CobaltChest__hi": {
+    "h": 356,
+    "of": "lk_item_CobaltChest",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_CobaltDagger": {
+    "atlas": "atlas_lk_items2_2",
+    "h": 110,
+    "hi": "lk_item_CobaltDagger__hi",
+    "rect": [
+      684,
+      114,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_CobaltDagger__hi": {
+    "h": 356,
+    "of": "lk_item_CobaltDagger",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_CobaltHead": {
+    "atlas": "atlas_lk_items2_2",
+    "h": 110,
+    "hi": "lk_item_CobaltHead__hi",
+    "rect": [
+      798,
+      114,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_CobaltHead__hi": {
+    "h": 356,
+    "of": "lk_item_CobaltHead",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_CobaltLegs": {
+    "atlas": "atlas_lk_items2_2",
+    "h": 110,
+    "hi": "lk_item_CobaltLegs__hi",
+    "rect": [
+      912,
+      114,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_CobaltLegs__hi": {
+    "h": 356,
+    "of": "lk_item_CobaltLegs",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_CobaltOre": {
+    "atlas": "atlas_lk_items2_1",
+    "h": 110,
+    "hi": "lk_item_CobaltOre__hi",
+    "rect": [
+      0,
+      228,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_CobaltOre__hi": {
+    "h": 356,
+    "of": "lk_item_CobaltOre",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_CobaltPickaxe": {
+    "atlas": "atlas_lk_items2_2",
+    "h": 110,
+    "hi": "lk_item_CobaltPickaxe__hi",
+    "rect": [
+      0,
+      228,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_CobaltPickaxe__hi": {
+    "h": 356,
+    "of": "lk_item_CobaltPickaxe",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_CobaltSpear": {
+    "atlas": "atlas_lk_items2_2",
+    "h": 110,
+    "hi": "lk_item_CobaltSpear__hi",
+    "rect": [
+      114,
+      228,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_CobaltSpear__hi": {
+    "h": 356,
+    "of": "lk_item_CobaltSpear",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_CobaltSword": {
+    "atlas": "atlas_lk_items2_2",
+    "h": 110,
+    "hi": "lk_item_CobaltSword__hi",
+    "rect": [
+      228,
+      228,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_CobaltSword__hi": {
+    "h": 356,
+    "of": "lk_item_CobaltSword",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_CookedMeat": {
+    "atlas": "atlas_lk_items2_1",
+    "h": 110,
+    "hi": "lk_item_CookedMeat__hi",
+    "rect": [
+      114,
+      228,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_CookedMeat__hi": {
+    "h": 356,
+    "of": "lk_item_CookedMeat",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_CopperAxe": {
+    "atlas": "atlas_lk_items2_2",
+    "h": 110,
+    "hi": "lk_item_CopperAxe__hi",
+    "rect": [
+      342,
+      228,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_CopperAxe__hi": {
+    "h": 356,
+    "of": "lk_item_CopperAxe",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_CopperBar": {
+    "atlas": "atlas_lk_items2_1",
+    "h": 110,
+    "hi": "lk_item_CopperBar__hi",
+    "rect": [
+      228,
+      228,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_CopperBar__hi": {
+    "h": 356,
+    "of": "lk_item_CopperBar",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_CopperBow": {
+    "atlas": "atlas_lk_items2_2",
+    "h": 110,
+    "hi": "lk_item_CopperBow__hi",
+    "rect": [
+      456,
+      228,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_CopperBow__hi": {
+    "h": 356,
+    "of": "lk_item_CopperBow",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_CopperChest": {
+    "atlas": "atlas_lk_items2_2",
+    "h": 110,
+    "hi": "lk_item_CopperChest__hi",
+    "rect": [
+      570,
+      228,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_CopperChest__hi": {
+    "h": 356,
+    "of": "lk_item_CopperChest",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_CopperDagger": {
+    "atlas": "atlas_lk_items2_2",
+    "h": 110,
+    "hi": "lk_item_CopperDagger__hi",
+    "rect": [
+      684,
+      228,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_CopperDagger__hi": {
+    "h": 356,
+    "of": "lk_item_CopperDagger",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_CopperHead": {
+    "atlas": "atlas_lk_items2_2",
+    "h": 110,
+    "hi": "lk_item_CopperHead__hi",
+    "rect": [
+      798,
+      228,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_CopperHead__hi": {
+    "h": 356,
+    "of": "lk_item_CopperHead",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_CopperLegs": {
+    "atlas": "atlas_lk_items2_2",
+    "h": 110,
+    "hi": "lk_item_CopperLegs__hi",
+    "rect": [
+      912,
+      228,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_CopperLegs__hi": {
+    "h": 356,
+    "of": "lk_item_CopperLegs",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_CopperOre": {
+    "atlas": "atlas_lk_items2_1",
+    "h": 110,
+    "hi": "lk_item_CopperOre__hi",
+    "rect": [
+      342,
+      228,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_CopperOre__hi": {
+    "h": 356,
+    "of": "lk_item_CopperOre",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_CopperPickaxe": {
+    "atlas": "atlas_lk_items2_2",
+    "h": 110,
+    "hi": "lk_item_CopperPickaxe__hi",
+    "rect": [
+      0,
+      342,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_CopperPickaxe__hi": {
+    "h": 356,
+    "of": "lk_item_CopperPickaxe",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_CopperSpear": {
+    "atlas": "atlas_lk_items2_2",
+    "h": 110,
+    "hi": "lk_item_CopperSpear__hi",
+    "rect": [
+      114,
+      342,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_CopperSpear__hi": {
+    "h": 356,
+    "of": "lk_item_CopperSpear",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_CopperSword": {
+    "atlas": "atlas_lk_items2_2",
+    "h": 110,
+    "hi": "lk_item_CopperSword__hi",
+    "rect": [
+      228,
+      342,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_CopperSword__hi": {
+    "h": 356,
+    "of": "lk_item_CopperSword",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_DireHide": {
+    "atlas": "atlas_lk_items2_1",
+    "h": 110,
+    "hi": "lk_item_DireHide__hi",
+    "rect": [
+      456,
+      228,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_DireHide__hi": {
+    "h": 356,
+    "of": "lk_item_DireHide",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_Elderberry": {
+    "atlas": "atlas_lk_items2_1",
+    "h": 110,
+    "hi": "lk_item_Elderberry__hi",
+    "rect": [
+      570,
+      228,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_Elderberry__hi": {
+    "h": 356,
+    "of": "lk_item_Elderberry",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_Emberglass": {
+    "atlas": "atlas_lk_items2_1",
+    "h": 110,
+    "hi": "lk_item_Emberglass__hi",
+    "rect": [
+      684,
+      228,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_Emberglass__hi": {
+    "h": 356,
+    "of": "lk_item_Emberglass",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_ExtractionRune": {
+    "atlas": "atlas_lk_items2_1",
+    "h": 110,
+    "hi": "lk_item_ExtractionRune__hi",
+    "rect": [
+      798,
+      228,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_ExtractionRune__hi": {
+    "h": 356,
+    "of": "lk_item_ExtractionRune",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_Fiber": {
+    "atlas": "atlas_lk_items2_1",
+    "h": 110,
+    "hi": "lk_item_Fiber__hi",
+    "rect": [
+      912,
+      228,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_Fiber__hi": {
+    "h": 356,
+    "of": "lk_item_Fiber",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_FireBomb": {
+    "atlas": "atlas_lk_items2_1",
+    "h": 110,
+    "hi": "lk_item_FireBomb__hi",
+    "rect": [
+      0,
+      342,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_FireBomb__hi": {
+    "h": 356,
+    "of": "lk_item_FireBomb",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_Flint": {
+    "atlas": "atlas_lk_items2_1",
+    "h": 110,
+    "hi": "lk_item_Flint__hi",
+    "rect": [
+      114,
+      342,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_FlintArrow": {
+    "atlas": "atlas_lk_items2_1",
+    "h": 110,
+    "hi": "lk_item_FlintArrow__hi",
+    "rect": [
+      228,
+      342,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_FlintArrow__hi": {
+    "h": 356,
+    "of": "lk_item_FlintArrow",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_FlintDagger": {
+    "atlas": "atlas_lk_items2_2",
+    "h": 110,
+    "hi": "lk_item_FlintDagger__hi",
+    "rect": [
+      342,
+      342,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_FlintDagger__hi": {
+    "h": 356,
+    "of": "lk_item_FlintDagger",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_FlintSpear": {
+    "atlas": "atlas_lk_items2_2",
+    "h": 110,
+    "hi": "lk_item_FlintSpear__hi",
+    "rect": [
+      456,
+      342,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_FlintSpear__hi": {
+    "h": 356,
+    "of": "lk_item_FlintSpear",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_Flint__hi": {
+    "h": 356,
+    "of": "lk_item_Flint",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_Frostleaf": {
+    "atlas": "atlas_lk_items2_1",
+    "h": 110,
+    "hi": "lk_item_Frostleaf__hi",
+    "rect": [
+      342,
+      342,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_Frostleaf__hi": {
+    "h": 356,
+    "of": "lk_item_Frostleaf",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_GlimmerDraught": {
+    "atlas": "atlas_lk_items2_1",
+    "h": 110,
+    "hi": "lk_item_GlimmerDraught__hi",
+    "rect": [
+      456,
+      342,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_GlimmerDraught__hi": {
+    "h": 356,
+    "of": "lk_item_GlimmerDraught",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_Glimmerberry": {
+    "atlas": "atlas_lk_items2_1",
+    "h": 110,
+    "hi": "lk_item_Glimmerberry__hi",
+    "rect": [
+      570,
+      342,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_Glimmerberry__hi": {
+    "h": 356,
+    "of": "lk_item_Glimmerberry",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_GlowFur": {
+    "atlas": "atlas_lk_items2_1",
+    "h": 110,
+    "hi": "lk_item_GlowFur__hi",
+    "rect": [
+      684,
+      342,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_GlowFur__hi": {
+    "h": 356,
+    "of": "lk_item_GlowFur",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_GreaterPotion": {
+    "atlas": "atlas_lk_items2_1",
+    "h": 110,
+    "hi": "lk_item_GreaterPotion__hi",
+    "rect": [
+      798,
+      342,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_GreaterPotion__hi": {
+    "h": 356,
+    "of": "lk_item_GreaterPotion",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_GuardianFang": {
+    "atlas": "atlas_lk_items2_1",
+    "h": 110,
+    "hi": "lk_item_GuardianFang__hi",
+    "rect": [
+      912,
+      342,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_GuardianFang__hi": {
+    "h": 356,
+    "of": "lk_item_GuardianFang",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_GuardianHeart": {
+    "atlas": "atlas_lk_items2_1",
+    "h": 110,
+    "hi": "lk_item_GuardianHeart__hi",
+    "rect": [
+      0,
+      456,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_GuardianHeart__hi": {
+    "h": 356,
+    "of": "lk_item_GuardianHeart",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_Hazelnut": {
+    "atlas": "atlas_lk_items2_1",
+    "h": 110,
+    "hi": "lk_item_Hazelnut__hi",
+    "rect": [
+      114,
+      456,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_Hazelnut__hi": {
+    "h": 356,
+    "of": "lk_item_Hazelnut",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_HeartyTonic": {
+    "atlas": "atlas_lk_items2_1",
+    "h": 110,
+    "hi": "lk_item_HeartyTonic__hi",
+    "rect": [
+      228,
+      456,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_HeartyTonic__hi": {
+    "h": 356,
+    "of": "lk_item_HeartyTonic",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_Herbs": {
+    "atlas": "atlas_lk_items2_1",
+    "h": 110,
+    "hi": "lk_item_Herbs__hi",
+    "rect": [
+      342,
+      456,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_Herbs__hi": {
+    "h": 356,
+    "of": "lk_item_Herbs",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_Hide": {
+    "atlas": "atlas_lk_items2_1",
+    "h": 110,
+    "hi": "lk_item_Hide__hi",
+    "rect": [
+      456,
+      456,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_HideChest": {
+    "atlas": "atlas_lk_items2_1",
+    "h": 110,
+    "hi": "lk_item_HideChest__hi",
+    "rect": [
+      570,
+      456,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_HideChest__hi": {
+    "h": 356,
+    "of": "lk_item_HideChest",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_HideHead": {
+    "atlas": "atlas_lk_items2_1",
+    "h": 110,
+    "hi": "lk_item_HideHead__hi",
+    "rect": [
+      684,
+      456,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_HideHead__hi": {
+    "h": 356,
+    "of": "lk_item_HideHead",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_HideLegs": {
+    "atlas": "atlas_lk_items2_1",
+    "h": 110,
+    "hi": "lk_item_HideLegs__hi",
+    "rect": [
+      798,
+      456,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_HideLegs__hi": {
+    "h": 356,
+    "of": "lk_item_HideLegs",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_Hide__hi": {
+    "h": 356,
+    "of": "lk_item_Hide",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_IronAxe": {
+    "atlas": "atlas_lk_items2_2",
+    "h": 110,
+    "hi": "lk_item_IronAxe__hi",
+    "rect": [
+      570,
+      342,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_IronAxe__hi": {
+    "h": 356,
+    "of": "lk_item_IronAxe",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_IronBar": {
+    "atlas": "atlas_lk_items2_1",
+    "h": 110,
+    "hi": "lk_item_IronBar__hi",
+    "rect": [
+      912,
+      456,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_IronBar__hi": {
+    "h": 356,
+    "of": "lk_item_IronBar",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_IronBow": {
+    "atlas": "atlas_lk_items2_2",
+    "h": 110,
+    "hi": "lk_item_IronBow__hi",
+    "rect": [
+      684,
+      342,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_IronBow__hi": {
+    "h": 356,
+    "of": "lk_item_IronBow",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_IronChest": {
+    "atlas": "atlas_lk_items2_2",
+    "h": 110,
+    "hi": "lk_item_IronChest__hi",
+    "rect": [
+      798,
+      342,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_IronChest__hi": {
+    "h": 356,
+    "of": "lk_item_IronChest",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_IronDagger": {
+    "atlas": "atlas_lk_items2_2",
+    "h": 110,
+    "hi": "lk_item_IronDagger__hi",
+    "rect": [
+      912,
+      342,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_IronDagger__hi": {
+    "h": 356,
+    "of": "lk_item_IronDagger",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_IronHead": {
+    "atlas": "atlas_lk_items2_2",
+    "h": 110,
+    "hi": "lk_item_IronHead__hi",
+    "rect": [
+      0,
+      456,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_IronHead__hi": {
+    "h": 356,
+    "of": "lk_item_IronHead",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_IronLegs": {
+    "atlas": "atlas_lk_items2_2",
+    "h": 110,
+    "hi": "lk_item_IronLegs__hi",
+    "rect": [
+      114,
+      456,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_IronLegs__hi": {
+    "h": 356,
+    "of": "lk_item_IronLegs",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_IronOre": {
+    "atlas": "atlas_lk_items2_1",
+    "h": 110,
+    "hi": "lk_item_IronOre__hi",
+    "rect": [
+      0,
+      570,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_IronOre__hi": {
+    "h": 356,
+    "of": "lk_item_IronOre",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_IronPickaxe": {
+    "atlas": "atlas_lk_items2_2",
+    "h": 110,
+    "hi": "lk_item_IronPickaxe__hi",
+    "rect": [
+      228,
+      456,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_IronPickaxe__hi": {
+    "h": 356,
+    "of": "lk_item_IronPickaxe",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_IronSpear": {
+    "atlas": "atlas_lk_items2_2",
+    "h": 110,
+    "hi": "lk_item_IronSpear__hi",
+    "rect": [
+      342,
+      456,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_IronSpear__hi": {
+    "h": 356,
+    "of": "lk_item_IronSpear",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_IronSword": {
+    "atlas": "atlas_lk_items2_2",
+    "h": 110,
+    "hi": "lk_item_IronSword__hi",
+    "rect": [
+      456,
+      456,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_IronSword__hi": {
+    "h": 356,
+    "of": "lk_item_IronSword",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_Jade": {
+    "atlas": "atlas_lk_items2_1",
+    "h": 110,
+    "hi": "lk_item_Jade__hi",
+    "rect": [
+      114,
+      570,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_JadeDagger": {
+    "atlas": "atlas_lk_items2_2",
+    "h": 110,
+    "hi": "lk_item_JadeDagger__hi",
+    "rect": [
+      570,
+      456,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_JadeDagger__hi": {
+    "h": 356,
+    "of": "lk_item_JadeDagger",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_JadeSpear": {
+    "atlas": "atlas_lk_items2_2",
+    "h": 110,
+    "hi": "lk_item_JadeSpear__hi",
+    "rect": [
+      684,
+      456,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_JadeSpear__hi": {
+    "h": 356,
+    "of": "lk_item_JadeSpear",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_Jade__hi": {
+    "h": 356,
+    "of": "lk_item_Jade",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_JuniperBerry": {
+    "atlas": "atlas_lk_items2_1",
+    "h": 110,
+    "hi": "lk_item_JuniperBerry__hi",
+    "rect": [
+      228,
+      570,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_JuniperBerry__hi": {
+    "h": 356,
+    "of": "lk_item_JuniperBerry",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_MithrilAxe": {
+    "atlas": "atlas_lk_items2_2",
+    "h": 110,
+    "hi": "lk_item_MithrilAxe__hi",
+    "rect": [
+      798,
+      456,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_MithrilAxe__hi": {
+    "h": 356,
+    "of": "lk_item_MithrilAxe",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_MithrilBar": {
+    "atlas": "atlas_lk_items2_1",
+    "h": 110,
+    "hi": "lk_item_MithrilBar__hi",
+    "rect": [
+      342,
+      570,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_MithrilBar__hi": {
+    "h": 356,
+    "of": "lk_item_MithrilBar",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_MithrilBow": {
+    "atlas": "atlas_lk_items2_2",
+    "h": 110,
+    "hi": "lk_item_MithrilBow__hi",
+    "rect": [
+      912,
+      456,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_MithrilBow__hi": {
+    "h": 356,
+    "of": "lk_item_MithrilBow",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_MithrilChest": {
+    "atlas": "atlas_lk_items2_2",
+    "h": 110,
+    "hi": "lk_item_MithrilChest__hi",
+    "rect": [
+      0,
+      570,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_MithrilChest__hi": {
+    "h": 356,
+    "of": "lk_item_MithrilChest",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_MithrilDagger": {
+    "atlas": "atlas_lk_items2_2",
+    "h": 110,
+    "hi": "lk_item_MithrilDagger__hi",
+    "rect": [
+      114,
+      570,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_MithrilDagger__hi": {
+    "h": 356,
+    "of": "lk_item_MithrilDagger",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_MithrilHead": {
+    "atlas": "atlas_lk_items2_2",
+    "h": 110,
+    "hi": "lk_item_MithrilHead__hi",
+    "rect": [
+      228,
+      570,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_MithrilHead__hi": {
+    "h": 356,
+    "of": "lk_item_MithrilHead",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_MithrilLegs": {
+    "atlas": "atlas_lk_items2_2",
+    "h": 110,
+    "hi": "lk_item_MithrilLegs__hi",
+    "rect": [
+      342,
+      570,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_MithrilLegs__hi": {
+    "h": 356,
+    "of": "lk_item_MithrilLegs",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_MithrilOre": {
+    "atlas": "atlas_lk_items2_1",
+    "h": 110,
+    "hi": "lk_item_MithrilOre__hi",
+    "rect": [
+      456,
+      570,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_MithrilOre__hi": {
+    "h": 356,
+    "of": "lk_item_MithrilOre",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_MithrilPickaxe": {
+    "atlas": "atlas_lk_items2_2",
+    "h": 110,
+    "hi": "lk_item_MithrilPickaxe__hi",
+    "rect": [
+      456,
+      570,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_MithrilPickaxe__hi": {
+    "h": 356,
+    "of": "lk_item_MithrilPickaxe",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_MithrilSpear": {
+    "atlas": "atlas_lk_items2_2",
+    "h": 110,
+    "hi": "lk_item_MithrilSpear__hi",
+    "rect": [
+      570,
+      570,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_MithrilSpear__hi": {
+    "h": 356,
+    "of": "lk_item_MithrilSpear",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_MithrilSword": {
+    "atlas": "atlas_lk_items2_2",
+    "h": 110,
+    "hi": "lk_item_MithrilSword__hi",
+    "rect": [
+      684,
+      570,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_MithrilSword__hi": {
+    "h": 356,
+    "of": "lk_item_MithrilSword",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_Moonpetal": {
+    "atlas": "atlas_lk_items2_1",
+    "h": 110,
+    "hi": "lk_item_Moonpetal__hi",
+    "rect": [
+      570,
+      570,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_Moonpetal__hi": {
+    "h": 356,
+    "of": "lk_item_Moonpetal",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_Obsidian": {
+    "atlas": "atlas_lk_items2_1",
+    "h": 110,
+    "hi": "lk_item_Obsidian__hi",
+    "rect": [
+      684,
+      570,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_ObsidianDagger": {
+    "atlas": "atlas_lk_items2_2",
+    "h": 110,
+    "hi": "lk_item_ObsidianDagger__hi",
+    "rect": [
+      798,
+      570,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_ObsidianDagger__hi": {
+    "h": 356,
+    "of": "lk_item_ObsidianDagger",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_ObsidianSpear": {
+    "atlas": "atlas_lk_items2_2",
+    "h": 110,
+    "hi": "lk_item_ObsidianSpear__hi",
+    "rect": [
+      912,
+      570,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_ObsidianSpear__hi": {
+    "h": 356,
+    "of": "lk_item_ObsidianSpear",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_Obsidian__hi": {
+    "h": 356,
+    "of": "lk_item_Obsidian",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_Potion": {
+    "atlas": "atlas_lk_items2_1",
+    "h": 110,
+    "hi": "lk_item_Potion__hi",
+    "rect": [
+      798,
+      570,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_Potion__hi": {
+    "h": 356,
+    "of": "lk_item_Potion",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_Raspberry": {
+    "atlas": "atlas_lk_items2_1",
+    "h": 110,
+    "hi": "lk_item_Raspberry__hi",
+    "rect": [
+      912,
+      570,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_Raspberry__hi": {
+    "h": 356,
+    "of": "lk_item_Raspberry",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_RawMeat": {
+    "atlas": "atlas_lk_items2_1",
+    "h": 110,
+    "hi": "lk_item_RawMeat__hi",
+    "rect": [
+      0,
+      684,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_RawMeat__hi": {
+    "h": 356,
+    "of": "lk_item_RawMeat",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_Redberry": {
+    "atlas": "atlas_lk_items2_1",
+    "h": 110,
+    "hi": "lk_item_Redberry__hi",
+    "rect": [
+      114,
+      684,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_Redberry__hi": {
+    "h": 356,
+    "of": "lk_item_Redberry",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_RedcapMushroom": {
+    "atlas": "atlas_lk_items2_1",
+    "h": 110,
+    "hi": "lk_item_RedcapMushroom__hi",
+    "rect": [
+      228,
+      684,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_RedcapMushroom__hi": {
+    "h": 356,
+    "of": "lk_item_RedcapMushroom",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_Resin": {
+    "atlas": "atlas_lk_items2_1",
+    "h": 110,
+    "hi": "lk_item_Resin__hi",
+    "rect": [
+      342,
+      684,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_Resin__hi": {
+    "h": 356,
+    "of": "lk_item_Resin",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_SiegeResin": {
+    "atlas": "atlas_lk_items2_1",
+    "h": 110,
+    "hi": "lk_item_SiegeResin__hi",
+    "rect": [
+      456,
+      684,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_SiegeResin__hi": {
+    "h": 356,
+    "of": "lk_item_SiegeResin",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_SilverAxe": {
+    "atlas": "atlas_lk_items2_2",
+    "h": 110,
+    "hi": "lk_item_SilverAxe__hi",
+    "rect": [
+      0,
+      684,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_SilverAxe__hi": {
+    "h": 356,
+    "of": "lk_item_SilverAxe",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_SilverBar": {
+    "atlas": "atlas_lk_items2_1",
+    "h": 110,
+    "hi": "lk_item_SilverBar__hi",
+    "rect": [
+      570,
+      684,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_SilverBar__hi": {
+    "h": 356,
+    "of": "lk_item_SilverBar",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_SilverBow": {
+    "atlas": "atlas_lk_items2_2",
+    "h": 110,
+    "hi": "lk_item_SilverBow__hi",
+    "rect": [
+      114,
+      684,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_SilverBow__hi": {
+    "h": 356,
+    "of": "lk_item_SilverBow",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_SilverChest": {
+    "atlas": "atlas_lk_items2_2",
+    "h": 110,
+    "hi": "lk_item_SilverChest__hi",
+    "rect": [
+      228,
+      684,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_SilverChest__hi": {
+    "h": 356,
+    "of": "lk_item_SilverChest",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_SilverDagger": {
+    "atlas": "atlas_lk_items2_2",
+    "h": 110,
+    "hi": "lk_item_SilverDagger__hi",
+    "rect": [
+      342,
+      684,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_SilverDagger__hi": {
+    "h": 356,
+    "of": "lk_item_SilverDagger",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_SilverHead": {
+    "atlas": "atlas_lk_items2_2",
+    "h": 110,
+    "hi": "lk_item_SilverHead__hi",
+    "rect": [
+      456,
+      684,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_SilverHead__hi": {
+    "h": 356,
+    "of": "lk_item_SilverHead",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_SilverLegs": {
+    "atlas": "atlas_lk_items2_2",
+    "h": 110,
+    "hi": "lk_item_SilverLegs__hi",
+    "rect": [
+      570,
+      684,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_SilverLegs__hi": {
+    "h": 356,
+    "of": "lk_item_SilverLegs",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_SilverOre": {
+    "atlas": "atlas_lk_items2_1",
+    "h": 110,
+    "hi": "lk_item_SilverOre__hi",
+    "rect": [
+      684,
+      684,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_SilverOre__hi": {
+    "h": 356,
+    "of": "lk_item_SilverOre",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_SilverPickaxe": {
+    "atlas": "atlas_lk_items2_2",
+    "h": 110,
+    "hi": "lk_item_SilverPickaxe__hi",
+    "rect": [
+      684,
+      684,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_SilverPickaxe__hi": {
+    "h": 356,
+    "of": "lk_item_SilverPickaxe",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_SilverSpear": {
+    "atlas": "atlas_lk_items2_2",
+    "h": 110,
+    "hi": "lk_item_SilverSpear__hi",
+    "rect": [
+      798,
+      684,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_SilverSpear__hi": {
+    "h": 356,
+    "of": "lk_item_SilverSpear",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_SilverSword": {
+    "atlas": "atlas_lk_items2_2",
+    "h": 110,
+    "hi": "lk_item_SilverSword__hi",
+    "rect": [
+      912,
+      684,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_SilverSword__hi": {
+    "h": 356,
+    "of": "lk_item_SilverSword",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_Starstone": {
+    "atlas": "atlas_lk_items2_1",
+    "h": 110,
+    "hi": "lk_item_Starstone__hi",
+    "rect": [
+      798,
+      684,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_Starstone__hi": {
+    "h": 356,
+    "of": "lk_item_Starstone",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_Stone": {
+    "atlas": "atlas_lk_items2_1",
+    "h": 110,
+    "hi": "lk_item_Stone__hi",
+    "rect": [
+      912,
+      684,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_StoneAxe": {
+    "atlas": "atlas_lk_items2_1",
+    "h": 110,
+    "hi": "lk_item_StoneAxe__hi",
+    "rect": [
+      0,
+      798,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_StoneAxe__hi": {
+    "h": 356,
+    "of": "lk_item_StoneAxe",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_StoneDagger": {
+    "atlas": "atlas_lk_items2_1",
+    "h": 110,
+    "hi": "lk_item_StoneDagger__hi",
+    "rect": [
+      114,
+      798,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_StoneDagger__hi": {
+    "h": 356,
+    "of": "lk_item_StoneDagger",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_StonePickaxe": {
+    "atlas": "atlas_lk_items2_1",
+    "h": 110,
+    "hi": "lk_item_StonePickaxe__hi",
+    "rect": [
+      228,
+      798,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_StonePickaxe__hi": {
+    "h": 356,
+    "of": "lk_item_StonePickaxe",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_StoneSpear": {
+    "atlas": "atlas_lk_items2_1",
+    "h": 110,
+    "hi": "lk_item_StoneSpear__hi",
+    "rect": [
+      342,
+      798,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_StoneSpear__hi": {
+    "h": 356,
+    "of": "lk_item_StoneSpear",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_StoneSword": {
+    "atlas": "atlas_lk_items2_1",
+    "h": 110,
+    "hi": "lk_item_StoneSword__hi",
+    "rect": [
+      456,
+      798,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_StoneSword__hi": {
+    "h": 356,
+    "of": "lk_item_StoneSword",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_Stone__hi": {
+    "h": 356,
+    "of": "lk_item_Stone",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_Stormglass": {
+    "atlas": "atlas_lk_items2_1",
+    "h": 110,
+    "hi": "lk_item_Stormglass__hi",
+    "rect": [
+      570,
+      798,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_Stormglass__hi": {
+    "h": 356,
+    "of": "lk_item_Stormglass",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_StrongGlimmerDraught": {
+    "atlas": "atlas_lk_items2_1",
+    "h": 110,
+    "hi": "lk_item_StrongGlimmerDraught__hi",
+    "rect": [
+      684,
+      798,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_StrongGlimmerDraught__hi": {
+    "h": 356,
+    "of": "lk_item_StrongGlimmerDraught",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_StrongSunberryDraught": {
+    "atlas": "atlas_lk_items2_1",
+    "h": 110,
+    "hi": "lk_item_StrongSunberryDraught__hi",
+    "rect": [
+      798,
+      798,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_StrongSunberryDraught__hi": {
+    "h": 356,
+    "of": "lk_item_StrongSunberryDraught",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_Sunberry": {
+    "atlas": "atlas_lk_items2_1",
+    "h": 110,
+    "hi": "lk_item_Sunberry__hi",
+    "rect": [
+      912,
+      798,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_SunberryDraught": {
+    "atlas": "atlas_lk_items2_1",
+    "h": 110,
+    "hi": "lk_item_SunberryDraught__hi",
+    "rect": [
+      0,
+      912,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_SunberryDraught__hi": {
+    "h": 356,
+    "of": "lk_item_SunberryDraught",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_Sunberry__hi": {
+    "h": 356,
+    "of": "lk_item_Sunberry",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_Sweetberry": {
+    "atlas": "atlas_lk_items2_1",
+    "h": 110,
+    "hi": "lk_item_Sweetberry__hi",
+    "rect": [
+      114,
+      912,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_Sweetberry__hi": {
+    "h": 356,
+    "of": "lk_item_Sweetberry",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_Thornvine": {
+    "atlas": "atlas_lk_items2_1",
+    "h": 110,
+    "hi": "lk_item_Thornvine__hi",
+    "rect": [
+      228,
+      912,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_Thornvine__hi": {
+    "h": 356,
+    "of": "lk_item_Thornvine",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_Wood": {
+    "atlas": "atlas_lk_items2_1",
+    "h": 110,
+    "hi": "lk_item_Wood__hi",
+    "rect": [
+      342,
+      912,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_Wood__hi": {
+    "h": 356,
+    "of": "lk_item_Wood",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_WoodenAxe": {
+    "atlas": "atlas_lk_items2_1",
+    "h": 110,
+    "hi": "lk_item_WoodenAxe__hi",
+    "rect": [
+      456,
+      912,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_WoodenAxe__hi": {
+    "h": 356,
+    "of": "lk_item_WoodenAxe",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_WoodenBow": {
+    "atlas": "atlas_lk_items2_1",
+    "h": 110,
+    "hi": "lk_item_WoodenBow__hi",
+    "rect": [
+      570,
+      912,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_WoodenBow__hi": {
+    "h": 356,
+    "of": "lk_item_WoodenBow",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_WoodenPickaxe": {
+    "atlas": "atlas_lk_items2_1",
+    "h": 110,
+    "hi": "lk_item_WoodenPickaxe__hi",
+    "rect": [
+      684,
+      912,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_WoodenPickaxe__hi": {
+    "h": 356,
+    "of": "lk_item_WoodenPickaxe",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_WoodenSpear": {
+    "atlas": "atlas_lk_items2_1",
+    "h": 110,
+    "hi": "lk_item_WoodenSpear__hi",
+    "rect": [
+      798,
+      912,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_WoodenSpear__hi": {
+    "h": 356,
+    "of": "lk_item_WoodenSpear",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
+  },
+  "lk_item_Workbench": {
+    "atlas": "atlas_lk_items2_1",
+    "h": 110,
+    "hi": "lk_item_Workbench__hi",
+    "rect": [
+      912,
+      912,
+      110,
+      110
+    ],
+    "slice": null,
+    "w": 110
+  },
+  "lk_item_Workbench__hi": {
+    "h": 356,
+    "of": "lk_item_Workbench",
+    "scale": 3.2364,
+    "slice": null,
+    "w": 356
   },
   "lk_keycap": {
     "atlas": "atlas_lk_lobby",

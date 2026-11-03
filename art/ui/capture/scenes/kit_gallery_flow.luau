@@ -239,9 +239,11 @@ do
 	screen:Destroy()
 end
 
--- Dimming keeps the "picture missing" glyph's own fade.
+-- Dimming keeps the "picture missing" glyph's own fade. Every catalog item has
+-- its own icon now, so an id without art stands in for one whose art is not
+-- uploaded (item_icons_flow covers the catalog items' fallbacks).
 do
-	local slot = Kit.Slot.new(root, { rect = { 10, 600, 92, 99 }, item = { catalogId = "IronSword" } })
+	local slot = Kit.Slot.new(root, { rect = { 10, 600, 92, 99 }, item = { catalogId = "UnmadeSword" } })
 	local function glyph()
 		for _, part in slot.icon.root:GetDescendants() do
 			if part:IsA("ImageLabel") then

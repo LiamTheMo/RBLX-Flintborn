@@ -690,11 +690,16 @@ pressed > open > focused > hover > empty > normal. Force any state with the
 
 ### 6.5 Items: art, tint and the no-art placeholder
 
-- Item art comes only from `ItemInfo.Icon(itemId) → (icon name, tint?)` in
+- **Every item has its own icon**: `ItemInfo.ItemSprite(itemId)` →
+  `lk_item_<CatalogId>`, built from the owner's item art by
+  [`art/ui/items/build_item_icons.py`](../../art/ui/items/build_item_icons.py)
+  (§9.7). `Kit.ItemIcon` (through `Art.ItemIcon`) draws it once its 1x atlas is
+  uploaded (`Widgets.HasBaseArt`); until then the item keeps its older kit art,
+  `ItemInfo.Icon(itemId) → (icon name, tint?)` in
   [`src/shared/Items/ItemInfo.luau`](../../src/shared/Items/ItemInfo.luau),
-  resolved by `ItemInfo.Sprite`; an item's own `lk_item_<id>` / `item_<id>` sprite
-  wins when one exists. [ITEM_ART.md](ITEM_ART.md) lists every item (144 items:
-  12 exact, 83 stand-in, 49 none).
+  resolved by `ItemInfo.Sprite`, so a deploy before the upload never regresses.
+  [ITEM_ART.md](ITEM_ART.md) lists that older art (144 items: 12 exact, 83
+  stand-in, 49 none).
 - **Tints** are `ImageColor3` multiplies: they darken or shift a hue (iron
   greyer, a berry redder) and can never lighten. Items that need lighter art
   need real art.
@@ -901,6 +906,8 @@ for new glyphs.
 | `atlas_lk_journal_hi` | High-resolution Journal illustrations | new: uploaded by the owner |
 | `atlas_lk_items_hi_1` | Hero copies of the tools the Forge and Crafting pictures show (hatchet, pickaxe, spear, stone axe, torch, campfire, build) and the armour stand-in glyph | new: to upload |
 | `atlas_lk_items_hi_2` … `_4` | Hero copies of the other item art | new: to upload |
+| `atlas_lk_items2_1`, `atlas_lk_items2_2` | Every catalog item's own 110 px icon (`lk_item_<id>`, §9.7): 81 and 63 icons | new: to upload |
+| (no atlas) `lk_item_<id>__hi` | The 144 item icons' 356 px hero copies, one image each | new: to upload |
 | `atlas_island_hi_1_1` … `_2_2` | The island painting at 2040 px as 2 × 2 tiles | new: uploaded by the owner |
 
 - **Never change an uploaded atlas.** Once an atlas is uploaded its bytes and
@@ -986,6 +993,40 @@ for new glyphs.
    lists exactly the new atlas.
 9. **Record** the decision in ARCHITECTURE §12 (D26) and the screen specs, then
    hand the atlas to the owner to upload.
+
+### 9.7 Item icons
+
+The owner's item art is one 512 × 512 RGBA PNG per catalog item in
+`src/assets/Models/2D/` (named after the display name in kebab case, "/" as
+"and": `bone-legs-and-boots.png`). Rojo syncs that folder but skips PNGs.
+[`art/ui/items/ICONS.json`](../../art/ui/items/ICONS.json) maps each catalog id
+to its display name, family, PNG and atlas group;
+[`build_item_icons.py`](../../art/ui/items/build_item_icons.py) (deterministic,
+two or three minutes) makes, for each item:
+
+- the alpha clean-up of §9.1 step 3 at the source's resolution (only true
+  pin-holes, up to 8 px, are filled; gaps between berries or legs stay open);
+- a square around the trimmed art, its long side holding the art with a 4 px
+  (slot) margin, resampled with premultiplied Lanczos to **`lk_item_<id>`**, 110
+  px (the biggest slot draws an item 67 design px, 94 px at 1440p), and from the
+  same source pixels to **`lk_item_<id>__hi`**, 356 px (`HERO_PX`), the slot
+  icon's `hi` copy (scale 3.24, so it draws past `HiFrom` 1.16: in the Forge /
+  Crafting picture and the Inventory detail card only); both downscales, no
+  recolour, then the §9.1 step 7 finish (alpha snap, colour bleed);
+- the manifest entries; the slot icons packed into the ICONS.json groups
+  (`pack_atlas.item_groups`), "" placeholders in `UiAssetIds.json` for the new
+  atlases and every hero image, and `UiSprites.json` synced.
+
+The hero copies are **images of their own**, not atlases (a 1024 atlas holds
+eight; 18 sheets would choke phones): `Widgets` gates a copy without an atlas
+on its own image (`readyImage`), so it draws only once loaded, fetched in the
+background when a hero box first wants it. Upload with
+`python3 scripts/roblox_upload_ui_assets.py --upload --only 'atlas_lk_items2_*,lk_item_*__hi'`
+(146 images; throttling waits as asked, an interrupted run continues when
+re-run). Never move an item between uploaded atlases: a new item goes into a
+new group in ICONS.json. The `item_icons_flow` capture scene checks the
+fallback and the hero gate; the `item_info` spec checks every catalog item has
+its icon and hero copy in `UiSprites.json`.
 
 ---
 

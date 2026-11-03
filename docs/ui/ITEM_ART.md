@@ -1,5 +1,13 @@
 # Item art
 
+**Every catalog item now has art of its own**: `lk_item_<CatalogId>` (110 px,
+atlases `atlas_lk_items2_1` / `_2`) and its 356 px hero copy
+`lk_item_<CatalogId>__hi`, built from `src/assets/Models/2D/` by
+`art/ui/items/build_item_icons.py` with the mapping in
+`art/ui/items/ICONS.json` (STYLE_GUIDE §9.7). `Kit.ItemIcon` draws it once its
+atlas is uploaded. The table below is the older kit art each item keeps drawing
+until then (and the fallback if the new atlas ever fails to have an id).
+
 Which art every catalog item (`ItemCatalog.Items`, generated gear, ores and bars
 included) draws in slots, cards and the hotbar until it has art of its own. The
 source is `ItemInfo.Icon(id) → (name, tint)` in `src/shared/Items/ItemInfo.luau`

@@ -3,7 +3,7 @@
 Reference: `art/blender/assets/references/069.png` (1024 × 1536 px). INDEX.md row 69: "Flintborn palisade wall study".
 The sheet's header reads **"PAGE 73/132"** (top right), title **"PALISADE WALL"**, subtitle "INDIVIDUAL ASSET PRODUCTION
 REFERENCE", footer "FLINTBORN — INDIVIDUAL MODEL STUDY" (our number is INDEX's 069).
-Builder: `art/blender/kit/mcp/m069.py` → `build()` (not written yet). Procedure: `art/blender/kit/mcp/STAGES.md`. One
+Builder: `art/blender/kit/mcp/m069.py` → `build()`. Procedure: `art/blender/kit/mcp/STAGES.md`. One
 modeller does stages 1–6 in a background Blender, then a fresh verifier does stage 7; the main session puts the model
 into the kit file, exports and commits.
 
@@ -894,3 +894,336 @@ Palisade, Stockade, LogWall, StakeWall, Fence, Rampart, Barricade, Gate, Wall:
    rails stopping ≥ 0.70 inside the seams, dressing symmetric front/back so no PivotOffset is needed.
 9. **Sheet conflicts as resolved in §3:** the "rear three-quarter" is the front redrawn without the banner; the side
    depth difference from the lashings is recorded, not scored.
+
+## Stage 1 — Modelling (modeller, 2026-11-03)
+
+Builder `art/blender/kit/mcp/m069.py` → `build()`; worked in a background session on `art/blender/assets/kit/wip/M069.blend`
+(saved after every good build). Every piece is its own closed shell built from its own function (`timber`, `bands` /
+`band_paths`, `beam`, `lashing`, `banner`, `rock`, `rosette`), placed by the §2 tables, no booleans. Objects: hero
+`Stockade`, tiling module `StockadeStraight` (= `wall()`), parts `StockadeLog` (L4), `StockadePost` (P2 with closed
+bands), `StockadeRail` (a 9-stud rail with a three-turn lashing; no stub: without its post it would float),
+`StockadeBanner`, `StockadeRock` (F1), `StockadeRosette` (G2).
+
+What was built, and where it departs from §2 (each change measured):
+- **Timbers:** the §2.2 table; chamfer faces 0.22 Ø; rings at z 0, 0.50, 1.20 (foot blend), the shoulder, then an
+  8-facet pyramid (tip length 0.70 Ø ± 0.06 seeded, apex ± 0.04; the end logs exact and centred). 62 tris each.
+  **L6 is Ø 0.79** (spec 0.80) so the row closes at exactly 15.99 with 0.01 gaps; L7 … L11 sit 0.01 left of §2.2.
+  Ordered skyline 8.3 / 10.3 / 8.0 / 8.8 / 8.9 / 7.6 / 9.5 / 11.5 / 9.8 / 12.2 / 9.4 / 10.4 exactly; tip lengths
+  0.659–0.738 Ø. Not built (budget): the 0.04 shoulder rim (sub-pixel at hero distance), the ring 0.25 under the
+  shoulder, the post rings at the band edges, the rails' mid ring.
+- **Bands (changed from §2.4):** the neighbouring timbers stand 0.01 from each post, so a closed loop round the post
+  passed 0.30 through them (first build). Each turn is the mitred offset loop (offset 0.16, rope Ø 0.36, 5-sided
+  twisted) cut where its centreline comes within 0.16 of a neighbour: a front run and a rear run, each end carried on to
+  sink 0.04 into the neighbour, square to its surface (`band_paths`). From front, rear and side the band reads as
+  wrapping the post; the hidden sides are not modelled. The Post part keeps closed loops (`alone=True`). Turns 0.34
+  apart. Bands P1 2.10–3.14 / 6.40–7.44, P2 2.10–3.14 / 6.60–7.64.
+- **Rail ends (computed, `_end_x`):** in a chamfer, the inner edge 0.02 into the chamfer face; against a band,
+  bisected so rail and rope run are at most 0.03 into each other (`_seat_on_band`). Result (x0 … x1): RR1 −4.475 …
+  3.766, RR2 −4.921 … 4.211, RF1 −4.921 … 2.600, RF2 1.450 … 3.761; stubs RR1_w −7.213 … −6.763 (0.45 long, so it
+  stays more than 0.70 inside the seam), RR1_e 6.084 … 6.850, RR2_w −6.959 … −6.359, RR2_e 5.649 … 6.850, RF1_w
+  −6.959 … −6.359, RF2_e 6.095 … 7.300. **The rear +X stubs run on to 6.85** so they rest on L11 (0.60 long they hung
+  off the post only). Rails 28 tris, pale end faces.
+- **Lashings:** open 4-point C-runs (rope Ø 0.28, 0.12 off the rail faces), both ends sunk 0.04 into the log face
+  behind; RF1 3 turns at L3 and L5, **RF2 2 turns at x 7.00** (spec 6.95: keeps both turns on L11's broad face), rear
+  2 turns at L3 and L8 on both rails. 36 tris a turn.
+- **Banner:** pegs 0.30 square sunk 0.05 into L8 / P2, the rod 8-sided (a flat down) resting 0.005 on the pegs, knob
+  balls (6 × 3) 0.17 past each rod end, **the hem as a closed sleeve tube round the rod** (0.007 clear of it) with the
+  flat 0.08 cloth slab 0.017 up into it (no ±0.05 wave, so the emblem lies flat on it), swallowtail points z 1.95,
+  notch 3.25, double-diamond rings 1.30 × 2.90 / 0.70 × 1.55 and two edge stripes as 0.02 slabs half sunk in the
+  cloth front.
+- **Rocks:** convex hulls of jittered rings (5-point foot on z 0, 5-point shoulder, broad 4-point upper ring, 2-point
+  broken top: blocks with sloping top facets, not eggs), 28 tris; each pushed in y toward the wall until it would meet
+  it (bisected, gap ≤ 0.004). Centres F1 (−7.00, −1.469), F3 (−4.05, −1.093), F4 (−0.60, −1.001), F5 (3.60, −1.115),
+  F6 (5.90, −1.490), B1 (5.70, 1.563), B2 (−2.90, 1.347), B3 (−6.70, 1.478).
+- **Rosettes (changed from §2.6):** five 8-tri leaves read as a flat star a third the size of the sheet's clumps (f34 G
+  share 1.3 % against 8.8). Now **six broad round leaves** (the kit "disc" outline, 16 tris, W/L 1.0, at most 1.15
+  wide) in two alternating tiers (pitch 40–46° and 60–68°), radial, folded 28° on the midrib with the front point not
+  raised (with a raised ridge two facets per leaf turned edge-on: sweep 35–46 % on the first build), each reaching an
+  ellipse stretched along the wall's foot (1.45 × 0.95; the end clumps 1.00 × 0.85). **Nine clumps** (G8 front x 4.75
+  and G9 rear x 0.40 added); each clump's y set so its outermost tip is at |y| 2.50; the clump turned to the yaw where
+  fewest leaves meet the wall or a rock, then any leaf that still does (or crosses |x| 7.95) shortened in 0.86 steps.
+  Clumps about 1.5 tall.
+- **Cameras:** `f34_sheet` probed az −15 … −30 × e 10 / 15 / 20 (obj / timber W : H): (−15, 10) 1.238 / 1.243,
+  (−20, 15) 1.176 / 1.180, (−25, 15) 1.133 / 1.127, (−30, 15) 1.086 / 1.063. Chosen **(−22, 12)**: 1.153 / 1.169,
+  between the sheet's 1.235 (obj) and 1.115 (timber): the sheet's dressing spreads wider than ours. `lash_cu` from the
+  front-right (az 40; from the front-left the banner covers the band).
+- **Hero 15.99 × 5.00 × 12.20, module 15.99 × 3.37 × 12.20**, both with the bbox bottom centre on the build origin.
+
+Renders (all in `art/blender/renders/models/M069/`): `front_sheet`, `rear_sheet`, `side_sheet`, `f34_sheet`,
+`r34_sheet` (the f34 with the banner hidden, §3.2), `top_sheet`, kit views `front34 rear34 front side rear top`, parts
+`part_*`, `exploded`, `scale` (5.5 marker in front of L3), `tiling_front_sheet`, `tiling_f34`, `tiling_top_sheet`,
+`tiling_plain_f34`, `seam_cu`, `seam_top_cu`, `lash_cu`, `tip_cu`, `base_cu`, `banner_cu`, `thumb_sheet`,
+`spin*_sheet`, contact sheets `M069_views.png` and `M069_spin.png`. Looked at view by view against the sheet: the read
+(orange log row, uneven pale skyline, banded posts, lashed rails on both faces, red banner on the right half, lavender
+rocks and lime clumps) holds in every cell; the spin shows no floating piece, no see-through cloth, no flat leaf card.
+
+## Stage 2 — Optimisation and cleanup
+
+| Object | Tris | Size | Shells | Non-manifold edges, bowtie verts, boundary, loose, zero-area, n-gons, dup verts | Winding errors | Floating / unchained / buried |
+| --- | --- | --- | --- | --- | --- | --- |
+| Stockade | **3948** | 15.99 × 5.00 × 12.20 | 135 | all 0 | 0 | 0 / 0 / 0 |
+| StockadeStraight | **2584** | 15.99 × 3.37 × 12.20 | 62 | all 0 | 0 | 0 / 0 / 0 |
+| StockadeLog | 62 | 1.35 × 1.35 × 8.80 | 1 | all 0 | 0 | 0 |
+| StockadePost | 542 | 2.41 × 2.41 × 12.20 | 7 | all 0 | 0 | 0 |
+| StockadeRail | 136 | 9.00 × 1.00 × 1.41 | 4 | all 0 | 0 | 0 |
+| StockadeBanner | 276 | 4.10 × 1.35 × 6.77 | 11 | all 0 | 0 | 0 |
+| StockadeRock | 28 | 1.40 × 1.49 × 1.63 | 1 | all 0 | 0 | 0 |
+| StockadeRosette | 96 | 2.33 × 1.88 × 1.54 | 6 | all 0 | 0 | 0 |
+
+- Hero tris by kind: logs 620, posts 124, bands 984 (24 runs), rails 112, stubs 168, lashings 576 (16 turns), pegs
+  24, rod 28, knobs 48, sleeve 64, cloth 24, emblem 64, stripes 24, rocks 224, leaves 864 (54). **3948 is over the
+  3850 plan but under the 4000 ceiling**: the foliage took the room (stage 1). If it must come down: rosettes 9 → 7.
+- Winding: 0 inconsistent edges and 0 inward faces by the parity test on every shell; normals outward; flat shading;
+  no custom normals; transforms applied; origin at the bbox bottom centre (pivot residual 0.000 on hero and module).
+- Contact (`contact_report`): 0 floating and 0 unchained on every object, worst gap 0.000; feet on z 0.000.
+- Bury (`bury_report`, ray parity): 0 over 0.05. Worst per pair: band>log 0.040 (the run ends), lash>log 0.040,
+  peg>log / peg>post 0.050 (the stated seat), knob>rod 0.040, rod>knob 0.033, rail>band 0.026, band>stub 0.025,
+  rail>post 0.020, stub>post 0.020, cloth>sleeve 0.017, band>post 0.011, emblem / stripe>cloth 0.010, leaf>leaf
+  0.008, stub>log 0.005, leaf>rock 0.004.
+- Pierce (thin slabs: cloth, sleeve, emblem, stripes): 0. Rope ends (`rope_ends_report`): every open run touches at
+  both ends, worst gap 0.000 (the Rail part 0.019: its lashing ends stop behind the rail, where a log would be).
+- Thin corners: 8 under 3° on the hero (the banner stripes' long triangles), smallest 0.97° (floor 0.3°); 0
+  non-planar quads.
+- Leaf sweep (`leaf_sweep_report`, 5° azimuth steps at e 0 and e 10): whole leaves edge-on 0.0 % at every step
+  (limit 10 %); mean-plane share within 15° of edge-on (reported only) at most 35 %.
+
+**Seam check (two modules side by side: the hero and the module each copied at +16):** 0 intersecting triangle pairs,
+closest approach 0.010 (L11's face at +7.995 to the next module's L1 face at +8.005); x extents exactly −7.995 /
++7.995, 0 vertices past |x| 7.995; both end faces flat at ±7.995 over y −0.506 … +0.506 (the broad face of the Ø 1.47
+octagon; §2.1's "±0.55" was approximate) from z 0 to the shoulder (L1 7.271, L11 9.371), identical sections; the
+members' outermost ends 0.70 inside the seams (RF2_e at 7.30); dressing inside |x| 7.95 (7.948). `seam_top_cu` and
+the tiling shots show the end logs meeting square with no gap, overlap or step.
+
+## Stage 3 — UV
+
+`M.smart_uv` at 45°, ANGLE_BASED re-unwrap, margin 0.008, then overlaps cut free (`_uv_unfold`, 0 cuts needed). Every
+object: 0 overlapping pairs, 0 flipped, min island gap 0.016, border 0.008, texel density 1.0 / 1.0 / 1.0, conformal
+stretch p95 1.00 (Post 1.05, Rock 1.09). The exporter writes its own palette UVs; this layer is clean for FBX / OBJ.
+
+## Stage 4 — Materials, colour and texture
+
+**Keys:** `K.calibrate` on the studio dome toward §5.4's targets, then corrected on the hero renders against the sheet
+cells with the spec 1.2 masks (`m069.measure` / `m069.compare`):
+
+| Key | Final hex | How |
+| --- | --- | --- |
+| m069_timber | `#8F5B28` | dome `#885726` (rendered 167, 99, 38 against `#AB6426`), raised 5 % so the rear cell's wood median comes within 15 |
+| m069_timber_end | `#CFA266` | the dome's `#D29457` clipped red on the tips (`#FFBA63`); G and B raised toward the sheet's tips `#FBBF68` / `#FCD07E` |
+| m069_timber_deep | `#69461F` | dome `#64431D`, raised with timber |
+| m069_rope / rope_deep | `#C49A5C` / `#93652F` | the dome's `#A9824D` read timber-coloured on the hero; raised 15 % |
+| m069_banner / banner_deep | `#FC231F` / `#A9140F` | dome |
+| m069_cloth_white | `#F4EEEC` | not calibrated (the samplers drop near-white); renders `#FFFFF9`, s 0.02 |
+| m069_rock / light / dark | `#8A8594` / `#ABA6B4` / `#4E4C5C` | the dome's `#6D6E7C` rendered blue-grey and dark on the hero (rock_dark's dome run diverged); lifted and turned toward the sheet's lavender (B ≥ R) |
+| m069_leaf_light / leaf / leaf_dark | `#AACF0E` / `#9ACA1C` / `#2C5C1C` | the dome's `#91B10B` / `#698F11` / `#254F18` rendered dark and olive on the clumps; brightened |
+
+**By role and position, never by facing:** tip facets, rail and stub end faces, knobs and peg ends timber_end (hard
+edge); timber foot bands z 0–0.5 → 50 % and 0.5–1.2 → 25 % toward timber_deep; rope one strand in five rope_deep (by
+place round the twist); the hem sleeve 50 % and the cloth above z 8.0 25 % toward banner_deep; emblem and stripes
+white; rock: a soil band (0–16 % of the height 50 %, to 32 % 25 % toward rock_dark; the hidden underside plain) and
+broad noise patches (40 % toward light, 20 % toward dark), **not §5.3's top / bottom height bands**: on a lone rock
+those read as painted light to the kit check (correlation 0.95, now 0.17); leaves by place along the leaf (the heart
+45 % toward leaf_dark, the middle leaf, the outer part lime on the low tier; the high tier one step deeper). Tint 0.05
+per timber and rail piece, 0.04 rock, 0.03 leaf, 0.02 cloth. All matte (roughness 0.8–0.95), no metal, no emission.
+Kit check baked shading: hero 0.25, module 0.26, Post 0.20, Rock 0.17; the Log part 0.75 (its pale tip faces up)
+carries `kit_shading_ok` (the sheet's Wood (Secondary) swatch on the cut tip, by role).
+
+**Re-measured on the final renders (median / lit / shade; sheet first):**
+
+| Region | Sheet | Ours | Note |
+| --- | --- | --- | --- |
+| Timber, f34 cell | `#975822` / `#D38234` / `#553116` | `#9B5B22` / `#AA6426` / `#603713` | median and shade ✓; lit quartile 40 under (below) |
+| Timber, front cell | `#985822` | `#9B5A22` | ✓ |
+| Timber, rear cell | `#9A5A23` (shafts above the rails `#AB6426`) | `#8D5421` | whole cell within 15; the rear-shaft target missed by about 30 (the rear faces get less studio light) |
+| Pale tips, `tip_cu` / front cell | `#F8B15E` / `#FBBF68` | `#FFC671` / `#FFC873` | within 15 of the front tips; about 20 over close-up B in G |
+| Rope, rear cell (R class below the tips) | `#D49951` | `#CF9E57` | ✓; `lash_cu` (shadowed side) `#B3864D` |
+| Banner, front | `#FC231F` | `#FF1F1A` | ✓; emblem white `#FFFFF9`, s 0.02 ✓ |
+| Rock, front / rear | `#7C7887` / `#857D89` | `#7E7681` / `#797483` | ✓ both, B ≥ R |
+| Foliage, f34 / rear | `#81AF12` / `#729711` | `#7A9D12` / `#749D11` | rear ✓; f34 18 under in G |
+| Lime share of G, f34 | 63 % | 75 % | inside 63 ± 15 |
+
+**Shares and W : H (spec 1.2 masks):**
+- front_sheet: timber + rope W : H **1.315** (1.31 ± 0.05 ✓); W 76.8 / R 6.2 / B 7.7 / S 4.7 / G 4.6, all in
+  tolerance.
+- rear_sheet: timber W : H **1.317** ✓; W 82.9 ✓, G 3.9 (6 ± 3 ✓).
+- side_sheet: timber + rope **0.293** (0.277 ± 0.03 ✓), object 0.403 (0.467 ± 0.08 ✓).
+- f34_sheet (−22, 12): object 1.153 (1.235 ± 0.08: 0.002 outside), timber 1.169 (1.115 ± 0.08 ✓); W 73.8 / R 9.9 /
+  B 7.0 / G 4.9 (8.8 ± 4, at the edge).
+- Wood lit / mid / shade: ours 1 / 79 / 20 (f34) against the sheet's 15 / 44 / 41: **recorded miss**. The kit studio
+  lights the wall evenly; the sheet's painted highlights and deep shade can't come from the base colour without moving
+  the median off the sheet, and the median is what is matched.
+
+## Stage 5 — Lighting
+
+Skipped: the sheet shows nothing emissive and no light (§7). No emission on any key, no Neon. Studio notes (Requires
+Manual Validation): the timber should read orange-brown in daylight, the pale tips against the sky, the rails'
+undersides dark by shadow only.
+
+## Stage 6 — VFX
+
+Skipped: no glow, smoke, dust or sparkle on the sheet, and the banner hangs still (§7). 0 sockets on every object
+(`export_stats`: 0 sockets, no glow keys).
+
+## Stages 1–6: open items for the verifier and the main session
+
+- Recorded misses: no shoulder rim on the tips; the sheet's pointed feet (decision 4); nine six-leaf clumps, sparser
+  than the sheet's heaped foliage (G share 4.6–4.9 % against 7.3–8.8 %); wood lit / shade bands (studio lighting);
+  f34 object W : H 1.153 (the sheet's dressing spreads wider); the rear-shaft timber target; the side cell's rear banner
+  edge (§3.4).
+- Departures from §2 listed under stage 1: L6 Ø 0.79, bands as front and rear runs, computed rail ends, longer rear +X
+  stubs, RR1_w stub 0.45, RF2 lashing at 7.00, the hem sleeve, rock colour by soil band and patches, nine rosettes.
+- Collision tags: hero `precise`, module `box`, Log / Post / Rail `box`, Banner / Rosette `none`, Rock `hull`; the
+  Studio climb check stays Requires Manual Validation. Stored points `m069_offset` (0, 0, 0), `m069_seams` (−8, 8),
+  `m069_rails`, `m069_pitch` 16 on hero and module; `m069_hang` on the Banner part.
+
+## Stage 7 verification (round 1)
+
+Independent verifier, read-only, background Blender on a copy of the kit file taken after the main session built 069
+into it (`build()` not called, file not saved). Every number below was re-measured with the verifier's own bmesh / BVH /
+raster code, and every view was rendered by the verifier into `<temp>\v069\r\` and set beside the matching sheet cell.
+
+**Result: PASS, 7/10.** No blockers. Every technical requirement and the tile contract are met exactly; the wall, its
+skyline, rails and banner read like the sheet. The dressing and the rope read less like the sheet (minors 1–3).
+
+### Technical (all objects)
+
+| Object | Tris | Size (studs) | Shells | Floating / unchained | Deepest sink |
+| --- | --- | --- | --- | --- | --- |
+| `Stockade` | 3948 / 4000 | 15.990 × 5.000 × 12.200 | 135 | 0 / 0 | 0.050 (pegs, the stated seat) |
+| `StockadeStraight` | 2584 (about 2850) | 15.990 × 3.366 × 12.200 | 62 | 0 / 0 | 0.042 (stub in band) |
+| `StockadeLog` | 62 | 1.350 × 1.350 × 8.800 | 1 | 0 / 0 | – |
+| `StockadePost` | 542 | 2.412 × 2.412 × 12.200 | 7 | 0 / 0 | 0.011 (band in post) |
+| `StockadeRail` | 136 | 9.000 × 0.998 × 1.406 | 4 (no stub) | 0 / 0 | 0.013 (lashing in rail) |
+| `StockadeBanner` | 276 | 4.100 × 1.347 × 6.767 | 11 | 0 / 0 | 0.050 (pegs) |
+| `StockadeRock` | 28 | 1.397 × 1.492 × 1.630 | 1 | 0 / 0 | – |
+| `StockadeRosette` | 96 | 2.330 × 1.882 × 1.537 | 6 | 0 / 0 | 0.015 (leaf in leaf) |
+
+- Every object: 0 non-manifold edges, 0 boundary, 0 wire, 0 loose verts, 0 bowtie verts, 0 zero-area faces, 0 n-gons,
+  0 duplicate verts, 0 winding errors (edge direction test), 0 negative-volume shells, 0 faces failing the parity test,
+  0 non-planar quads. Smallest corner 0.97° (8 faces under 3°, all banner stripe slivers; floor 0.3°). Origin at the
+  bbox bottom centre (error 0.0000 on x, y and z), rotation 0, scale 1, no modifiers, no custom normals, flat shading, no
+  unused slots, no children (0 sockets), no emission.
+- Hero tris by kind: logs 620, posts 124, bands 984 (24 runs), rails 112, stubs 168, lashings 576 (16 turns), pegs 24,
+  rod 28, knobs 48, sleeve 64, cloth 24, emblem 64, stripes 24, rocks 224, leaves 864 (54). 52 under the ceiling.
+- Shell count matches §8: 10 logs, 2 posts, 4 bands (as 24 front / rear runs), 4 rails, 6 stubs, 7 lashings (16
+  turns), 2 pegs, rod, 2 knobs, sleeve, cloth, 2 emblem rings, 2 stripes, 8 rocks, 9 rosettes (54 leaves).
+- Bury, by dense surface sampling of every intersecting triangle pair and three-ray parity: nothing over 0.05. Worst
+  per pair: peg>L8 / P2 0.050 (stated seat), stub>band 0.042, band run end>log 0.040, lashing end>log 0.040, knob>rod
+  0.040, rail>band 0.033, rail / stub>post 0.020, cloth>sleeve 0.017, leaf>leaf 0.016, lashing>rail 0.013, band>post
+  0.011, emblem / stripe>cloth 0.010, stub>L1 0.005, rod on pegs 0.005, leaf>rock 0.004. No pass-through on the 0.08
+  cloth or the 0.02 emblem and stripe shells; no leaf meets a log or rail.
+- UV: one `UVMap`; 0 overlapping pixels (2048² raster), 0 flipped, 0 zero-area UV faces, border 0.008 on every object.
+- Materials (base hex, Tint 0.955–1.045): timber `#8F5B28`, timber_end `#CFA266`, foot blends `#865626` / `#7C5024`,
+  rope `#C49A5C` / `#93652F`, banner `#FC231F` (hem blends `#E71F1B` / `#D21C17`), cloth_white `#F4EEEC`, rock `#8A8594`
+  with `#9792A1` / `#7E7A89` / `#7B7786` / `#6C6878`, leaf `#9ACA1C` / `#AACF0E` / `#84B41C` / `#68981C` / `#5E8E1C`;
+  roughness 0.80–0.95, metal 0, emission 0.
+- Colour against facing (face luminance against the normal): whole hero z 0.08, |z| 0.12; timber without tips 0.25
+  (foot bands by height), with the tips 0.42 (tips by role); rope 0.06; rock 0.29 (soil band); leaf 0.04; banner 0.02.
+  None by facing.
+- Collision tags as decided: hero `precise`, `StockadeStraight` `box`, Log / Post / Rail `box`, Banner / Rosette `none`,
+  Rock `hull`. Stored `m069_offset` (0, 0, 0), `m069_seams` (−8, 8), `m069_pitch` 16, `m069_rails` on hero and module;
+  `m069_hang` on the Banner.
+
+### Sizes and tiling (build frame)
+
+- **Timbers:** skyline from −X 8.3 / 10.3 / 8.0 / 8.8 / 8.9 / 7.6 / 9.5 / 11.5 / 9.8 / 12.2 / 9.4 / 10.4, exactly §2.2.
+  Ø 1.47 / 1.75 / 1.25 / 1.35 / 1.25 / 0.79 / 1.35 / 1.45 / 1.30 / 1.75 / 0.70 / 1.47; fillers at y +0.15; every gap
+  0.010; feet on z 0.000; tip length 0.659–0.738 Ø, apex offsets ≤ 0.04 (end logs centred).
+- **Seams:** x extents exactly ±7.995 on hero and module, 0 vertices past them. L1 and L11 have identical sections
+  (rings 0 / 0.5 / 1.2, the same octagon mirrored); their outer faces are flat at ±7.995 over y ±0.506, z 0 to the
+  shoulder (7.271 / 9.371). Only those two faces come within 0.3 of a seam; members end at |x| 7.300 (0.70 inside),
+  rocks at 7.72, leaves at 7.948.
+- **Two copies 16 apart** (hero | hero, module | module, hero | module both ways): 0 intersecting triangle pairs,
+  closest approach 0.010. The three-module front, f34 and plain f34 shots and a top seam close-up show the end logs
+  meeting square with no gap, step or overlap, the stubs one log short of each joint.
+- **Rails:** RR1 z 2.80 (x −4.475 … 3.766), RR2 5.90 (−4.921 … 4.211), RF1 5.40 (−4.921 … 2.600), RF2 7.10 (1.450 …
+  3.761); section 0.90 × 0.70, inner faces |y| 0.730. Stubs RR1_w −7.213 … −6.763, RR1_e 6.084 … 6.850, RR2_w −6.959 …
+  −6.359, RR2_e 5.649 … 6.850, RF1_w −6.959 … −6.359, RF2_e 6.095 … 7.300.
+- **Rope:** band runs 0.36 per turn, turns 0.34 apart: P1 2.10–3.14 / 6.40–7.44, P2 2.10–3.14 / 6.60–7.64, reaching
+  |y| 1.206. Lashings 0.28 per turn: RF1 three turns at L3 and L5, RF2 two turns at x 6.86 / 7.14, rear two turns at L3
+  and L8 on both rails; reaching |y| 1.683.
+- **Banner:** pegs 0.30 square out to y −1.95, tops 8.35; rod 3.34 × Ø 0.30 at z 8.495; knobs 0.42; cloth 2.20 × 0.08,
+  z 1.95–8.29 (6.55 below the rod axis); emblem rings 1.30 × 2.90 and 0.70 × 1.55 at (3.32, 5.50); stripes 0.10 ×
+  5.92. Clearances: cloth back face 0.33 in front of RF2 and 0.55 in front of P2's band, 0.15 / 0.09 off the pegs,
+  points 1.17 above F5.
+- **Dressing:** rocks 0.78–1.88 tall, flat on z 0, their tops at least 0.47 below RR1; nine rosettes about 2.2–2.7 ×
+  1.6–1.9 × 1.45–1.59 (end clumps about 1.2–1.5 × 1.0), reaching y ±2.500 exactly.
+- **Leaf sweep** (5° azimuth steps at e 0 and e 10, all 54 hero leaves and the part's 6): whole leaves edge-on 0.0 %
+  at every step (no leaf has 75 % of its upper facets within 15° of edge-on, none falls under 0.26 of its face-on
+  area). Mean-plane share within 15° of edge-on, reported only: at most 34.6 % (hero), 39.7 % (part).
+- **See-through:** a ray grid through the log line (x every 0.01, z 0.05–6.80) from az 0 / ±20 / ±40 / 60 / 160 / 180 /
+  200 / 220 at e 0 / 15 / 30 passes only through the 0.01 slots between timbers, and only exactly face-on (az 0 / 180).
+  Nothing at 20° or more.
+
+### Views against the sheet (masks of §1.2; sheet → ours)
+
+| View | W : H obj / timber + rope | Wood median / lit / shade | W / R / B / S / G % | lit / mid / shade % |
+| --- | --- | --- | --- | --- |
+| f34 (−22, 12) | 1.235 / 1.115 → **1.161 / 1.172** | `#975822` / `#D38234` / `#553116` → `#9B5B22` / `#AA6426` / `#603713` | 73.1 / 7.6 / 6.1 / 3.4 / 8.8 → 73.7 / 9.9 / 7.0 / 4.5 / 4.8 | 15/44/41 → 1/79/20 |
+| r34 (f34, no banner) | 1.192 / 1.094 → 1.161 / 1.169 | `#A35E22` → `#9B5A22` | 78.9 / 8.8 / 0 / 3.3 / 8.0 → 81.1 / 9.8 / 0 / 4.4 / 4.7 | 16/47/37 → 1/82/17 |
+| front (0, 0) | log row 1.31 → **1.314** | `#985822` → `#9B5A22` | 73.1 / 7.4 / 7.4 / 3.7 / 7.3 → 76.6 / 6.3 / 7.8 / 4.7 / 4.6 | 13/46/41 → 0/67/32 |
+| rear (180, 0) | log row 1.31 → **1.316** | `#9A5A23` → `#8D5421` | 80.0 / 8.2 / 0 / 4.7 / 6.0 → 82.9 / 8.0 / 0 / 5.2 / 3.9 | 12/51/37 → 0/83/17 |
+| side (90, 0) | 0.467 / 0.277 (spec) → 0.404 / **0.293** | `#A56024` → `#754519` (end face in shade) | B 6.1 → 2.0 (§3.4) | 16/56/29 → 0/25/75 |
+| top | content | `#925E29` → `#845727` | – | – |
+
+- Inside tolerance: every §1.2 W : H (the f34 object 0.006 inside its lower edge; at (−30, 15) it is 1.067, outside),
+  every front and rear share (front G 4.6 against 7.3 ± 3 and f34 G 4.8 against 8.8 ± 4, both near the lower edge).
+- Colours: wood medians within 4 (f34, front) and 13 (rear); banner `#FC231F` → `#FF1F1A`, emblem white s 0.02;
+  front rock `#7C7887` → `#807782`, rear `#857D89` → `#7A7584` (B ≥ R in every view); tips `#FFC671` against §5.4's
+  `#F8B15E` (G +21, B +19) and the front tips `#FBBF68` (within 9); rope, rear band close-up `#C49552` against
+  `#D49951` (within 16), the sheet's close-up A rope renders `#F0B962`; foliage rear `#729711` → `#749D13`, f34
+  `#81AF12` → `#799C13`, front `#7CA712` → `#5D750D` (the e 0 camera sees the undersides of the up-pitched leaves);
+  lime share of G 63–65 → 66–74.
+- The lit / shade spread is the recorded studio-lighting miss.
+- **f34 / r34:** the layout matches: the −X end log and banded P1 near, RF1 from the −X stub across five logs with two
+  lashings, the banner between L8 and P2 on its rod, RF2 from the banner past P2 to the lashed end, the +X post
+  tallest, rocks and clumps along the foot. **front / rear:** skyline, rails, lashings, stubs and bands as the cells;
+  tallest post at screen left in the rear. **side:** the +X end log with stubs either side and the banner edge (minor 5).
+  **top:** the row of octagonal pale tops, rails on both edges, rocks and clumps at both ends and mid.
+- **Close-ups:** B (tip) matches apart from the recorded missing rim; C (underside) shows the flat-cut feet, rail
+  undersides and lashings; A (band and rail) differs in rope build (minor 2). **Parts** against the exploded cell: Log,
+  Post with two bands, Rail, Banner (swallowtail, stripes, double diamond, knobbed rod) read; Rock and Rosette differ
+  (minors 1 and 3). **Spin** (eight azimuths at e 10): nothing floats, the cloth reads as a solid slab at the side
+  views. **Thumb** (180 × 150): skyline, bands, rails and the emblem read.
+
+### Blockers
+
+None.
+
+### Minors
+
+1. **Rosettes read as spiky crowns, not round-leaved clumps (shows).** Each clump is six leaves pitched up 40–68°;
+   from the f34 and the front they read as pointed blades in an open cup. The sheet draws low clusters of broad,
+   rounded, clover-like leaves facing up round a dark centre. The clumps are also sparser (G 4.6–4.8 % against
+   7.3–8.8 %). From above each clump has an open hole at the centre (ground shows) where the sheet shows a dark centre.
+   Fix if wanted: flatter leaves (pitch about 15–30°), a blunter, wider outline (W / L about 1.1–1.2, no point), 7–8
+   leaves or a small inner ring, a dark hub cap closing the centre, then re-run the sweep. The hero has 52 tris of
+   headroom, so this needs tris from elsewhere (rosettes 864, bands 984).
+2. **Rope reads as thin twisted slats (shows).** At sheet scale the bands and lashings render as pale lines with dark
+   grooves between turns. The sheet draws fat, round, cream-golden coils (close-up A). Because the posts stand flush
+   in the row, the band runs cross the post front straight and sink into the neighbours instead of wrapping a visible
+   post side. On shaded faces the rope renders dull (rear band `#C49552`, front lashings darker). Fix if wanted: less
+   twist per segment so the facets read round, turns overlapping by about 0.03 to close the grooves, rope key lifted
+   toward the sheet's `#D8A85E`.
+3. **Rocks read as upright pebbles (shows).** F1 is 1.40 W × 1.49 D × 1.63 H (§2.6: 1.60 × 1.50 × 1.70), and the
+   others are also about as tall as wide. The sheet's rocks are broad, squat boulders, wider than tall (exploded W : H
+   about 1.3–1.5). In the f34 the stone renders lighter and more mauve than the sheet (`#958B97`, h 290, against
+   `#686679`, h 249); front and rear are within 6–11. Fix if wanted: widen to W ≥ H with flatter tops, and turn the key
+   slightly toward blue.
+4. **Posts flush with the log row (shows, slightly).** The sheet draws the posts standing proud, with the front rail
+   passing behind them. Here every axis is on y 0 (§2.1, decided), so the posts stand only 0.14–0.31 proud of their
+   neighbours and read as thicker logs, with RF1 butting into P1's chamfer. No change under the tile contract.
+5. **Side view (shows).** L11 stands in front of P2, so the side reads as a plain end log with stubs; P2's bands only
+   peek out (the lower front run, the upper rear run). The sheet's side cell draws the banded post square on with the
+   banner on both faces (§3.4, recorded). The W : H values are in tolerance.
+6. **Lighting spread (recorded).** Wood lit / mid / shade 1 / 79 / 20 against 15 / 44 / 41; f34 lit quartile 41
+   under the sheet. Studio lighting, as recorded in stage 4.
+7. **f34 camera (content only).** At (−22, 12) the wall reads nearer front-on than the sheet's f34, which shows more of
+   the logs' left faces. At (−30, 15) the object W : H falls to 1.067, outside 1.235 ± 0.08, so −22 is the right
+   choice.
+8. **Rail part without a stub (does not show on the hero).** §8 lists one rail with a lashing and a stub. The part has
+   no stub: the modeller notes it would float without its post. Recorded departure; acceptable.
+9. **Face-on hairline slots (does not show).** The 0.01 gaps between timbers pass straight through the wall only at
+   exactly az 0 / 180 (124–233 of about 45,000 grid rays), never at 20° or more. A sub-pixel hairline at most; optional
+   Studio glance.
+10. **Seats at their limits (does not show).** Pegs 0.050 (the stated seat); rail>band 0.033 against §2.3's 0.03;
+    `StockadeStraight` 2584 against "about 2850" (under, fine).

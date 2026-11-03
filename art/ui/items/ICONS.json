@@ -1,0 +1,886 @@
+{
+  "about": [
+    "Every catalog item's icon (ItemCatalog.Items, generated gear included): its display name, family, the source PNG in src/assets/Models/2D (512 x 512 RGBA, kebab-case display name) and the atlas its slot icon is packed into.",
+    "art/ui/items/build_item_icons.py builds lk_item_<id> (the slot icon) and lk_item_<id>__hi (the hero copy) from it. Never move an item to another atlas once that atlas is uploaded: add new items to a new atlas group."
+  ],
+  "items": {
+    "AbyssalShard": {
+      "name": "Abyssal Shard",
+      "family": "Material",
+      "png": "abyssal-shard.png",
+      "atlas": "atlas_lk_items2_1"
+    },
+    "AdamantineAxe": {
+      "name": "Adamantine Axe",
+      "family": "Tool",
+      "png": "adamantine-axe.png",
+      "atlas": "atlas_lk_items2_2"
+    },
+    "AdamantineBar": {
+      "name": "Adamantine Bar",
+      "family": "Material",
+      "png": "adamantine-bar.png",
+      "atlas": "atlas_lk_items2_1"
+    },
+    "AdamantineBow": {
+      "name": "Adamantine Bow",
+      "family": "Weapon",
+      "png": "adamantine-bow.png",
+      "atlas": "atlas_lk_items2_2"
+    },
+    "AdamantineChest": {
+      "name": "Adamantine Chest",
+      "family": "Armor",
+      "png": "adamantine-chest.png",
+      "atlas": "atlas_lk_items2_2"
+    },
+    "AdamantineDagger": {
+      "name": "Adamantine Dagger",
+      "family": "Weapon",
+      "png": "adamantine-dagger.png",
+      "atlas": "atlas_lk_items2_2"
+    },
+    "AdamantineHead": {
+      "name": "Adamantine Head",
+      "family": "Armor",
+      "png": "adamantine-head.png",
+      "atlas": "atlas_lk_items2_2"
+    },
+    "AdamantineLegs": {
+      "name": "Adamantine Legs/Boots",
+      "family": "Armor",
+      "png": "adamantine-legs-and-boots.png",
+      "atlas": "atlas_lk_items2_2",
+      "note": "\"/\" in the name reads \"and\" in the file name"
+    },
+    "AdamantineOre": {
+      "name": "Adamantine Ore",
+      "family": "Material",
+      "png": "adamantine-ore.png",
+      "atlas": "atlas_lk_items2_1"
+    },
+    "AdamantinePickaxe": {
+      "name": "Adamantine Pickaxe",
+      "family": "Tool",
+      "png": "adamantine-pickaxe.png",
+      "atlas": "atlas_lk_items2_2"
+    },
+    "AdamantineSpear": {
+      "name": "Adamantine Spear",
+      "family": "Weapon",
+      "png": "adamantine-spear.png",
+      "atlas": "atlas_lk_items2_2"
+    },
+    "AdamantineSword": {
+      "name": "Adamantine Sword",
+      "family": "Weapon",
+      "png": "adamantine-sword.png",
+      "atlas": "atlas_lk_items2_2"
+    },
+    "AdvancedMedicine": {
+      "name": "Advanced Medicine",
+      "family": "Consumable",
+      "png": "advanced-medicine.png",
+      "atlas": "atlas_lk_items2_1"
+    },
+    "Amethyst": {
+      "name": "Amethyst",
+      "family": "Material",
+      "png": "amethyst.png",
+      "atlas": "atlas_lk_items2_1"
+    },
+    "AncientEmber": {
+      "name": "Ancient Ember",
+      "family": "Material",
+      "png": "ancient-ember.png",
+      "atlas": "atlas_lk_items2_1"
+    },
+    "AshenOil": {
+      "name": "Ashen Oil",
+      "family": "Material",
+      "png": "ashen-oil.png",
+      "atlas": "atlas_lk_items2_1"
+    },
+    "BasicMedicine": {
+      "name": "Basic Medicine",
+      "family": "Consumable",
+      "png": "basic-medicine.png",
+      "atlas": "atlas_lk_items2_1"
+    },
+    "Bloodroot": {
+      "name": "Bloodroot",
+      "family": "Material",
+      "png": "bloodroot.png",
+      "atlas": "atlas_lk_items2_1"
+    },
+    "Bone": {
+      "name": "Bone",
+      "family": "Material",
+      "png": "bone.png",
+      "atlas": "atlas_lk_items2_1"
+    },
+    "BoneChest": {
+      "name": "Bone Chest",
+      "family": "Armor",
+      "png": "bone-chest.png",
+      "atlas": "atlas_lk_items2_1"
+    },
+    "BoneDagger": {
+      "name": "Bone Dagger",
+      "family": "Weapon",
+      "png": "bone-dagger.png",
+      "atlas": "atlas_lk_items2_1"
+    },
+    "BoneHead": {
+      "name": "Bone Head",
+      "family": "Armor",
+      "png": "bone-head.png",
+      "atlas": "atlas_lk_items2_2"
+    },
+    "BoneLegs": {
+      "name": "Bone Legs/Boots",
+      "family": "Armor",
+      "png": "bone-legs-and-boots.png",
+      "atlas": "atlas_lk_items2_2",
+      "note": "\"/\" in the name reads \"and\" in the file name"
+    },
+    "BoneSpear": {
+      "name": "Bone Spear",
+      "family": "Weapon",
+      "png": "bone-spear.png",
+      "atlas": "atlas_lk_items2_2"
+    },
+    "BreachingCharge": {
+      "name": "Breaching Charge",
+      "family": "Siege",
+      "png": "breaching-charge.png",
+      "atlas": "atlas_lk_items2_1"
+    },
+    "CaveMushroom": {
+      "name": "Cave Mushroom",
+      "family": "Material",
+      "png": "cave-mushroom.png",
+      "atlas": "atlas_lk_items2_1"
+    },
+    "ChargedCore": {
+      "name": "Charged Core",
+      "family": "Material",
+      "png": "charged-core.png",
+      "atlas": "atlas_lk_items2_1"
+    },
+    "ChestnutMushroom": {
+      "name": "Chestnut Mushroom",
+      "family": "Material",
+      "png": "chestnut-mushroom.png",
+      "atlas": "atlas_lk_items2_1"
+    },
+    "Clay": {
+      "name": "Clay",
+      "family": "Material",
+      "png": "clay.png",
+      "atlas": "atlas_lk_items2_1"
+    },
+    "CobaltAxe": {
+      "name": "Cobalt Axe",
+      "family": "Tool",
+      "png": "cobalt-axe.png",
+      "atlas": "atlas_lk_items2_2"
+    },
+    "CobaltBar": {
+      "name": "Cobalt Bar",
+      "family": "Material",
+      "png": "cobalt-bar.png",
+      "atlas": "atlas_lk_items2_1"
+    },
+    "CobaltBow": {
+      "name": "Cobalt Bow",
+      "family": "Weapon",
+      "png": "cobalt-bow.png",
+      "atlas": "atlas_lk_items2_2"
+    },
+    "CobaltChest": {
+      "name": "Cobalt Chest",
+      "family": "Armor",
+      "png": "cobalt-chest.png",
+      "atlas": "atlas_lk_items2_2"
+    },
+    "CobaltDagger": {
+      "name": "Cobalt Dagger",
+      "family": "Weapon",
+      "png": "cobalt-dagger.png",
+      "atlas": "atlas_lk_items2_2"
+    },
+    "CobaltHead": {
+      "name": "Cobalt Head",
+      "family": "Armor",
+      "png": "cobalt-head.png",
+      "atlas": "atlas_lk_items2_2"
+    },
+    "CobaltLegs": {
+      "name": "Cobalt Legs/Boots",
+      "family": "Armor",
+      "png": "cobalt-legs-and-boots.png",
+      "atlas": "atlas_lk_items2_2",
+      "note": "\"/\" in the name reads \"and\" in the file name"
+    },
+    "CobaltOre": {
+      "name": "Cobalt Ore",
+      "family": "Material",
+      "png": "cobalt-ore.png",
+      "atlas": "atlas_lk_items2_1"
+    },
+    "CobaltPickaxe": {
+      "name": "Cobalt Pickaxe",
+      "family": "Tool",
+      "png": "cobalt-pickaxe.png",
+      "atlas": "atlas_lk_items2_2"
+    },
+    "CobaltSpear": {
+      "name": "Cobalt Spear",
+      "family": "Weapon",
+      "png": "cobalt-spear.png",
+      "atlas": "atlas_lk_items2_2"
+    },
+    "CobaltSword": {
+      "name": "Cobalt Sword",
+      "family": "Weapon",
+      "png": "cobalt-sword.png",
+      "atlas": "atlas_lk_items2_2"
+    },
+    "CookedMeat": {
+      "name": "Cooked Meat",
+      "family": "Consumable",
+      "png": "cooked-meat.png",
+      "atlas": "atlas_lk_items2_1"
+    },
+    "CopperAxe": {
+      "name": "Copper Axe",
+      "family": "Tool",
+      "png": "copper-axe.png",
+      "atlas": "atlas_lk_items2_2"
+    },
+    "CopperBar": {
+      "name": "Copper Bar",
+      "family": "Material",
+      "png": "copper-bar.png",
+      "atlas": "atlas_lk_items2_1"
+    },
+    "CopperBow": {
+      "name": "Copper Bow",
+      "family": "Weapon",
+      "png": "copper-bow.png",
+      "atlas": "atlas_lk_items2_2"
+    },
+    "CopperChest": {
+      "name": "Copper Chest",
+      "family": "Armor",
+      "png": "copper-chest.png",
+      "atlas": "atlas_lk_items2_2"
+    },
+    "CopperDagger": {
+      "name": "Copper Dagger",
+      "family": "Weapon",
+      "png": "copper-dagger.png",
+      "atlas": "atlas_lk_items2_2"
+    },
+    "CopperHead": {
+      "name": "Copper Head",
+      "family": "Armor",
+      "png": "copper-head.png",
+      "atlas": "atlas_lk_items2_2"
+    },
+    "CopperLegs": {
+      "name": "Copper Legs/Boots",
+      "family": "Armor",
+      "png": "copper-legs-and-boots.png",
+      "atlas": "atlas_lk_items2_2",
+      "note": "\"/\" in the name reads \"and\" in the file name"
+    },
+    "CopperOre": {
+      "name": "Copper Ore",
+      "family": "Material",
+      "png": "copper-ore.png",
+      "atlas": "atlas_lk_items2_1"
+    },
+    "CopperPickaxe": {
+      "name": "Copper Pickaxe",
+      "family": "Tool",
+      "png": "copper-pickaxe.png",
+      "atlas": "atlas_lk_items2_2"
+    },
+    "CopperSpear": {
+      "name": "Copper Spear",
+      "family": "Weapon",
+      "png": "copper-spear.png",
+      "atlas": "atlas_lk_items2_2"
+    },
+    "CopperSword": {
+      "name": "Copper Sword",
+      "family": "Weapon",
+      "png": "copper-sword.png",
+      "atlas": "atlas_lk_items2_2"
+    },
+    "DireHide": {
+      "name": "Dire Hide",
+      "family": "Material",
+      "png": "dire-hide.png",
+      "atlas": "atlas_lk_items2_1"
+    },
+    "Elderberry": {
+      "name": "Elderberry",
+      "family": "Material",
+      "png": "elderberry.png",
+      "atlas": "atlas_lk_items2_1"
+    },
+    "Emberglass": {
+      "name": "Emberglass",
+      "family": "Material",
+      "png": "emberglass.png",
+      "atlas": "atlas_lk_items2_1"
+    },
+    "ExtractionRune": {
+      "name": "Portable Extraction Rune",
+      "family": "Placeable",
+      "png": "portable-extraction-rune.png",
+      "atlas": "atlas_lk_items2_1",
+      "note": "named after the display name, not the id"
+    },
+    "Fiber": {
+      "name": "Plant Fiber",
+      "family": "Material",
+      "png": "plant-fiber.png",
+      "atlas": "atlas_lk_items2_1",
+      "note": "named after the display name, not the id"
+    },
+    "FireBomb": {
+      "name": "Fire Bomb",
+      "family": "Siege",
+      "png": "fire-bomb.png",
+      "atlas": "atlas_lk_items2_1"
+    },
+    "Flint": {
+      "name": "Flint",
+      "family": "Material",
+      "png": "flint.png",
+      "atlas": "atlas_lk_items2_1"
+    },
+    "FlintArrow": {
+      "name": "Flint Arrow",
+      "family": "Ammo",
+      "png": "flint-arrow.png",
+      "atlas": "atlas_lk_items2_1"
+    },
+    "FlintDagger": {
+      "name": "Flint Dagger",
+      "family": "Weapon",
+      "png": "flint-dagger.png",
+      "atlas": "atlas_lk_items2_2"
+    },
+    "FlintSpear": {
+      "name": "Flint Spear",
+      "family": "Weapon",
+      "png": "flint-spear.png",
+      "atlas": "atlas_lk_items2_2"
+    },
+    "Frostleaf": {
+      "name": "Frostleaf",
+      "family": "Material",
+      "png": "frostleaf.png",
+      "atlas": "atlas_lk_items2_1"
+    },
+    "GlimmerDraught": {
+      "name": "Glimmer Draught",
+      "family": "Consumable",
+      "png": "glimmer-draught.png",
+      "atlas": "atlas_lk_items2_1"
+    },
+    "Glimmerberry": {
+      "name": "Glimmerberry",
+      "family": "Consumable",
+      "png": "glimmerberry.png",
+      "atlas": "atlas_lk_items2_1"
+    },
+    "GlowFur": {
+      "name": "Glow-Fur",
+      "family": "Material",
+      "png": "glow-fur.png",
+      "atlas": "atlas_lk_items2_1",
+      "note": "the hyphen in the name stays one"
+    },
+    "GreaterPotion": {
+      "name": "Greater Healing Potion",
+      "family": "Consumable",
+      "png": "greater-healing-potion.png",
+      "atlas": "atlas_lk_items2_1",
+      "note": "named after the display name, not the id"
+    },
+    "GuardianFang": {
+      "name": "Guardian's Fang",
+      "family": "Weapon",
+      "png": "guardians-fang.png",
+      "atlas": "atlas_lk_items2_1",
+      "note": "the apostrophe is dropped"
+    },
+    "GuardianHeart": {
+      "name": "Guardian Heart",
+      "family": "Material",
+      "png": "guardian-heart.png",
+      "atlas": "atlas_lk_items2_1"
+    },
+    "Hazelnut": {
+      "name": "Hazelnut",
+      "family": "Material",
+      "png": "hazelnut.png",
+      "atlas": "atlas_lk_items2_1"
+    },
+    "HeartyTonic": {
+      "name": "Hearty Tonic",
+      "family": "Consumable",
+      "png": "hearty-tonic.png",
+      "atlas": "atlas_lk_items2_1"
+    },
+    "Herbs": {
+      "name": "Herbs",
+      "family": "Material",
+      "png": "herbs.png",
+      "atlas": "atlas_lk_items2_1"
+    },
+    "Hide": {
+      "name": "Hide",
+      "family": "Material",
+      "png": "hide.png",
+      "atlas": "atlas_lk_items2_1"
+    },
+    "HideChest": {
+      "name": "Hide Chest",
+      "family": "Armor",
+      "png": "hide-chest.png",
+      "atlas": "atlas_lk_items2_1"
+    },
+    "HideHead": {
+      "name": "Hide Head",
+      "family": "Armor",
+      "png": "hide-head.png",
+      "atlas": "atlas_lk_items2_1"
+    },
+    "HideLegs": {
+      "name": "Hide Legs/Boots",
+      "family": "Armor",
+      "png": "hide-legs-and-boots.png",
+      "atlas": "atlas_lk_items2_1",
+      "note": "\"/\" in the name reads \"and\" in the file name"
+    },
+    "IronAxe": {
+      "name": "Iron Axe",
+      "family": "Tool",
+      "png": "iron-axe.png",
+      "atlas": "atlas_lk_items2_2"
+    },
+    "IronBar": {
+      "name": "Iron Bar",
+      "family": "Material",
+      "png": "iron-bar.png",
+      "atlas": "atlas_lk_items2_1"
+    },
+    "IronBow": {
+      "name": "Iron Bow",
+      "family": "Weapon",
+      "png": "iron-bow.png",
+      "atlas": "atlas_lk_items2_2"
+    },
+    "IronChest": {
+      "name": "Iron Chest",
+      "family": "Armor",
+      "png": "iron-chest.png",
+      "atlas": "atlas_lk_items2_2"
+    },
+    "IronDagger": {
+      "name": "Iron Dagger",
+      "family": "Weapon",
+      "png": "iron-dagger.png",
+      "atlas": "atlas_lk_items2_2"
+    },
+    "IronHead": {
+      "name": "Iron Head",
+      "family": "Armor",
+      "png": "iron-head.png",
+      "atlas": "atlas_lk_items2_2"
+    },
+    "IronLegs": {
+      "name": "Iron Legs/Boots",
+      "family": "Armor",
+      "png": "iron-legs-and-boots.png",
+      "atlas": "atlas_lk_items2_2",
+      "note": "\"/\" in the name reads \"and\" in the file name"
+    },
+    "IronOre": {
+      "name": "Iron Ore",
+      "family": "Material",
+      "png": "iron-ore.png",
+      "atlas": "atlas_lk_items2_1"
+    },
+    "IronPickaxe": {
+      "name": "Iron Pickaxe",
+      "family": "Tool",
+      "png": "iron-pickaxe.png",
+      "atlas": "atlas_lk_items2_2"
+    },
+    "IronSpear": {
+      "name": "Iron Spear",
+      "family": "Weapon",
+      "png": "iron-spear.png",
+      "atlas": "atlas_lk_items2_2"
+    },
+    "IronSword": {
+      "name": "Iron Sword",
+      "family": "Weapon",
+      "png": "iron-sword.png",
+      "atlas": "atlas_lk_items2_2"
+    },
+    "Jade": {
+      "name": "Jade",
+      "family": "Material",
+      "png": "jade.png",
+      "atlas": "atlas_lk_items2_1"
+    },
+    "JadeDagger": {
+      "name": "Jade Dagger",
+      "family": "Weapon",
+      "png": "jade-dagger.png",
+      "atlas": "atlas_lk_items2_2"
+    },
+    "JadeSpear": {
+      "name": "Jade Spear",
+      "family": "Weapon",
+      "png": "jade-spear.png",
+      "atlas": "atlas_lk_items2_2"
+    },
+    "JuniperBerry": {
+      "name": "Juniper Berry",
+      "family": "Material",
+      "png": "juniper-berry.png",
+      "atlas": "atlas_lk_items2_1"
+    },
+    "MithrilAxe": {
+      "name": "Mithril Axe",
+      "family": "Tool",
+      "png": "mithril-axe.png",
+      "atlas": "atlas_lk_items2_2"
+    },
+    "MithrilBar": {
+      "name": "Mithril Bar",
+      "family": "Material",
+      "png": "mithril-bar.png",
+      "atlas": "atlas_lk_items2_1"
+    },
+    "MithrilBow": {
+      "name": "Mithril Bow",
+      "family": "Weapon",
+      "png": "mithril-bow.png",
+      "atlas": "atlas_lk_items2_2"
+    },
+    "MithrilChest": {
+      "name": "Mithril Chest",
+      "family": "Armor",
+      "png": "mithril-chest.png",
+      "atlas": "atlas_lk_items2_2"
+    },
+    "MithrilDagger": {
+      "name": "Mithril Dagger",
+      "family": "Weapon",
+      "png": "mithril-dagger.png",
+      "atlas": "atlas_lk_items2_2"
+    },
+    "MithrilHead": {
+      "name": "Mithril Head",
+      "family": "Armor",
+      "png": "mithril-head.png",
+      "atlas": "atlas_lk_items2_2"
+    },
+    "MithrilLegs": {
+      "name": "Mithril Legs/Boots",
+      "family": "Armor",
+      "png": "mithril-legs-and-boots.png",
+      "atlas": "atlas_lk_items2_2",
+      "note": "\"/\" in the name reads \"and\" in the file name"
+    },
+    "MithrilOre": {
+      "name": "Mithril Ore",
+      "family": "Material",
+      "png": "mithril-ore.png",
+      "atlas": "atlas_lk_items2_1"
+    },
+    "MithrilPickaxe": {
+      "name": "Mithril Pickaxe",
+      "family": "Tool",
+      "png": "mithril-pickaxe.png",
+      "atlas": "atlas_lk_items2_2"
+    },
+    "MithrilSpear": {
+      "name": "Mithril Spear",
+      "family": "Weapon",
+      "png": "mithril-spear.png",
+      "atlas": "atlas_lk_items2_2"
+    },
+    "MithrilSword": {
+      "name": "Mithril Sword",
+      "family": "Weapon",
+      "png": "mithril-sword.png",
+      "atlas": "atlas_lk_items2_2"
+    },
+    "Moonpetal": {
+      "name": "Moonpetal",
+      "family": "Material",
+      "png": "moonpetal.png",
+      "atlas": "atlas_lk_items2_1"
+    },
+    "Obsidian": {
+      "name": "Obsidian",
+      "family": "Material",
+      "png": "obsidian.png",
+      "atlas": "atlas_lk_items2_1"
+    },
+    "ObsidianDagger": {
+      "name": "Obsidian Dagger",
+      "family": "Weapon",
+      "png": "obsidian-dagger.png",
+      "atlas": "atlas_lk_items2_2"
+    },
+    "ObsidianSpear": {
+      "name": "Obsidian Spear",
+      "family": "Weapon",
+      "png": "obsidian-spear.png",
+      "atlas": "atlas_lk_items2_2"
+    },
+    "Potion": {
+      "name": "Healing Potion",
+      "family": "Consumable",
+      "png": "healing-potion.png",
+      "atlas": "atlas_lk_items2_1",
+      "note": "named after the display name, not the id"
+    },
+    "Raspberry": {
+      "name": "Raspberry",
+      "family": "Material",
+      "png": "raspberry.png",
+      "atlas": "atlas_lk_items2_1"
+    },
+    "RawMeat": {
+      "name": "Raw Meat",
+      "family": "Material",
+      "png": "raw-meat.png",
+      "atlas": "atlas_lk_items2_1"
+    },
+    "Redberry": {
+      "name": "Redberry",
+      "family": "Consumable",
+      "png": "redberry.png",
+      "atlas": "atlas_lk_items2_1"
+    },
+    "RedcapMushroom": {
+      "name": "Redcap Mushroom",
+      "family": "Material",
+      "png": "redcap-mushroom.png",
+      "atlas": "atlas_lk_items2_1"
+    },
+    "Resin": {
+      "name": "Resin",
+      "family": "Material",
+      "png": "resin.png",
+      "atlas": "atlas_lk_items2_1"
+    },
+    "SiegeResin": {
+      "name": "Siege Resin",
+      "family": "Material",
+      "png": "siege-resin.png",
+      "atlas": "atlas_lk_items2_1"
+    },
+    "SilverAxe": {
+      "name": "Silver Axe",
+      "family": "Tool",
+      "png": "silver-axe.png",
+      "atlas": "atlas_lk_items2_2"
+    },
+    "SilverBar": {
+      "name": "Silver Bar",
+      "family": "Material",
+      "png": "silver-bar.png",
+      "atlas": "atlas_lk_items2_1"
+    },
+    "SilverBow": {
+      "name": "Silver Bow",
+      "family": "Weapon",
+      "png": "silver-bow.png",
+      "atlas": "atlas_lk_items2_2"
+    },
+    "SilverChest": {
+      "name": "Silver Chest",
+      "family": "Armor",
+      "png": "silver-chest.png",
+      "atlas": "atlas_lk_items2_2"
+    },
+    "SilverDagger": {
+      "name": "Silver Dagger",
+      "family": "Weapon",
+      "png": "silver-dagger.png",
+      "atlas": "atlas_lk_items2_2"
+    },
+    "SilverHead": {
+      "name": "Silver Head",
+      "family": "Armor",
+      "png": "silver-head.png",
+      "atlas": "atlas_lk_items2_2"
+    },
+    "SilverLegs": {
+      "name": "Silver Legs/Boots",
+      "family": "Armor",
+      "png": "silver-legs-and-boots.png",
+      "atlas": "atlas_lk_items2_2",
+      "note": "\"/\" in the name reads \"and\" in the file name"
+    },
+    "SilverOre": {
+      "name": "Silver Ore",
+      "family": "Material",
+      "png": "silver-ore.png",
+      "atlas": "atlas_lk_items2_1"
+    },
+    "SilverPickaxe": {
+      "name": "Silver Pickaxe",
+      "family": "Tool",
+      "png": "silver-pickaxe.png",
+      "atlas": "atlas_lk_items2_2"
+    },
+    "SilverSpear": {
+      "name": "Silver Spear",
+      "family": "Weapon",
+      "png": "silver-spear.png",
+      "atlas": "atlas_lk_items2_2"
+    },
+    "SilverSword": {
+      "name": "Silver Sword",
+      "family": "Weapon",
+      "png": "silver-sword.png",
+      "atlas": "atlas_lk_items2_2"
+    },
+    "Starstone": {
+      "name": "Starstone",
+      "family": "Material",
+      "png": "starstone.png",
+      "atlas": "atlas_lk_items2_1"
+    },
+    "Stone": {
+      "name": "Stone",
+      "family": "Material",
+      "png": "stone.png",
+      "atlas": "atlas_lk_items2_1"
+    },
+    "StoneAxe": {
+      "name": "Stone Axe",
+      "family": "Tool",
+      "png": "stone-axe.png",
+      "atlas": "atlas_lk_items2_1"
+    },
+    "StoneDagger": {
+      "name": "Stone Dagger",
+      "family": "Weapon",
+      "png": "stone-dagger.png",
+      "atlas": "atlas_lk_items2_1"
+    },
+    "StonePickaxe": {
+      "name": "Stone Pickaxe",
+      "family": "Tool",
+      "png": "stone-pickaxe.png",
+      "atlas": "atlas_lk_items2_1"
+    },
+    "StoneSpear": {
+      "name": "Stone Spear",
+      "family": "Weapon",
+      "png": "stone-spear.png",
+      "atlas": "atlas_lk_items2_1"
+    },
+    "StoneSword": {
+      "name": "Stone Sword",
+      "family": "Weapon",
+      "png": "stone-sword.png",
+      "atlas": "atlas_lk_items2_1"
+    },
+    "Stormglass": {
+      "name": "Stormglass",
+      "family": "Material",
+      "png": "stormglass.png",
+      "atlas": "atlas_lk_items2_1"
+    },
+    "StrongGlimmerDraught": {
+      "name": "Strong Glimmer Draught",
+      "family": "Consumable",
+      "png": "strong-glimmer-draught.png",
+      "atlas": "atlas_lk_items2_1"
+    },
+    "StrongSunberryDraught": {
+      "name": "Strong Sunberry Draught",
+      "family": "Consumable",
+      "png": "strong-sunberry-draught.png",
+      "atlas": "atlas_lk_items2_1"
+    },
+    "Sunberry": {
+      "name": "Sunberry",
+      "family": "Consumable",
+      "png": "sunberry.png",
+      "atlas": "atlas_lk_items2_1"
+    },
+    "SunberryDraught": {
+      "name": "Sunberry Draught",
+      "family": "Consumable",
+      "png": "sunberry-draught.png",
+      "atlas": "atlas_lk_items2_1"
+    },
+    "Sweetberry": {
+      "name": "Sweetberry",
+      "family": "Consumable",
+      "png": "sweetberry.png",
+      "atlas": "atlas_lk_items2_1"
+    },
+    "Thornvine": {
+      "name": "Thornvine",
+      "family": "Material",
+      "png": "thornvine.png",
+      "atlas": "atlas_lk_items2_1"
+    },
+    "Wood": {
+      "name": "Wood",
+      "family": "Material",
+      "png": "wood.png",
+      "atlas": "atlas_lk_items2_1"
+    },
+    "WoodenAxe": {
+      "name": "Wooden Axe",
+      "family": "Tool",
+      "png": "wooden-axe.png",
+      "atlas": "atlas_lk_items2_1"
+    },
+    "WoodenBow": {
+      "name": "Wooden Bow",
+      "family": "Weapon",
+      "png": "wooden-bow.png",
+      "atlas": "atlas_lk_items2_1"
+    },
+    "WoodenPickaxe": {
+      "name": "Wooden Pickaxe",
+      "family": "Tool",
+      "png": "wooden-pickaxe.png",
+      "atlas": "atlas_lk_items2_1"
+    },
+    "WoodenSpear": {
+      "name": "Wooden Spear",
+      "family": "Weapon",
+      "png": "wooden-spear.png",
+      "atlas": "atlas_lk_items2_1"
+    },
+    "Workbench": {
+      "name": "Workbench",
+      "family": "Placeable",
+      "png": "workbench.png",
+      "atlas": "atlas_lk_items2_1"
+    }
+  }
+}

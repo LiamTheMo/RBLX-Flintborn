@@ -1,15 +1,17 @@
--- A catalog item's picture, from ItemInfo.Icon(catalogId) (the single
--- item-to-icon source; it may return a tint too), then lk_item_<CatalogId> /
--- item_<CatalogId>, then the `icon` prop; with none, the item's name in ink,
--- then a neutral glyph for the item's kind (KitItemName carries the name for
--- tooltips), so nothing reads blank and no slot prints text.
+-- A catalog item's picture (Art.ItemIcon): its own icon (ItemInfo.ItemSprite,
+-- lk_item_<CatalogId>) once that icon's atlas is uploaded, else the kit art
+-- ItemInfo.Icon(catalogId) names (it may return a tint too), then
+-- item_<CatalogId>, then the `icon` prop; with none, a neutral glyph for the
+-- item's kind (KitItemName carries the name for tooltips), so nothing reads
+-- blank and no slot prints text.
 --
 -- In slots, rows and tiles the picture is never drawn larger than its art
 -- (MAX_SCALE design px per pixel of the art that draws there, Art.Capped): a
 -- box bigger than the art centres it at that size instead of blurring it. The
 -- hero boxes (the Forge and Crafting picture, the Inventory detail card) pass
 -- `maxScale = false`: every item fills the box, drawn from its hero copy
--- (`lk_icon_<id>__hi`, 356 px, UiAssets.Copies) once that atlas is uploaded.
+-- (`lk_item_<id>__hi`, 356 px, UiAssets.Copies) once that image is uploaded
+-- and has loaded on this client (Widgets).
 --
 --   Kit.ItemIcon.new(slot, { rect = { 10, 10, 70, 70 }, catalogId = "StoneAxe" })
 --   Kit.ItemIcon.new(card, { rect = { 73, 38, 152, 166 }, catalogId = "StoneAxe", maxScale = false })
@@ -45,8 +47,9 @@ function ItemIcon:SetItem(catalogId: string?, icon: string?)
 	self.catalogId = catalogId
 	self.root:SetAttribute("KitStandIn", nil)
 	local z = self.base.z + 1
-	-- ItemInfo.Icon is the one item-to-art source (owned with the item data);
-	-- its optional tint recolours shared art (an ore drawn from the stone icon).
+	-- ItemInfo is the one item-to-art source (owned with the item data): the
+	-- item's own icon, else kit art whose optional tint recolours it (an ore
+	-- drawn from the stone icon).
 	local artIcon, tint = Art.ItemIcon(catalogId)
 	local sprite = if artIcon then nil else Art.ItemSprite(catalogId)
 	self.root:SetAttribute("KitRole", "item." .. tostring(artIcon or sprite or icon or catalogId))
