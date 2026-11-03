@@ -85,7 +85,7 @@ palette / notes panel y 1347–1491, divider x 484; footer rule y 1512.
 
 **Scratch study material** (no Blender) in
 `<temp>\m063_study\`.
-Run with `C:/Users/Orang/.local/bin/uv.exe run --no-project --with pillow --with numpy --with scipy python <script> < /dev/null`.
+Run with `uv run --no-project --with pillow --with numpy --with scipy python <script> < /dev/null`.
 - **Helpers:** `m.py` (boxes, `cls`, `gtone`, `clsimg`, `hsv`), `zoom.py` (`zoom.py x0 y0 x1 y1 scale out.png [grid]`),
   `probe2.py` (`probe2.py x,y …` → hex and HSV), `lines2.py` (frame rules), `sw.py` (swatches), `man.py` (manifest
   names; `man.py Cand1 Cand2 …` lists owned names containing each candidate).
@@ -936,7 +936,7 @@ few marginal leaves. Leaf variety is pitch only (side leaves roll 5–12°, the 
 leaves off the bands. The back-right clusters have their stalks toward the wall and their leaves turned out to the
 front-right, so they peek out on both sides of the rope as on the front cell, never facing the wall.
 
-**Stage 1 measurements** (renders with the floor hidden, the study's masks: `<temp>\...\scratchpad\m063_mod\meas.py`,
+**Stage 1 measurements** (renders with the floor hidden, the study's masks: `<temp>/m063_mod/meas.py`,
 the pad window = the top 27 %):
 
 | View | W : H (sheet) | G / B / P (sheet) | Quarters G/B/P, top → bottom | Tones D / M / Br / L |
@@ -1094,7 +1094,7 @@ y = 0.
 
 Fresh verifier, read-only: background Blender on `art/blender/assets/kit/wip/M063_verify.blend` (the kit file right after
 the main session's `m063.build()`), nothing rebuilt or saved. Renders in `art/blender/renders/models/M063/verify/`;
-scripts in `<temp>\...\scratchpad\m063_ver\` (`v1.py` audit, `v2.py` shells / contact / bury / wall, `v3.py` slivers /
+scripts in `<temp>/m063_ver/` (`v1.py` audit, `v2.py` shells / contact / bury / wall, `v3.py` slivers /
 UV / `K.check`, `v4.py` strand gaps and socket fit, `vis.py` ray grid every 10°, `leafn.py` leaf facing every 5°,
 `cmp.py` / `mont.py` / `m2.py` montages, `sheetcol.py` / `partcol.py` colour samples; the modeller's `meas.py` for the
 shares).
@@ -1223,7 +1223,7 @@ darken anything. **Nothing is coloured by face normal.**
 
 Fresh modeller, background Blender on port 9878, work file `art/blender/assets/kit/wip/M063.blend` (saved after the final
 clean build). Builder `art/blender/kit/mcp/m063.py` only; no shared helper touched. Scratch scripts (facing search,
-share measure, large renders) in `<temp>\...\scratchpad\m063_fix\`.
+share measure, large renders) in `<temp>/m063_fix/`.
 
 **Starting state.** A fix round had been half done before the pause: lobe creases (`CREASE = 0.20`), a yaw-about-the-
 vertical fan in `cluster_geom`, `edge_sweep` / `sweep_problems` written but not called by `build()`. Re-running `build()`
@@ -1387,7 +1387,7 @@ says this. The round-2 verifier should still look at the ±25° and ±65° views
 
 Fresh verifier, read-only: background Blender on `art/blender/assets/kit/wip/M063v.blend` (the kit file right after the
 main session's 063 build), nothing rebuilt or saved, `m063.build()` not called. My own scripts and renders are in
-`<temp>\...\scratchpad\v063\` (`va.py` audit / shells / winding / self-hits / slivers / UV; `vb.py` contact, chain,
+`<temp>/v063/` (`va.py` audit / shells / winding / self-hits / slivers / UV; `vb.py` contact, chain,
 bury, wall, attach, leaf-to-stalk, cluster grouping; `vc.py` leaf edge-on sweep; `vd.py` ray grid; `ve.py` renders;
 `img.py` / `vf.py` the study's masks, shares and montages). Shells, clusters and leaf planes were taken from the mesh
 itself (connected shells, kind by material, clusters by leaf–stalk contact), not from the builder's records.
@@ -1531,7 +1531,7 @@ targeted third round fixes only that blocker (plus the LeafCluster T-bar minor i
 ## Paused (fix round 3, 2026-11-01)
 
 Paused on request, mid-round. Work file `art/blender/assets/kit/wip/M063.blend` saved after the last good build
-(`build()`: `problems: []`). Scratch scripts (leaf harness, facing search `fopt.py`) in `<temp>\...\scratchpad\r3\`.
+(`build()`: `problems: []`). Scratch scripts (leaf harness, facing search `fopt.py`) in `<temp>/r3/`.
 
 **Done (in `m063.py`):**
 - **Leaf rebuilt** (blocker 1): the pleat (`PLEAT`, `CREASE`, raised vein verts, 12 points) is gone. New leaf: 10 outline
@@ -1571,7 +1571,7 @@ Paused on request, mid-round. Work file `art/blender/assets/kit/wip/M063.blend` 
 
 Fresh verifier, read-only: background Blender on `art/blender/assets/kit/wip/M063v.blend` (the kit file right after the
 main session built the round-3 fix into it). Nothing rebuilt or saved, and `m063.build()` was not called. Scripts and
-renders are in `<temp>\...\scratchpad\v063r3\`: `va.py` (audit, shells, slivers, UV), `vb.py` (contact, bury, wall,
+renders are in `<temp>/v063r3/`: `va.py` (audit, shells, slivers, UV), `vb.py` (contact, bury, wall,
 clusters), `vc.py` / `vc2.py` (sweep plus facet tilt and outline points), `vd.py` (ray grid), `ve2.py` (renders and
 cluster close-ups), `vf.py` / `vg.py` (the study's masks and the montages `C_leaf1-3`, `C_cl_a-d`, `C_spin_*`, `C_obl`,
 `C_worst`, `C_parts1/2`). Shells, clusters and leaf planes were read from the mesh, not from the builder's records.

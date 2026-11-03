@@ -63,7 +63,7 @@ Sheet text:
   boxes at y 22–52, x 714 / 776 / 838 / 900 / 962 (`m.SW`).
 
 **Scratch study material** (no Blender), in
-`<temp>\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m048_study\`.
+`<temp>/m048_study/`.
 Run with the scratch venv `..\venv22\Scripts\python.exe` (Python 3.14, Pillow, numpy).
 - **Helpers:** `m.py` (masks, boxes `V` / `X` / `SW` / `TITLES`, `label`), `zoom.py` (crop with an optional sheet
   grid), `px.py` (pixel probe), `lines.py` (cell borders).
@@ -1051,7 +1051,7 @@ The sheet shows no effect and no water or foam (decision 9). The hero has no soc
 A fresh verifier, read-only. It used a background session on port 9877 with `wip/M048_verify.blend`. It ran no
 `build()`, edited no code and saved nothing. Every number below was re-measured with the verifier's own bmesh, BVH
 and numpy code; `M.audit`, `M.uv_stats` and `K.check` were used only as cross-checks. Renders went to the scratchpad
-(`…/scratchpad/m048_verify/`), not to `renders/models/M048/`. The sheet cells were measured with the verifier's own
+(`<temp>/m048_verify/`), not to `renders/models/M048/`. The sheet cells were measured with the verifier's own
 implementation of the §1.2 masks, which reproduces §1.2 on the f34 cell: W : H 1.568, W 35.9, K 58.2, Y 5.9.
 
 ### Mesh

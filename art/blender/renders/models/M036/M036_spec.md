@@ -53,7 +53,7 @@ Sheet text:
 - **O, other:** dark creases, outlines and anti-aliasing; in silhouettes but not in the shares (3.0–3.6 %).
 
 **Scratch study material** (no Blender), in
-`<temp>\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m036_study\`.
+`<temp>/m036_study/`.
 Run with the scratch venv `..\venv22\Scripts\python.exe` (Python 3.14 with Pillow and numpy; no scipy, so `m.py` has
 its own `label()`).
 - **Helpers:** `m.py` (masks `cls()`, view boxes `V` and `X`, `preview()`, `label()`), `zoom.py` (crop + upscale),
@@ -1020,7 +1020,7 @@ problem if the hero ever carries one.
 
 Fresh verifier; read-only background session on port 9882 against `wip/M036_verify.blend` (nothing built, edited or
 saved). Every number below was re-measured through the MCP. Renders and close-ups went to the scratchpad
-(`…/scratchpad/m036_verify/renders/`), made with `m036.render_views` and `m033.render_close` with `M.MODEL_RENDERS`
+(`<temp>/m036_verify/renders/`), made with `m036.render_views` and `m033.render_close` with `M.MODEL_RENDERS`
 redirected in memory. The colour checks sampled both the sheet and the renders with the study's masks
 (`m036.compare` plus my own cap and foliage boxes).
 
@@ -1422,7 +1422,7 @@ Nothing was built, edited or saved.
   render helpers.
 - Every number below was re-measured through the MCP: `M.audit`, my own bmesh shell, contact and penetration code, plus
   `m036.contact_report` and `K.check` for comparison.
-- Renders went to `…/scratchpad/m036_verify2/renders/M036/` (`m036.render_views` with `M.MODEL_RENDERS` redirected in
+- Renders went to `<temp>/m036_verify2/renders/M036/` (`m036.render_views` with `M.MODEL_RENDERS` redirected in
   memory).
 - Colours were sampled on both the sheet and the renders with the study's masks: `m036.compare`, plus my own boxes for
   the caps, B's mat, the foliage quartiles and the whites.

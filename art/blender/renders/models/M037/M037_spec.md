@@ -73,7 +73,7 @@ painted out (`TITLES` in `m.py`). The masks are `cls()` in `m.py` (HSV, h in deg
   background: measure renders made with `FB_Ground.hide_render = True` (§2.6).
 
 **Scratch study material** (no Blender), in
-`<temp>\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m037_study\`.
+`<temp>/m037_study/`.
 Run with the scratch venv `..\venv22\Scripts\python.exe` (Pillow + numpy).
 - **Helpers:** `m.py` (masks `cls()`, view boxes `V`, exploded and close-up boxes `X`, `preview()`), `lab.py` (connected
   components), `zoom.py` (crop + upscale), `grid.py` → `g_*.png` (10 % grids over each view's silhouette, red = centre
@@ -1321,7 +1321,7 @@ flow. Renders are made with `vfx=True`.
 ## Verification round 1 (verifier, 2026-10-29)
 
 A fresh verifier, read-only. It used port 9881 on `wip/M037_verify.blend`: no build, no save, and no edits to any
-`.py`. Renders went to the scratchpad (`…/scratchpad/m037_verify/r/M037/`) through `m037.render_views` with
+`.py`. Renders went to the scratchpad (`<temp>/m037_verify/r/M037/`) through `m037.render_views` with
 `M.MODEL_RENDERS` redirected. They were measured with `m037_study/measure_render.py` and `region.py`, plus my own scripts.
 These were:
 - `v3.py`: per-shell self-intersection, water/land distance, and a floating/chain check over **all** shells, including

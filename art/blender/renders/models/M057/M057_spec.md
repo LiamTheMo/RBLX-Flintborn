@@ -69,7 +69,7 @@ y 578 / 837 with dividers x 265, 511, 761; lower frames y 842–843 / 1378–137
   and the moss band all land in their classes.
 
 **Scratch study material** (no Blender) in
-`<temp>\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m057_study\`.
+`<temp>/m057_study/`.
 Run with the scratch venv `..\venv22\Scripts\python.exe`.
 - **Helpers:** `m.py` (masks, boxes, `silhouette()`), `zoom.py` (`zoom.py x0 y0 x1 y1 scale out.png [grid]`),
   `comps_053.py` (`label()`), `woodmap.py`, `tonemap.py` (054's, pointed at 057).
@@ -1585,7 +1585,7 @@ cores covered all round. Most of the other targets moved toward the sheet. The c
 green domes with leaf cards on them, not the sheet's dense lobed broadleaf clumps.
 
 Background session port 9882 on `wip/M057.blend`; the final `m057.build()` was saved. Scratch scripts are in
-`scratchpad/m057fix/`:
+`<temp>/m057fix/`:
 - `hero.py` (fast hero and preview);
 - `full.py` (the full build, then save);
 - `vis.py` / `visimg.py` (a ray grid over ten views: the share of foliage pixels that hit a bare core, and the
@@ -1718,7 +1718,7 @@ No commits or exports.
 ### Main session ruling on the budget block (2026-10-30)
 None of options (a), (b) or (c) is taken. The hero stays one piece under 4000. Instead, the **construction changes**.
 
-**Why.** Seen beside the sheet (`scratchpad/m057fix/fin_a.png`), the sheet's crown is made of dense, cauliflower-like clusters of small rounded leaf lumps. Cards laid on a smooth faceted core can't give that: bare core shows between them, and they don't break the outline.
+**Why.** Seen beside the sheet (`<temp>/m057fix/fin_a.png`), the sheet's crown is made of dense, cauliflower-like clusters of small rounded leaf lumps. Cards laid on a smooth faceted core can't give that: bare core shows between them, and they don't break the outline.
 
 **New construction for each crown clump: the core is the foliage.**
 - Build the clump as a cluster of overlapping low-poly rounded sub-domes (lumps), about 0.9–1.6 studs each and roughly 10–20 tris each.
@@ -1741,10 +1741,10 @@ The round-1 fix's other gains are kept: Y-TR from the rear, the bark-coloured ca
 ## Fix round 2 (fix modeller, lump clusters, 2026-10-30)
 
 Background session port 9882 on `wip/M057.blend`; the final `m057.build()` was saved and the session stopped.
-`build()["problems"]` is empty. No commits or exports. Scratch in `scratchpad/m057fix2/`: `ev.sh` (hero, previews,
+`build()["problems"]` is empty. No commits or exports. Scratch in `<temp>/m057fix2/`: `ev.sh` (hero, previews,
 `meas2.py`, `scal.py`, `sbs.py`), `full.py`, `chk.py`, `part.py`, `az.py` / `azcount.py` (outline lobes at the four
 extra azimuths), `m057_fix1.py` (the round-1-fix builder, for the baseline). The new comparison is
-`scratchpad/m057fix2/fin_r2.png` (sheet left, ours right: f34, front, side, rear, top).
+`<temp>/m057fix2/fin_r2.png` (sheet left, ours right: f34, front, side, rear, top).
 
 ### What changed in `m057.py`
 
@@ -1932,7 +1932,7 @@ roots. Both are visible leftovers. Neither is a breakage, and neither makes the 
 
 ### Primary question: the crown
 
-- **Read at sheet / game distance** (`f34_sheet`, `front_sheet`, `front34`, `az045`–`az315`, `scratchpad/m057v2/sbs_*.png`):
+- **Read at sheet / game distance** (`f34_sheet`, `front_sheet`, `front34`, `az045`–`az315`, `<temp>/m057v2/sbs_*.png`):
   - The clumps read as dense, crinkled leaf clusters, each made of several swells, with dark undersides and lit tops
     by height.
   - No plates, cabbage balls or flaps, and no bare core. The skin is the foliage.

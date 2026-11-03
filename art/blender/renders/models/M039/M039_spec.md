@@ -57,7 +57,7 @@ Sheet text:
   Swatches 46 × 48 px at x 36 / 130 / 226 / 329 / 418 / 508, y 1366–1414.
 
 **Scratch study material** (no Blender), in
-`<temp>\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m039_study\`.
+`<temp>/m039_study/`.
 Run with the scratch venv `..\venv22\Scripts\python.exe` (Python 3.14, Pillow, numpy; `m.py` has its own `label()`).
 - **Helpers:** `m.py` (masks `cls()`/`cellcls()`, boxes `V`/`X`, swatches `SW`, `label()`, `preview()`), `zoom.py`,
   `lines.py`, `prev.py` (mask previews `cls_*.png`).
@@ -1232,7 +1232,7 @@ full convex-hull SAT per rock pair, leaf/bud probe geometry, green colour quarti
 
 ## Verification round 2 (verifier, 2026-10-29)
 
-A fresh verifier, read-only, using a background Blender on port 9880 (`wip/M039_verify.blend`, not saved). I re-measured every number below with my own bmesh, BVH, ray-parity and SAT code (`mesh.py`, `shells.py`, `colgeo.py`). I made my own renders of the six `*_sheet` cameras, the foliage, foot-rock and side-rock parts, `part_foliage_top`, `foot_under`, `junc_cu` and two extra close-ups (`c2_cu` and `c10_cu`), plus 1440 × 1200 renders of f34 and r34. Colour was sampled with Pillow on both images (`col.py`). Everything is in `scratchpad\m039_verify2\`.
+A fresh verifier, read-only, using a background Blender on port 9880 (`wip/M039_verify.blend`, not saved). I re-measured every number below with my own bmesh, BVH, ray-parity and SAT code (`mesh.py`, `shells.py`, `colgeo.py`). I made my own renders of the six `*_sheet` cameras, the foliage, foot-rock and side-rock parts, `part_foliage_top`, `foot_under`, `junc_cu` and two extra close-ups (`c2_cu` and `c10_cu`), plus 1440 × 1200 renders of f34 and r34. Colour was sampled with Pillow on both images (`col.py`). Everything is in `<temp>/m039_verify2/`.
 
 ### Measured
 

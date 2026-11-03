@@ -764,7 +764,7 @@ The exporter writes its own palette UVs. This layer is for FBX/OBJ export and an
 
 - Stage 4: unchanged from stage 1's notes. The crystal's apex and back shoulder are buried in the right shell's
   front-lower edge, so only the cap faces in front of the slab's edge show.
-- `FlintbornWorldKit.blend` holds a library datablock for `…/scratchpad/kit_pre.blend` that predates this stage. It
+- `FlintbornWorldKit.blend` holds a library datablock for `<temp>/kit_pre.blend` that predates this stage. It
   is not M014 data, so I left it alone; the main session may want to remove it.
 
 ## Stage 4 — Materials, colour and texture

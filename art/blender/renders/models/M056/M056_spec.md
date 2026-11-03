@@ -73,7 +73,7 @@ Swatches (`m.SW`, y 220–255): S1 (20–51), S2 (55–86), S3 (90–121), S4 (1
   low on the sheet. Apply the same masks to our renders and the bias cancels.
 
 **Scratch study material** (no Blender) in
-`<temp>\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m056_study\`.
+`<temp>/m056_study/`.
 Run the scripts with the scratch venv `..\venv22\Scripts\python.exe` (Python 3.14, Pillow, numpy).
 - **Helpers:** `m.py` (masks, boxes, swatches, `cellcls()`, `silhouette()`, `preview()`) and `zoom.py` (`zoom.py x0 y0
   x1 y1 scale out.png [grid]`).
@@ -1097,7 +1097,7 @@ Skipped: the sheet shows no effect (no spores, falling leaves or insects). No VF
 
 - **Rebuild:** `import importlib, kit_models, m056; importlib.reload(kit_models); importlib.reload(m056); m056.build()`
   (about 7 s to build and 37 s to render). `build()` returns audit, uv, materials, views, contact, bury, winding,
-  leaves and problems; problems is empty on the final build. Measure renders with `scratchpad/m056_study/mr.py` (the
+  leaves and problems; problems is empty on the final build. Measure renders with `<temp>/m056_study/mr.py` (the
   study's `m.py` masks; the render background is the corner pixel).
 - **Near misses against §2.7**, each within about 1 point or 0.03:
   - f34 G 48.1 (needs ≥ 48.6); r34 G 46.5 (≥ 47); r34 T 3.4 (≤ 3);
