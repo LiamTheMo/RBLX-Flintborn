@@ -38,6 +38,8 @@ export type State = {
 	regenDelay: number?,
 	medicineLockUntil: number,
 	foodHeals: { FoodHeal },
+	-- Seconds since the last natural regeneration step (StepRegen).
+	regenElapsed: number?,
 }
 
 function SurvivalRules.NewState(): State
@@ -217,6 +219,24 @@ function SurvivalRules.StepFoodHeals(state: State, now: number, dt: number): num
 		end
 	end
 	return healed
+end
+
+-- Natural regeneration (owner decision 2026-11-03): HEALTH_REGEN_PER_STEP of
+-- max HP every HEALTH_REGEN_STEP_SECONDS, never past max. Whole steps, so health
+-- changes once a second rather than every frame. At full health the clock
+-- waits, so the first step after a hit comes a full step later. Returns the HP
+-- to add this frame (0 between steps).
+function SurvivalRules.StepRegen(state: State, dt: number, health: number, maxHealth: number): number
+	local missing = maxHealth - health
+	if missing <= 0 then
+		state.regenElapsed = 0
+		return 0
+	end
+	local step = GameConstants.HEALTH_REGEN_STEP_SECONDS
+	local elapsed = (state.regenElapsed or 0) + dt
+	local steps = math.floor(elapsed / step)
+	state.regenElapsed = elapsed - steps * step
+	return math.min(missing, steps * GameConstants.HEALTH_REGEN_PER_STEP * maxHealth)
 end
 
 -- A damaging hit halves every pending food heal and cancels any left at ≤10 HP (Q65).
