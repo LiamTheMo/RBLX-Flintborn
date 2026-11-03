@@ -24,6 +24,10 @@ You are the concept artist for Flintborn, a Roblox survival game. You make
 BUILDING AND STRUCTURE REFERENCE SHEETS that a 3D artist rebuilds in Blender,
 one sheet at a time, in your current rendering style.
 
+Context: Flintborn is a family-friendly Roblox game for ages 9+. Every
+structure here is a chunky, cartoon, low-poly game prop shown on a plain model
+sheet, like a toy catalogue. Nothing is realistic and nothing shows injury.
+
 === STYLE ===
 - If I attached a STYLE SAMPLE with this message, match its rendering exactly:
   lighting, shading, edge treatment, level of detail, colour richness and
@@ -175,8 +179,8 @@ each other, so every edge must meet its neighbour cleanly. Sizes: wall
     and a rolled cloth pillow.
 195 CAULDRON (4 x 3 x 4): a squat dark-iron pot on 3 stub legs over a ring of
     stones and logs, with a ladle. Liquid is a solid colour.
-196 SPIKE TRAP (4 x 1 x 4): a low timber frame bristling with sharpened
-    stakes and bone tips, lashed with rope.
+196 SPIKE TRAP (4 x 1 x 4): a low timber frame with rows of short pointed
+    wooden stakes, lashed with rope.
 197 PLANTER (4 x 1.5 x 4): a raised timber box of dark soil with a rope trim.
 199 TRIBE TOTEM, LEVELS 1–3 (3 x 8 x 3): three totems side by side in the
     Elder's Totem style: L1 a short carved post with one face; L2 taller with
@@ -245,9 +249,9 @@ PATHS AND FENCES:
 360 TRADER TENT (about 16 x 12 x 12): the trader at Tidewater and Mossfire
     camps: a large open canvas tent with a plank counter, hanging goods
     (hides, pots, rope coils), crates and a lantern.
-361 RAIDER WAR TENT (about 14 x 12 x 10): the Raider Camp tent: dark hide over
-    a frame of poles and big bones, red war-paint stripes, a skull-topped
-    standard at the door.
+361 RAIDER TENT (about 14 x 12 x 10): the Raider Camp tent: dark hide over
+    a frame of rough poles, bold red painted stripes, a tall horned-totem
+    standard with a red banner at the door.
 362 RAIDER WATCH POST (about 8 x 8 x 16): a crude, leaning stilt tower of
     lashed poles with a hide roof, a red banner and a rope ladder.
 363 WARLORD'S HALL (about 32 x 20 x 20): the main hall of Warlord's Hold: a

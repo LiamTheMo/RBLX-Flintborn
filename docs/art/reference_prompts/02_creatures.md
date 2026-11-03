@@ -12,7 +12,7 @@ follow the house style and sheet layout exactly.
 - Theme: primitive fantasy on a shattered crater island. Stone-age tribes,
   Ice-Age megafauna and ancient stone guardians. The mood is adventurous and
   approachable: passive animals look calm, predators look alert, and bosses
-  look powerful. No gore, blood, exposed organs or horror.
+  look powerful. Family-friendly for ages 9+: cartoonish and never scary.
 - Render: a clean, stylized LOW-POLY 3D render. Broad, flat-shaded planar
   facets with chunky, readable masses. Fur, feathers and scales are a few big
   faceted tufts or plates, never individual hairs or fine scales. SOLID COLOURS
