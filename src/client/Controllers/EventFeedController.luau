@@ -55,14 +55,7 @@ function EventFeedController.ActiveViews()
 	return views
 end
 
-local function make(className: string, props, parent)
-	local instance = Instance.new(className)
-	for key, value in props do
-		instance[key] = value
-	end
-	instance.Parent = parent
-	return instance
-end
+local make = Theme.Make
 
 -- Compass direction and distance from the player to `position`.
 local function bearing(position: Vector3): string

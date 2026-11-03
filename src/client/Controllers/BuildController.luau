@@ -78,14 +78,7 @@ local ROW_HEIGHT = 46
 local TIER_W = 190
 local SNAP_W, TURN_W, PLACE_W = 156, 88, 136
 
-local function make(className: string, props, parent)
-	local instance = Instance.new(className)
-	for key, value in props do
-		instance[key] = value
-	end
-	instance.Parent = parent
-	return instance
-end
+local make = Theme.Make
 
 -- The tier the current piece is built in: the chosen ladder tier when the piece
 -- comes in it (the choice survives picking a chest in between), else its only one.

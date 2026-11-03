@@ -35,14 +35,7 @@ local player = Players.LocalPlayer
 local ui = {}
 local hornSpawnAt = nil
 
-local function make(className: string, props, parent)
-	local instance = Instance.new(className)
-	for key, value in props do
-		instance[key] = value
-	end
-	instance.Parent = parent
-	return instance
-end
+local make = Theme.Make
 
 local function cue(text: string)
 	if ui.cue then

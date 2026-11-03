@@ -10,7 +10,9 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local UserInputService = game:GetService("UserInputService")
 
 local HudModel = require(ReplicatedStorage.Shared.UI.HudModel)
--- Only the kit's scale and tokens: the kit's components require this module.
+-- Only the kit's core, scale and tokens (none of them requires this module):
+-- the kit's components require this module.
+local KitCore = require(script.Parent.Parent.Hud.Kit.Core)
 local KitScale = require(script.Parent.Parent.Hud.Kit.Scale)
 local KitTokens = require(script.Parent.Parent.Hud.Kit.Tokens)
 
@@ -29,14 +31,8 @@ Theme.ColourBlindRarity = {
 	Exclusive = Color3.fromRGB(255, 255, 255),
 }
 
-function Theme.Make(className: string, props, parent)
-	local instance = Instance.new(className)
-	for key, value in props do
-		instance[key] = value
-	end
-	instance.Parent = parent
-	return instance
-end
+-- Creates `className` with `props` under `parent` (the kit's Core.Make).
+Theme.Make = KitCore.Make
 
 function Theme.Option(name: string): any
 	return Players.LocalPlayer:GetAttribute(name)
