@@ -25,7 +25,7 @@ running session holds; check with `Get-CimInstance Win32_Process -Filter "Name='
 same tris, sizes and renders as the GUI, mean pixel difference 0.02/255.
 
 ```bash
-PY=C:/Users/Orang/.local/bin/python3.14.exe   # or Blender's own: "<blender dir>/5.2/python/bin/python.exe"
+PY=python3                                     # the owner's uv Python on Windows, or Blender's own: "<blender dir>/5.2/python/bin/python.exe"
 export BLENDER_PATH=...                         # if blender.exe is not at D:/Steam/steamapps/common/Blender/
 $PY art/blender/kit/mcp/bgmcp.py start <port> art/blender/assets/kit/wip/MNNN.blend   # once, at the start
 $PY art/blender/kit/mcp/bgmcp.py run <port> <code.py>       # or `run <port> -` with a heredoc; prints the JSON response
