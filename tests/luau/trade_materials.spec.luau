@@ -9,68 +9,12 @@ local Server = game:GetService("ServerScriptService").Server
 
 -- Fake clock and task scheduler ---------------------------------------------------
 
-local clock = 0
-local queue = {}
-local sequence = 0
-local threadErrors = {}
-
-local function resume(thread, ...)
-	local ok, err = coroutine.resume(thread, ...)
-	if not ok then
-		table.insert(threadErrors, tostring(err))
-	end
-end
-
-task = {}
-function task.spawn(fn, ...)
-	local thread = if type(fn) == "thread" then fn else coroutine.create(fn)
-	resume(thread, ...)
-	return thread
-end
-function task.delay(seconds, fn, ...)
-	sequence += 1
-	table.insert(
-		queue,
-		{ at = clock + (seconds or 0), sequence = sequence, thread = coroutine.create(fn), args = table.pack(...) }
-	)
-end
-function task.wait(seconds)
-	sequence += 1
-	table.insert(
-		queue,
-		{ at = clock + (seconds or 0), sequence = sequence, thread = coroutine.running(), args = table.pack() }
-	)
-	coroutine.yield()
-	return seconds
-end
-
-warn = function() end
+local scheduler = require(game:GetService("ServerStorage").TestSupport.Scheduler).new():Install()
+local threadErrors = scheduler.threadErrors
 
 -- Runs everything due within the next `seconds`, in time order.
 local function advance(seconds: number)
-	local target = clock + seconds
-	while true do
-		local best = nil
-		for index, entry in queue do
-			if entry.at <= target then
-				local current = best and queue[best]
-				if
-					current == nil
-					or entry.at < current.at
-					or (entry.at == current.at and entry.sequence < current.sequence)
-				then
-					best = index
-				end
-			end
-		end
-		if best == nil then
-			break
-		end
-		local entry = table.remove(queue, best)
-		clock = math.max(clock, entry.at)
-		resume(entry.thread, table.unpack(entry.args, 1, entry.args.n))
-	end
-	clock = target
+	scheduler:Advance(seconds)
 end
 
 -- Fake Roblox services ------------------------------------------------------------
@@ -111,7 +55,7 @@ end
 game.JobId = "job-trade"
 workspace = {
 	GetServerTimeNow = function()
-		return clock
+		return scheduler.clock
 	end,
 }
 

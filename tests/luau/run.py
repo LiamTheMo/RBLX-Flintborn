@@ -5,8 +5,10 @@ Game modules are written for Roblox: they `require(script.Parent.X)` and use
 datatypes like Color3 and Vector3. The CLI has neither, so each spec runs in a
 generated bundle: prelude.luau (minimal datatype stubs, a fake `script`/`game`
 instance tree, and a require that resolves it) followed by every module under
-src/shared and src/server (MOUNTS) as a loader function (a JSON file as a
-module returning its table, as Rojo builds it), followed by the spec itself.
+src/shared, src/server and tests/luau/support (MOUNTS) as a loader function (a
+JSON file as a module returning its table, as Rojo builds it), followed by the
+spec itself. support/ holds helpers several specs share (a fake clock and task
+scheduler, engine signals); specs require them from ServerStorage.TestSupport.
 
 Only pure-logic modules are testable this way -- anything touching Instances,
 services, or the network still needs a Studio playtest. Server services are
@@ -35,6 +37,9 @@ MOUNTS = {
     ("ReplicatedStorage", "Shared"): ROOT / "src" / "shared",
     # Server modules are testable when their Roblox services are injected (fakes in specs).
     ("ServerScriptService", "Server"): ROOT / "src" / "server",
+    # Shared spec helpers (fake clock and scheduler, engine signals); test-only,
+    # not part of the game.
+    ("ServerStorage", "TestSupport"): HERE / "support",
 }
 
 
