@@ -54,6 +54,13 @@ one at a time because both share the key's rate limit):
   every batch is verified against the latest published place at the end. If a
   batch fails part-way, the earlier batches are already saved: re-run the deploy
   to finish (a batch only writes sources that differ).
+- Every batch publishes the place, so a server can start between two batches.
+  Library modules go first; the scripts that run on their own (the entry scripts
+  and every module under `Services/` or `Controllers/`) go last, in a batch of
+  their own. Part-way through, the old code still runs, against libraries that
+  should only have gained functions: when a release removes or renames a library
+  function that live Services or Controllers still call, keep the old name for one
+  release.
 - **JSON modules** (`*.json` under the roots, except `*.project.json`,
   `*.meta.json` and `*.model.json`) are published as ModuleScripts named after the
   file, whose `Source` is the JSON converted to a Luau table (`return {...}`), as
