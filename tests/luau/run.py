@@ -5,11 +5,14 @@ Game modules are written for Roblox: they `require(script.Parent.X)` and use
 datatypes like Color3 and Vector3. The CLI has neither, so each spec runs in a
 generated bundle: prelude.luau (minimal datatype stubs, a fake `script`/`game`
 instance tree, and a require that resolves it) followed by every module under
-src/shared as a loader function (a JSON file as a module returning its
-table, as Rojo builds it), followed by the spec itself.
+src/shared and src/server (MOUNTS) as a loader function (a JSON file as a
+module returning its table, as Rojo builds it), followed by the spec itself.
 
 Only pure-logic modules are testable this way -- anything touching Instances,
-services, or the network still needs a Studio playtest.
+services, or the network still needs a Studio playtest. Server services are
+testable when a spec injects fakes for the Roblox services they use.
+
+    python3 tests/luau/run.py       # every *.spec.luau here, one bundle each
 """
 import json
 import shutil
