@@ -75,9 +75,7 @@ function CacheService.Spawn(entry, position: Vector3, parent: Instance, onOpened
 		prompt:Destroy()
 		openChest(dressing)
 		ProgressionService.GrantXp(player, "Cache", entry.name)
-		for _, item in EventRules.RollLoot(entry.loot, rng, ModifierService.Sum(player, "Luck")) do
-			DropService.Spawn(item, position + Vector3.new(rng:NextNumber(-3, 3), 0, rng:NextNumber(-3, 3)))
-		end
+		DropService.Scatter(EventRules.RollLoot(entry.loot, rng, ModifierService.Sum(player, "Luck")), position, rng)
 		onOpened()
 	end, function(player)
 		InventoryService.Notify(player, "Interrupted: the cache channel starts over.")

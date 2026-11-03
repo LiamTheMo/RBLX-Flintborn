@@ -153,12 +153,6 @@ local function finish(event)
 	AnnouncementService.End(event.id)
 end
 
-local function spill(loot, position: Vector3, luck: number?)
-	for _, item in EventRules.RollLoot(loot, rng, luck) do
-		DropService.Spawn(item, position + Vector3.new(rng:NextNumber(-3, 3), 0, rng:NextNumber(-3, 3)))
-	end
-end
-
 -- The hitbox of each node look: size, whether it blocks walking, and the prompt's action.
 local function hitbox(name: string): Vector3
 	local size = PropModels.HITBOX[name]
@@ -224,7 +218,7 @@ local function spawnNode(event, loot, position: Vector3, minRank: number?, onCla
 		end
 		if EventRules.Claim(site) then
 			part:Destroy()
-			spill(loot, position, ModifierService.Sum(player, "Luck"))
+			DropService.Scatter(EventRules.RollLoot(loot, rng, ModifierService.Sum(player, "Luck")), position, rng)
 			ProgressionService.GrantXp(player, "RareNode", event.entry.name)
 			onClaimed()
 		end

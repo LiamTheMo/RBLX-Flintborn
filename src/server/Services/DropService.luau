@@ -157,6 +157,14 @@ function DropService.Spawn(item, position: Vector3, gathered: { ownerId: number,
 	end
 end
 
+-- Spills `items` (rolled loot) as ordinary drops, each up to 3 studs off
+-- `position` on both horizontal axes, jittered with the caller's `rng`.
+function DropService.Scatter(items, position: Vector3, rng: Random)
+	for _, item in items do
+		DropService.Spawn(item, position + Vector3.new(rng:NextNumber(-3, 3), 0, rng:NextNumber(-3, 3)))
+	end
+end
+
 -- `walked` is a walk-over pickup of a gathered drop: it fails silently.
 function pickUp(player: Player, id: string, walked: boolean)
 	local drop = drops[id]
