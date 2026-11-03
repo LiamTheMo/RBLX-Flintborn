@@ -3,7 +3,8 @@
 Reference: `art/reference/ui/lobby/06_forge.png`. Kit: `art/reference/ui/lobby/kit/`
 (sheet numbers below are the file prefixes). Design resolution: 1672 × 941 (the image
 size); every bound is a screen pixel of the mockup, x, y, w, h from its top-left, ±1–2 px.
-Status: Draft. Source of truth for build: the reference image.
+Status: Built (`src/client/Hud/Screens/RecipeWindow.luau`, mode `forge`); this is the
+measured spec it was built from. Source of truth for build: the reference image.
 
 Raw crops, font comparisons and the measuring scripts are in `art/ui/kit/analysis/forge/`.
 
@@ -14,7 +15,7 @@ dimmed lobby HUD, opened by the Forge tile of the HUD menu grid (`ForgeControlle
 and closed by the ✕ button, ButtonB, or the Forge tile again. Three columns: RECIPES (list,
 one row selected), the selected recipe (name, picture, description, REQUIRES cards,
 QUANTITY stepper, FORGE button), and YOUR MATERIALS (vault materials, one row
-highlighted). The window replaces the forge mode of `Hud/CraftingPanel`.
+highlighted). The window replaced the forge mode of `Hud/CraftingPanel` (removed, ARCHITECTURE §9).
 
 ## Dim overlay and the HUD behind
 
@@ -139,7 +140,7 @@ text → clasps and corner brackets (they overlap the frame edge) → Close.
 
 ## Measurements log
 
-Run from the repo root. `T=<skill>/scripts/ref_tools.py`; helpers in
+Run from the repo root. `T=<skill>/scripts/ref_tools.py` (`ref_tools.py` is an external reference-measuring helper from the UI modelling skill, not part of this repo; the repo's own measuring scripts are the ones in `art/ui/kit/analysis/`); helpers in
 `art/ui/kit/analysis/forge/` (`runs.py` colour runs, `edges.py` edge clusters, `ink.py`
 and `mlib.py` text ink boxes and row profiles, `mask.py` colour-class bounding boxes,
 `parchruns.py` parchment spans, `ruler.py` labelled zoom crops, `kitgrid.py` kit sheets

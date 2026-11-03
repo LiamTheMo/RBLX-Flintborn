@@ -2,7 +2,8 @@
 
 Reference: `art/reference/ui/lobby/04_party.png`; kit sheets in `art/reference/ui/lobby/kit/`
 (index: `art/reference/ui/lobby/README.md`).
-Design resolution: 1672 × 941. Status: Draft (measured; open questions at the end).
+Design resolution: 1672 × 941. Status: Built (`src/client/Hud/Screens/PartyWindow.luau`);
+this is the measured spec it was built from (open questions at the end).
 Source of truth for build: the reference, changed by the owner decisions marked
 **Deviation**. Raw measurements and crops: `art/ui/kit/analysis/party/`
 (scripts shared from `art/ui/kit/analysis/lobby/tools/`).

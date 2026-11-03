@@ -2,7 +2,8 @@
 
 Reference: `art/reference/ui/lobby/05_play.png`; kit sheets in `art/reference/ui/lobby/kit/`
 (index: `art/reference/ui/lobby/README.md`).
-Design resolution: 1672 × 941. Status: Draft (measured; open questions at the end).
+Design resolution: 1672 × 941. Status: Built (`src/client/Hud/Screens/PlayWindow.luau`);
+this is the measured spec it was built from (open questions at the end).
 The built window follows ARCHITECTURE D25 (Inventory chrome) and D26 (the
 sheet-21 rune art); see "Deviations from reference" and "Play rune art (D26)"
 below. The look and tokens in general: [STYLE_GUIDE.md](STYLE_GUIDE.md).
