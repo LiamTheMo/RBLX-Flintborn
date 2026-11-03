@@ -38,11 +38,11 @@ python3 art/ui/capture/capture.py kit_gallery_flow   # behaviour checks + leak c
 | `Kit/Art.luau` | Roles to art: `Plate`, `Sprite`, `Icon`, `IconSprite`, `ItemIcon`, `KindGlyph`, `SizeOf`, `SliceScale`, `Missing`, stand-ins |
 | `Kit/Core.luau` | `Make`, `Size`, `Place`, `Root`, `Label`, `SetText`, `Style`, `TextWidth`, `TextFloor`, `Dim` (also `Kit.Dim`), `SetRestFade`, `Signal`, `Maid` |
 | `Kit/Interact.luau` | The shared state machine (`attach`) |
-| `Kit/Motion.luau` | `Play(inst, key, goal, onDone?)`, `Set`, `Stop`, `Pulse`, `Reduced()` |
+| `Kit/Motion.luau` | `Play(inst, key, goal, onDone?)`, `Set`, `Pulse`, `Reduced()` |
 | `Kit/Sound.luau` | `Play(key)` (silent while the token id is empty, D14) |
 | `Kit/Scale.luau` | `TopInset(gui)`, `WindowTop(gui)`, `Hud(gui, root, opts)`, `WindowFit(...)` (small windows capped on phones, §16), `Window(screen)`, `IsSmallTouch(h)` |
 | `Kit/Modal.luau` | One window at a time, dialogs above, Escape / B, selection save and restore (a window's ✕ gives way to its first content control), blur, Roblox touch controls hidden while open |
-| `Kit/Debug.luau` | `Each(root, fn)`, `Force(root, state)`, `Find(root, role)` |
+| `Kit/Debug.luau` | `Each(root, fn)`, `Force(root, state)` |
 | Components | `Screen Window Panel SectionHeader Button IconButton Tab (TabGroup) Slot Bar Checkbox Toggle Slider Dropdown SearchBox Stepper KeyCap Divider ListRow PlayerRow Badge CurrencyPill Portrait Picture Icon ItemIcon Text Scroll Toast ConfirmDialog Tooltip` |
 
 ## 2. Conventions

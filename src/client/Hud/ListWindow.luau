@@ -1172,10 +1172,6 @@ function ListWindow:HideConfirm()
 	end
 end
 
-function ListWindow:IsConfirming(): boolean
-	return self.confirm ~= nil and not self.confirm.dialog.closed
-end
-
 -- Opening and closing ------------------------------------------------------------------------
 
 function ListWindow:Open(gamepad: boolean?)

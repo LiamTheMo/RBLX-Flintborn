@@ -24,15 +24,4 @@ function Debug.Force(root: Instance, state: string?)
 	root:SetAttribute("DebugState", state)
 end
 
--- Every component root under `root` whose KitRole is `role`.
-function Debug.Find(root: Instance, role: string): { Instance }
-	local found = {}
-	Debug.Each(root, function(item)
-		if item:GetAttribute("KitRole") == role then
-			table.insert(found, item)
-		end
-	end)
-	return found
-end
-
 return Debug

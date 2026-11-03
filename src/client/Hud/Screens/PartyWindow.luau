@@ -729,10 +729,6 @@ function PartyWindow:Rows(name: string)
 	return list
 end
 
-function PartyWindow:SearchText(): string
-	return self.search:GetText()
-end
-
 -- Opens the window. `section` ("invite" | "party") picks the control gamepad
 -- selection starts on (the window's first control otherwise).
 function PartyWindow:Open(section: string?, gamepad: boolean?)
