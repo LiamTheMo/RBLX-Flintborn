@@ -479,14 +479,10 @@ end
 
 InventoryController.ActivateHotbar = activateHotbar
 
--- Opens the window on `tabId` ("Backpack" or "Equipped"; the last tab
--- otherwise). `gamepad` moves gamepad selection into it.
-function InventoryController.Open(tabId: string?, gamepad: boolean?)
+-- Opens the window on the last tab. `gamepad` moves gamepad selection into it.
+function InventoryController.Open(gamepad: boolean?)
 	if window == nil or window:IsOpen() then
 		return
-	end
-	if tabId == "Backpack" or tabId == "Equipped" then
-		tab = tabId
 	end
 	selected, moving = nil, nil
 	-- Drawn once open; a gamepad then lands on the first slot (InventoryWindow).
@@ -504,7 +500,7 @@ function InventoryController.ToggleBackpack(gamepad: boolean?)
 	if InventoryController.IsOpen() then
 		window:Close()
 	else
-		InventoryController.Open(nil, gamepad)
+		InventoryController.Open(gamepad)
 	end
 end
 

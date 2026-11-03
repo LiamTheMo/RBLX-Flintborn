@@ -45,10 +45,6 @@ local Theme = require(script.Parent.Parent.Ui.Theme)
 
 local HudController = {}
 
--- Fires (index) when the selected hotbar slot changes. The selection follows the
--- equipped slot, and every key press or tap on a slot also uses it.
-HudController.SelectionChanged = Signal.new()
-
 -- The menu tiles (left, the lobby's 2 × 3 grid): {id, icon, bind action named
 -- in the tooltip, controller, function}. Touch players have no keys, so every
 -- panel with a key has a tile.
@@ -60,6 +56,9 @@ HudController.MENU = {
 	{ "Map", "map", "Map", "MapController", "Toggle" },
 	{ "Progress", "trophy", "Progression", "ProgressionController", "Toggle" },
 }
+
+-- The selected hotbar slot. The selection follows the equipped slot, and every
+-- key press or tap on a slot also uses it.
 HudController.Selected = 1
 
 -- Status text ticks fast (the medicine countdown); party, objective and event
@@ -585,7 +584,6 @@ end
 local function selectSlot(index: number)
 	HudController.Selected = index
 	widgets.bottom:Select(index)
-	HudController.SelectionChanged:Fire(index)
 end
 
 local function bindHotbar(active: boolean)

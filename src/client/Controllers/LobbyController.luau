@@ -4,8 +4,7 @@
 --
 -- This keeps the logic; the lobby HUD and the Party and Play windows draw it:
 -- Deploy(), PartyAction() and its wrappers (Invite, Accept, Decline, Leave),
--- PartyView(), IsInvited(), Preview(), Invitable(), Status(), Changed and
--- PartyChanged.
+-- PartyView(), Preview(), Invitable(), Status(), Changed and PartyChanged.
 
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -173,12 +172,6 @@ end
 -- }
 function LobbyController.PartyView()
 	return partyView
-end
-
--- True while your party has an unanswered invite out to `userId` (leader only).
-function LobbyController.IsInvited(userId: number): boolean
-	local party = partyView.party
-	return party ~= nil and table.find(party.invited or {}, userId) ~= nil
 end
 
 function LobbyController.Invitable(): { Player }

@@ -244,10 +244,6 @@ function CraftingController.Toggle()
 	watch()
 end
 
-function CraftingController.IsOpen(): boolean
-	return window ~= nil and window:IsOpen()
-end
-
 function CraftingController.Start()
 	if not PlaceConfig.IsWorld() then
 		return

@@ -20,9 +20,6 @@ local Reasons = require(script.Parent.Parent.Ui.Reasons)
 
 local ForgeController = {}
 
--- How long CONVERT is held before a Permanent conversion is sent.
-ForgeController.CONFIRM_DELAY = RecipeWindow.CONVERT_HOLD
-
 local player = Players.LocalPlayer
 local window = nil
 local busy = false
@@ -144,10 +141,6 @@ function ForgeController.Toggle()
 	end
 	window:Open()
 	task.spawn(refresh)
-end
-
-function ForgeController.IsOpen(): boolean
-	return window ~= nil and window:IsOpen()
 end
 
 function ForgeController.Start()
