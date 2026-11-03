@@ -34,6 +34,8 @@ local function setStatus(text: string)
 	LobbyController.Changed:Fire("status")
 end
 
+-- Reads the deploy preview (yields) and returns it, or nil when the server could
+-- not answer.
 local function refreshPreview()
 	local ok, items = pcall(function()
 		return Remotes.Get("DeployPreview"):InvokeServer()
@@ -42,7 +44,9 @@ local function refreshPreview()
 	if ok and type(items) == "table" then
 		previewItems = items
 		LobbyController.Changed:Fire("preview")
+		return items
 	end
+	return nil
 end
 
 -- Coalesces refresh requests: one fetch at a time, never on the caller's thread,
@@ -190,17 +194,7 @@ end
 
 -- Reads the deploy preview now (yields) and returns it, or nil when the server
 -- could not answer; the lobby HUD asks this when Enter is pressed (GDD Q155).
-function LobbyController.FetchPreview()
-	local ok, items = pcall(function()
-		return Remotes.Get("DeployPreview"):InvokeServer()
-	end)
-	if ok and type(items) == "table" then
-		previewItems = items
-		LobbyController.Changed:Fire("preview")
-		return items
-	end
-	return nil
-end
+LobbyController.FetchPreview = refreshPreview
 
 function LobbyController.Status(): string
 	return statusText
