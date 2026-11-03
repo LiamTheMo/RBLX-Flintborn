@@ -267,7 +267,7 @@ Everything still manual before `v1.00` is in [`docs/release/RELEASE_CHECKLIST.md
 
 ## Post-release hardening (after v0.18)
 
-Automated: three rounds of independent review across economy, trading, progression, run lifecycle, persistence, crash recovery, combat, building, enemies and anti-cheat, plus the client. Each confirmed bug has a regression case. The new specs are `hardening_economy`, `hardening_lifecycle`, `hardening_gameplay`, `review_economy`, `review_lifecycle` (which runs the real server services against faked Roblox services), `review_gameplay`, `followup_recovery` and `followup_extraction`. The spec runner now covers 28 spec files.
+Automated: three rounds of independent review across economy, trading, progression, run lifecycle, persistence, crash recovery, combat, building, enemies and anti-cheat, plus the client. Each confirmed bug has a regression case. The new specs are `hardening_economy` (which also holds the old-save economy cases, once `review_economy`), `hardening_lifecycle`, `hardening_gameplay`, `review_lifecycle` (which runs the real server services against faked Roblox services), `review_gameplay`, `followup_recovery` and `followup_extraction`. The spec runner now covers 28 spec files.
 
 Closed in this pass:
 - **Economy and trades:**

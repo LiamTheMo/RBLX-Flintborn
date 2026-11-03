@@ -1,5 +1,7 @@
 -- Economy hardening: codes, purchases, Center doubling, rebirth credit, trade
--- reconciliation and limits, PvP credit, tutorial skips and shop pricing.
+-- reconciliation and limits, PvP credit, tutorial skips and shop pricing. Saves
+-- made before the permanent redemption ledger and the remembered tutorial skip
+-- must not reopen the exploits those records close.
 local Server = game:GetService("ServerScriptService").Server
 local Shared = game:GetService("ReplicatedStorage").Shared
 local EconomyRules = require(Shared.Economy.EconomyRules)
@@ -57,6 +59,45 @@ test("a code redeems once ever, even after the journal forgets it", function()
 	local ok, reason = pcall(OperationJournal.Run, profile, "code:FLINTBORN-LAUNCH", "CodeRedeem", 9, redeem)
 	expect(not ok and reason == "AlreadyRedeemed", "the permanent record refuses it")
 	expectEq(profile.currency.gems, 25, "25 Gems once")
+end)
+
+-- A save from before the ledger: the redemption lives only in the journal.
+local function legacyRedeemedSave()
+	local saved = ProfileSchema.Default(0)
+	saved.currency.redeemedCodes = nil
+	saved.currency.gems = 25
+	saved.operations.records["code:FLINTBORN-LAUNCH"] =
+		{ kind = "CodeRedeem", status = "committed", at = 1, result = nil }
+	table.insert(saved.operations.order, "code:FLINTBORN-LAUNCH")
+	return saved
+end
+
+test("a code redeemed before the ledger existed stays redeemed after the journal trims", function()
+	local profile, problem = ProfileSchema.Migrate(legacyRedeemedSave(), 0)
+	expectEq(problem, nil, "loads")
+	flushJournal(profile)
+	expectEq(OperationJournal.Get(profile, "code:FLINTBORN-LAUNCH"), nil, "journal trimmed")
+	local ok, reason = pcall(
+		OperationJournal.Run,
+		profile,
+		"code:FLINTBORN-LAUNCH",
+		"CodeRedeem",
+		9,
+		strict(function(working)
+			return EconomyRules.RedeemCode(working, "FLINTBORN-LAUNCH", { gems = 25 }, 9)
+		end)
+	)
+	expect(not ok and reason == "AlreadyRedeemed", "the old redemption still counts")
+	expectEq(profile.currency.gems, 25, "25 Gems once")
+end)
+
+test("only committed code redemptions are copied into the ledger", function()
+	local saved = legacyRedeemedSave()
+	saved.operations.records["code:FLINTBORN-LAUNCH"] = nil
+	saved.operations.records["buy:code:x"] = { kind = "ShopBuy", status = "committed", at = 1 }
+	saved.operations.records["code:FLINTBORN-RESPEC"] = { kind = "CodeRedeem", status = "pending", at = 1 }
+	local profile = ProfileSchema.Migrate(saved, 0)
+	expectEq(next(profile.currency.redeemedCodes), nil, "nothing redeemed")
 end)
 
 test("a respec code with nothing to respec fails and grants no Gems", function()
@@ -255,6 +296,17 @@ test("a tutorial skip blocks rewards even after a replay", function()
 	local extract = TutorialSteps.Steps[TutorialSteps.Index.Extract]
 	TutorialSteps.Advance(state, "RunStarted", 1)
 	expect(TutorialSteps.Skip(state), "skipped")
+	TutorialSteps.Replay(state)
+	expect(not state.skipped, "the replay runs")
+	expect(not TutorialSteps.ClaimReward(state, extract), "but never pays a skipper")
+end)
+
+test("a tutorial skipped before skips were remembered still pays nothing after a replay", function()
+	local saved = ProfileSchema.Default(0)
+	saved.tutorial = { step = 2, skipped = true, completedAt = nil, rewardsGranted = {} }
+	local profile = ProfileSchema.Migrate(saved, 0)
+	local state = profile.tutorial
+	local extract = TutorialSteps.Steps[TutorialSteps.Index.Extract]
 	TutorialSteps.Replay(state)
 	expect(not state.skipped, "the replay runs")
 	expect(not TutorialSteps.ClaimReward(state, extract), "but never pays a skipper")
