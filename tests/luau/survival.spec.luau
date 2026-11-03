@@ -9,28 +9,27 @@ local function run(fn, seconds, dt)
 	end
 end
 
+-- Steps a moving player's stamina for `seconds` in 0.1 s frames.
+local function stamina(state, seconds: number)
+	run(function(dt)
+		SurvivalRules.StepStamina(state, dt, true)
+	end, seconds, 0.1)
+end
+
 test("a full stamina bar lasts 3 s of sprint, pauses 3 s, then refills in 5 s", function()
 	local state = SurvivalRules.NewState()
 	state.sprintIntent = true
-	run(function(dt)
-		SurvivalRules.StepStamina(state, dt, true)
-	end, 2.9, 0.1)
+	stamina(state, 2.9)
 	expect(state.stamina > 0, "still has stamina at 2.9 s")
 	expect(SurvivalRules.IsSprinting(state, true), "still sprinting")
-	run(function(dt)
-		SurvivalRules.StepStamina(state, dt, true)
-	end, 0.1, 0.1)
+	stamina(state, 0.1)
 	expectNear(state.stamina, 0, 1e-9, "empty at 3 s")
 	expect(not SurvivalRules.IsSprinting(state, true), "sprint stops when empty")
 
 	state.sprintIntent = false
-	run(function(dt)
-		SurvivalRules.StepStamina(state, dt, true)
-	end, 3, 0.1)
+	stamina(state, 3)
 	expectNear(state.stamina, 0, 1e-9, "no recovery for 3 s after the sprint ends")
-	run(function(dt)
-		SurvivalRules.StepStamina(state, dt, true)
-	end, 5, 0.1)
+	stamina(state, 5)
 	expectNear(state.stamina, 1, 1e-9, "full again 5 s after recovery starts")
 end)
 
@@ -40,24 +39,21 @@ test("recovery stops the moment a sprint starts and waits 3 s after it ends", fu
 	SurvivalRules.StepStamina(state, 1, true)
 	expectNear(state.stamina, 0.7, 1e-9, "walking recovers at the normal rate")
 	state.sprintIntent = true
+	SurvivalRules.StepStamina(state, 0.5, false)
+	expectNear(state.stamina, 0.8, 1e-9, "standing still with sprint held still recovers: only sprinting spends")
+	state.sprintIntent = true
 	SurvivalRules.StepStamina(state, 0.3, true)
-	expectNear(state.stamina, 0.6, 1e-9, "sprinting drains and does not recover")
+	expectNear(state.stamina, 0.7, 1e-9, "sprinting drains and does not recover")
 	state.sprintIntent = false
-	run(function(dt)
-		SurvivalRules.StepStamina(state, dt, true)
-	end, 2.9, 0.1)
-	expectNear(state.stamina, 0.6, 1e-9, "still paused 2.9 s after letting go")
+	stamina(state, 2.9)
+	expectNear(state.stamina, 0.7, 1e-9, "still paused 2.9 s after letting go")
 	state.sprintIntent = true
 	SurvivalRules.StepStamina(state, 0.3, true)
 	state.sprintIntent = false
-	run(function(dt)
-		SurvivalRules.StepStamina(state, dt, true)
-	end, 2.9, 0.1)
-	expectNear(state.stamina, 0.5, 1e-9, "a new sprint restarts the 3 s pause")
-	run(function(dt)
-		SurvivalRules.StepStamina(state, dt, true)
-	end, 1.1, 0.1)
-	expectNear(state.stamina, 0.5 + 1 / 5, 1e-9, "after the pause, recovery resumes at the normal rate")
+	stamina(state, 2.9)
+	expectNear(state.stamina, 0.6, 1e-9, "a new sprint restarts the 3 s pause")
+	stamina(state, 1.1)
+	expectNear(state.stamina, 0.6 + 1 / 5, 1e-9, "after the pause, recovery resumes at the normal rate")
 end)
 
 test("walking after letting go of sprint never drains stamina, whatever the network jitter", function()
@@ -108,17 +104,6 @@ test("travel at sprint pace without a sprint request still drains", function()
 	)
 end)
 
-test("only sprinting spends stamina", function()
-	local state = SurvivalRules.NewState()
-	state.stamina = 0.5
-	SurvivalRules.StepStamina(state, 1, true)
-	expect(state.stamina > 0.5, "walking regenerates")
-	state.stamina = 0.5
-	state.sprintIntent = true
-	SurvivalRules.StepStamina(state, 1, false)
-	expect(state.stamina > 0.5, "standing still with sprint held regenerates")
-end)
-
 test("food empties in 60 minutes and slows strictly below 25% with nothing worse at 0%", function()
 	local state = SurvivalRules.NewState()
 	run(function(dt)
@@ -137,21 +122,15 @@ test("food empties in 60 minutes and slows strictly below 25% with nothing worse
 	expectNear(SurvivalRules.MoveSpeed(state, true), SurvivalRules.WALK_SPEED * 0.9, 1e-9, "below 25% is slowed")
 end)
 
-test("walk and sprint speeds", function()
-	local state = SurvivalRules.NewState()
-	expectEq(SurvivalRules.MoveSpeed(state, true), SurvivalRules.WALK_SPEED, "walk")
-	state.sprintIntent = true
-	expectEq(SurvivalRules.MoveSpeed(state, true), SurvivalRules.SPRINT_SPEED, "sprint")
-	expectEq(SurvivalRules.CROUCH_SPEED, nil, "there is no crouch")
-end)
-
-test("walking through water is 30% slower, on top of sprint and hunger (GDD §55)", function()
+test("walk and sprint speeds; water is 30% slower, on top of sprint and hunger (GDD §55)", function()
 	local state = SurvivalRules.NewState()
 	local walk, water = SurvivalRules.WALK_SPEED, SurvivalRules.WATER_SPEED_MULTIPLIER
 	expectEq(water, 0.7, "30% slower")
 	expectNear(SurvivalRules.MoveSpeed(state, true, true), walk * 0.7, 1e-9, "walking in water")
 	expectEq(SurvivalRules.MoveSpeed(state, true, false), walk, "dry ground is unchanged")
+	expectEq(SurvivalRules.CROUCH_SPEED, nil, "there is no crouch")
 	state.sprintIntent = true
+	expectEq(SurvivalRules.MoveSpeed(state, true), SurvivalRules.SPRINT_SPEED, "sprint on land")
 	expectNear(SurvivalRules.MoveSpeed(state, true, true), SurvivalRules.SPRINT_SPEED * 0.7, 1e-9, "sprinting in water")
 	state.food = 0.1
 	expectNear(
@@ -181,21 +160,20 @@ test("stepping into or out of water never looks like a sprint", function()
 		return flagged
 	end
 	local dry, wet = SurvivalRules.WalkPace(false), SurvivalRules.WalkPace(true)
-	local speeds, paces, allowances = {}, {}, {}
-	for index = 1, 30 do
-		local inWater = index > 10
-		paces[index] = if inWater then wet else dry
-		allowances[index] = if index > 11 then wet else dry
-		speeds[index] = if index > 13 then wet else dry
+	-- Into water: the pace flips after sample 10, the allowance after 11, the client's speed after 13.
+	-- Out of water: the same flips in reverse, the client slowing with the pace.
+	local function crossing(into: boolean): boolean
+		local speeds, paces, allowances = {}, {}, {}
+		for index = 1, 30 do
+			local function side(after: number)
+				return if (index > after) == into then wet else dry
+			end
+			paces[index], allowances[index], speeds[index] = side(10), side(11), side(if into then 13 else 10)
+		end
+		return walkThrough(speeds, paces, allowances)
 	end
-	expect(not walkThrough(speeds, paces, allowances), "walking into water")
-	for index = 1, 30 do
-		local inWater = index <= 10
-		paces[index] = if inWater then wet else dry
-		allowances[index] = if index <= 11 then wet else dry
-		speeds[index] = if index <= 10 then wet else dry
-	end
-	expect(not walkThrough(speeds, paces, allowances), "walking out of water")
+	expect(not crossing(true), "walking into water")
+	expect(not crossing(false), "walking out of water")
 	-- Keeping dry-land walking speed in water is faster than the water allows.
 	local cheat = SurvivalRules.NewPace()
 	local caught = false
@@ -219,9 +197,6 @@ test("medicine locks for its animation, heals its amount and caps at max HP", fu
 	expect(SurvivalRules.StartMedicine(state, potion, 10), "a potion starts")
 	expectEq(SurvivalRules.MedicineHeal(potion, 80, 100), 100, "capped at max HP")
 	expectEq(state.medicineLockUntil, 11.5, "potion locks for 1.5 s")
-	local advanced = Consumables.Get("AdvancedMedicine")
-	expectEq(advanced.heal, 25, "advanced heals 25")
-	expectEq(advanced.animationSeconds, 1, "advanced locks 1 s")
 end)
 
 test("food restores hunger and heals its total over exactly 10 s", function()
@@ -252,17 +227,14 @@ test("food restores hunger and heals its total over exactly 10 s", function()
 	expectEq(Consumables.Get("Berries"), nil, "plain Berries are gone")
 end)
 
-test("a hit halves pending food healing and cancels it at 10 HP or less", function()
+test("pending food healing: halved per heal by a hit, cancelled at 10 HP or less, cleared when downed", function()
 	local state = SurvivalRules.NewState()
 	state.foodHeals = { { remaining = 40, endsAt = 10 } }
 	SurvivalRules.OnDamaged(state)
 	expectEq(state.foodHeals[1].remaining, 20, "40 -> 20")
 	SurvivalRules.OnDamaged(state)
 	expectEq(#state.foodHeals, 0, "20 -> 10 is cancelled")
-end)
-
-test("food heals stack with each other and with medicine", function()
-	local state = SurvivalRules.NewState()
+	-- Food heals stack with each other and with medicine.
 	SurvivalRules.Eat(state, Consumables.Get("CookedMeat"), 0)
 	SurvivalRules.Eat(state, Consumables.Get("CookedMeat"), 0)
 	expectEq(#state.foodHeals, 2, "two heals at once")
@@ -270,12 +242,6 @@ test("food heals stack with each other and with medicine", function()
 	expect(SurvivalRules.StartMedicine(state, Consumables.Get("BasicMedicine"), 0), "medicine still works")
 	SurvivalRules.OnDamaged(state)
 	expectEq(SurvivalRules.PendingFoodHealing(state), 30, "each heal halved separately")
-end)
-
-test("downed players lose pending food healing", function()
-	local state = SurvivalRules.NewState()
-	SurvivalRules.Eat(state, Consumables.Get("Redberry"), 0)
-	expect(SurvivalRules.PendingFoodHealing(state) > 0, "a Redberry heals over time")
 	SurvivalRules.OnDowned(state)
-	expectEq(SurvivalRules.PendingFoodHealing(state), 0, "cleared")
+	expectEq(SurvivalRules.PendingFoodHealing(state), 0, "downed players lose it")
 end)

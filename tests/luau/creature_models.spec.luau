@@ -38,16 +38,26 @@ local function checkRecipe(label: string, recipe, maxParts: number)
 	)
 end
 
-test("every enemy has a valid normalized model standing on its hitbox", function()
+local function named(recipe, name: string)
+	local found = {}
+	for _, spec in recipe.parts do
+		if spec.name == name then
+			table.insert(found, spec)
+		end
+	end
+	return found
+end
+
+test("every enemy and boss, and any unknown id, has a valid normalized model standing on its hitbox", function()
 	for _, enemyId in sortedIds(EnemyCatalog.Enemies) do
 		checkRecipe(enemyId, CreatureModels.For(enemyId), CreatureModels.MAX_CREATURE_PARTS)
 	end
-end)
-
-test("every boss has a valid normalized model standing on its hitbox", function()
 	for _, bossId in sortedIds(BossCatalog.Bosses) do
 		checkRecipe(bossId, CreatureModels.ForBoss(bossId), CreatureModels.MAX_BOSS_PARTS)
 	end
+	-- An unknown id still gets a model, by theme or a generic one.
+	checkRecipe("unknown enemy", CreatureModels.For("NoSuchCreature"), CreatureModels.MAX_CREATURE_PARTS)
+	checkRecipe("unknown boss", CreatureModels.ForBoss("NoSuchBoss"), CreatureModels.MAX_BOSS_PARTS)
 end)
 
 test("the Guardian's pillar and shield have models", function()
@@ -63,33 +73,17 @@ test("models are shared data and keep the catalog colour", function()
 	-- The body part wears the catalog colour.
 	for _, enemyId in { "WildBoar", "GreyWolf", "BrownBear" } do
 		local expected = Recipe.Rgb(EnemyCatalog.Get(enemyId).color)
-		local body = nil
-		for _, spec in CreatureModels.For(enemyId).parts do
-			if spec.name == "Body" then
-				body = spec
-			end
-		end
+		local body = named(CreatureModels.For(enemyId), "Body")[1]
 		assert(body, enemyId .. " has a body")
-		expectEq(body.color[1], expected[1], enemyId .. " red")
-		expectEq(body.color[2], expected[2], enemyId .. " green")
-		expectEq(body.color[3], expected[3], enemyId .. " blue")
+		for channel = 1, 3 do
+			expectEq(body.color[channel], expected[channel], enemyId .. " colour channel " .. channel)
+		end
 	end
 end)
 
-test("an unknown id still gets a model, by theme or a generic one", function()
-	checkRecipe("unknown enemy", CreatureModels.For("NoSuchCreature"), CreatureModels.MAX_CREATURE_PARTS)
-	checkRecipe("unknown boss", CreatureModels.ForBoss("NoSuchBoss"), CreatureModels.MAX_BOSS_PARTS)
-end)
-
-test("creatures look like their kind", function()
+test("creatures look like their kind; glowing parts are Neon and shells translucent", function()
 	local function count(recipe, name: string): number
-		local total = 0
-		for _, spec in recipe.parts do
-			if spec.name == name then
-				total += 1
-			end
-		end
-		return total
+		return #named(recipe, name)
 	end
 	for _, enemyId in { "WildBoar", "GreyWolf", "BrownBear", "PlainsBison", "StonehideRhino", "WoollyMammoth" } do
 		expectEq(count(CreatureModels.For(enemyId), "Leg"), 4, enemyId .. " legs")
@@ -103,18 +97,8 @@ test("creatures look like their kind", function()
 	expect(count(CreatureModels.For("Skeleton"), "Skull") == 1, "skeleton skull")
 	expect(count(CreatureModels.For("EmberWisp"), "Core") == 1, "wisp core")
 	expect(count(CreatureModels.ForBoss("Minotaur"), "Horns") == 2, "minotaur horns")
-end)
-
-test("glowing parts are Neon and translucent shells carry transparency", function()
 	local wisp = CreatureModels.For("EmberWisp")
-	local shell, core = nil, nil
-	for _, spec in wisp.parts do
-		if spec.name == "Shell" then
-			shell = spec
-		elseif spec.name == "Core" then
-			core = spec
-		end
-	end
+	local shell, core = named(wisp, "Shell")[1], named(wisp, "Core")[1]
 	assert(shell and core, "wisp has a shell and a core")
 	expectEq(core.material, "Neon", "wisp core glows")
 	expect(shell.transparency ~= nil and shell.transparency > 0, "wisp shell is translucent")

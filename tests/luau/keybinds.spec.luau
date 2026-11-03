@@ -25,16 +25,13 @@ test("the requested defaults: Shift sprint, B backpack, M map, 1-6 hotbar, Q dro
 	expectEq(Keybinds.Resolve({ Hotbar7 = "G" }).Hotbar7, nil, "a saved bind for a removed slot is ignored")
 end)
 
-test("every default is allowed and no two actions share one", function()
+test("every default is allowed and unique; movement, chat and menu keys can never be bound", function()
 	local used = {}
 	for _, action in Keybinds.Actions do
 		expect(Keybinds.IsAllowed(action.default), action.id .. " default is bindable")
 		expect(used[action.default] == nil, action.default .. " used once")
 		used[action.default] = true
 	end
-end)
-
-test("movement, chat and menu keys can never be bound", function()
 	for _, key in { "W", "A", "S", "D", "Space", "Slash", "Escape", "Return", "Backspace", "F9", "Nope" } do
 		expect(not Keybinds.IsAllowed(key), key .. " is reserved")
 		expectEq(Keybinds.Assign({}, "Drop", key), nil, key .. " is refused")

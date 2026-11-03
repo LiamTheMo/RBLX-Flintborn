@@ -7,51 +7,20 @@
 
 local Shared = game:GetService("ReplicatedStorage").Shared
 local Server = game:GetService("ServerScriptService").Server
+local TestSupport = game:GetService("ServerStorage").TestSupport
+local FakeRoblox = require(TestSupport.FakeRoblox)
 
--- Fake clock and task scheduler ---------------------------------------------------
-
-local scheduler = require(game:GetService("ServerStorage").TestSupport.Scheduler).new():Install()
-local threadErrors = scheduler.threadErrors
-
--- Runs everything due within the next `seconds`, in time order.
+local scheduler = require(TestSupport.Scheduler).new():Install()
 local function advance(seconds: number)
 	scheduler:Advance(seconds)
 end
-
--- Fake Roblox services ------------------------------------------------------------
-
-local guids = 0
-local fakes = {
-	HttpService = {
-		GenerateGUID = function()
-			guids += 1
-			return ("guid-%d"):format(guids)
-		end,
-	},
-	MemoryStoreService = {
-		GetHashMap = function()
-			error("MemoryStore unavailable in specs")
-		end,
-	},
-}
-local originalGetService = game.GetService
-game.GetService = function(self, name)
-	return fakes[name] or originalGetService(self, name)
-end
+FakeRoblox.Provide({
+	HttpService = FakeRoblox.Guids(),
+	MemoryStoreService = require(TestSupport.FakeStores).NoMemoryStore,
+})
 game.JobId = "job-recovery"
-
-local PlaceConfig = require(Shared.Config.PlaceConfig)
-PlaceConfig.IsWorld = function()
-	return true
-end
-PlaceConfig.IsLobby = function()
-	return false
-end
-local Remotes = require(Shared.Net.Remotes)
-Remotes.Handle = function() end
-Remotes.Get = function()
-	return { FireClient = function() end, FireAllClients = function() end }
-end
+FakeRoblox.Place("World")
+FakeRoblox.Remotes()
 
 local CrashRecoveryRules = require(Shared.Recovery.CrashRecoveryRules)
 local InventoryRules = require(Shared.Inventory.InventoryRules)
@@ -77,8 +46,7 @@ InventoryService.Start()
 RunCheckpointService.Start()
 
 local function newPlayer(userId: number)
-	local player = { UserId = userId, Name = "P" .. userId, DisplayName = "P" .. userId, Parent = {} }
-	function player.SetAttribute() end
+	local player = FakeRoblox.Player(userId, { Parent = {} })
 	profiles[player] = ProfileSchema.Default(0)
 	return player
 end
@@ -150,7 +118,7 @@ test("an item dropped and picked back up is restored after a crash", function()
 	expect(holds(profile, "sword-1"), "the carried sword comes back")
 	expect(holds(profile, "perm-1"), "the carried Permanent sword comes back")
 	expect(profile.permanentItems["perm-1"] ~= nil, "with its ownership")
-	expectEq(#threadErrors, 0, "no spawned thread errored: " .. tostring(threadErrors[1]))
+	scheduler:ExpectNoThreadErrors()
 end)
 
 test("an item someone else holds at the crash is not restored to its old carrier", function()
@@ -170,5 +138,5 @@ test("an item someone else holds at the crash is not restored to its old carrier
 	advance(RunCheckpointService.DEBOUNCE + 1)
 	expect(holds(crashAndRecover(owner), "axe-1"), "the owner carries it again")
 	expect(not holds(crashAndRecover(other), "axe-1"), "the other player no longer does")
-	expectEq(#threadErrors, 0, "no spawned thread errored: " .. tostring(threadErrors[1]))
+	scheduler:ExpectNoThreadErrors()
 end)

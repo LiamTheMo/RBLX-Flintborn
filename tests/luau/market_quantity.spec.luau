@@ -35,13 +35,18 @@ local function count(profile, catalogId: string): number
 	return total
 end
 
-test("buying several packs at once costs each pack and lands as one stack", function()
+test("buying several packs costs each pack and lands as one stack; no quantity buys one", function()
 	local profile = rich(1000)
 	local ok = EconomyRules.Buy(profile, "RedberryPack", ids(), 7, 3)
 	expect(ok, "three packs bought")
 	expectEq(profile.currency.coins, 1000 - 3 * ShopCatalog.ById.RedberryPack.price, "paid for three")
 	expectEq(count(profile, "Redberry"), 15, "three packs of five")
 	expectEq(#profile.lobbyBackpack.slots, 1, "one stack")
+	-- No quantity buys one, as before.
+	local single = rich(500)
+	expect(EconomyRules.Buy(single, "Bandage", ids(), 7), "one bought")
+	expectEq(count(single, "BasicMedicine"), 1, "one medicine")
+	expectEq(single.currency.coins, 450, "one price")
 end)
 
 test("buying several tools makes one item each, every one owned", function()
@@ -55,13 +60,6 @@ test("buying several tools makes one item each, every one owned", function()
 		expectEq(slot.ownerId, 7, "owned")
 	end
 	expectEq(profile.currency.coins, 1000 - 4 * 150, "paid 4 x 150")
-end)
-
-test("no quantity buys one, as before", function()
-	local profile = rich(500)
-	expect(EconomyRules.Buy(profile, "Bandage", ids(), 7), "one bought")
-	expectEq(count(profile, "BasicMedicine"), 1, "one medicine")
-	expectEq(profile.currency.coins, 450, "one price")
 end)
 
 test("a client quantity that is not a whole number in range is refused and changes nothing", function()
@@ -82,20 +80,17 @@ test("a title is bought once: a larger quantity is refused", function()
 	expectEq(EconomyRules.MaxBuy(profile, "TitleWanderer"), 0, "an owned title offers none")
 end)
 
-test("a purchase the Coins do not cover in full buys nothing", function()
-	local profile = rich(100)
-	local ok, reason = EconomyRules.Buy(profile, "RedberryPack", ids(), 7, 3)
+test("a purchase the Coins or the backpack cannot cover in full buys nothing", function()
+	local poor = rich(100)
+	local ok, reason = EconomyRules.Buy(poor, "RedberryPack", ids(), 7, 3)
 	expect(not ok and reason == "NotEnoughCoins", "120 Coins needed")
-	expectEq(profile.currency.coins, 100, "Coins kept")
-	expectEq(#profile.lobbyBackpack.slots, 0, "no berries")
-end)
-
-test("a purchase the backpack cannot hold in full buys nothing", function()
+	expectEq(poor.currency.coins, 100, "Coins kept")
+	expectEq(#poor.lobbyBackpack.slots, 0, "no berries")
 	local profile = rich(1000000)
 	for i = 1, GameConstants.BACKPACK_SLOTS - 2 do
 		profile.lobbyBackpack.slots[i] = { instanceId = "x" .. i, catalogId = "StoneSpear", qualityRoll = 0 }
 	end
-	local ok, reason = EconomyRules.Buy(profile, "StoneAxe", ids(), 7, 3)
+	ok, reason = EconomyRules.Buy(profile, "StoneAxe", ids(), 7, 3)
 	expect(not ok and reason == "BackpackFull", "three axes need three free slots")
 	expectEq(#profile.lobbyBackpack.slots, GameConstants.BACKPACK_SLOTS - 2, "no axe added")
 	expectEq(profile.currency.coins, 1000000, "no Coins taken")
@@ -133,7 +128,7 @@ test("MaxBuy offers what the Coins, the backpack and the limit allow", function(
 	expect(not ok, "and nothing past it")
 end)
 
-test("a backpack stack sells in part; the rest stays", function()
+test("a backpack stack sells in part and the rest stays; no quantity sells the whole slot", function()
 	local profile = rich(0)
 	profile.lobbyBackpack.slots[1] = { catalogId = "Flint", quantity = 10 }
 	local ok, coins = EconomyRules.Sell(profile, "backpack", 1, 4, "sale:a", 1)
@@ -142,6 +137,11 @@ test("a backpack stack sells in part; the rest stays", function()
 	expectEq(profile.currency.coins, coins, "paid")
 	ok = EconomyRules.Sell(profile, "backpack", 1, 6, "sale:b", 1)
 	expect(ok and #profile.lobbyBackpack.slots == 0, "selling the rest empties the slot")
+	-- No quantity sells the whole slot, as before.
+	profile.lobbyBackpack.slots[1] = { catalogId = "Flint", quantity = 10 }
+	ok, coins = EconomyRules.Sell(profile, "backpack", 1, nil, "sale:all", 1)
+	expect(ok and coins == 10 * ShopCatalog.SellValue("Flint"), "all ten")
+	expectEq(#profile.lobbyBackpack.slots, 0, "slot gone")
 end)
 
 test("a backpack sale never sells more than the slot holds, nor odd amounts", function()
@@ -159,14 +159,6 @@ test("a backpack sale never sells more than the slot holds, nor odd amounts", fu
 	local ok, reason = EconomyRules.Sell(profile, "backpack", 1, 2, "sale:y", 1)
 	expect(not ok and reason == "BadQuantity", "two of one spear refused")
 	expect(EconomyRules.Sell(profile, "backpack", 1, 1, "sale:z", 1), "one spear sells")
-end)
-
-test("no quantity sells the whole slot, as before", function()
-	local profile = rich(0)
-	profile.lobbyBackpack.slots[1] = { catalogId = "Flint", quantity = 10 }
-	local ok, coins = EconomyRules.Sell(profile, "backpack", 1, nil, "sale:all", 1)
-	expect(ok and coins == 10 * ShopCatalog.SellValue("Flint"), "all ten")
-	expectEq(#profile.lobbyBackpack.slots, 0, "slot gone")
 end)
 
 test("a backpack slot that changed since the client looked sells nothing", function()

@@ -11,6 +11,11 @@ local function sword(id)
 	return { instanceId = id, catalogId = "StoneSword", ownerId = 1, location = "Carried", qualityRoll = 0 }
 end
 
+-- A material stack carrying `carried` of its units in from the lobby (GDD §53).
+local function stack(catalogId, quantity, carried)
+	return { catalogId = catalogId, quantity = quantity, carried = carried }
+end
+
 test("only living, non-downed, at-risk players inside the zone at the deadline extract", function()
 	local base = { alive = true, downed = false, atRisk = true, inZone = true }
 	expect(ExtractionRules.Qualifies(base), "qualifies")
@@ -22,19 +27,19 @@ test("only living, non-downed, at-risk players inside the zone at the deadline e
 	local downed = table.clone(base)
 	downed.downed = true
 	expect(not ExtractionRules.Qualifies(downed), "downed players do not extract")
-	expect(ExtractionRules.InZone(Vector3.new(5, 0, 5), Vector3.new(0, 0, 0), 8), "inside the radius")
-	expect(not ExtractionRules.InZone(Vector3.new(9, 0, 0), Vector3.new(0, 0, 0), 8), "outside")
+	-- A late arrival inside the zone at zero qualifies; an early leaver does not.
+	local center = Vector3.new(100, 10, 100)
+	expect(ExtractionRules.InZone(Vector3.new(104, 12, 98), center, 12), "arrived late, inside at zero")
+	expect(not ExtractionRules.InZone(Vector3.new(140, 10, 100), center, 12), "left before zero")
+	expect(not ExtractionRules.InZone(Vector3.new(100, 60, 100), center, 12), "far above the zone")
 end)
 
-test("fixed exits take 120 s, runes 30 s, and only the fixed Center portal doubles", function()
-	expectEq(ExtractionRules.FIXED_SECONDS, 120, "120 s")
-	expectEq(ExtractionRules.PORTABLE_SECONDS, 30, "30 s")
+test("materials auto-bank, unique gear goes to the lobby backpack, and only the fixed Center portal doubles", function()
+	expectEq(ExtractionRules.FIXED_SECONDS, 120, "fixed exits take 120 s")
+	expectEq(ExtractionRules.PORTABLE_SECONDS, 30, "runes take 30 s")
 	expectEq(ExtractionRules.Multiplier("Center"), 2, "center doubles")
 	expectEq(ExtractionRules.Multiplier("Fixed"), 1, "ordinary portal")
 	expectEq(ExtractionRules.Multiplier("Portable"), 1, "runes never double, even at the center")
-end)
-
-test("ordinary materials auto-bank and unique gear goes to the lobby backpack", function()
 	local profile = ProfileSchema.Default(0)
 	local receipt = ExtractionRules.Settle(profile, {
 		{ catalogId = "Stone", quantity = 30 },
@@ -49,18 +54,6 @@ test("ordinary materials auto-bank and unique gear goes to the lobby backpack", 
 	expectEq(profile.metrics.extractions, 1, "counted")
 end)
 
-test("the Center doubles materials but never clones a sword", function()
-	local profile = ProfileSchema.Default(0)
-	ExtractionRules.Settle(profile, { { catalogId = "Stone", quantity = 30 }, sword("s1") }, "Center", "r1", 5)
-	expectEq(profile.vault.materials.Stone, 60, "30 stone becomes 60")
-	expectEq(#profile.lobbyBackpack.slots, 1, "one sword")
-end)
-
--- A material stack carrying `carried` of its units in from the lobby (GDD §53).
-local function stack(catalogId, quantity, carried)
-	return { catalogId = catalogId, quantity = quantity, carried = carried }
-end
-
 test("carried-in materials never double at the Center; only what was gathered does", function()
 	local profile = ProfileSchema.Default(0)
 	-- 100 Wood brought in merged with 60 gathered into one stack of 160.
@@ -68,36 +61,34 @@ test("carried-in materials never double at the Center; only what was gathered do
 	expectEq(profile.vault.materials.Wood, 220, "100 + 60 × 2")
 	expectEq(receipt.vaulted.Wood, 220, "the receipt lists 220")
 	expectEq(receipt.carriedIn.Wood, 100, "and the 100 it did not double")
-end)
-
-test("carrying 100 in and extracting 40 doubles nothing", function()
-	local profile = ProfileSchema.Default(0)
-	ExtractionRules.Settle(profile, { stack("Wood", 40, 40) }, "Center", "r1", 5)
-	expectEq(profile.vault.materials.Wood, 40, "40 settle once")
-end)
-
-test("carried units count across stacks, whoever extracts them", function()
-	local profile = ProfileSchema.Default(0)
-	ExtractionRules.Settle(profile, {
-		stack("Stone", 25, 25),
-		stack("Wood", 10),
-		stack("Stone", 45, 25),
-	}, "Center", "r1", 5)
-	expectEq(profile.vault.materials.Stone, 90, "50 once + 20 gathered × 2")
-	expectEq(profile.vault.materials.Wood, 20, "a material with no carried units doubles in full")
-	-- A malformed tag never counts more than the stack holds.
+	-- Carried units count across stacks, whoever extracts them.
+	local mixed = ProfileSchema.Default(0)
+	ExtractionRules.Settle(
+		mixed,
+		{ stack("Stone", 25, 25), stack("Wood", 10), stack("Stone", 45, 25) },
+		"Center",
+		"r1",
+		5
+	)
+	expectEq(mixed.vault.materials.Stone, 90, "50 once + 20 gathered × 2")
+	expectEq(mixed.vault.materials.Wood, 20, "a material with no carried units doubles in full")
+	-- Carrying 100 in and extracting 40 doubles nothing; a malformed tag never counts more than the stack.
 	local odd = ProfileSchema.Default(0)
-	ExtractionRules.Settle(odd, { stack("Wood", 10, 99), stack("Stone", 10, -4) }, "Center", "r2", 5)
-	expectEq(odd.vault.materials.Wood, 10, "carried is capped at the quantity")
+	ExtractionRules.Settle(
+		odd,
+		{ stack("Wood", 40, 40), stack("Stone", 10, -4), stack("Wood", 10, 99) },
+		"Center",
+		"r2",
+		5
+	)
+	expectEq(odd.vault.materials.Wood, 50, "all-carried stacks settle once, carried capped at the quantity")
 	expectEq(odd.vault.materials.Stone, 20, "a negative tag counts as none")
-end)
-
-test("other extractions settle carried-in and gathered materials alike", function()
+	-- Other extractions settle carried-in and gathered materials alike.
 	for _, kind in { "Fixed", "Portable" } do
-		local profile = ProfileSchema.Default(0)
-		local receipt = ExtractionRules.Settle(profile, { stack("Wood", 160, 100) }, kind, "r1", 5)
-		expectEq(profile.vault.materials.Wood, 160, kind .. " settles 160")
-		expectEq(receipt.carriedIn, nil, kind .. " lists nothing as skipped")
+		local plain = ProfileSchema.Default(0)
+		local plainReceipt = ExtractionRules.Settle(plain, { stack("Wood", 160, 100) }, kind, "r1", 5)
+		expectEq(plain.vault.materials.Wood, 160, kind .. " settles 160")
+		expectEq(plainReceipt.carriedIn, nil, kind .. " lists nothing as skipped")
 	end
 	expectEq(ExtractionRules.MaterialYield(160, 100, 1), 160, "×1 never changes a total")
 end)
@@ -119,21 +110,17 @@ test("a Play loadout and a crash checkpoint keep each stack's carried units", fu
 	expectEq(restored.carried, nil, "without a run tag")
 end)
 
-test("anything over a vault stack's 1,000 is deleted and listed", function()
+test("settlement overflow is deleted and listed: 1,000 per vault stack, 50 lobby backpack slots", function()
 	local profile = ProfileSchema.Default(0)
 	local receipt = ExtractionRules.Settle(profile, { { catalogId = "Wood", quantity = 600 } }, "Center", "r1", 5)
 	expectEq(profile.vault.materials.Wood, 1000, "1,000 stored")
 	expectEq(receipt.deleted.Wood, 200, "200 deleted")
 	expectEq(receipt.vaulted.Wood, 1000, "1,000 banked")
-end)
-
-test("items beyond 50 lobby backpack slots are deleted", function()
-	local profile = ProfileSchema.Default(0)
 	local items = {}
 	for i = 1, 55 do
 		table.insert(items, sword("s" .. i))
 	end
-	local receipt = ExtractionRules.Settle(profile, items, "Fixed", "r1", 5)
+	receipt = ExtractionRules.Settle(profile, items, "Fixed", "r2", 5)
 	expectEq(#profile.lobbyBackpack.slots, 50, "50 kept")
 	expectEq(receipt.deleted.StoneSword, 5, "5 deleted")
 end)
@@ -283,13 +270,6 @@ test("a settlement that fails part-way deletes and grants nothing", function()
 	expectEq(profile.vault.materials.Stone, 10, "vault unchanged")
 	expectEq(profile.receipts.extraction["extract:e2"], nil, "no receipt")
 	expectEq(OperationJournal.Get(profile, "extract:e2"), nil, "can be retried later")
-end)
-
-test("a late arrival inside the zone at zero qualifies; an early leaver does not", function()
-	local center = Vector3.new(100, 10, 100)
-	expect(ExtractionRules.InZone(Vector3.new(104, 12, 98), center, 12), "arrived late, inside at zero")
-	expect(not ExtractionRules.InZone(Vector3.new(140, 10, 100), center, 12), "left before zero")
-	expect(not ExtractionRules.InZone(Vector3.new(100, 60, 100), center, 12), "far above the zone")
 end)
 
 test("only the newest receipts are kept", function()

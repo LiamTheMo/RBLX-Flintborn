@@ -1,12 +1,15 @@
 local Shared = game:GetService("ReplicatedStorage").Shared
+local HudLayout = require(Shared.UI.HudLayout)
 local HudModel = require(Shared.UI.HudModel)
 
+-- The grid tests below run on the shipped layout (D30: margin 24, gap 12, column 315).
+local GRID = HudLayout.grid
+
 test("fractions display as whole numbers 0–100", function()
-	expectEq(HudModel.Percent(1), 100, "full")
-	expectEq(HudModel.Percent(0.724), 72, "rounds down below .5")
-	expectEq(HudModel.Percent(0.726), 73, "rounds up from .5")
-	expectEq(HudModel.Percent(1.4), 100, "clamped above")
-	expectEq(HudModel.Percent(-0.2), 0, "clamped below")
+	-- Rounds to nearest, clamps both ways; missing and NaN read 0.
+	for input, shown in { [1] = 100, [0.724] = 72, [0.726] = 73, [1.4] = 100, [-0.2] = 0 } do
+		expectEq(HudModel.Percent(input), shown, "Percent " .. input)
+	end
 	expectEq(HudModel.Percent(nil), 0, "missing reads 0")
 	expectEq(HudModel.Percent(0 / 0), 0, "NaN reads 0")
 end)
@@ -33,15 +36,6 @@ test("XP fraction and level text", function()
 	expectEq(HudModel.LevelText(12), "LV. 12", "badge text")
 	expectEq(HudModel.LevelText(nil), "LV. 0", "missing level")
 	expectEq(HudModel.LevelText(50, true), "MAX", "level cap")
-end)
-
-test("lobby currency text", function()
-	expectEq(HudModel.Thousands(2450), "2,450", "thousands")
-	expectEq(HudModel.Thousands(125), "125", "under a thousand")
-	expectEq(HudModel.Thousands(1000000), "1,000,000", "millions")
-	expectEq(HudModel.Thousands(999), "999", "no leading comma")
-	expectEq(HudModel.Thousands(nil), "0", "missing reads 0")
-	expectEq(HudModel.Thousands(-5), "0", "negative reads 0")
 end)
 
 test("timers read m:ss and h:mm:ss", function()
@@ -157,14 +151,8 @@ test("Roblox's touch controls sit inside the device safe area", function()
 	expectEq(HudModel.Thumbstick(844, 390, notched).x, 72, "the ring 25 px inside the left inset")
 end)
 
-test("the HUD grid: one margin, one gap, one column width (D30)", function()
-	local layout = require(game:GetService("ReplicatedStorage").Shared.UI.HudLayout)
-	local grid = layout.grid
-	expectEq(grid.margin, 24, "M: 24 design px from every edge (12 px on a phone at scale 0.5)")
-	expectEq(grid.gap, 12, "G: 12 design px between stacked pieces")
-	expectEq(grid.column, 315, "the right-hand column's width")
-	expectEq(layout.gear.size[1], 52, "the shared ⚙ is 52 wide")
-	expectEq(layout.gear.size[2], 46, "and 46 tall")
+test("the HUD layout pins regions to grid columns (D30)", function()
+	local layout = HudLayout
 	-- Every edge-pinned region names its column instead of carrying offsets.
 	for _, key in { "vitals", "status", "objective", "event" } do
 		expectEq(layout[key].column, "right", key .. " is in the right-hand column")
@@ -179,8 +167,6 @@ test("the HUD grid: one margin, one gap, one column width (D30)", function()
 	expect(math.abs((b.xp[1] + b.xp[3] / 2) - hotbarRight / 2) <= 0.5, "the XP bar is centred over the hotbar")
 	expect(math.abs((b.popups[1] - b.xp[1])) < 1e-6 and b.popups[3] == b.xp[3], "the XP pop-ups over the bar")
 end)
-
-local GRID = { margin = 24, gap = 12, column = 315, topBand = 0.3, bottomBand = 0.25 }
 
 test("the edge rule per column: the margin in the corner bands, else the safe inset for the whole column", function()
 	-- 844 × 390: the top band ends at y 117, the bottom band starts at 292.5.
@@ -211,7 +197,7 @@ end)
 test(
 	"the corner settings button: the grid's corner, or above the thumbstick ring when it reaches the corner",
 	function()
-		local gear = { size = { 52, 46 }, ringGap = 12, pad = 44 }
+		local gear = HudLayout.gear
 		local left, bottom, where =
 			HudModel.GearCorner(GRID, gear, { width = 1672, height = 941, scale = 1, touch = false })
 		expectEq(left, 24, "desktop: the margin from the left")
@@ -380,14 +366,17 @@ test("the world event panel shows the soonest event", function()
 	end
 end)
 
-test("currency amounts compact past 100,000", function()
-	expectEq(HudModel.Compact(2450), "2,450", "small amounts keep separators")
-	expectEq(HudModel.Compact(99999), "99,999", "just below the threshold")
-	expectEq(HudModel.Compact(100000), "100K", "thousands")
-	expectEq(HudModel.Compact(250500), "250K", "three-digit thousands drop the decimal")
-	expectEq(HudModel.Compact(1234567), "1.2M", "millions with a decimal")
-	expectEq(HudModel.Compact(2000000), "2M", "a round million")
-	expectEq(HudModel.Compact(999999), "999K", "never rounds up to 1000K")
-	expectEq(HudModel.Compact(3400000000), "3.4B", "billions")
+test("currency text has separators, and compacts past 100,000", function()
+	for input, text in { [125] = "125", [999] = "999", [2450] = "2,450", [1000000] = "1,000,000", [-5] = "0" } do
+		expectEq(HudModel.Thousands(input), text, "Thousands " .. input)
+	end
+	expectEq(HudModel.Thousands(nil), "0", "missing reads 0")
+	-- Three-digit thousands drop the decimal and never round up to 1000K.
+	for input, text in { [2450] = "2,450", [99999] = "99,999", [100000] = "100K", [250500] = "250K", [999999] = "999K" } do
+		expectEq(HudModel.Compact(input), text, "Compact " .. input)
+	end
+	for input, text in { [1234567] = "1.2M", [2000000] = "2M", [3400000000] = "3.4B" } do
+		expectEq(HudModel.Compact(input), text, "Compact " .. input)
+	end
 	expectEq(HudModel.Compact(nil), "0", "missing reads 0")
 end)

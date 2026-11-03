@@ -13,7 +13,16 @@ local function partyView(members, leader, extra)
 	return view
 end
 
-test("alone you are listed as the leader of a party of one", function()
+-- Eight members, `firstId` first.
+local function fullParty(firstId)
+	local full = {}
+	for i = 1, 8 do
+		table.insert(full, { userId = if i == 1 then firstId else 10 + i, name = "P" .. i })
+	end
+	return full
+end
+
+test("alone you are listed as the leader of a party of one; counts stay within the cap", function()
 	local view = { party = nil, invites = {}, maxSize = 8 }
 	local members = PartyModel.Members(view, 1, "LiamTheMo")
 	expectEq(#members, 1, "one row")
@@ -21,6 +30,11 @@ test("alone you are listed as the leader of a party of one", function()
 	expect(members[1].leader, "leads")
 	expect(members[1].isSelf, "marked as you")
 	expectEq(PartyModel.LeaderName(members), "LiamTheMo", "leader name")
+	-- Counts read n/8 and n / 8 within the cap.
+	expectEq(PartyModel.CountText(1, 8), "1/8", "heading")
+	expectEq(PartyModel.CountText(nil, 8), "1/8", "alone")
+	expectEq(PartyModel.CountText(9, 8), "8/8", "clamped")
+	expectEq(PartyModel.MembersText(3, 8), "3 / 8", "detail row")
 end)
 
 test("the leader is listed first, then members in joining order", function()
@@ -38,13 +52,6 @@ test("the leader is listed first, then members in joining order", function()
 	expectEq(members[2].ready, nil, "no ready flags")
 end)
 
-test("counts read n/8 and n / 8 within the cap", function()
-	expectEq(PartyModel.CountText(1, 8), "1/8", "heading")
-	expectEq(PartyModel.CountText(nil, 8), "1/8", "alone")
-	expectEq(PartyModel.CountText(9, 8), "8/8", "clamped")
-	expectEq(PartyModel.MembersText(3, 8), "3 / 8", "detail row")
-end)
-
 test("created time reads relative to the server clock", function()
 	expectEq(PartyModel.RelativeTime(1000, 1000), "Just now", "same second")
 	expectEq(PartyModel.RelativeTime(1000, 1059.9), "Just now", "under a minute")
@@ -58,19 +65,19 @@ test("created time reads relative to the server clock", function()
 	expectEq(PartyModel.RelativeTime(1000, nil), "—", "no clock")
 end)
 
-test("only the leader or a solo player may invite, and not into a full party", function()
+test("only the leader or a solo player may invite, not into a full party; leave needs company", function()
 	expect(PartyModel.CanInvite({ party = nil, maxSize = 8 }, 1), "solo")
 	expect(PartyModel.CanInvite(partyView({ { userId = 1, name = "A" } }, 1), 1), "leader")
 	local ok, reason = PartyModel.CanInvite(partyView({ { userId = 1 }, { userId = 2 } }, 1), 2)
 	expect(not ok, "member")
 	expectEq(reason, "NotLeader", "member reason")
-	local full = {}
-	for i = 1, 8 do
-		table.insert(full, { userId = i, name = "P" .. i })
-	end
-	ok, reason = PartyModel.CanInvite(partyView(full, 1), 1)
+	ok, reason = PartyModel.CanInvite(partyView(fullParty(1), 1), 1)
 	expect(not ok, "full")
 	expectEq(reason, "PartyFull", "full reason")
+	-- Leave shows only in a party with someone else.
+	expect(not PartyModel.CanLeave({ party = nil }), "solo")
+	expect(not PartyModel.CanLeave(partyView({ { userId = 1 } }, 1)), "party of one")
+	expect(PartyModel.CanLeave(partyView({ { userId = 1 }, { userId = 2 } }, 1)), "two")
 end)
 
 test("search matches display or user name, case-insensitively and literally", function()
@@ -102,12 +109,7 @@ test("invite rows are filtered, sorted and carry their button state", function()
 	rows = PartyModel.InviteRows(candidates, view, 1, "sun")
 	expectEq(#rows, 1, "filtered")
 	expectEq(rows[1].userId, 3, "the match")
-	local full = {}
-	for i = 1, 8 do
-		table.insert(full, { userId = 10 + i, name = "P" .. i })
-	end
-	full[1].userId = 1
-	rows = PartyModel.InviteRows(candidates, partyView(full, 1), 1, "")
+	rows = PartyModel.InviteRows(candidates, partyView(fullParty(1), 1), 1, "")
 	expectEq(rows[1].state, "full", "a full party disables invites")
 end)
 
@@ -128,12 +130,6 @@ test("there is no ready toggle or tally (D24)", function()
 	}, {})
 	expectEq(data.readyButton, nil, "no toggle data")
 	expectEq(data.selfReady, nil, "no own ready flag")
-end)
-
-test("leave shows only in a party with someone else", function()
-	expect(not PartyModel.CanLeave({ party = nil }), "solo")
-	expect(not PartyModel.CanLeave(partyView({ { userId = 1 } }, 1)), "party of one")
-	expect(PartyModel.CanLeave(partyView({ { userId = 1 }, { userId = 2 } }, 1)), "two")
 end)
 
 test("refusal codes read as sentences", function()

@@ -36,7 +36,16 @@ test("every tool, weapon, siege item and arrow has a buildable held recipe", fun
 		local problems = Recipe.Problems(recipe, MAX_PARTS)
 		expectEq(#problems, 0, id .. ": " .. table.concat(problems, "; "))
 	end
-	expectEq(GearModels.Held("GuardianFang") ~= nil, true, "the Guardian's Fang is covered")
+	local neon = false
+	for _, spec in GearModels.Held("GuardianFang").parts do
+		neon = neon or spec.material == "Neon"
+	end
+	expect(neon, "the Guardian's Fang has a Neon accent")
+	-- Every ladder tier that makes gear has a look.
+	for _, tier in Tiers.Ladder do
+		local look = GearModels.Tiers[tier.id]
+		expect(look ~= nil and #look.color == 3, tier.id .. " has an RGB colour")
+	end
 end)
 
 test("consumables and placeables get a small generic held model, materials none", function()
@@ -51,7 +60,7 @@ test("consumables and placeables get a small generic held model, materials none"
 	expectEq(GearModels.Held("NoSuchItem"), nil, "unknown ids show nothing")
 end)
 
-test("held tools and weapons put the business end at +Y", function()
+test("held tools and weapons put the business end at +Y at a believable size for an R6 hand", function()
 	for _, id in itemsOf("Tool", "Weapon") do
 		if not GearModels.IsBow(id) then
 			local recipe = GearModels.Held(id)
@@ -67,23 +76,20 @@ test("held tools and weapons put the business end at +Y", function()
 			expect(headY > 0.5, id .. " head sits above the grip")
 		end
 	end
-end)
-
-test("held sizes are believable for an R6 hand", function()
-	local function reach(id)
+	for id, range in
+		{
+			IronSword = { 3.5, 5 },
+			StoneDagger = { 1.4, 2.4 },
+			WoodenSpear = { 6, 8 },
+			IronAxe = { 2.6, 3.6 },
+			IronPickaxe = { 2.6, 3.6 },
+			WoodenBow = { 3.5, 4.5 },
+		}
+	do
 		local low, high = GearModels.Extent(GearModels.Held(id))
-		return high[2] - low[2]
+		local length = high[2] - low[2]
+		expect(length >= range[1] and length <= range[2], ("%s is %.1f studs"):format(id, length))
 	end
-	local function between(id, from, to)
-		local length = reach(id)
-		expect(length >= from and length <= to, ("%s is %.1f studs"):format(id, length))
-	end
-	between("IronSword", 3.5, 5)
-	between("StoneDagger", 1.4, 2.4)
-	between("WoodenSpear", 6, 8)
-	between("IronAxe", 2.6, 3.6)
-	between("IronPickaxe", 2.6, 3.6)
-	between("WoodenBow", 3.5, 4.5)
 end)
 
 test("bows are held upright and are the only items held in the left hand", function()
@@ -92,22 +98,6 @@ test("bows are held upright and are the only items held in the left hand", funct
 	end
 	expectEq(GearModels.IsBow("IronAxe"), false)
 	expectEq(GearModels.IsBow("Wood"), false)
-end)
-
-test("every ladder tier that makes gear has a look", function()
-	for _, tier in Tiers.Ladder do
-		expect(GearModels.Tiers[tier.id] ~= nil, tier.id .. " has colours")
-		local color = GearModels.Tiers[tier.id].color
-		expectEq(#color, 3, tier.id .. " colour is RGB")
-	end
-end)
-
-test("the Guardian's Fang has a Neon accent", function()
-	local neon = false
-	for _, spec in GearModels.Held("GuardianFang").parts do
-		neon = neon or spec.material == "Neon"
-	end
-	expect(neon, "special items glow")
 end)
 
 local SLOT_PARTS = {

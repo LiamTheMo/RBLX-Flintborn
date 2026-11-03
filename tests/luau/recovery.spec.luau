@@ -15,14 +15,11 @@ local function carried()
 	}
 end
 
-test("a crash (checkpoint left, heartbeat gone) is eligible", function()
+test("a crash (checkpoint left, heartbeat gone) is eligible; a logout or planned shutdown never is", function()
 	local checkpoint = CrashRecoveryRules.Checkpoint("run1", "job1", carried(), {}, NOW - 20)
 	expectEq(CrashRecoveryRules.Classify(checkpoint, nil, NOW), "Eligible", "no heartbeat")
 	expectEq(CrashRecoveryRules.Classify(checkpoint, NOW - 200, NOW), "Eligible", "stale heartbeat")
 	expectEq(CrashRecoveryRules.Classify(checkpoint, NOW - 10, NOW), "ServerAlive", "the server still runs")
-end)
-
-test("a logout or planned shutdown leaves no checkpoint and is never eligible", function()
 	-- Logout makes a body and shutdown escrows; both end the run, deleting the checkpoint.
 	expectEq(CrashRecoveryRules.Classify(nil, nil, NOW), "NoCheckpoint", "logout")
 	expectEq(CrashRecoveryRules.Classify(nil, NOW - 500, NOW), "NoCheckpoint", "shutdown")

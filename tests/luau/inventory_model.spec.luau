@@ -57,25 +57,6 @@ local LOBBY = {
 	backpackCapacity = 50,
 }
 
-test("the lobby Backpack tab's All shows everything the player owns", function()
-	local sections = InventoryModel.LobbySections(LOBBY, "Backpack")
-	local all = shown(sections, "All")
-	local found = items(sections)
-	local count = 0
-	for id in found do
-		count += 1
-		expect(all[id], id .. " shows under All")
-	end
-	expectEq(count, #LOBBY.backpack + #LOBBY.items + #LOBBY.materials, "backpack, vault items and materials")
-	expectEq(found.b1, "StoneAxe", "a tool")
-	expectEq(found.b2, "Redberry", "food")
-	expectEq(found.b3, "BasicMedicine", "medicine")
-	expectEq(found.i1, "IronSword", "a weapon from the vault")
-	expectEq(found.i2, "HideChest", "armour from the vault")
-	expectEq(found.mWood, "Wood", "a vault material")
-	expectEq(sections[1].id, "backpack", "the backpack comes first")
-end)
-
 test("the Vault tab shows the vault alone, materials included", function()
 	local sections = InventoryModel.LobbySections(LOBBY, "Vault")
 	local found = items(sections)
@@ -95,9 +76,17 @@ test("empty slots only fill out the last row", function()
 	expectEq(#vault[1].cells, 6, "three vault items, three empties: the materials follow at once")
 end)
 
-test("a category shows exactly its items, and All is every category together", function()
+test("the lobby Backpack tab's All shows everything; a category shows exactly its items", function()
 	local sections = InventoryModel.LobbySections(LOBBY, "Backpack")
 	local found = items(sections)
+	expectEq(sections[1].id, "backpack", "the backpack comes first")
+	local all, count = shown(sections, "All"), 0
+	for id in found do
+		count += 1
+		expect(all[id], id .. " shows under All")
+	end
+	expectEq(count, #LOBBY.backpack + #LOBBY.items + #LOBBY.materials, "backpack, vault items and materials")
+	expect(found.b1 == "StoneAxe" and found.i1 == "IronSword" and found.mWood == "Wood", "backpack, vault, materials")
 	local union = {}
 	for _, category in ItemInfo.CATEGORIES do
 		if category == "All" then

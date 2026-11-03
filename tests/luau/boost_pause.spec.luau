@@ -8,79 +8,15 @@
 local Shared = game:GetService("ReplicatedStorage").Shared
 local Server = game:GetService("ServerScriptService").Server
 
--- Fake clock and task scheduler ---------------------------------------------------
-
-local clock = 1000
-local queue = {}
-
-task = {}
-function task.spawn(fn, ...)
-	local thread = if type(fn) == "thread" then fn else coroutine.create(fn)
-	coroutine.resume(thread, ...)
-	return thread
-end
-function task.delay(seconds, fn, ...)
-	table.insert(queue, { at = clock + (seconds or 0), fn = fn, args = table.pack(...) })
-end
-function task.defer(fn, ...)
-	task.delay(0, fn, ...)
-end
-function task.wait(seconds)
-	return seconds
-end
-
+local TestSupport = game:GetService("ServerStorage").TestSupport
+local FakeRoblox = require(TestSupport.FakeRoblox)
+local scheduler = require(TestSupport.Scheduler).new(1000):Install():InstallServerTime()
 local function advance(seconds: number)
-	local target = clock + seconds
-	while true do
-		local best = nil
-		for index, entry in queue do
-			if entry.at <= target and (best == nil or entry.at < queue[best].at) then
-				best = index
-			end
-		end
-		if best == nil then
-			break
-		end
-		local entry = table.remove(queue, best)
-		clock = math.max(clock, entry.at)
-		entry.fn(table.unpack(entry.args, 1, entry.args.n))
-	end
-	clock = target
+	scheduler:Advance(seconds)
 end
-
-workspace = {
-	GetServerTimeNow = function()
-		return clock
-	end,
-}
-
--- Fake Roblox services ------------------------------------------------------------
-
-local removing = {}
-local Players = {
-	PlayerAdded = { Connect = function() end },
-	PlayerRemoving = {
-		Connect = function(_, fn)
-			table.insert(removing, fn)
-		end,
-	},
-	_list = {},
-}
-function Players.GetPlayers(self)
-	return table.clone(self._list)
-end
-local originalGetService = game.GetService
-game.GetService = function(self, name)
-	if name == "Players" then
-		return Players
-	end
-	return originalGetService(self, name)
-end
-
-local PlaceConfig = require(Shared.Config.PlaceConfig)
-PlaceConfig.IsWorld = function()
-	return true
-end
+local Players = FakeRoblox.Players()
+FakeRoblox.Provide({ Players = Players })
+FakeRoblox.Place("World")
 
 local BoostRules = require(Shared.Survival.BoostRules)
 local ProfileSchema = require(Shared.Data.ProfileSchema)
@@ -104,13 +40,7 @@ local ModifierService = require(Server.Services.ModifierService)
 ModifierService.Start()
 
 local function newPlayer(userId: number)
-	local player = { UserId = userId, Name = "Player" .. userId, Parent = Players, attributes = {} }
-	function player.SetAttribute(self, key, value)
-		self.attributes[key] = value
-	end
-	function player.GetAttribute(self, key)
-		return self.attributes[key]
-	end
+	local player = FakeRoblox.Player(userId, nil, Players)
 	profiles[player] = ProfileSchema.Default(0)
 	return player
 end
@@ -157,7 +87,7 @@ test("the next deploy resumes them with the same remaining time, whatever passed
 	advance(3 * 3600)
 	startRun(player)
 	expectEq(player:GetAttribute("BoostXP"), 0.25, "the HUD amount is back")
-	expectEq(player:GetAttribute("BoostXPUntil"), clock + 400, "with the 400 s it had left")
+	expectEq(player:GetAttribute("BoostXPUntil"), scheduler.clock + 400, "with the 400 s it had left")
 	expect(
 		not ModifierService.BoostTakes(player, { kind = "XP", amount = 0.25, seconds = 900 }),
 		"an equal boost still changes nothing"
@@ -173,32 +103,27 @@ test("the next deploy resumes them with the same remaining time, whatever passed
 	expectEq(player:GetAttribute("BoostXPUntil"), nil, "with its timer")
 end)
 
-test("death ends the boosts and clears what an earlier extraction saved", function()
-	local player = newPlayer(3)
-	startRun(player)
-	ModifierService.ApplyBoost(player, XP_DRAUGHT)
-	advance(100)
-	endRun(player, "Extracted")
-	startRun(player)
-	expectEq(#profiles[player].boosters.paused, 1, "the saved copy stays while the run is on (a crash keeps it)")
-	advance(50)
-	endRun(player, "Died")
-	expectEq(#profiles[player].boosters.paused, 0, "nothing saved after a death")
-	expectEq(player:GetAttribute("BoostXP"), nil, "the boost ended")
-	startRun(player)
-	expectEq(player:GetAttribute("BoostXP"), nil, "and the next run starts without it")
-end)
-
-test("leaving the world without extracting ends them too", function()
-	local player = newPlayer(4)
-	startRun(player)
-	ModifierService.ApplyBoost(player, LUCK_BERRY)
-	advance(10)
-	endRun(player, "Extracted")
-	startRun(player)
-	ModifierService.ApplyBoost(player, XP_DRAUGHT)
-	endRun(player, "Left")
-	expectEq(#profiles[player].boosters.paused, 0, "a logout saves nothing and clears the saved Luck")
+test("dying or leaving without extracting ends the boosts and clears what was saved", function()
+	for userId, reason in { [3] = "Died", [4] = "Left" } do
+		local player = newPlayer(userId)
+		startRun(player)
+		ModifierService.ApplyBoost(player, LUCK_BERRY)
+		advance(10)
+		endRun(player, "Extracted")
+		startRun(player)
+		expectEq(
+			#profiles[player].boosters.paused,
+			1,
+			reason .. ": the saved copy stays during the run (a crash keeps it)"
+		)
+		ModifierService.ApplyBoost(player, XP_DRAUGHT)
+		advance(50)
+		endRun(player, reason)
+		expectEq(#profiles[player].boosters.paused, 0, reason .. ": nothing saved, the saved Luck cleared")
+		expectEq(player:GetAttribute("BoostXP"), nil, reason .. ": the boost ended")
+		startRun(player)
+		expectEq(player:GetAttribute("BoostLuck"), nil, reason .. ": the next run starts without them")
+	end
 end)
 
 test("a boost drunk after a resume replaces a weaker resumed one only when stronger", function()
@@ -207,10 +132,10 @@ test("a boost drunk after a resume replaces a weaker resumed one only when stron
 	startRun(player)
 	local entry, started = ModifierService.ApplyBoost(player, { kind = "XP", amount = 0.10, seconds = 180 })
 	expect(not started and entry.amount == 0.10, "an equal Sunberry keeps the resumed boost")
-	expectEq(player:GetAttribute("BoostXPUntil"), clock + 100, "untouched")
+	expectEq(player:GetAttribute("BoostXPUntil"), scheduler.clock + 100, "untouched")
 	_, started = ModifierService.ApplyBoost(player, XP_DRAUGHT)
 	expect(started, "a stronger draught takes over")
-	expectEq(player:GetAttribute("BoostXPUntil"), clock + 600, "with its own timer")
+	expectEq(player:GetAttribute("BoostXPUntil"), scheduler.clock + 600, "with its own timer")
 	advance(100)
 	expectEq(player:GetAttribute("BoostXP"), 0.25, "the resumed boost's timer never ends the new one")
 	endRun(player, "Extracted")

@@ -5,13 +5,10 @@
 
 local ReasonText = require(game:GetService("ReplicatedStorage").Shared.UI.ReasonText)
 
-test("the scan found the server's refusal codes", function()
+test("the scan finds the server's refusal codes and every one has player-facing text", function()
 	expect(type(__SERVER_REFUSAL_CODES) == "table", "run.py passes the scanned codes")
 	expect(#__SERVER_REFUSAL_CODES >= 50, ("found %d codes"):format(#__SERVER_REFUSAL_CODES))
 	expect(table.find(__SERVER_REFUSAL_CODES, "TooFar") ~= nil, "TooFar is among them")
-end)
-
-test("every code the server returns has player-facing text", function()
 	local missing = {}
 	for _, code in __SERVER_REFUSAL_CODES do
 		if not ReasonText.Has(code) then

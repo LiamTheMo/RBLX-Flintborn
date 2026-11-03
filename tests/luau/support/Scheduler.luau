@@ -4,9 +4,10 @@
 -- clock in place of the global one and silences `warn`; Advance(seconds) moves the
 -- clock and runs everything due by then in time order (ties in the order they
 -- were scheduled). An error in a scheduled thread is collected in `threadErrors`
--- instead of stopping the spec.
+-- instead of stopping the spec; ExpectNoThreadErrors() fails a case on any.
 --
 --     local scheduler = require(game:GetService("ServerStorage").TestSupport.Scheduler).new():Install()
+--     scheduler:InstallServerTime() -- workspace:GetServerTimeNow() follows the clock
 --     scheduler:Advance(5)
 
 local Scheduler = {}
@@ -57,6 +58,16 @@ function Scheduler:Install()
 	return self
 end
 
+-- Makes workspace:GetServerTimeNow() read this clock (creating `workspace` when a
+-- spec has none). Returns the scheduler.
+function Scheduler:InstallServerTime()
+	workspace = workspace or {}
+	workspace.GetServerTimeNow = function()
+		return self.clock
+	end
+	return self
+end
+
 -- Runs everything due within the next `seconds`, in time order.
 function Scheduler:Advance(seconds: number)
 	local target = self.clock + seconds
@@ -83,6 +94,14 @@ function Scheduler:Advance(seconds: number)
 		self:Resume(entry.thread, table.unpack(entry.args, 1, entry.args.n))
 	end
 	self.clock = target
+end
+
+-- Fails the running spec case, printing each, when a scheduled thread raised.
+function Scheduler:ExpectNoThreadErrors()
+	for _, err in self.threadErrors do
+		print("    thread error: " .. err)
+	end
+	expectEq(#self.threadErrors, 0, "thread errors")
 end
 
 return Scheduler
