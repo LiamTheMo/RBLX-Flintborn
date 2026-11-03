@@ -20,13 +20,11 @@ local function quest(id, count, claimed)
 	}
 end
 
-test("status: open, ready when finished, claimed", function()
+test("status is open, ready or claimed; claim is enabled only when ready and none is on its way", function()
 	expectEq(JournalModel.Status(quest("DailyGather", 12, false)), "open", "under way")
 	expectEq(JournalModel.Status(quest("DailyGather", 100, false)), "ready", "finished")
 	expectEq(JournalModel.Status(quest("DailyGather", 100, true)), "claimed", "claimed")
-end)
-
-test("claim is enabled only for a finished, unclaimed quest with no claim on its way", function()
+	-- Claim is enabled only for a finished, unclaimed quest with no claim on its way.
 	expect(not JournalModel.Claim(quest("DailyCraft", 3, false)).enabled, "unfinished")
 	expect(JournalModel.Claim(quest("DailyCraft", 15, false)).enabled, "finished")
 	local busy = JournalModel.Claim(quest("DailyCraft", 15, false), true)
