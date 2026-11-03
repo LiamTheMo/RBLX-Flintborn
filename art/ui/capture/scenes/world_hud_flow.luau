@@ -120,6 +120,22 @@ check(HudController.Selected == 4, "a press selects slot 4")
 check(table.find(calls, "ActivateHotbar 4") ~= nil, "and uses it like its key")
 check(slots[4].root:GetAttribute("KitState") == "selected", "slot 4 draws selected")
 
+-- Putting the held item away (its key again: the server's equipped goes to nil)
+-- clears the selection, so no slot draws selected.
+InventoryController.Changed:Fire({
+	slots = {
+		{ area = "hotbar", index = 1, catalogId = "StoneAxe", quantity = 1, permanent = true },
+		{ area = "hotbar", index = 2, catalogId = "StoneSpear", quantity = 1 },
+		{ area = "hotbar", index = 4, catalogId = "Redberry", quantity = 7 },
+	},
+	equipped = nil,
+})
+local anySelected = false
+for _, slot in slots do
+	anySelected = anySelected or slot.root:GetAttribute("KitState") == "selected"
+end
+check(HudController.Selected == nil and not anySelected, "putting the item away deselects the hotbar")
+
 -- Menu tiles open their panels.
 hud.tiles[1].control:Activate()
 hud.tiles[2].control:Activate()
