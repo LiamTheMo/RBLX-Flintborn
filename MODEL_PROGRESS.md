@@ -265,7 +265,7 @@ Skill vs design doc / repo (design doc wins, reported):
 | 066 | Canvas Shelter Model Study | World & resources | ✅ | 3876 (+11 parts) | V1 PASS 7/10 | Studio check: walk-under with precise collision; lashings flat and thin vs the sheet's fat round X-knots; canvas tone (lit top clips); shallower sag; rear shows the banner emblem; crates lack corner plates; plain barrel; slim furniture; ridge a step light |
 | 067 | Flintborn Table and Seating Study | World & resources | ✅ | 2540 (+6 parts) | V1 PASS 8/10 | Studio check: walk through the 1.1-wide stool corridor; Trestle part a wide trapezoid and Crossbar part slender vs their cells (decided layout); tie stub low-contrast in the side view; front/rear W : H a decided miss |
 | 068 | Flintborn timber hut model study | World & resources | ⬜ | | | |
-| 069 | Flintborn palisade wall study | World & resources | ⬜ | | | |
+| 069 | Flintborn palisade wall study | World & resources | ✅ | 3948 (+StockadeStraight 2584, +6 parts) | V1 PASS 7/10 | Studio check: players can't climb the chock rocks or front rails over the tips (precise collision); leaf clumps read as spiky crowns, sparser than the sheet's low clover clumps; rope bands look like thin twisted slats; chock rocks upright and a little mauve; flat-cut feet and flush posts are decided misses |
 | 070 | Ruined lean-to model study | World & resources | ⬜ | | | |
 | 071 | Flintborn Supply Crate Model Study | World & resources | ⬜ | | | |
 | 072 | Flintborn Timber Gate Model Study | World & resources | ⬜ | | | |
@@ -470,3 +470,6 @@ Skill vs design doc / repo (design doc wins, reported):
   - 069 Palisade Wall: studied with decisions; not started (work copy `wip/M069.blend` ready).
   - 070 Ruined Lean-To: studied with decisions; the modeller was stopped before writing any builder, so modelling starts from scratch.
   - Not yet in a PR: 060–067. PRs target v0.19; merge origin/v0.19 first (three one-line `<temp>` path conflicts in the M058/M062/M063 specs: take v0.19's lines). The GitHub CLI is not installed on this machine yet.
+- 2026-11-02: 060–067 merged into v0.19 (PR #99).
+- 2026-11-03: resumed. The main session accepted 068's paused deviations (pitch 32°, canvas eave |x| 7.45, saddle block instead of the apex lashing).
+- 2026-11-03: 069 Palisade Wall built by a parallel modeller: `Stockade`, a 16-stud tiling stockade of 12 octagonal timbers with pale pyramid tips (skyline 8.3–12.2), two banded posts, rails on both faces with lashings, a swallowtail banner, chock rocks and leaf clumps; plus `StockadeStraight`, the plain tiling module (seams at x ±8, nothing crossing, log-to-log). R1 PASS 7.
