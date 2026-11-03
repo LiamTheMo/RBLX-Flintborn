@@ -23,7 +23,7 @@ The user supplied 34 master reference sheets in `art/reference/kit/`: World `W01
    - Agents read only `art/blender/kit/BUILDER_GUIDE.md`.
    - One fix round.
    - Builders at medium effort, at most 4 builds.
-   - Planners and verifiers on Sonnet.
+   - Planners and verifiers on a lighter model.
    - Verifiers grade from the runner's stats JSON and compare image, without rebuilding or exporting.
    - Keep the orchestrator session short: hand off again when it grows long.
 8. **Never commit or push** unless the user asks. All work is on branch `feat/kit-pilot` and is uncommitted so far.
