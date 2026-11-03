@@ -2,7 +2,7 @@
 """Build every catalog item's own icon from the owner's item art.
 
 Inputs : art/ui/items/ICONS.json (catalog id -> display name, family, source
-         PNG, atlas group) and the PNGs it names in src/assets/Models/2D
+         PNG, atlas group) and the PNGs it names in art/ui/items/source
          (512 x 512 RGBA, one item each, named after the display name).
 Outputs: art/ui/sprites/lk_item_<CatalogId>.png      the slot icon, SLOT_PX square
          art/ui/sprites/lk_item_<CatalogId>__hi.png  its hero copy, HERO_PX square
@@ -56,7 +56,7 @@ import slice_lobby_kit as kit  # noqa: E402
 import roblox_upload_ui_assets as uploader  # noqa: E402
 
 MAPPING = HERE / "ICONS.json"
-SOURCE = ROOT / "src" / "assets" / "Models" / "2D"
+SOURCE = HERE / "source"
 SPRITES = ROOT / "art" / "ui" / "sprites"
 MANIFEST = SPRITES / "manifest.json"
 IDS_FILE = ROOT / "src" / "shared" / "UI" / "UiAssetIds.json"

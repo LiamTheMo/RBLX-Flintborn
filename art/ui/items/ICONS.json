@@ -1,6 +1,6 @@
 {
   "about": [
-    "Every catalog item's icon (ItemCatalog.Items, generated gear included): its display name, family, the source PNG in src/assets/Models/2D (512 x 512 RGBA, kebab-case display name) and the atlas its slot icon is packed into.",
+    "Every catalog item's icon (ItemCatalog.Items, generated gear included): its display name, family, the source PNG in art/ui/items/source (512 x 512 RGBA, kebab-case display name) and the atlas its slot icon is packed into.",
     "art/ui/items/build_item_icons.py builds lk_item_<id> (the slot icon) and lk_item_<id>__hi (the hero copy) from it. Never move an item to another atlas once that atlas is uploaded: add new items to a new atlas group."
   ],
   "items": {

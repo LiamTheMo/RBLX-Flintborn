@@ -1007,8 +1007,9 @@ for new glyphs.
 ### 9.7 Item icons
 
 The owner's item art is one 512 × 512 RGBA PNG per catalog item in
-`src/assets/Models/2D/` (named after the display name in kebab case, "/" as
-"and": `bone-legs-and-boots.png`). Rojo syncs that folder but skips PNGs.
+`art/ui/items/source/` (named after the display name in kebab case, "/" as
+"and": `bone-legs-and-boots.png`). It is source art for the icon build only;
+the game draws the packed atlases.
 [`art/ui/items/ICONS.json`](../../art/ui/items/ICONS.json) maps each catalog id
 to its display name, family, PNG and atlas group;
 [`build_item_icons.py`](../../art/ui/items/build_item_icons.py) (deterministic,
