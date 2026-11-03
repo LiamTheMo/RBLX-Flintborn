@@ -98,7 +98,8 @@ function BottomBar:SetSlotItems(items)
 	end
 end
 
-function BottomBar:Select(index: number)
+-- Draws slot `index` selected and the others not (nil: none selected).
+function BottomBar:Select(index: number?)
 	self.selected = index
 	for slotIndex, slot in self.slots do
 		slot:SetSelected(slotIndex == index)

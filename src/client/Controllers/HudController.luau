@@ -58,9 +58,10 @@ HudController.MENU = {
 	{ "Progress", "trophy", "Progression", "ProgressionController", "Toggle" },
 }
 
--- The selected hotbar slot. The selection follows the equipped slot, and every
--- key press or tap on a slot also uses it.
-HudController.Selected = 1
+-- The selected hotbar slot, or nil for none. The selection follows the equipped
+-- slot (and clears when the held item is put away, used up or dropped), and
+-- every key press or tap on a slot also uses it.
+HudController.Selected = 1 :: number?
 
 -- Status text ticks fast (the medicine countdown); party, objective and event
 -- panels refresh a little slower.
@@ -541,7 +542,7 @@ end
 
 -- Hotbar -----------------------------------------------------------------------
 
-local function selectSlot(index: number)
+local function selectSlot(index: number?)
 	HudController.Selected = index
 	widgets.bottom:Select(index)
 end
@@ -576,7 +577,10 @@ local function bindHotbar(active: boolean)
 			if index then
 				selectSlot(index)
 			elseif step then
-				selectSlot(HudModel.HotbarStep(HudController.Selected, step, count))
+				-- From no selection, a step forward lands on the first slot and a
+				-- step back on the last.
+				local from = HudController.Selected or (if step > 0 then 0 else count + 1)
+				selectSlot(HudModel.HotbarStep(from, step, count))
 			end
 		end
 		return Enum.ContextActionResult.Pass
@@ -828,11 +832,18 @@ function HudController.Start()
 	-- selection. The mouse wheel stays on camera zoom (GDD Q58). Slot badges name
 	-- the bound keys and follow rebinds.
 	local count = layout.bottom.hotbar.count
+	-- The equipped slot of the last snapshot: when it goes from a slot to none
+	-- (put away with its key again, used up or dropped) the selection clears.
+	local held = nil
 	local function showItems(snapshot)
 		widgets.bottom:SetSlotItems(HudController.HotbarItems(snapshot, count))
-		if snapshot.equipped and snapshot.equipped ~= HudController.Selected then
-			selectSlot(snapshot.equipped)
+		local equipped = snapshot.equipped
+		if equipped and equipped ~= HudController.Selected then
+			selectSlot(equipped)
+		elseif equipped == nil and held ~= nil then
+			selectSlot(nil)
 		end
+		held = equipped
 	end
 	InventoryController.Changed:Connect(showItems)
 	-- Fills freshly mounted regions (at start and after a remount).
