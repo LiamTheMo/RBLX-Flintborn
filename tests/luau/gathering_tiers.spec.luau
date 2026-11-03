@@ -15,6 +15,7 @@ local function tool(tierId: string, kind: string)
 	return item.tool
 end
 
+-- Sickles are gone (crafting.spec checks every tool is an axe or a pickaxe).
 test("plants by hand at 1 per hit whatever is held; axes and pickaxes drop 1 + tool rank", function()
 	for nodeType, node in NodeCatalog.Nodes do
 		if node.tool == nil and node.minRank == nil then
@@ -23,9 +24,6 @@ test("plants by hand at 1 per hit whatever is held; axes and pickaxes drop 1 + t
 			end
 			expect(NodeCatalog.GateNotice(nodeType, nil) == nil, nodeType .. " has no gate")
 		end
-	end
-	for _, item in ItemCatalog.Items do
-		expect(item.tool == nil or item.tool.kind ~= "Sickle", item.id .. " is not a sickle")
 	end
 	for index, tierId in LADDER do
 		expectEq(NodeCatalog.YieldFor("Tree", tool(tierId, "Axe")), 1 + index, tierId .. " axe on a tree")
@@ -59,6 +57,20 @@ test("mining below the gate gives nothing and names the pickaxe needed", functio
 		end
 	end
 	expectEq(NodeCatalog.GateNotice("IronDeposit", nil), "Needs a Copper Pickaxe or better", "the spec's example")
+	-- Each ore and gem needs the previous tier's pickaxe (GDD §53).
+	for nodeType, needed in
+		{
+			CopperDeposit = "Stone",
+			IronDeposit = "Copper",
+			SilverDeposit = "Iron",
+			CobaltDeposit = "Silver",
+			MithrilDeposit = "Cobalt",
+			ObsidianOutcrop = "Iron",
+			JadeVein = "Cobalt",
+		}
+	do
+		expectEq(LADDER[NodeCatalog.Nodes[nodeType].minRank], needed, nodeType .. " opens at " .. needed)
+	end
 end)
 
 test("trees drop Resin and rocks Flint per hit; the finishing hit on rock adds Flint", function()
