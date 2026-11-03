@@ -287,7 +287,8 @@ local card = find("Card", find("Notice"))
 press(find("Close", card))
 check(not card.Visible, "the notice's ✕ dismisses it")
 
--- Build: a tab picks the piece, the arrows step the tier, Rotate turns it.
+-- Build: a tab picks the piece, the arrows step the tier, the turn buttons turn
+-- it and Snap switches the magnetic snap.
 started.BuildController.Toggle()
 local palette = find("Palette")
 press(find("Floor", palette))
@@ -296,7 +297,20 @@ press(find("TierUp", palette))
 local tier = find("Tier", palette).Text
 check(string.find(tier, "2/") ~= nil, "the arrow steps the tier (" .. tier .. ")")
 press(find("Rotate", palette))
-check(true, "Rotate presses without error")
+press(find("RotateBack", palette))
+check(true, "the turn buttons press without error")
+local function labelOf(button)
+	for _, child in button:GetDescendants() do
+		if child:IsA("TextLabel") and string.find(child.Text, "Snap") then
+			return child.Text
+		end
+	end
+	return ""
+end
+check(string.find(labelOf(find("Snap", palette)), "on") ~= nil, "snap starts on")
+press(find("Snap", palette))
+check(string.find(labelOf(find("Snap", palette)), "off") ~= nil, "Snap switches it off")
+press(find("Snap", palette))
 press(find("Chest", palette))
 check(not find("TierUp", palette).Visible, "one-tier pieces hide the arrows")
 press(find("Floor", palette))

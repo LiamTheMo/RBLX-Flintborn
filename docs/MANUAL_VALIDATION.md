@@ -132,13 +132,13 @@ Studio and live checks:
 
 ## v0.10 — Building, totems, raiding and farming
 
-Automated: 7 specs cover the 50 m portal aura rejecting partial overlaps (whole footprint, rotation aware), totem HP 500 / 1,000 / 2,500 with growing radius, cover stopping decay and loss of cover assigning one 240–360 s deadline that never re-rolls, rival totems never covering or taking over while the owner's totem stands, takeover after it falls, server-generated structures never claimable or decaying, tool bonuses against materials, grid snapping and server-timed crops. Deployed and verified on both places (2026-10-23).
+Automated: 7 specs cover the 50 m portal aura rejecting partial overlaps (whole footprint, rotation aware), totem HP 500 / 1,000 / 2,500 with growing radius, cover stopping decay and loss of cover assigning one 240–360 s deadline that never re-rolls, rival totems never covering or taking over while the owner's totem stands, takeover after it falls, server-generated structures never claimable or decaying, tool bonuses against materials, grid snapping and server-timed crops. Deployed and verified on both places (2026-10-23). The grid was replaced by free placement in GDD §60 (see "Free-placement building" below).
 
 Placeholders: 50 m = 178.6 studs (1 stud = 0.28 m); totem radius 15 / 35 / 70 studs; wall HP wood 300 / stone 800 / iron 1,600; tools hit 1.5× against their material (axe vs wood, pickaxe vs stone/iron); crops Berries 3 min, Herbs 5 min, Sapling 10 min; chests 20 slots; traps 15 damage per 2 s; 300 pieces per owner. Solo players own their pieces until they join a tribe. A crafted workbench is placed as an ordinary structure.
 
 Studio and live checks (two tribes):
 
-- [ ] X opens build mode: the ghost snaps, rotates (R / L2 / Rotate) and shows ✓ or ✕ with colour; Place works on touch and controller.
+- [ ] X opens build mode: the ghost follows the aim, rotates (R / RB / the turn buttons, GDD §60) and shows ✓ or ✕ with colour; Place works on touch and controller.
 - [ ] Building wood → stone → iron charges the shown costs; pieces near an extraction portal or rune are refused, including pieces whose edge crosses the red aura.
 - [ ] Without a totem a piece shows a decay timer and vanishes in 4–6 minutes; a totem stops it; upgrading the totem grows the radius and HP.
 - [ ] The owner leaves; the base stays. A raider breaks a wall with weapons/tools and opens a chest (public); a wall between the raider and the chest blocks it.
@@ -698,3 +698,47 @@ Studio and live checks (desktop, touch and controller unless stated):
 - [ ] **Inventory window:** USE on a hotbar food holds it and plays the same animated use (the window's buttons wait until it ends); USE on a draught when a stronger boost runs is refused with the usual reason and the draught stays.
 - [ ] **Refusals:** a draught while a stronger boost runs says "a boost at least as strong is already running"; medicine during its lock (after switching slots mid-drink) says to wait.
 
+
+## Overhead health bars
+
+How it's built: `src/client/Hud/OverheadHealth.luau` (started by `HudController`, world place only) puts a kit `Bar` in a BillboardGui over each other player's head while they are below full health; the rules (when it shows, lingers, fades and hides, the downed look, sizes) are pure in `src/shared/UI/OverheadHealthModel.luau`. It follows the replicated Humanoid `Health` / `MaxHealth` and the `Downed` / `DownedHealth` player attributes through their change signals. Spec: [HudScreen](ui/HudScreen.md#overhead-health-bars).
+
+Automated (`overhead_health.spec.luau`, `settings.spec.luau`; capture scene `overhead_health` for the look, `settings` / `settings_phone` for the new row):
+- No bar at full health, for dead characters, for your own character, or with Show Health Bars off; a bar from the first missing whole point of health.
+- A downed player's bar shows the downed pool in the orange fill under "Downed".
+- Healed back to full, a bar lingers 1.2 s and then fades; death or the setting hides it at once.
+- The bar stays at least 9 screen px high on phones.
+
+Placeholders: linger 1.2 s, draw range 100 studs, the bar 1.5 studs plus 14 px over the head's top (`OverheadHealthModel` constants).
+
+Studio and live checks (two or more players; desktop, touch and controller unless stated):
+
+- [ ] **Shows when hurt:** hit another player (or let a creature do it): a small red bar appears over their head at once and drops with each hit; at full health nobody has one. Your own character never shows one.
+- [ ] **Heals away:** the hurt player eats or uses medicine back to full: the bar fills, stays about a second, then fades out. A hit during the fade brings it straight back.
+- [ ] **Downed:** a downed tribe member shows an orange bar under "Downed" that drops as they take damage; revived, it turns back into a red bar at their revived health; bled out or finished, the bar goes at once.
+- [ ] **Name tag:** with Show Names on, the bar sits above the name tag and never covers it, both up close and at 80-100 studs; Roblox's own green health bar never shows. With Show Names off the bar still shows over the head.
+- [ ] **Range and walls:** the bar is hidden behind walls, rocks and terrain, and disappears past about 100 studs; it stays readable at that range and is not oversized up close; it is not darkened at night.
+- [ ] **Phones:** on a phone the bar and the "Downed" line are readable (about 72 px wide) and never covered by the HUD in a way that hides who is hurt; changing UI Scale in Settings resizes the bars the next time they update.
+- [ ] **Setting:** Settings, Gameplay, Show Health Bars off hides every bar at once; on again, hurt players' bars come back at once.
+- [ ] **Respawn and leave:** a player who dies and respawns has no bar until hurt again; a player who leaves takes their bar with them; no bars are left floating where a character was.
+- [ ] **Performance:** a 30-player server in a fight keeps its frame rate (no per-frame work; the MicroProfiler shows nothing from OverheadHealth while health is steady).
+
+## Free-placement building (GDD §60)
+
+How it's built: `BuildRules` (shared, pure) holds the free-placement rules: yaw parsing on 15° steps, world bounds, turned footprints (`HalfExtents`, `HorizontalDistance`, `InFootprint`), oriented overlap with a tolerance (`BoxesOverlap`), support and slope (`SupportPoints`, `SupportVerdict`), the face offset (`OffsetFromFace`) and the magnetic snap (`SnapToNeighbours`). `PlacementProbe` (shared) casts the support rays and reads nearby pieces' size and `Yaw` attribute for the server and the ghost alike. `BuildingService` takes `Build(pieceId, tier, basePosition, yaw)` and decides; records keep the piece's own half-size and yaw beside the world-aligned box raids and siege still use. `BuildController` draws the ghost, snaps it, previews the checks it can make and sends the snapped position and yaw. Structures are not saved, so no data migrates.
+
+Automated: `free_build.spec.luau` (yaw parsing incl. NaN, infinity and off-step values; bounds; turned footprints and facing; overlap of turned pieces, flush and stacked pieces fitting; support, floating and slope; the face offset; snapping end to end, into corners, onto a floor's edge, along a turned neighbour, never into the neighbour, and staying free when turned off-line or far away), `building.spec.luau` (auras by the turned footprint), `reasons.spec.luau` (the new codes have words); capture scenes `world_overlays` page 7 and `world_overlays_phone` page 4 (the palette with Snap, -15°, +15° and the Ctrl key cap), `world_overlays_flow` (the turn buttons and the Snap switch).
+
+Placeholders: 15° steps (`BuildRules.ROTATE_STEP`), hold-to-repeat after 0.35 s every 0.08 s, snap distance 1.5 studs, overlap tolerance 0.25 stud a side, support within 1.5 studs below the base, 40° maximum slope, build area ±2,304 studs and heights −40 to 1,000.
+
+Studio and live checks (desktop, touch and controller unless stated):
+
+- [ ] **Free aim (desktop):** the ghost follows the mouse smoothly over terrain, floors and slopes with its base on the surface (no stepping to a grid); it ignores your own and other characters; aiming at a wall's side puts the ghost beside the wall on the ground.
+- [ ] **Free aim (touch):** the ghost starts at the screen centre; tapping the ground moves it to the tap; dragging turns the camera and the ghost stays under the tapped spot; tapping the palette never moves it.
+- [ ] **Free aim (controller):** the ghost sits at the screen centre and follows the camera; RT places; RB turns forward and LB back (no hotbar step or drop while building); B leaves and re-enters the palette as before.
+- [ ] **Rotation:** R turns 15° (the status line shows the angle), Shift+R turns back, holding R keeps turning; the -15° / +15° buttons do the same; a rebound Rotate key works; pieces stay upright at every angle.
+- [ ] **Snap:** a wall brought close to another wall's end lines up end to end ("lined up" shows); at a right angle it makes a clean corner; a wall on a floor sits on the floor's top, flush with its edge; a roof aimed at a wall top sits level on it; turning one step off or holding Ctrl frees it; Snap: off frees it for good; it never pulls a piece into the neighbour.
+- [ ] **Refusals with words:** the ghost turns red and the status line says why for: too far, an extraction portal's aura, overlapping a piece (flush neighbours stay green), floating in the air (NoGround), a cliff or steep hillside (TooSteep), beyond the island's edge (OutOfBounds), not enough materials; Place inside a rock, on another player or out of sight is refused by the server with its words.
+- [ ] **Exploit safety (Studio, a client's command bar):** a Build call with NaN, infinite or huge coordinates, a 7° turn, a far-away position or a position inside another piece is refused and charges nothing.
+- [ ] **Everything else:** turned pieces take damage from swings where they look to be (a 45° wall is hit only where it stands; Fire Bomb bursts still use the box around it, slightly generous), doors open and close at any angle, chests open, planters grow and harvest, Workbench / Furnace / Anvil / Cauldron work as stations, totems cover and claim turned pieces, decay timers show on hover, the Guardian clears turned pieces from its arena, and a carried workbench is placed facing the player.
+- [ ] **Performance:** with build mode open, the ghost stays smooth on a mid-range phone next to a base of 100+ pieces.

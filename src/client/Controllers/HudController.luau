@@ -36,6 +36,7 @@ local InteractionPrompt = require(Hud.InteractionPrompt)
 local Kit = require(Hud.Kit)
 local Layout = require(Hud.Layout)
 local ObjectivePanel = require(Hud.ObjectivePanel)
+local OverheadHealth = require(Hud.OverheadHealth)
 local PartyFrames = require(Hud.PartyFrames)
 local Vitals = require(Hud.Vitals)
 local Binds = require(script.Parent.Parent.Ui.Binds)
@@ -597,8 +598,8 @@ local function bindHotbar(active: boolean)
 	end
 	-- One step above InventoryController's bindings (Medium, rebound often, so
 	-- otherwise usually first) and passing every key on, so the hotbar keys still
-	-- use their slot, as before. Below High, so build mode's placement (ButtonR1)
-	-- sinks the bumper before it reaches us.
+	-- use their slot, as before. Below High, so build mode's rotate (ButtonR1 /
+	-- ButtonL1) sinks the bumpers before they reach us.
 	-- Rebinding in Settings re-runs this with the new keys (Binds.Changed).
 	local count = layout.bottom.hotbar.count
 	local slotKeys = hotbarKeys(count)
@@ -928,6 +929,10 @@ function HudController.Start()
 	EventFeedController.Changed:Connect(rebuildWaypoints)
 
 	InteractionPrompt.Start(function()
+		return scale
+	end)
+	-- Bars over hurt players' heads, at the HUD's scale.
+	OverheadHealth.Start(function()
 		return scale
 	end)
 
