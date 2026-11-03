@@ -35,13 +35,12 @@ local handled = {}
 local function view(contents)
 	local entries = {}
 	for index, item in contents do
-		local def = ItemCatalog.Get(item.catalogId)
 		table.insert(entries, {
 			index = index,
 			key = ListingKeys.KeyOf(item),
 			catalogId = item.catalogId,
-			name = def and def.name or item.catalogId,
-			rarity = def and def.rarity or "Common",
+			name = ItemCatalog.NameOf(item.catalogId),
+			rarity = ItemCatalog.RarityOf(item.catalogId),
 			quantity = item.quantity,
 			qualityRoll = item.qualityRoll,
 			permanent = item.permanent,

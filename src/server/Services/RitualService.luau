@@ -44,8 +44,7 @@ local summoning = {}
 local function offeringText(ritual): string
 	local parts = {}
 	for catalogId, quantity in ritual.offering do
-		local def = ItemCatalog.Get(catalogId)
-		table.insert(parts, ("%d %s"):format(quantity, def and def.name or catalogId))
+		table.insert(parts, ("%d %s"):format(quantity, ItemCatalog.NameOf(catalogId)))
 	end
 	table.sort(parts)
 	return table.concat(parts, ", ")

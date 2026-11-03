@@ -28,13 +28,12 @@ local chests = {}
 local function view(chest)
 	local entries = {}
 	for index, item in chest.slots do
-		local def = ItemCatalog.Get(item.catalogId)
 		table.insert(entries, {
 			index = index,
 			key = ListingKeys.KeyOf(item),
 			catalogId = item.catalogId,
-			name = def and def.name or item.catalogId,
-			rarity = def and def.rarity or "Common",
+			name = ItemCatalog.NameOf(item.catalogId),
+			rarity = ItemCatalog.RarityOf(item.catalogId),
 			quantity = item.quantity,
 			permanent = item.permanent,
 		})

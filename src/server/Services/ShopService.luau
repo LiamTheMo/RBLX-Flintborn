@@ -21,11 +21,6 @@ local TradeService = require(script.Parent.TradeService)
 
 local ShopService = {}
 
-local function nameOf(catalogId: string): string
-	local def = ItemCatalog.Get(catalogId)
-	return def and def.name or catalogId
-end
-
 -- Shop stock, merchant quotes for everything sellable, vault and offer info.
 local function view(player: Player)
 	local profile = ProfileService.GetProfile(player)
@@ -37,7 +32,7 @@ local function view(player: Player)
 		table.insert(stock, {
 			id = entry.id,
 			catalogId = entry.catalogId,
-			name = entry.title and ("Title: " .. entry.title) or nameOf(entry.catalogId),
+			name = entry.title and ("Title: " .. entry.title) or ItemCatalog.NameOf(entry.catalogId),
 			quantity = entry.quantity,
 			price = entry.price,
 			category = entry.category,
@@ -56,7 +51,7 @@ local function view(player: Player)
 				source = "backpack",
 				key = index,
 				catalogId = item.catalogId,
-				name = nameOf(item.catalogId),
+				name = ItemCatalog.NameOf(item.catalogId),
 				quantity = item.quantity,
 				coins = coins,
 				each = (EconomyRules.Quote(item, 1)),
@@ -71,7 +66,7 @@ local function view(player: Player)
 				source = "vault",
 				key = catalogId,
 				catalogId = catalogId,
-				name = nameOf(catalogId),
+				name = ItemCatalog.NameOf(catalogId),
 				quantity = quantity,
 				each = each,
 				warning = warning,

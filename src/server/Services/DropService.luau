@@ -38,15 +38,10 @@ DropService.ORDINARY_SECONDS = GameConstants.CORPSE_SECONDS
 
 local drops = {}
 
-local function itemName(item): string
-	local def = ItemCatalog.Get(item.catalogId)
-	return def and def.name or item.catalogId
-end
-
 -- The prompt's line: "Stone Axe (Permanent)", "Wood ×20" (plain words: the
 -- game's fonts have no star glyph).
 local function label(item): string
-	return itemName(item)
+	return ItemCatalog.NameOf(item.catalogId)
 		.. (if item.permanent then " (Permanent)" else "")
 		.. (item.quantity and (" ×" .. item.quantity) or "")
 end
@@ -92,7 +87,7 @@ function DropService.FinishClaim(player: Player, copy, previousOwnerId: number?)
 		profile.permanentItems[copy.instanceId] = PermanentRules.LedgerEntry(copy, os.time())
 	end)
 	if previousOwnerId ~= player.UserId then
-		InventoryService.Notify(player, "You now own this Permanent " .. itemName(copy) .. ".")
+		InventoryService.Notify(player, "You now own this Permanent " .. ItemCatalog.NameOf(copy.catalogId) .. ".")
 	end
 end
 

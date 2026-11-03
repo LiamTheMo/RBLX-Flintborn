@@ -57,8 +57,7 @@ end
 local function seedText(seed): string
 	local parts = {}
 	for catalogId, quantity in seed do
-		local def = ItemCatalog.Get(catalogId)
-		table.insert(parts, ("%d %s"):format(quantity, def and def.name or catalogId))
+		table.insert(parts, ("%d %s"):format(quantity, ItemCatalog.NameOf(catalogId)))
 	end
 	return table.concat(parts, ", ")
 end
