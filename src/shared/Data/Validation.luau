@@ -22,4 +22,12 @@ function Validation.IsId(value: any): boolean
 	return type(value) == "string" and #value >= 1 and #value <= 64 and string.match(value, "^[%w%-_:]+$") ~= nil
 end
 
+-- A client aim: the unit vector of a real (not tiny, not NaN) Vector3, or nil.
+function Validation.Direction(value: any): Vector3?
+	if typeof(value) ~= "Vector3" or value.Magnitude < 0.5 or value.Magnitude ~= value.Magnitude then
+		return nil
+	end
+	return value.Unit
+end
+
 return Validation

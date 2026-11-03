@@ -28,6 +28,7 @@ local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local SessionStates = require(ReplicatedStorage.Shared.Admission.SessionStates)
 local SiegeRules = require(ReplicatedStorage.Shared.Combat.SiegeRules)
 local Signal = require(ReplicatedStorage.Shared.Core.Signal)
+local Validation = require(ReplicatedStorage.Shared.Data.Validation)
 local WeaponCatalog = require(ReplicatedStorage.Shared.Combat.WeaponCatalog)
 local AntiExploitService = require(script.Parent.AntiExploitService)
 local BuildingService = require(script.Parent.BuildingService)
@@ -148,13 +149,6 @@ local function acceptSequence(player: Player, sequence: any): boolean
 	return true
 end
 
-local function validDirection(direction: any): Vector3?
-	if typeof(direction) ~= "Vector3" or direction.Magnitude < 0.5 or direction.Magnitude ~= direction.Magnitude then
-		return nil
-	end
-	return direction.Unit
-end
-
 local function readyToAttack(player: Player, cooldown: number): boolean
 	local now = os.clock()
 	if not DamageRules.CooldownReady(lastAttack[player], now, cooldown) then
@@ -165,8 +159,8 @@ local function readyToAttack(player: Player, cooldown: number): boolean
 end
 
 -- True when nothing solid (structures, ground, terrain) lies between `from` and
--- `to`, other than `target` itself.
-local function clearLine(from: Vector3, to: Vector3, ignore, target: Instance?): boolean
+-- `to`, other than `target` itself. Siege throws use it too.
+function CombatService.ClearLine(from: Vector3, to: Vector3, ignore, target: Instance?): boolean
 	local params = RaycastParams.new()
 	params.FilterType = Enum.RaycastFilterType.Exclude
 	params.FilterDescendantsInstances = ignore
@@ -214,7 +208,7 @@ local function structureDistance(player: Player, origin: Vector3, flatAim: Vecto
 end
 
 local function melee(player: Player, sequence: any, direction: any)
-	local aim = validDirection(direction)
+	local aim = Validation.Direction(direction)
 	local root = Characters.RootOf(player)
 	local head = player.Character and player.Character:FindFirstChild("Head")
 	if not acceptSequence(player, sequence) or aim == nil or root == nil or head == nil then
@@ -242,7 +236,7 @@ local function melee(player: Player, sequence: any, direction: any)
 	-- Everything a line-of-sight ray ignores: characters never block a swing.
 	local ignore = Characters.All()
 	local function canSee(part: BasePart): boolean
-		return clearLine(head.Position, part.Position, ignore, part)
+		return CombatService.ClearLine(head.Position, part.Position, ignore, part)
 	end
 	local flatAim = Vector3.new(aim.X, 0, aim.Z)
 	local damage = DamageRules.MeleeDamage(profile, equipped and equipped.qualityRoll)
@@ -300,7 +294,7 @@ local function ensureAnimator(character: Model)
 end
 
 local function shoot(player: Player, sequence: any, drawSeconds: any, direction: any)
-	local aim = validDirection(direction)
+	local aim = Validation.Direction(direction)
 	local character = player.Character
 	local head = character and character:FindFirstChild("Head")
 	if not acceptSequence(player, sequence) or aim == nil or head == nil or Characters.AliveHumanoid(player) == nil then
