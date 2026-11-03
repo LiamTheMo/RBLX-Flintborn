@@ -311,7 +311,7 @@ local function scatter()
 	folder.Name = "ResourceNodes"
 	folder.Parent = workspace
 	local generated = WorldState.IsGenerated()
-	local radius = workspace:GetAttribute("FlintbornMapRadius") or ResourceService.DEFAULT_MAP_RADIUS
+	local radius = WorldState.MapRadius(ResourceService.DEFAULT_MAP_RADIUS)
 	local scale = radius / BiomeCatalog.MAP_RADIUS
 	local made = 0
 	for _, zoneId in BiomeCatalog.ZONE_IDS do

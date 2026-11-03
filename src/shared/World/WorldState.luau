@@ -30,6 +30,12 @@ function WorldState.IsGenerated(): boolean
 	return workspace:GetAttribute(WorldState.GENERATED_ATTRIBUTE) == true
 end
 
+-- The map's radius in studs, set by the generated island; `default` until then.
+WorldState.MAP_RADIUS_ATTRIBUTE = "FlintbornMapRadius"
+function WorldState.MapRadius(default: number): number
+	return workspace:GetAttribute(WorldState.MAP_RADIUS_ATTRIBUTE) or default
+end
+
 -- The generated island's decorative scenery (WorldBuildService), or nil. Its trunks,
 -- boulders and logs are solid and queryable so players stand on them and builds
 -- avoid them, so ground rays that place creatures and events exclude this folder.

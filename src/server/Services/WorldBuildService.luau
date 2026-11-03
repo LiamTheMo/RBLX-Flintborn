@@ -1284,7 +1284,7 @@ local function publish(generated: boolean)
 		workspace:SetAttribute(WorldState.GENERATED_ATTRIBUTE, true)
 	end
 	workspace:SetAttribute("FlintbornIsland", true)
-	workspace:SetAttribute("FlintbornMapRadius", BiomeCatalog.MAP_RADIUS)
+	workspace:SetAttribute(WorldState.MAP_RADIUS_ATTRIBUTE, BiomeCatalog.MAP_RADIUS)
 end
 
 function WorldBuildService.Init()

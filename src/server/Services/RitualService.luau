@@ -212,7 +212,7 @@ function RitualService.Start()
 		end
 		if #tagged == 0 then
 			-- Placeholder altars in the inner ring until the island arrives (v0.15).
-			local radius = (workspace:GetAttribute("FlintbornMapRadius") or RitualService.DEFAULT_MAP_RADIUS) * 0.45
+			local radius = WorldState.MapRadius(RitualService.DEFAULT_MAP_RADIUS) * 0.45
 			for index = 1, RitualService.PLACEHOLDER_SITES do
 				local angle = (index / RitualService.PLACEHOLDER_SITES) * math.pi * 2 + 0.6
 				local hit = workspace:Raycast(

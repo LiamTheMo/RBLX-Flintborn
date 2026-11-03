@@ -20,7 +20,7 @@ SpawnService.SPAWN_HEIGHT_OFFSET = 4
 local rng = Random.new()
 
 local function sampleGround(): { Vector3 }
-	local radius = workspace:GetAttribute("FlintbornMapRadius") or SpawnService.DEFAULT_MAP_RADIUS
+	local radius = WorldState.MapRadius(SpawnService.DEFAULT_MAP_RADIUS)
 	local params = RaycastParams.new()
 	params.FilterType = Enum.RaycastFilterType.Exclude
 	params.FilterDescendantsInstances = {}

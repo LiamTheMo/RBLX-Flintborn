@@ -284,7 +284,7 @@ local function setupSites()
 		end
 	end
 	if center == nil and #candidates == 0 then
-		local radius = (workspace:GetAttribute("FlintbornMapRadius") or ExtractionService.DEFAULT_MAP_RADIUS) * 0.6
+		local radius = WorldState.MapRadius(ExtractionService.DEFAULT_MAP_RADIUS) * 0.6
 		local origin = groundAt(0, 0)
 		if origin then
 			center = { position = origin, kind = "Center", radius = 8, name = "Center Crater Portal" }

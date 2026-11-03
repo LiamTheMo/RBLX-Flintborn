@@ -113,7 +113,7 @@ end
 -- ground (the cave floor for cave events, which a raycast from above would miss);
 -- an authored map falls back to a distance band and a raycast.
 local function place(entry): Vector3?
-	local mapRadius = workspace:GetAttribute("FlintbornMapRadius") or EventDirectorService.DEFAULT_MAP_RADIUS
+	local mapRadius = WorldState.MapRadius(EventDirectorService.DEFAULT_MAP_RADIUS)
 	local generated = WorldState.IsGenerated()
 	local footprints = activeFootprints()
 	local zones = keepOut()
