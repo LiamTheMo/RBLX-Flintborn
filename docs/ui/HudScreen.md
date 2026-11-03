@@ -69,6 +69,7 @@ builds every region), `Hud/Vitals`, `BottomBar`, `PartyFrames`, `Compass`,
 | Level and XP | bottom centre, M up (D30; D27–D29: 49), 572 × 124 (the lobby's group, HudLayout `bottom`); the XP bar (356) centred over the hotbar at x 108, the level text ending 7 px left of it, the XP text from 11 px right of it, the XP pop-ups over it | "LV. n" `Text`, `Bar` xp on the track (356 × 16), "450/750 XP" `Text`; at the cap a full bar, the real level and "Max level" | progression snapshots (`ProgressionController.Changed`) |
 | Hotbar | under the XP bar, 6 × `Slot` hotbar 89 × 89 (square) at the lobby's x, y 35 in the bottom group | `Slot` with `ItemIcon` art via itemId, count, Permanent star, leather number badge (keyboard and mouse only), gold glow when selected | run inventory `area == "hotbar"`; badges read `Binds.Label("HotbarN")` and follow `Kit.Input.Watch`; the selection follows the equipped slot |
 | Interaction prompt | BillboardGui over the prompt's part, 230–420 × 64 (touch: × 70, object line 15), at the HUD scale | `Panel` plaque, `KeyCap` (live key: Interact bind, gamepad button or TAP), action `Text` (`rowTitle`), object `Text` (`small`), `Bar` xp hold bar; the plaque widens for the longer line (with `Kit.Core.FIT_SLACK`), so on touch only a text past 420 ends in "…" | ProximityPrompt texts; redrawn on rebinds and text changes |
+| Overhead health bars | a BillboardGui over each other player's head while they are below full health, 96 × 14 bar (+ an 18 px "Downed" line), at the HUD scale clamped to 0.75–1.35; see [Overhead health bars](#overhead-health-bars) | `Bar` health fill on the track; downed: `food` (orange) fill under a `Text` "Downed" (`hudSmall` 15, cream, ink outline) | Humanoid `Health`/`MaxHealth`; `Downed`, `DownedHealth` player attributes; Show Health Bars setting |
 | Damage numbers | world billboards | display font (`fonts.display`), `gold` with an `ink` outline | `CombatFeedback` hits, when Show Damage is on |
 | Touch attack | touch only, bottom right (right 300, bottom 60; phones right 220, bottom 30: right of the hotbar, left of the Roblox jump button), 130 × 124 | `IconButton` round with the spear icon (axe or pickaxe while one is held; drumstick, heart or lightning while food, medicine or a draught is, GDD §59); the Kit pads its hit area | press = swing or start the bow draw, release fires; holding a consumable, press = eat or drink it (one item per press) |
 | Settings | the bottom-left corner (D30): M from the left and M from the bottom (desktop x 24–76, y 871–917), 52 × 46 (HudLayout `gear`, the lobby's too); on touch screens the same unless Roblox's thumbstick ring reaches the corner (a phone without a side inset), then above the ring (`HudModel.GearCorner`; see Phones) | `IconButton` settings (`SettingsController`'s own HUD-scaled gui `FlintbornSettingsButton`, `SettingsController.GearSize` / `GearPosition`); gamepad: left of the first hotbar slot, under the bottom-left tile (Map; `SettingsController.LinkGear`) | opens Settings (also the Settings key, O by default) |
@@ -127,6 +128,50 @@ compass letters included).
   The hotbar stays visible while the backpack is open.
 - Every value is the server's replicated value; bars show the real fraction (D20).
 
+## Overhead health bars
+
+Owner request: while a player is below their maximum health, a bar over their
+head that every player sees. `Hud/OverheadHealth.luau` draws it (started by
+`HudController`, so world place only: players cannot be damaged in the lobby);
+the rules are pure in `src/shared/UI/OverheadHealthModel.luau`
+(`overhead_health.spec.luau`).
+
+- **When:** shown while the character is alive and its health, rounded up as
+  the HUD's health row shows it, is below the maximum (`Mode` "hurt"). Back at
+  full it stays at full for `LINGER_SECONDS` (1.2 s), then fades out
+  (`toastOut`); a new hit during the linger or the fade brings it straight back.
+  Death, leaving, respawning and the setting turning off remove it at once.
+- **Downed** (the `Downed` player attribute; Humanoid health sits at 1): the bar
+  shows the downed pool (`DownedHealth` of `GameConstants.DOWNED_HEALTH`) in the
+  orange fill under a "Downed" line, so a downed tribe-mate reads apart from a
+  hurt one at range (the colour) and up close (the word). The revive prompt is
+  unchanged.
+- **Whose:** every other player. Your own is hidden
+  (`OverheadHealthModel.SHOW_OWN = false`): the HUD's health row already shows it.
+  Everyone's bar is red: a green tint for tribe-mates was left out because green
+  is the stamina fill, and the tribe frames already list tribe-mates' health.
+- **Names:** the name tag stays Roblox's (Show Names). Roblox's own overhead
+  health bar (shown when damaged) is turned off on every character on this
+  client (`HealthDisplayType` AlwaysOff), so there is one bar. The bar's foot sits
+  `STUDS_ABOVE_HEAD` (1.5) studs over the head's top plus a 14 px lift, above the
+  name tag.
+- **Size and range:** drawn in screen px (`Content` at the billboard's UIScale),
+  so it reads at range and is never huge up close; the scale is the HUD's,
+  clamped to `MIN_SCALE` 0.75 (phones, whose HUD scale is about 0.4: a 72 × 10.5
+  px bar, the "Downed" line at 11 px) and `MAX_SCALE` 1.35. `AlwaysOnTop` is off
+  so walls and terrain hide it; `MaxDistance` 100 studs; `LightInfluence` 0 so
+  night does not darken it.
+- **Cost:** per player only signal connections (`HealthChanged`, `MaxHealth`,
+  the two attributes, CharacterAdded / Removing); no per-frame work. A billboard
+  is built the first time that character is hurt, disabled while hidden and
+  destroyed with the character, so a 30-player server at full health has none.
+- **Setting:** Settings, Gameplay, "Show Health Bars" (`showHealthBars`,
+  attribute `ShowHealthBars`, default on) hides every bar at once.
+- **Capture:** `overhead_health` draws `OverheadHealth.Draw`'s content as a
+  billboard's frame (the harness draws no 3D world or BillboardGui): hurt 72 %,
+  35 %, 8 % and downed at half and a sixth of the pool, at the desktop scale, the
+  phone scale and 3×.
+
 ## Verification
 
 ```bash
@@ -135,6 +180,7 @@ python3 art/ui/capture/capture.py world_hud_states   # low vitals, forced tile a
 python3 art/ui/capture/capture.py world_hud_phone    # 844 × 390 notched (47 px side insets), 667 × 375, 2000 × 924 touch: top bar 58 px, jump button and thumbstick drawn
 python3 art/ui/capture/capture.py world_hud_wide     # 2560 × 1080
 python3 art/ui/capture/capture.py world_hud_flow     # HudController.Start driven by real signals (checks, the live placement; page 1 the eating bar)
+python3 art/ui/capture/capture.py overhead_health    # overhead health bars: hurt and downed, desktop, phone and 3x
 ```
 
 Every scene runs the layout checks in `art/ui/capture/hud_checks.luau`

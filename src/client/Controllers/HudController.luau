@@ -36,6 +36,7 @@ local InteractionPrompt = require(Hud.InteractionPrompt)
 local Kit = require(Hud.Kit)
 local Layout = require(Hud.Layout)
 local ObjectivePanel = require(Hud.ObjectivePanel)
+local OverheadHealth = require(Hud.OverheadHealth)
 local PartyFrames = require(Hud.PartyFrames)
 local Vitals = require(Hud.Vitals)
 local Binds = require(script.Parent.Parent.Ui.Binds)
@@ -928,6 +929,10 @@ function HudController.Start()
 	EventFeedController.Changed:Connect(rebuildWaypoints)
 
 	InteractionPrompt.Start(function()
+		return scale
+	end)
+	-- Bars over hurt players' heads, at the HUD's scale.
+	OverheadHealth.Start(function()
 		return scale
 	end)
 

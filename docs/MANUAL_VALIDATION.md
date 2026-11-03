@@ -698,3 +698,27 @@ Studio and live checks (desktop, touch and controller unless stated):
 - [ ] **Inventory window:** USE on a hotbar food holds it and plays the same animated use (the window's buttons wait until it ends); USE on a draught when a stronger boost runs is refused with the usual reason and the draught stays.
 - [ ] **Refusals:** a draught while a stronger boost runs says "a boost at least as strong is already running"; medicine during its lock (after switching slots mid-drink) says to wait.
 
+
+## Overhead health bars
+
+How it's built: `src/client/Hud/OverheadHealth.luau` (started by `HudController`, world place only) puts a kit `Bar` in a BillboardGui over each other player's head while they are below full health; the rules (when it shows, lingers, fades and hides, the downed look, sizes) are pure in `src/shared/UI/OverheadHealthModel.luau`. It follows the replicated Humanoid `Health` / `MaxHealth` and the `Downed` / `DownedHealth` player attributes through their change signals. Spec: [HudScreen](ui/HudScreen.md#overhead-health-bars).
+
+Automated (`overhead_health.spec.luau`, `settings.spec.luau`; capture scene `overhead_health` for the look, `settings` / `settings_phone` for the new row):
+- No bar at full health, for dead characters, for your own character, or with Show Health Bars off; a bar from the first missing whole point of health.
+- A downed player's bar shows the downed pool in the orange fill under "Downed".
+- Healed back to full, a bar lingers 1.2 s and then fades; death or the setting hides it at once.
+- The bar stays at least 9 screen px high on phones.
+
+Placeholders: linger 1.2 s, draw range 100 studs, the bar 1.5 studs plus 14 px over the head's top (`OverheadHealthModel` constants).
+
+Studio and live checks (two or more players; desktop, touch and controller unless stated):
+
+- [ ] **Shows when hurt:** hit another player (or let a creature do it): a small red bar appears over their head at once and drops with each hit; at full health nobody has one. Your own character never shows one.
+- [ ] **Heals away:** the hurt player eats or uses medicine back to full: the bar fills, stays about a second, then fades out. A hit during the fade brings it straight back.
+- [ ] **Downed:** a downed tribe member shows an orange bar under "Downed" that drops as they take damage; revived, it turns back into a red bar at their revived health; bled out or finished, the bar goes at once.
+- [ ] **Name tag:** with Show Names on, the bar sits above the name tag and never covers it, both up close and at 80-100 studs; Roblox's own green health bar never shows. With Show Names off the bar still shows over the head.
+- [ ] **Range and walls:** the bar is hidden behind walls, rocks and terrain, and disappears past about 100 studs; it stays readable at that range and is not oversized up close; it is not darkened at night.
+- [ ] **Phones:** on a phone the bar and the "Downed" line are readable (about 72 px wide) and never covered by the HUD in a way that hides who is hurt; changing UI Scale in Settings resizes the bars the next time they update.
+- [ ] **Setting:** Settings, Gameplay, Show Health Bars off hides every bar at once; on again, hurt players' bars come back at once.
+- [ ] **Respawn and leave:** a player who dies and respawns has no bar until hurt again; a player who leaves takes their bar with them; no bars are left floating where a character was.
+- [ ] **Performance:** a 30-player server in a fight keeps its frame rate (no per-frame work; the MicroProfiler shows nothing from OverheadHealth while health is steady).
