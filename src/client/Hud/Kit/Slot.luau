@@ -19,8 +19,9 @@ local ItemIcon = require(script.Parent.ItemIcon)
 local Slot = {}
 Slot.__index = Slot
 
--- `itemId` is accepted for `catalogId`. Art and tint always come from
--- ItemInfo.Icon(id); `icon` is used (untinted) only when ItemInfo has none.
+-- `itemId` is accepted for `catalogId`. The art is always the item's own icon
+-- (Kit.ItemIcon, lk_item_<id>); `icon` is used only for an id that is not a
+-- catalog item.
 export type Item = { catalogId: string?, itemId: string?, quantity: number?, permanent: boolean?, icon: string? }
 
 -- props: rect | size (default 90), variant ("item" | "hotbar"), item, count,

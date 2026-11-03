@@ -143,7 +143,7 @@ local function refreshList()
 		)
 	end
 	table.sort(lines)
-	if #lines > 0 and not HudMode.ReplacesLegacy() then
+	if #lines > 0 and not HudMode.WorldHud() then
 		ui.list:Show(table.concat(lines, "\n"))
 	else
 		ui.list:Hide()

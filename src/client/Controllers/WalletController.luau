@@ -454,7 +454,7 @@ local function build()
 	end
 end
 
--- Opens or closes the window (keys, and the on-screen navigation bar).
+-- Opens or closes the window (keys, and the HUD's menu tiles).
 function WalletController.Toggle()
 	if window.screen:IsOpen() then
 		close()

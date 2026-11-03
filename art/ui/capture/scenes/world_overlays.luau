@@ -3,8 +3,9 @@
 --
 --   1 in a run: tutorial hint with key caps, downed (bleeding out), boss bar,
 --     Horn of War, an event banner, two boosts (one ending soon)
---   2 revived / shielded / legacy lists: downed while revived, shielded boss,
---     the extraction and event lists, the boss cue plaque and a subtitle
+--   2 revived / shielded / lists: downed while revived, shielded boss, the
+--     extraction and event lists (kit notice cards, shown when no world HUD
+--     is), the boss cue plaque and a subtitle
 --   3 body loot window        4 storage chest window
 --   5 tribe window (leader)   6 tribe window (no tribe, an invite)
 --   7 build palette           8 death summary      9 extraction protection
@@ -243,7 +244,7 @@ if cue then
 end
 find("Tutorial").Visible = false
 find("EventBanner"):Destroy()
-HudMode.ReplacesLegacy = function()
+HudMode.WorldHud = function()
 	return false
 end
 events.ExtractionEvent.OnClientEvent:Fire({
@@ -274,8 +275,8 @@ events.EventAnnounced.OnClientEvent:Fire({
 	endsAt = 95,
 }, true)
 find("BoostList").Visible = false
-check(find("ExtractionList").Visible, "the legacy extraction list shows")
-check(find("Events").Visible, "the legacy event list shows")
+check(find("ExtractionList").Visible, "the extraction list shows")
+check(find("Events").Visible, "the event list shows")
 __dump(gui, W, H, BG)
 -- The run's banners stay out of the window pages.
 player:SetAttribute("Downed", false)

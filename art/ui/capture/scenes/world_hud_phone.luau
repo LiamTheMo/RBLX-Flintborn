@@ -24,7 +24,7 @@ local SettingsController = require(Client.Controllers.SettingsController)
 
 -- Stand-in background: art/reference/lobby_map.png is the lobby village (the
 -- repo has no in-world screenshot). The world HUD never shows in the lobby: it
--- builds only in the world place (HudMode.ReplacesLegacy) and shows only during
+-- builds only in the world place (HudMode.WorldHud) and shows only during
 -- a run (SessionStates.IsAtRisk).
 local BACKGROUND = { background = "art/reference/lobby_map.png" }
 UserInputService.TouchEnabled = true

@@ -207,7 +207,7 @@ Kit.Scale's probe guis and checks the live placement with and without them.
 The scenes draw over `art/reference/lobby_map.png`, a stand-in: it is the lobby
 village, because the repo has no in-world screenshot. In game the world HUD
 (vitals, objective, world event and the rest) is built only in the world place
-(`HudMode.ReplacesLegacy`) and shown only during a run (`SessionStates.IsAtRisk`);
+(`HudMode.WorldHud`) and shown only during a run (`SessionStates.IsAtRisk`);
 the lobby never shows it.
 
 ## Known limits (Kit requests)
@@ -217,8 +217,6 @@ the lobby never shows it.
   low mark still show it.
 - `hudSmall` ink text (LV and XP beside the bar, as on the lobby) has no outline
   or plate, so it is hard to read over dark ground.
-- Bows have no item art yet (`ItemInfo`); their slot shows the Kit's neutral
-  kind glyph.
 - Needs a device: the real jump button and thumbstick geometry, and whether
   ButtonSelect reaches Roblox's own selection mode while bound to Progress.
 

@@ -1,9 +1,4 @@
 {
-  "atlas_hud": {
-    "h": 512,
-    "slice": null,
-    "w": 1024
-  },
   "atlas_island": {
     "h": 1024,
     "slice": null,
@@ -49,26 +44,6 @@
     "slice": null,
     "w": 1024
   },
-  "atlas_lk_items_hi_1": {
-    "h": 1024,
-    "slice": null,
-    "w": 1024
-  },
-  "atlas_lk_items_hi_2": {
-    "h": 1024,
-    "slice": null,
-    "w": 1024
-  },
-  "atlas_lk_items_hi_3": {
-    "h": 1024,
-    "slice": null,
-    "w": 1024
-  },
-  "atlas_lk_items_hi_4": {
-    "h": 1024,
-    "slice": null,
-    "w": 1024
-  },
   "atlas_lk_journal_hi": {
     "h": 1024,
     "slice": null,
@@ -98,790 +73,6 @@
     "h": 1024,
     "slice": null,
     "w": 1024
-  },
-  "atlas_lobby": {
-    "h": 1024,
-    "slice": null,
-    "w": 1024
-  },
-  "atlas_map": {
-    "h": 512,
-    "slice": null,
-    "w": 1024
-  },
-  "atlas_pieces": {
-    "h": 1024,
-    "slice": null,
-    "w": 1024
-  },
-  "atlas_screens": {
-    "h": 1024,
-    "slice": null,
-    "w": 1024
-  },
-  "atlas_ui": {
-    "h": 1024,
-    "slice": null,
-    "w": 1024
-  },
-  "atlas_window_crafting_1": {
-    "h": 1024,
-    "slice": null,
-    "w": 1024
-  },
-  "atlas_window_crafting_2": {
-    "h": 1024,
-    "slice": null,
-    "w": 1024
-  },
-  "atlas_window_forge_1": {
-    "h": 1024,
-    "slice": null,
-    "w": 1024
-  },
-  "atlas_window_forge_2": {
-    "h": 1024,
-    "slice": null,
-    "w": 1024
-  },
-  "atlas_window_inventory_1": {
-    "h": 1024,
-    "slice": null,
-    "w": 1024
-  },
-  "atlas_window_inventory_2": {
-    "h": 1024,
-    "slice": null,
-    "w": 1024
-  },
-  "atlas_window_journal_1": {
-    "h": 1024,
-    "slice": null,
-    "w": 1024
-  },
-  "atlas_window_journal_2": {
-    "h": 1024,
-    "slice": null,
-    "w": 1024
-  },
-  "atlas_window_settings_1": {
-    "h": 1024,
-    "slice": null,
-    "w": 1024
-  },
-  "atlas_window_settings_2": {
-    "h": 1024,
-    "slice": null,
-    "w": 1024
-  },
-  "atlas_windows_bag": {
-    "h": 1024,
-    "slice": null,
-    "w": 1024
-  },
-  "atlas_windows_craft": {
-    "h": 1024,
-    "slice": null,
-    "w": 1024
-  },
-  "atlas_windows_menu": {
-    "h": 1024,
-    "slice": null,
-    "w": 1024
-  },
-  "button_add_friend": {
-    "h": 163,
-    "slice": null,
-    "w": 183
-  },
-  "button_back": {
-    "h": 163,
-    "slice": null,
-    "w": 183
-  },
-  "button_backpack": {
-    "h": 165,
-    "slice": null,
-    "w": 183
-  },
-  "button_check": {
-    "h": 164,
-    "slice": null,
-    "w": 184
-  },
-  "button_chest": {
-    "h": 165,
-    "slice": null,
-    "w": 183
-  },
-  "button_gear": {
-    "h": 166,
-    "slice": null,
-    "w": 180
-  },
-  "button_gift": {
-    "h": 166,
-    "slice": null,
-    "w": 184
-  },
-  "button_group": {
-    "h": 165,
-    "slice": null,
-    "w": 183
-  },
-  "button_help": {
-    "h": 164,
-    "slice": null,
-    "w": 180
-  },
-  "button_map": {
-    "h": 164,
-    "slice": null,
-    "w": 183
-  },
-  "button_scroll": {
-    "h": 165,
-    "slice": null,
-    "w": 183
-  },
-  "button_sound_on": {
-    "h": 164,
-    "slice": null,
-    "w": 179
-  },
-  "button_star": {
-    "h": 166,
-    "slice": null,
-    "w": 182
-  },
-  "button_swap": {
-    "h": 163,
-    "slice": null,
-    "w": 182
-  },
-  "button_tools": {
-    "h": 165,
-    "slice": null,
-    "w": 180
-  },
-  "button_x": {
-    "h": 164,
-    "slice": null,
-    "w": 184
-  },
-  "compass_marker": {
-    "atlas": "atlas_hud",
-    "h": 30,
-    "rect": [
-      0,
-      445,
-      32,
-      30
-    ],
-    "slice": null,
-    "w": 32
-  },
-  "fill_blue": {
-    "h": 45,
-    "slice": [
-      17,
-      15,
-      17,
-      14
-    ],
-    "w": 168
-  },
-  "fill_green": {
-    "h": 41,
-    "slice": [
-      19,
-      13,
-      16,
-      12
-    ],
-    "w": 168
-  },
-  "fill_orange_striped": {
-    "h": 43,
-    "slice": [
-      21,
-      14,
-      21,
-      14
-    ],
-    "w": 175
-  },
-  "fill_red": {
-    "h": 41,
-    "slice": [
-      18,
-      13,
-      17,
-      12
-    ],
-    "w": 168
-  },
-  "fill_track": {
-    "h": 46,
-    "slice": [
-      18,
-      15,
-      18,
-      14
-    ],
-    "w": 212
-  },
-  "fill_yellow": {
-    "h": 42,
-    "slice": [
-      17,
-      14,
-      17,
-      12
-    ],
-    "w": 168
-  },
-  "frame_badge": {
-    "h": 90,
-    "slice": [
-      39,
-      36,
-      38,
-      33
-    ],
-    "w": 191
-  },
-  "frame_bar": {
-    "h": 111,
-    "slice": [
-      48,
-      31,
-      47,
-      32
-    ],
-    "w": 425
-  },
-  "frame_bar_hollow": {
-    "atlas": "atlas_map",
-    "h": 111,
-    "rect": [
-      0,
-      337,
-      425,
-      111
-    ],
-    "slice": [
-      48,
-      36,
-      47,
-      37
-    ],
-    "w": 425
-  },
-  "frame_compass": {
-    "h": 84,
-    "slice": [
-      59,
-      21,
-      60,
-      21
-    ],
-    "w": 729
-  },
-  "frame_panel_large": {
-    "h": 178,
-    "slice": [
-      43,
-      35,
-      44,
-      39
-    ],
-    "w": 338
-  },
-  "frame_panel_large_hollow": {
-    "h": 178,
-    "slice": [
-      46,
-      38,
-      46,
-      40
-    ],
-    "w": 338
-  },
-  "frame_panel_medium": {
-    "h": 110,
-    "slice": [
-      35,
-      22,
-      35,
-      21
-    ],
-    "w": 357
-  },
-  "frame_panel_wide": {
-    "h": 109,
-    "slice": [
-      35,
-      20,
-      35,
-      19
-    ],
-    "w": 421
-  },
-  "frame_prompt": {
-    "h": 118,
-    "slice": [
-      29,
-      21,
-      36,
-      20
-    ],
-    "w": 311
-  },
-  "frame_round": {
-    "h": 201,
-    "slice": null,
-    "w": 199
-  },
-  "frame_round_hollow": {
-    "h": 201,
-    "slice": null,
-    "w": 199
-  },
-  "frame_selected_hollow": {
-    "h": 152,
-    "slice": [
-      46,
-      48,
-      45,
-      48
-    ],
-    "w": 165
-  },
-  "frame_slot": {
-    "h": 145,
-    "slice": [
-      33,
-      37,
-      35,
-      34
-    ],
-    "w": 151
-  },
-  "frame_slot_selected": {
-    "h": 146,
-    "slice": [
-      35,
-      39,
-      37,
-      38
-    ],
-    "w": 152
-  },
-  "frame_square_hollow": {
-    "h": 135,
-    "slice": [
-      45,
-      46,
-      50,
-      45
-    ],
-    "w": 142
-  },
-  "frame_wide_hollow": {
-    "h": 130,
-    "slice": [
-      52,
-      38,
-      45,
-      42
-    ],
-    "w": 219
-  },
-  "icon_add_friend": {
-    "h": 112,
-    "slice": null,
-    "w": 125
-  },
-  "icon_anvil": {
-    "h": 112,
-    "slice": null,
-    "w": 171
-  },
-  "icon_axe": {
-    "h": 139,
-    "slice": null,
-    "w": 137
-  },
-  "icon_back": {
-    "h": 103,
-    "slice": null,
-    "w": 111
-  },
-  "icon_backpack": {
-    "h": 128,
-    "slice": null,
-    "w": 123
-  },
-  "icon_bell": {
-    "h": 114,
-    "slice": null,
-    "w": 105
-  },
-  "icon_bow": {
-    "h": 138,
-    "slice": null,
-    "w": 139
-  },
-  "icon_calendar": {
-    "h": 118,
-    "slice": null,
-    "w": 122
-  },
-  "icon_campfire": {
-    "h": 133,
-    "slice": null,
-    "w": 138
-  },
-  "icon_check": {
-    "h": 102,
-    "slice": null,
-    "w": 123
-  },
-  "icon_chest": {
-    "h": 115,
-    "slice": null,
-    "w": 157
-  },
-  "icon_coin": {
-    "h": 122,
-    "slice": null,
-    "w": 120
-  },
-  "icon_coin_bag": {
-    "h": 125,
-    "slice": null,
-    "w": 111
-  },
-  "icon_collapse": {
-    "h": 101,
-    "slice": null,
-    "w": 111
-  },
-  "icon_compass": {
-    "h": 133,
-    "slice": null,
-    "w": 118
-  },
-  "icon_crossed_swords": {
-    "h": 134,
-    "slice": null,
-    "w": 139
-  },
-  "icon_crown": {
-    "h": 127,
-    "slice": null,
-    "w": 145
-  },
-  "icon_down": {
-    "h": 78,
-    "slice": null,
-    "w": 113
-  },
-  "icon_exit": {
-    "h": 113,
-    "slice": null,
-    "w": 133
-  },
-  "icon_expand": {
-    "h": 106,
-    "slice": null,
-    "w": 120
-  },
-  "icon_eye": {
-    "h": 92,
-    "slice": null,
-    "w": 143
-  },
-  "icon_gear": {
-    "h": 126,
-    "slice": null,
-    "w": 128
-  },
-  "icon_gem": {
-    "h": 128,
-    "slice": null,
-    "w": 118
-  },
-  "icon_gift": {
-    "h": 126,
-    "slice": null,
-    "w": 128
-  },
-  "icon_group": {
-    "h": 115,
-    "slice": null,
-    "w": 157
-  },
-  "icon_hammer": {
-    "h": 129,
-    "slice": null,
-    "w": 128
-  },
-  "icon_hand": {
-    "h": 113,
-    "slice": null,
-    "w": 107
-  },
-  "icon_heart": {
-    "h": 113,
-    "slice": null,
-    "w": 125
-  },
-  "icon_help": {
-    "h": 123,
-    "slice": null,
-    "w": 124
-  },
-  "icon_hourglass": {
-    "h": 116,
-    "slice": null,
-    "w": 84
-  },
-  "icon_info": {
-    "h": 108,
-    "slice": null,
-    "w": 109
-  },
-  "icon_left": {
-    "h": 102,
-    "slice": null,
-    "w": 72
-  },
-  "icon_lightning": {
-    "h": 130,
-    "slice": null,
-    "w": 84
-  },
-  "icon_lock": {
-    "h": 118,
-    "slice": null,
-    "w": 90
-  },
-  "icon_lock_silver": {
-    "h": 142,
-    "slice": null,
-    "w": 113
-  },
-  "icon_map": {
-    "h": 119,
-    "slice": null,
-    "w": 148
-  },
-  "icon_meat": {
-    "h": 135,
-    "slice": null,
-    "w": 123
-  },
-  "icon_minus": {
-    "h": 46,
-    "slice": null,
-    "w": 111
-  },
-  "icon_more": {
-    "h": 45,
-    "slice": null,
-    "w": 131
-  },
-  "icon_mountain": {
-    "atlas": "atlas_hud",
-    "h": 99,
-    "rect": [
-      100,
-      220,
-      158,
-      99
-    ],
-    "slice": null,
-    "w": 158
-  },
-  "icon_music": {
-    "h": 103,
-    "slice": null,
-    "w": 94
-  },
-  "icon_pickaxe": {
-    "h": 133,
-    "slice": null,
-    "w": 134
-  },
-  "icon_plus": {
-    "h": 107,
-    "slice": null,
-    "w": 109
-  },
-  "icon_red_dot": {
-    "h": 79,
-    "slice": null,
-    "w": 80
-  },
-  "icon_refresh": {
-    "h": 106,
-    "slice": null,
-    "w": 110
-  },
-  "icon_right": {
-    "h": 104,
-    "slice": null,
-    "w": 74
-  },
-  "icon_run": {
-    "atlas": "atlas_hud",
-    "h": 128,
-    "rect": [
-      300,
-      0,
-      124,
-      128
-    ],
-    "slice": null,
-    "w": 124
-  },
-  "icon_scroll": {
-    "h": 125,
-    "slice": null,
-    "w": 147
-  },
-  "icon_search": {
-    "h": 114,
-    "slice": null,
-    "w": 119
-  },
-  "icon_shield": {
-    "h": 133,
-    "slice": null,
-    "w": 123
-  },
-  "icon_skull": {
-    "h": 110,
-    "slice": null,
-    "w": 107
-  },
-  "icon_sound_off": {
-    "h": 110,
-    "slice": null,
-    "w": 120
-  },
-  "icon_sound_on": {
-    "h": 105,
-    "slice": null,
-    "w": 123
-  },
-  "icon_spear": {
-    "h": 136,
-    "slice": null,
-    "w": 127
-  },
-  "icon_spinner": {
-    "h": 148,
-    "slice": null,
-    "w": 141
-  },
-  "icon_star": {
-    "h": 123,
-    "slice": null,
-    "w": 130
-  },
-  "icon_star_gold": {
-    "h": 124,
-    "slice": null,
-    "w": 130
-  },
-  "icon_stone_hammer": {
-    "h": 138,
-    "slice": null,
-    "w": 130
-  },
-  "icon_storm": {
-    "atlas": "atlas_hud",
-    "h": 122,
-    "rect": [
-      690,
-      0,
-      115,
-      122
-    ],
-    "slice": null,
-    "w": 115
-  },
-  "icon_swap": {
-    "h": 122,
-    "slice": null,
-    "w": 121
-  },
-  "icon_sword": {
-    "h": 138,
-    "slice": null,
-    "w": 135
-  },
-  "icon_tower": {
-    "atlas": "atlas_hud",
-    "h": 112,
-    "rect": [
-      809,
-      0,
-      132,
-      112
-    ],
-    "slice": null,
-    "w": 132
-  },
-  "icon_trophy": {
-    "h": 121,
-    "slice": null,
-    "w": 132
-  },
-  "icon_unlock": {
-    "h": 124,
-    "slice": null,
-    "w": 89
-  },
-  "icon_up": {
-    "h": 73,
-    "slice": null,
-    "w": 108
-  },
-  "icon_warning": {
-    "h": 100,
-    "slice": null,
-    "w": 112
-  },
-  "icon_waypoint": {
-    "atlas": "atlas_hud",
-    "h": 112,
-    "rect": [
-      0,
-      220,
-      96,
-      112
-    ],
-    "slice": null,
-    "w": 96
-  },
-  "icon_x": {
-    "h": 103,
-    "slice": null,
-    "w": 103
-  },
-  "keycap": {
-    "h": 148,
-    "slice": [
-      31,
-      41,
-      33,
-      39
-    ],
-    "w": 165
   },
   "lk_badge_count": {
     "atlas": "atlas_lk_lobby",
@@ -2537,7 +1728,6 @@
   "lk_glyph_ink_backpack": {
     "atlas": "atlas_lk_icons",
     "h": 116,
-    "hi": "lk_glyph_ink_backpack__hi",
     "rect": [
       120,
       0,
@@ -2546,20 +1736,6 @@
     ],
     "slice": null,
     "w": 115
-  },
-  "lk_glyph_ink_backpack__hi": {
-    "atlas": "atlas_lk_items_hi_1",
-    "h": 220,
-    "of": "lk_glyph_ink_backpack",
-    "rect": [
-      720,
-      704,
-      218,
-      220
-    ],
-    "scale": 1.8966,
-    "slice": null,
-    "w": 218
   },
   "lk_glyph_ink_book": {
     "atlas": "atlas_lk_icons",
@@ -3118,7 +2294,6 @@
   "lk_icon_berries": {
     "atlas": "atlas_lk_items",
     "h": 73,
-    "hi": "lk_icon_berries__hi",
     "rect": [
       771,
       307,
@@ -3127,20 +2302,6 @@
     ],
     "slice": null,
     "w": 78
-  },
-  "lk_icon_berries__hi": {
-    "atlas": "atlas_lk_items_hi_3",
-    "h": 333,
-    "of": "lk_icon_berries",
-    "rect": [
-      0,
-      360,
-      356,
-      333
-    ],
-    "scale": 4.5641,
-    "slice": null,
-    "w": 356
   },
   "lk_icon_berry_bush": {
     "atlas": "atlas_lk_icons",
@@ -3172,7 +2333,6 @@
   "lk_icon_bone": {
     "atlas": "atlas_lk_items",
     "h": 79,
-    "hi": "lk_icon_bone__hi",
     "rect": [
       428,
       307,
@@ -3182,20 +2342,6 @@
     "slice": null,
     "w": 87
   },
-  "lk_icon_bone__hi": {
-    "atlas": "atlas_lk_items_hi_3",
-    "h": 323,
-    "of": "lk_icon_bone",
-    "rect": [
-      360,
-      360,
-      356,
-      323
-    ],
-    "scale": 4.092,
-    "slice": null,
-    "w": 356
-  },
   "lk_icon_bridge": {
     "h": 63,
     "slice": null,
@@ -3204,7 +2350,6 @@
   "lk_icon_build": {
     "atlas": "atlas_lk_items",
     "h": 97,
-    "hi": "lk_icon_build__hi",
     "rect": [
       871,
       200,
@@ -3214,24 +2359,9 @@
     "slice": null,
     "w": 108
   },
-  "lk_icon_build__hi": {
-    "atlas": "atlas_lk_items_hi_1",
-    "h": 320,
-    "of": "lk_icon_build",
-    "rect": [
-      0,
-      704,
-      356,
-      320
-    ],
-    "scale": 3.2963,
-    "slice": null,
-    "w": 356
-  },
   "lk_icon_campfire": {
     "atlas": "atlas_lk_items",
     "h": 100,
-    "hi": "lk_icon_campfire__hi",
     "rect": [
       590,
       200,
@@ -3240,20 +2370,6 @@
     ],
     "slice": null,
     "w": 95
-  },
-  "lk_icon_campfire__hi": {
-    "atlas": "atlas_lk_items_hi_1",
-    "h": 356,
-    "of": "lk_icon_campfire",
-    "rect": [
-      0,
-      0,
-      338,
-      356
-    ],
-    "scale": 3.56,
-    "slice": null,
-    "w": 338
   },
   "lk_icon_cave": {
     "h": 74,
@@ -3386,7 +2502,6 @@
   "lk_icon_crystals": {
     "atlas": "atlas_lk_items",
     "h": 100,
-    "hi": "lk_icon_crystals__hi",
     "rect": [
       689,
       200,
@@ -3396,20 +2511,6 @@
     "slice": null,
     "w": 94
   },
-  "lk_icon_crystals__hi": {
-    "atlas": "atlas_lk_items_hi_3",
-    "h": 356,
-    "of": "lk_icon_crystals",
-    "rect": [
-      0,
-      0,
-      335,
-      356
-    ],
-    "scale": 3.56,
-    "slice": null,
-    "w": 335
-  },
   "lk_icon_cursor": {
     "h": 96,
     "slice": null,
@@ -3418,7 +2519,6 @@
   "lk_icon_drumstick": {
     "atlas": "atlas_lk_items",
     "h": 103,
-    "hi": "lk_icon_drumstick__hi",
     "rect": [
       0,
       200,
@@ -3427,20 +2527,6 @@
     ],
     "slice": null,
     "w": 116
-  },
-  "lk_icon_drumstick__hi": {
-    "atlas": "atlas_lk_items_hi_3",
-    "h": 316,
-    "of": "lk_icon_drumstick",
-    "rect": [
-      0,
-      697,
-      356,
-      316
-    ],
-    "scale": 3.069,
-    "slice": null,
-    "w": 356
   },
   "lk_icon_exclamation": {
     "atlas": "atlas_lk_lobby",
@@ -3534,7 +2620,6 @@
   "lk_icon_hatchet": {
     "atlas": "atlas_lk_items",
     "h": 127,
-    "hi": "lk_icon_hatchet__hi",
     "rect": [
       160,
       0,
@@ -3544,24 +2629,9 @@
     "slice": null,
     "w": 133
   },
-  "lk_icon_hatchet__hi": {
-    "atlas": "atlas_lk_items_hi_1",
-    "h": 340,
-    "of": "lk_icon_hatchet",
-    "rect": [
-      0,
-      360,
-      356,
-      340
-    ],
-    "scale": 2.6767,
-    "slice": null,
-    "w": 356
-  },
   "lk_icon_heart": {
     "atlas": "atlas_lk_items",
     "h": 103,
-    "hi": "lk_icon_heart__hi",
     "rect": [
       120,
       200,
@@ -3571,24 +2641,9 @@
     "slice": null,
     "w": 116
   },
-  "lk_icon_heart__hi": {
-    "atlas": "atlas_lk_items_hi_4",
-    "h": 316,
-    "of": "lk_icon_heart",
-    "rect": [
-      360,
-      351,
-      356,
-      316
-    ],
-    "scale": 3.069,
-    "slice": null,
-    "w": 356
-  },
   "lk_icon_hide": {
     "atlas": "atlas_lk_items",
     "h": 75,
-    "hi": "lk_icon_hide__hi",
     "rect": [
       608,
       307,
@@ -3597,20 +2652,6 @@
     ],
     "slice": null,
     "w": 79
-  },
-  "lk_icon_hide__hi": {
-    "atlas": "atlas_lk_items_hi_2",
-    "h": 338,
-    "of": "lk_icon_hide",
-    "rect": [
-      360,
-      360,
-      356,
-      338
-    ],
-    "scale": 4.5063,
-    "slice": null,
-    "w": 356
   },
   "lk_icon_hourglass": {
     "atlas": "atlas_lk_icons",
@@ -3649,7 +2690,6 @@
   "lk_icon_lightning": {
     "atlas": "atlas_lk_items",
     "h": 116,
-    "hi": "lk_icon_lightning__hi",
     "rect": [
       552,
       0,
@@ -3658,20 +2698,6 @@
     ],
     "slice": null,
     "w": 86
-  },
-  "lk_icon_lightning__hi": {
-    "atlas": "atlas_lk_items_hi_3",
-    "h": 356,
-    "of": "lk_icon_lightning",
-    "rect": [
-      339,
-      0,
-      264,
-      356
-    ],
-    "scale": 3.069,
-    "slice": null,
-    "w": 264
   },
   "lk_icon_lock": {
     "atlas": "atlas_lk_lobby",
@@ -3700,7 +2726,6 @@
   "lk_icon_logs": {
     "atlas": "atlas_lk_items",
     "h": 95,
-    "hi": "lk_icon_logs__hi",
     "rect": [
       0,
       307,
@@ -3710,24 +2735,9 @@
     "slice": null,
     "w": 110
   },
-  "lk_icon_logs__hi": {
-    "atlas": "atlas_lk_items_hi_2",
-    "h": 307,
-    "of": "lk_icon_logs",
-    "rect": [
-      360,
-      711,
-      356,
-      307
-    ],
-    "scale": 3.2364,
-    "slice": null,
-    "w": 356
-  },
   "lk_icon_magma_ore": {
     "atlas": "atlas_lk_items",
     "h": 87,
-    "hi": "lk_icon_magma_ore__hi",
     "rect": [
       220,
       307,
@@ -3736,20 +2746,6 @@
     ],
     "slice": null,
     "w": 100
-  },
-  "lk_icon_magma_ore__hi": {
-    "atlas": "atlas_lk_items_hi_2",
-    "h": 310,
-    "of": "lk_icon_magma_ore",
-    "rect": [
-      0,
-      711,
-      356,
-      310
-    ],
-    "scale": 3.56,
-    "slice": null,
-    "w": 356
   },
   "lk_icon_magnifier": {
     "atlas": "atlas_lk_icons",
@@ -3831,7 +2827,6 @@
   "lk_icon_mushroom": {
     "atlas": "atlas_lk_items",
     "h": 73,
-    "hi": "lk_icon_mushroom__hi",
     "rect": [
       853,
       307,
@@ -3840,20 +2835,6 @@
     ],
     "slice": null,
     "w": 72
-  },
-  "lk_icon_mushroom__hi": {
-    "atlas": "atlas_lk_items_hi_2",
-    "h": 356,
-    "of": "lk_icon_mushroom",
-    "rect": [
-      0,
-      0,
-      351,
-      356
-    ],
-    "scale": 4.8767,
-    "slice": null,
-    "w": 351
   },
   "lk_icon_party": {
     "atlas": "atlas_lk_lobby",
@@ -3897,7 +2878,6 @@
   "lk_icon_pickaxe": {
     "atlas": "atlas_lk_items",
     "h": 124,
-    "hi": "lk_icon_pickaxe__hi",
     "rect": [
       297,
       0,
@@ -3907,24 +2887,9 @@
     "slice": null,
     "w": 135
   },
-  "lk_icon_pickaxe__hi": {
-    "atlas": "atlas_lk_items_hi_1",
-    "h": 327,
-    "of": "lk_icon_pickaxe",
-    "rect": [
-      360,
-      360,
-      356,
-      327
-    ],
-    "scale": 2.637,
-    "slice": null,
-    "w": 356
-  },
   "lk_icon_plank": {
     "atlas": "atlas_lk_items",
     "h": 102,
-    "hi": "lk_icon_plank__hi",
     "rect": [
       360,
       200,
@@ -3934,24 +2899,9 @@
     "slice": null,
     "w": 106
   },
-  "lk_icon_plank__hi": {
-    "atlas": "atlas_lk_items_hi_4",
-    "h": 343,
-    "of": "lk_icon_plank",
-    "rect": [
-      360,
-      0,
-      356,
-      343
-    ],
-    "scale": 3.3585,
-    "slice": null,
-    "w": 356
-  },
   "lk_icon_plant_fiber": {
     "atlas": "atlas_lk_items",
     "h": 113,
-    "hi": "lk_icon_plant_fiber__hi",
     "rect": [
       729,
       0,
@@ -3960,20 +2910,6 @@
     ],
     "slice": null,
     "w": 116
-  },
-  "lk_icon_plant_fiber__hi": {
-    "atlas": "atlas_lk_items_hi_2",
-    "h": 347,
-    "of": "lk_icon_plant_fiber",
-    "rect": [
-      0,
-      360,
-      356,
-      347
-    ],
-    "scale": 3.069,
-    "slice": null,
-    "w": 356
   },
   "lk_icon_play_rune": {
     "atlas": "atlas_lk_play",
@@ -4034,7 +2970,6 @@
   "lk_icon_rocks": {
     "atlas": "atlas_lk_items",
     "h": 83,
-    "hi": "lk_icon_rocks__hi",
     "rect": [
       324,
       307,
@@ -4044,24 +2979,9 @@
     "slice": null,
     "w": 100
   },
-  "lk_icon_rocks__hi": {
-    "atlas": "atlas_lk_items_hi_4",
-    "h": 295,
-    "of": "lk_icon_rocks",
-    "rect": [
-      360,
-      676,
-      356,
-      295
-    ],
-    "scale": 3.56,
-    "slice": null,
-    "w": 356
-  },
   "lk_icon_rope": {
     "atlas": "atlas_lk_items",
     "h": 75,
-    "hi": "lk_icon_rope__hi",
     "rect": [
       691,
       307,
@@ -4070,20 +2990,6 @@
     ],
     "slice": null,
     "w": 76
-  },
-  "lk_icon_rope__hi": {
-    "atlas": "atlas_lk_items_hi_3",
-    "h": 351,
-    "of": "lk_icon_rope",
-    "rect": [
-      607,
-      0,
-      356,
-      351
-    ],
-    "scale": 4.6842,
-    "slice": null,
-    "w": 356
   },
   "lk_icon_ruin": {
     "atlas": "atlas_lk_icons",
@@ -4100,7 +3006,6 @@
   "lk_icon_runestone": {
     "atlas": "atlas_lk_items",
     "h": 116,
-    "hi": "lk_icon_runestone__hi",
     "rect": [
       436,
       0,
@@ -4109,20 +3014,6 @@
     ],
     "slice": null,
     "w": 112
-  },
-  "lk_icon_runestone__hi": {
-    "atlas": "atlas_lk_items_hi_2",
-    "h": 356,
-    "of": "lk_icon_runestone",
-    "rect": [
-      355,
-      0,
-      344,
-      356
-    ],
-    "scale": 3.069,
-    "slice": null,
-    "w": 344
   },
   "lk_icon_runestone_world": {
     "h": 100,
@@ -4169,7 +3060,6 @@
   "lk_icon_spear": {
     "atlas": "atlas_lk_items",
     "h": 76,
-    "hi": "lk_icon_spear__hi",
     "rect": [
       519,
       307,
@@ -4179,20 +3069,6 @@
     "slice": null,
     "w": 85
   },
-  "lk_icon_spear__hi": {
-    "atlas": "atlas_lk_items_hi_1",
-    "h": 318,
-    "of": "lk_icon_spear",
-    "rect": [
-      360,
-      704,
-      356,
-      318
-    ],
-    "scale": 4.1882,
-    "slice": null,
-    "w": 356
-  },
   "lk_icon_speech": {
     "h": 101,
     "slice": null,
@@ -4201,7 +3077,6 @@
   "lk_icon_star": {
     "atlas": "atlas_lk_items",
     "h": 113,
-    "hi": "lk_icon_star__hi",
     "rect": [
       849,
       0,
@@ -4211,24 +3086,9 @@
     "slice": null,
     "w": 116
   },
-  "lk_icon_star__hi": {
-    "atlas": "atlas_lk_items_hi_4",
-    "h": 347,
-    "of": "lk_icon_star",
-    "rect": [
-      0,
-      0,
-      356,
-      347
-    ],
-    "scale": 3.069,
-    "slice": null,
-    "w": 356
-  },
   "lk_icon_stone": {
     "atlas": "atlas_lk_items",
     "h": 103,
-    "hi": "lk_icon_stone__hi",
     "rect": [
       240,
       200,
@@ -4238,24 +3098,9 @@
     "slice": null,
     "w": 116
   },
-  "lk_icon_stone__hi": {
-    "atlas": "atlas_lk_items_hi_3",
-    "h": 316,
-    "of": "lk_icon_stone",
-    "rect": [
-      360,
-      697,
-      356,
-      316
-    ],
-    "scale": 3.069,
-    "slice": null,
-    "w": 356
-  },
   "lk_icon_stone_axe": {
     "atlas": "atlas_lk_items",
     "h": 196,
-    "hi": "lk_icon_stone_axe__hi",
     "rect": [
       0,
       0,
@@ -4265,24 +3110,9 @@
     "slice": null,
     "w": 156
   },
-  "lk_icon_stone_axe__hi": {
-    "atlas": "atlas_lk_items_hi_1",
-    "h": 356,
-    "of": "lk_icon_stone_axe",
-    "rect": [
-      342,
-      0,
-      283,
-      356
-    ],
-    "scale": 1.8163,
-    "slice": null,
-    "w": 283
-  },
   "lk_icon_stones": {
     "atlas": "atlas_lk_items",
     "h": 92,
-    "hi": "lk_icon_stones__hi",
     "rect": [
       114,
       307,
@@ -4292,24 +3122,9 @@
     "slice": null,
     "w": 102
   },
-  "lk_icon_stones__hi": {
-    "atlas": "atlas_lk_items_hi_4",
-    "h": 321,
-    "of": "lk_icon_stones",
-    "rect": [
-      0,
-      351,
-      356,
-      321
-    ],
-    "scale": 3.4902,
-    "slice": null,
-    "w": 356
-  },
   "lk_icon_torch": {
     "atlas": "atlas_lk_items",
     "h": 116,
-    "hi": "lk_icon_torch__hi",
     "rect": [
       642,
       0,
@@ -4318,20 +3133,6 @@
     ],
     "slice": null,
     "w": 83
-  },
-  "lk_icon_torch__hi": {
-    "atlas": "atlas_lk_items_hi_1",
-    "h": 356,
-    "of": "lk_icon_torch",
-    "rect": [
-      629,
-      0,
-      255,
-      356
-    ],
-    "scale": 3.069,
-    "slice": null,
-    "w": 255
   },
   "lk_icon_totem": {
     "atlas": "atlas_lk_icons",
@@ -4459,7 +3260,6 @@
   "lk_icon_tusk__hi": {
     "atlas": "atlas_lk_journal_hi",
     "h": 200,
-    "hi": "lk_icon_tusk__hi2",
     "of": "lk_icon_tusk",
     "rect": [
       854,
@@ -4471,24 +3271,9 @@
     "slice": null,
     "w": 160
   },
-  "lk_icon_tusk__hi2": {
-    "atlas": "atlas_lk_items_hi_2",
-    "h": 356,
-    "of": "lk_icon_tusk",
-    "rect": [
-      703,
-      0,
-      285,
-      356
-    ],
-    "scale": 3.56,
-    "slice": null,
-    "w": 285
-  },
   "lk_icon_warning": {
     "atlas": "atlas_lk_items",
     "h": 101,
-    "hi": "lk_icon_warning__hi",
     "rect": [
       470,
       200,
@@ -4497,20 +3282,6 @@
     ],
     "slice": null,
     "w": 116
-  },
-  "lk_icon_warning__hi": {
-    "atlas": "atlas_lk_items_hi_4",
-    "h": 310,
-    "of": "lk_icon_warning",
-    "rect": [
-      0,
-      676,
-      356,
-      310
-    ],
-    "scale": 3.069,
-    "slice": null,
-    "w": 356
   },
   "lk_icon_wave": {
     "h": 76,
@@ -8789,1169 +7560,6 @@
     ],
     "w": 316
   },
-  "nine_corner_bl": {
-    "h": 117,
-    "slice": null,
-    "w": 112
-  },
-  "nine_corner_br": {
-    "h": 116,
-    "slice": null,
-    "w": 113
-  },
-  "nine_corner_tl": {
-    "h": 115,
-    "slice": null,
-    "w": 108
-  },
-  "nine_corner_tr": {
-    "h": 115,
-    "slice": null,
-    "w": 107
-  },
-  "nine_edge_bottom": {
-    "h": 57,
-    "slice": null,
-    "w": 430
-  },
-  "nine_edge_left": {
-    "h": 153,
-    "slice": null,
-    "w": 54
-  },
-  "nine_edge_right": {
-    "h": 153,
-    "slice": null,
-    "w": 55
-  },
-  "nine_edge_top": {
-    "h": 56,
-    "slice": null,
-    "w": 430
-  },
-  "panel_dark": {
-    "h": 96,
-    "slice": [
-      16,
-      14,
-      14,
-      13
-    ],
-    "w": 223
-  },
-  "panel_dark_small": {
-    "h": 97,
-    "slice": [
-      14,
-      14,
-      13,
-      13
-    ],
-    "w": 106
-  },
-  "pill_dark": {
-    "h": 110,
-    "slice": [
-      38,
-      30,
-      37,
-      28
-    ],
-    "w": 194
-  },
-  "pm_arrow_left": {
-    "atlas": "atlas_pieces",
-    "h": 74,
-    "rect": [
-      908,
-      862,
-      86,
-      74
-    ],
-    "slice": null,
-    "w": 86
-  },
-  "pm_arrow_right": {
-    "atlas": "atlas_pieces",
-    "h": 75,
-    "rect": [
-      409,
-      862,
-      86,
-      75
-    ],
-    "slice": null,
-    "w": 86
-  },
-  "pm_banner": {
-    "h": 92,
-    "slice": [
-      64,
-      30,
-      64,
-      30
-    ],
-    "w": 948
-  },
-  "pm_button_action": {
-    "atlas": "atlas_pieces",
-    "h": 85,
-    "rect": [
-      646,
-      682,
-      227,
-      85
-    ],
-    "slice": [
-      40,
-      26,
-      40,
-      26
-    ],
-    "w": 227
-  },
-  "pm_button_add_friend": {
-    "atlas": "atlas_lobby",
-    "h": 52,
-    "rect": [
-      387,
-      869,
-      68,
-      52
-    ],
-    "slice": null,
-    "w": 68
-  },
-  "pm_button_apply": {
-    "atlas": "atlas_pieces",
-    "h": 89,
-    "rect": [
-      0,
-      682,
-      276,
-      89
-    ],
-    "slice": null,
-    "w": 276
-  },
-  "pm_button_check": {
-    "atlas": "atlas_ui",
-    "h": 150,
-    "rect": [
-      405,
-      749,
-      155,
-      150
-    ],
-    "slice": null,
-    "w": 155
-  },
-  "pm_button_claim": {
-    "atlas": "atlas_ui",
-    "h": 82,
-    "rect": [
-      0,
-      528,
-      391,
-      82
-    ],
-    "slice": [
-      70,
-      26,
-      70,
-      26
-    ],
-    "w": 391
-  },
-  "pm_button_craft": {
-    "atlas": "atlas_pieces",
-    "h": 94,
-    "rect": [
-      0,
-      584,
-      282,
-      94
-    ],
-    "slice": [
-      70,
-      26,
-      70,
-      26
-    ],
-    "w": 282
-  },
-  "pm_button_leather": {
-    "atlas": "atlas_ui",
-    "h": 140,
-    "rect": [
-      0,
-      384,
-      401,
-      140
-    ],
-    "slice": [
-      64,
-      44,
-      64,
-      44
-    ],
-    "w": 401
-  },
-  "pm_button_leather_disabled": {
-    "h": 141,
-    "slice": [
-      64,
-      44,
-      64,
-      44
-    ],
-    "w": 405
-  },
-  "pm_button_leather_hover": {
-    "h": 141,
-    "slice": [
-      64,
-      44,
-      64,
-      44
-    ],
-    "w": 406
-  },
-  "pm_button_leather_pressed": {
-    "h": 141,
-    "slice": [
-      64,
-      44,
-      64,
-      44
-    ],
-    "w": 404
-  },
-  "pm_button_paper": {
-    "atlas": "atlas_hud",
-    "h": 64,
-    "rect": [
-      262,
-      220,
-      129,
-      64
-    ],
-    "slice": [
-      22,
-      18,
-      22,
-      18
-    ],
-    "w": 129
-  },
-  "pm_button_parchment": {
-    "atlas": "atlas_pieces",
-    "h": 159,
-    "rect": [
-      134,
-      318,
-      386,
-      159
-    ],
-    "slice": [
-      56,
-      48,
-      56,
-      48
-    ],
-    "w": 386
-  },
-  "pm_button_parchment_disabled": {
-    "h": 159,
-    "slice": [
-      56,
-      48,
-      56,
-      48
-    ],
-    "w": 386
-  },
-  "pm_button_parchment_hover": {
-    "h": 159,
-    "slice": [
-      56,
-      48,
-      56,
-      48
-    ],
-    "w": 387
-  },
-  "pm_button_parchment_pressed": {
-    "h": 159,
-    "slice": [
-      56,
-      48,
-      56,
-      48
-    ],
-    "w": 385
-  },
-  "pm_button_reset": {
-    "atlas": "atlas_pieces",
-    "h": 77,
-    "rect": [
-      439,
-      775,
-      212,
-      77
-    ],
-    "slice": null,
-    "w": 212
-  },
-  "pm_button_square": {
-    "atlas": "atlas_pieces",
-    "h": 93,
-    "rect": [
-      286,
-      584,
-      116,
-      93
-    ],
-    "slice": [
-      26,
-      26,
-      26,
-      26
-    ],
-    "w": 116
-  },
-  "pm_button_strip": {
-    "atlas": "atlas_pieces",
-    "h": 80,
-    "rect": [
-      78,
-      775,
-      357,
-      80
-    ],
-    "slice": [
-      64,
-      26,
-      64,
-      26
-    ],
-    "w": 357
-  },
-  "pm_button_x": {
-    "atlas": "atlas_ui",
-    "h": 150,
-    "rect": [
-      721,
-      644,
-      155,
-      150
-    ],
-    "slice": null,
-    "w": 155
-  },
-  "pm_button_x_leather": {
-    "h": 53,
-    "slice": null,
-    "w": 55
-  },
-  "pm_button_zoom_in": {
-    "atlas": "atlas_map",
-    "h": 62,
-    "rect": [
-      799,
-      337,
-      62,
-      62
-    ],
-    "slice": null,
-    "w": 62
-  },
-  "pm_button_zoom_out": {
-    "atlas": "atlas_map",
-    "h": 63,
-    "rect": [
-      733,
-      337,
-      62,
-      63
-    ],
-    "slice": null,
-    "w": 62
-  },
-  "pm_card": {
-    "atlas": "atlas_ui",
-    "h": 148,
-    "rect": [
-      405,
-      492,
-      314,
-      148
-    ],
-    "slice": [
-      56,
-      48,
-      40,
-      40
-    ],
-    "w": 314
-  },
-  "pm_cat_all": {
-    "atlas": "atlas_pieces",
-    "h": 83,
-    "rect": [
-      0,
-      775,
-      74,
-      83
-    ],
-    "slice": null,
-    "w": 74
-  },
-  "pm_cat_food": {
-    "atlas": "atlas_pieces",
-    "h": 73,
-    "rect": [
-      0,
-      942,
-      79,
-      73
-    ],
-    "slice": null,
-    "w": 79
-  },
-  "pm_cat_materials": {
-    "atlas": "atlas_pieces",
-    "h": 68,
-    "rect": [
-      83,
-      942,
-      78,
-      68
-    ],
-    "slice": null,
-    "w": 78
-  },
-  "pm_cat_tools": {
-    "atlas": "atlas_pieces",
-    "h": 85,
-    "rect": [
-      877,
-      682,
-      84,
-      85
-    ],
-    "slice": null,
-    "w": 84
-  },
-  "pm_check_green": {
-    "atlas": "atlas_ui",
-    "h": 32,
-    "rect": [
-      363,
-      936,
-      32,
-      32
-    ],
-    "slice": null,
-    "w": 32
-  },
-  "pm_check_off": {
-    "atlas": "atlas_ui",
-    "h": 61,
-    "rect": [
-      898,
-      384,
-      58,
-      61
-    ],
-    "slice": null,
-    "w": 58
-  },
-  "pm_check_on": {
-    "atlas": "atlas_ui",
-    "h": 71,
-    "rect": [
-      927,
-      0,
-      70,
-      71
-    ],
-    "slice": null,
-    "w": 70
-  },
-  "pm_compass_rose": {
-    "atlas": "atlas_map",
-    "h": 117,
-    "rect": [
-      866,
-      0,
-      93,
-      117
-    ],
-    "slice": null,
-    "w": 93
-  },
-  "pm_ctab": {
-    "atlas": "atlas_pieces",
-    "h": 64,
-    "rect": [
-      252,
-      942,
-      82,
-      64
-    ],
-    "slice": [
-      16,
-      14,
-      16,
-      14
-    ],
-    "w": 82
-  },
-  "pm_ctab_selected": {
-    "atlas": "atlas_pieces",
-    "h": 64,
-    "rect": [
-      165,
-      942,
-      83,
-      64
-    ],
-    "slice": [
-      16,
-      14,
-      16,
-      14
-    ],
-    "w": 83
-  },
-  "pm_dropdown": {
-    "atlas": "atlas_ui",
-    "h": 73,
-    "rect": [
-      0,
-      936,
-      239,
-      73
-    ],
-    "slice": [
-      30,
-      26,
-      72,
-      26
-    ],
-    "w": 239
-  },
-  "pm_fill_xp": {
-    "atlas": "atlas_lobby",
-    "h": 14,
-    "rect": [
-      459,
-      869,
-      176,
-      14
-    ],
-    "slice": [
-      7,
-      6,
-      7,
-      6
-    ],
-    "w": 176
-  },
-  "pm_frame_hollow": {
-    "atlas": "atlas_map",
-    "h": 333,
-    "rect": [
-      0,
-      0,
-      774,
-      333
-    ],
-    "slice": [
-      96,
-      112,
-      96,
-      122
-    ],
-    "w": 774
-  },
-  "pm_frame_window": {
-    "atlas": "atlas_ui",
-    "h": 380,
-    "rect": [
-      0,
-      0,
-      743,
-      380
-    ],
-    "slice": [
-      96,
-      112,
-      96,
-      122
-    ],
-    "w": 743
-  },
-  "pm_glyph_armor": {
-    "atlas": "atlas_ui",
-    "h": 37,
-    "rect": [
-      836,
-      342,
-      39,
-      37
-    ],
-    "slice": null,
-    "w": 39
-  },
-  "pm_glyph_bag": {
-    "atlas": "atlas_ui",
-    "h": 37,
-    "rect": [
-      522,
-      903,
-      32,
-      37
-    ],
-    "slice": null,
-    "w": 32
-  },
-  "pm_glyph_bench": {
-    "atlas": "atlas_ui",
-    "h": 35,
-    "rect": [
-      747,
-      342,
-      41,
-      35
-    ],
-    "slice": null,
-    "w": 41
-  },
-  "pm_glyph_diamond": {
-    "atlas": "atlas_ui",
-    "h": 27,
-    "rect": [
-      464,
-      993,
-      24,
-      27
-    ],
-    "slice": null,
-    "w": 24
-  },
-  "pm_glyph_gamepad": {
-    "atlas": "atlas_ui",
-    "h": 42,
-    "rect": [
-      960,
-      446,
-      58,
-      42
-    ],
-    "slice": null,
-    "w": 58
-  },
-  "pm_glyph_gear": {
-    "atlas": "atlas_ui",
-    "h": 54,
-    "rect": [
-      405,
-      954,
-      53,
-      54
-    ],
-    "slice": null,
-    "w": 53
-  },
-  "pm_glyph_hammer": {
-    "atlas": "atlas_ui",
-    "h": 32,
-    "rect": [
-      363,
-      972,
-      27,
-      32
-    ],
-    "slice": null,
-    "w": 27
-  },
-  "pm_glyph_heart": {
-    "atlas": "atlas_ui",
-    "h": 135,
-    "rect": [
-      723,
-      492,
-      160,
-      135
-    ],
-    "slice": null,
-    "w": 160
-  },
-  "pm_glyph_monitor": {
-    "atlas": "atlas_ui",
-    "h": 51,
-    "rect": [
-      464,
-      903,
-      54,
-      51
-    ],
-    "slice": null,
-    "w": 54
-  },
-  "pm_glyph_mountain": {
-    "atlas": "atlas_ui",
-    "h": 27,
-    "rect": [
-      830,
-      453,
-      44,
-      27
-    ],
-    "slice": null,
-    "w": 44
-  },
-  "pm_glyph_person": {
-    "atlas": "atlas_ui",
-    "h": 60,
-    "rect": [
-      968,
-      568,
-      50,
-      60
-    ],
-    "slice": null,
-    "w": 50
-  },
-  "pm_glyph_sound": {
-    "atlas": "atlas_ui",
-    "h": 47,
-    "rect": [
-      405,
-      903,
-      55,
-      47
-    ],
-    "slice": null,
-    "w": 55
-  },
-  "pm_glyph_sword": {
-    "atlas": "atlas_ui",
-    "h": 31,
-    "rect": [
-      464,
-      958,
-      27,
-      31
-    ],
-    "slice": null,
-    "w": 27
-  },
-  "pm_glyph_tent": {
-    "atlas": "atlas_ui",
-    "h": 35,
-    "rect": [
-      792,
-      342,
-      40,
-      35
-    ],
-    "slice": null,
-    "w": 40
-  },
-  "pm_glyph_tools": {
-    "atlas": "atlas_ui",
-    "h": 39,
-    "rect": [
-      898,
-      449,
-      40,
-      39
-    ],
-    "slice": null,
-    "w": 40
-  },
-  "pm_glyph_weight": {
-    "atlas": "atlas_ui",
-    "h": 32,
-    "rect": [
-      997,
-      492,
-      23,
-      32
-    ],
-    "slice": null,
-    "w": 23
-  },
-  "pm_hud_card": {
-    "atlas": "atlas_hud",
-    "h": 216,
-    "rect": [
-      0,
-      0,
-      296,
-      216
-    ],
-    "slice": [
-      82,
-      50,
-      36,
-      46
-    ],
-    "w": 296
-  },
-  "pm_hud_compass": {
-    "atlas": "atlas_hud",
-    "h": 44,
-    "rect": [
-      523,
-      397,
-      485,
-      44
-    ],
-    "slice": [
-      36,
-      16,
-      36,
-      16
-    ],
-    "w": 485
-  },
-  "pm_hud_food": {
-    "atlas": "atlas_hud",
-    "h": 58,
-    "rect": [
-      395,
-      220,
-      334,
-      58
-    ],
-    "slice": null,
-    "w": 334
-  },
-  "pm_hud_health": {
-    "atlas": "atlas_hud",
-    "h": 57,
-    "rect": [
-      0,
-      336,
-      334,
-      57
-    ],
-    "slice": null,
-    "w": 334
-  },
-  "pm_hud_slot": {
-    "atlas": "atlas_hud",
-    "h": 124,
-    "rect": [
-      428,
-      0,
-      127,
-      124
-    ],
-    "slice": [
-      40,
-      40,
-      40,
-      40
-    ],
-    "w": 127
-  },
-  "pm_hud_slot_selected": {
-    "atlas": "atlas_hud",
-    "h": 124,
-    "rect": [
-      559,
-      0,
-      127,
-      124
-    ],
-    "slice": [
-      40,
-      40,
-      40,
-      40
-    ],
-    "w": 127
-  },
-  "pm_hud_stamina": {
-    "atlas": "atlas_hud",
-    "h": 57,
-    "rect": [
-      338,
-      336,
-      334,
-      57
-    ],
-    "slice": null,
-    "w": 334
-  },
-  "pm_hud_xp": {
-    "atlas": "atlas_hud",
-    "h": 44,
-    "rect": [
-      0,
-      397,
-      519,
-      44
-    ],
-    "slice": null,
-    "w": 519
-  },
-  "pm_icon_add_friend": {
-    "h": 143,
-    "slice": null,
-    "w": 179
-  },
-  "pm_icon_bolt": {
-    "atlas": "atlas_pieces",
-    "h": 160,
-    "rect": [
-      0,
-      318,
-      130,
-      160
-    ],
-    "slice": null,
-    "w": 130
-  },
-  "pm_icon_chest": {
-    "atlas": "atlas_pieces",
-    "h": 170,
-    "rect": [
-      533,
-      0,
-      214,
-      170
-    ],
-    "slice": null,
-    "w": 214
-  },
-  "pm_icon_coin": {
-    "atlas": "atlas_ui",
-    "h": 166,
-    "rect": [
-      747,
-      0,
-      176,
-      166
-    ],
-    "slice": null,
-    "w": 176
-  },
-  "pm_icon_crown": {
-    "atlas": "atlas_lobby",
-    "h": 131,
-    "rect": [
-      537,
-      726,
-      168,
-      131
-    ],
-    "slice": null,
-    "w": 168
-  },
-  "pm_icon_gem": {
-    "atlas": "atlas_ui",
-    "h": 168,
-    "rect": [
-      747,
-      170,
-      128,
-      168
-    ],
-    "slice": null,
-    "w": 128
-  },
-  "pm_icon_scroll": {
-    "atlas": "atlas_pieces",
-    "h": 164,
-    "rect": [
-      751,
-      0,
-      182,
-      164
-    ],
-    "slice": null,
-    "w": 182
-  },
-  "pm_inset": {
-    "atlas": "atlas_ui",
-    "h": 318,
-    "rect": [
-      0,
-      614,
-      376,
-      318
-    ],
-    "slice": [
-      22,
-      22,
-      22,
-      22
-    ],
-    "w": 376
-  },
-  "pm_item_slot": {
-    "atlas": "atlas_ui",
-    "h": 96,
-    "rect": [
-      729,
-      384,
-      97,
-      96
-    ],
-    "slice": [
-      20,
-      20,
-      20,
-      20
-    ],
-    "w": 97
-  },
-  "pm_jtab_leather": {
-    "atlas": "atlas_pieces",
-    "h": 58,
-    "rect": [
-      338,
-      942,
-      126,
-      58
-    ],
-    "slice": [
-      20,
-      16,
-      20,
-      8
-    ],
-    "w": 126
-  },
-  "pm_jtab_paper": {
-    "atlas": "atlas_pieces",
-    "h": 54,
-    "rect": [
-      468,
-      942,
-      129,
-      54
-    ],
-    "slice": [
-      20,
-      16,
-      20,
-      8
-    ],
-    "w": 129
-  },
-  "pm_keycap": {
-    "atlas": "atlas_ui",
-    "h": 71,
-    "rect": [
-      243,
-      936,
-      116,
-      71
-    ],
-    "slice": [
-      22,
-      22,
-      22,
-      26
-    ],
-    "w": 116
-  },
-  "pm_keycap_small": {
-    "h": 71,
-    "slice": null,
-    "w": 79
-  },
-  "pm_lobby_coins": {
-    "atlas": "atlas_lobby",
-    "h": 70,
-    "rect": [
-      0,
-      869,
-      166,
-      70
-    ],
-    "slice": null,
-    "w": 166
-  },
-  "pm_lobby_enter": {
-    "atlas": "atlas_lobby",
-    "h": 184,
-    "rect": [
-      0,
-      389,
-      626,
-      184
-    ],
-    "slice": null,
-    "w": 626
-  },
-  "pm_lobby_gear": {
-    "atlas": "atlas_lobby",
-    "h": 70,
-    "rect": [
-      310,
-      869,
-      73,
-      70
-    ],
-    "slice": null,
-    "w": 73
-  },
-  "pm_lobby_gems": {
-    "atlas": "atlas_lobby",
-    "h": 70,
-    "rect": [
-      170,
-      869,
-      136,
-      70
-    ],
-    "slice": null,
-    "w": 136
-  },
-  "pm_lobby_party": {
-    "atlas": "atlas_lobby",
-    "h": 385,
-    "rect": [
-      0,
-      0,
-      437,
-      385
-    ],
-    "slice": null,
-    "w": 437
-  },
-  "pm_lobby_profile": {
-    "atlas": "atlas_lobby",
-    "h": 139,
-    "rect": [
-      0,
-      726,
-      533,
-      139
-    ],
-    "slice": null,
-    "w": 533
-  },
-  "pm_lobby_server": {
-    "atlas": "atlas_lobby",
-    "h": 75,
-    "rect": [
-      709,
-      726,
-      255,
-      75
-    ],
-    "slice": null,
-    "w": 255
-  },
   "pm_map_island": {
     "atlas": "atlas_island",
     "h": 1000,
@@ -10049,671 +7657,5 @@
     ],
     "slice": null,
     "w": 1022
-  },
-  "pm_map_label": {
-    "atlas": "atlas_map",
-    "h": 108,
-    "rect": [
-      429,
-      337,
-      300,
-      108
-    ],
-    "slice": [
-      40,
-      30,
-      40,
-      30
-    ],
-    "w": 300
-  },
-  "pm_map_pin": {
-    "atlas": "atlas_map",
-    "h": 118,
-    "rect": [
-      778,
-      0,
-      84,
-      118
-    ],
-    "slice": null,
-    "w": 84
-  },
-  "pm_panel": {
-    "atlas": "atlas_pieces",
-    "h": 314,
-    "rect": [
-      0,
-      0,
-      529,
-      314
-    ],
-    "slice": [
-      70,
-      62,
-      70,
-      62
-    ],
-    "w": 529
-  },
-  "pm_quest_row": {
-    "atlas": "atlas_pieces",
-    "h": 88,
-    "rect": [
-      280,
-      682,
-      362,
-      88
-    ],
-    "slice": [
-      40,
-      30,
-      40,
-      30
-    ],
-    "w": 362
-  },
-  "pm_quest_row_selected": {
-    "atlas": "atlas_pieces",
-    "h": 90,
-    "rect": [
-      406,
-      584,
-      364,
-      90
-    ],
-    "slice": [
-      40,
-      30,
-      40,
-      30
-    ],
-    "w": 364
-  },
-  "pm_queue_empty": {
-    "atlas": "atlas_pieces",
-    "h": 96,
-    "rect": [
-      408,
-      482,
-      404,
-      96
-    ],
-    "slice": null,
-    "w": 404
-  },
-  "pm_queue_row": {
-    "atlas": "atlas_pieces",
-    "h": 98,
-    "rect": [
-      0,
-      482,
-      404,
-      98
-    ],
-    "slice": [
-      24,
-      24,
-      60,
-      24
-    ],
-    "w": 404
-  },
-  "pm_recipe_row": {
-    "atlas": "atlas_pieces",
-    "h": 74,
-    "rect": [
-      499,
-      862,
-      405,
-      74
-    ],
-    "slice": [
-      30,
-      24,
-      60,
-      24
-    ],
-    "w": 405
-  },
-  "pm_recipe_row_selected": {
-    "atlas": "atlas_pieces",
-    "h": 76,
-    "rect": [
-      0,
-      862,
-      405,
-      76
-    ],
-    "slice": [
-      30,
-      24,
-      60,
-      24
-    ],
-    "w": 405
-  },
-  "pm_req_card": {
-    "atlas": "atlas_pieces",
-    "h": 156,
-    "rect": [
-      524,
-      318,
-      106,
-      156
-    ],
-    "slice": [
-      18,
-      18,
-      18,
-      18
-    ],
-    "w": 106
-  },
-  "pm_search_box": {
-    "atlas": "atlas_pieces",
-    "h": 46,
-    "rect": [
-      601,
-      942,
-      230,
-      46
-    ],
-    "slice": [
-      40,
-      14,
-      14,
-      14
-    ],
-    "w": 230
-  },
-  "pm_side_tab": {
-    "atlas": "atlas_pieces",
-    "h": 124,
-    "rect": [
-      760,
-      318,
-      116,
-      124
-    ],
-    "slice": null,
-    "w": 116
-  },
-  "pm_side_tab_selected": {
-    "atlas": "atlas_pieces",
-    "h": 134,
-    "rect": [
-      634,
-      318,
-      122,
-      134
-    ],
-    "slice": null,
-    "w": 122
-  },
-  "pm_slider_knob": {
-    "atlas": "atlas_ui",
-    "h": 58,
-    "rect": [
-      960,
-      384,
-      58,
-      58
-    ],
-    "slice": null,
-    "w": 58
-  },
-  "pm_sort_button": {
-    "atlas": "atlas_pieces",
-    "h": 46,
-    "rect": [
-      835,
-      942,
-      81,
-      46
-    ],
-    "slice": null,
-    "w": 81
-  },
-  "pm_stat_chip": {
-    "atlas": "atlas_hud",
-    "h": 47,
-    "rect": [
-      676,
-      336,
-      104,
-      47
-    ],
-    "slice": [
-      16,
-      14,
-      16,
-      14
-    ],
-    "w": 104
-  },
-  "pm_stat_chip_tall": {
-    "atlas": "atlas_ui",
-    "h": 72,
-    "rect": [
-      887,
-      492,
-      106,
-      72
-    ],
-    "slice": [
-      18,
-      18,
-      18,
-      18
-    ],
-    "w": 106
-  },
-  "pm_stepper_field": {
-    "atlas": "atlas_ui",
-    "h": 62,
-    "rect": [
-      887,
-      568,
-      77,
-      62
-    ],
-    "slice": [
-      10,
-      10,
-      10,
-      10
-    ],
-    "w": 77
-  },
-  "pm_stepper_minus": {
-    "atlas": "atlas_ui",
-    "h": 65,
-    "rect": [
-      927,
-      75,
-      64,
-      65
-    ],
-    "slice": null,
-    "w": 64
-  },
-  "pm_stepper_plus": {
-    "atlas": "atlas_ui",
-    "h": 65,
-    "rect": [
-      830,
-      384,
-      64,
-      65
-    ],
-    "slice": null,
-    "w": 64
-  },
-  "pm_tab_leather": {
-    "atlas": "atlas_ui",
-    "h": 104,
-    "rect": [
-      405,
-      384,
-      320,
-      104
-    ],
-    "slice": [
-      40,
-      30,
-      52,
-      30
-    ],
-    "w": 320
-  },
-  "pm_tab_paper": {
-    "atlas": "atlas_ui",
-    "h": 101,
-    "rect": [
-      405,
-      644,
-      312,
-      101
-    ],
-    "slice": [
-      40,
-      30,
-      52,
-      30
-    ],
-    "w": 312
-  },
-  "pm_tile_forge": {
-    "atlas": "atlas_lobby",
-    "h": 145,
-    "rect": [
-      630,
-      389,
-      146,
-      145
-    ],
-    "slice": null,
-    "w": 146
-  },
-  "pm_tile_inventory": {
-    "atlas": "atlas_lobby",
-    "h": 145,
-    "rect": [
-      780,
-      389,
-      146,
-      145
-    ],
-    "slice": null,
-    "w": 146
-  },
-  "pm_tile_quests": {
-    "atlas": "atlas_lobby",
-    "h": 145,
-    "rect": [
-      0,
-      577,
-      146,
-      145
-    ],
-    "slice": null,
-    "w": 146
-  },
-  "pm_tile_shop": {
-    "atlas": "atlas_lobby",
-    "h": 145,
-    "rect": [
-      150,
-      577,
-      146,
-      145
-    ],
-    "slice": null,
-    "w": 146
-  },
-  "pm_tile_trade": {
-    "atlas": "atlas_lobby",
-    "h": 145,
-    "rect": [
-      300,
-      577,
-      146,
-      145
-    ],
-    "slice": null,
-    "w": 146
-  },
-  "pm_tile_vault": {
-    "atlas": "atlas_lobby",
-    "h": 145,
-    "rect": [
-      450,
-      577,
-      146,
-      145
-    ],
-    "slice": null,
-    "w": 146
-  },
-  "pm_window_crafting": {
-    "h": 742,
-    "slice": null,
-    "tiles": [
-      [
-        "pm_window_crafting__1_1",
-        0,
-        0,
-        816,
-        742
-      ],
-      [
-        "pm_window_crafting__1_2",
-        812,
-        0,
-        817,
-        742
-      ]
-    ],
-    "w": 1629
-  },
-  "pm_window_crafting__1_1": {
-    "atlas": "atlas_window_crafting_1",
-    "h": 742,
-    "rect": [
-      0,
-      0,
-      816,
-      742
-    ],
-    "slice": null,
-    "w": 816
-  },
-  "pm_window_crafting__1_2": {
-    "atlas": "atlas_window_crafting_2",
-    "h": 742,
-    "rect": [
-      0,
-      0,
-      817,
-      742
-    ],
-    "slice": null,
-    "w": 817
-  },
-  "pm_window_forge": {
-    "h": 742,
-    "slice": null,
-    "tiles": [
-      [
-        "pm_window_forge__1_1",
-        0,
-        0,
-        816,
-        742
-      ],
-      [
-        "pm_window_forge__1_2",
-        812,
-        0,
-        817,
-        742
-      ]
-    ],
-    "w": 1629
-  },
-  "pm_window_forge__1_1": {
-    "atlas": "atlas_window_forge_1",
-    "h": 742,
-    "rect": [
-      0,
-      0,
-      816,
-      742
-    ],
-    "slice": null,
-    "w": 816
-  },
-  "pm_window_forge__1_2": {
-    "atlas": "atlas_window_forge_2",
-    "h": 742,
-    "rect": [
-      0,
-      0,
-      817,
-      742
-    ],
-    "slice": null,
-    "w": 817
-  },
-  "pm_window_inventory": {
-    "h": 786,
-    "slice": null,
-    "tiles": [
-      [
-        "pm_window_inventory__1_1",
-        0,
-        0,
-        749,
-        786
-      ],
-      [
-        "pm_window_inventory__1_2",
-        745,
-        0,
-        749,
-        786
-      ]
-    ],
-    "w": 1494
-  },
-  "pm_window_inventory__1_1": {
-    "atlas": "atlas_window_inventory_1",
-    "h": 786,
-    "rect": [
-      0,
-      0,
-      749,
-      786
-    ],
-    "slice": null,
-    "w": 749
-  },
-  "pm_window_inventory__1_2": {
-    "atlas": "atlas_window_inventory_2",
-    "h": 786,
-    "rect": [
-      0,
-      0,
-      749,
-      786
-    ],
-    "slice": null,
-    "w": 749
-  },
-  "pm_window_journal": {
-    "h": 772,
-    "slice": null,
-    "tiles": [
-      [
-        "pm_window_journal__1_1",
-        0,
-        0,
-        818,
-        772
-      ],
-      [
-        "pm_window_journal__1_2",
-        814,
-        0,
-        818,
-        772
-      ]
-    ],
-    "w": 1632
-  },
-  "pm_window_journal__1_1": {
-    "atlas": "atlas_window_journal_1",
-    "h": 772,
-    "rect": [
-      0,
-      0,
-      818,
-      772
-    ],
-    "slice": null,
-    "w": 818
-  },
-  "pm_window_journal__1_2": {
-    "atlas": "atlas_window_journal_2",
-    "h": 772,
-    "rect": [
-      0,
-      0,
-      818,
-      772
-    ],
-    "slice": null,
-    "w": 818
-  },
-  "pm_window_settings": {
-    "h": 706,
-    "slice": null,
-    "tiles": [
-      [
-        "pm_window_settings__1_1",
-        0,
-        0,
-        817,
-        706
-      ],
-      [
-        "pm_window_settings__1_2",
-        813,
-        0,
-        817,
-        706
-      ]
-    ],
-    "w": 1630
-  },
-  "pm_window_settings__1_1": {
-    "atlas": "atlas_window_settings_1",
-    "h": 706,
-    "rect": [
-      0,
-      0,
-      817,
-      706
-    ],
-    "slice": null,
-    "w": 817
-  },
-  "pm_window_settings__1_2": {
-    "atlas": "atlas_window_settings_2",
-    "h": 706,
-    "rect": [
-      0,
-      0,
-      817,
-      706
-    ],
-    "slice": null,
-    "w": 817
-  },
-  "slot_broken": {
-    "h": 146,
-    "slice": null,
-    "w": 154
-  },
-  "slot_cooldown": {
-    "h": 92,
-    "slice": null,
-    "w": 92
-  },
-  "slot_cooldown_full": {
-    "h": 146,
-    "slice": null,
-    "w": 154
-  },
-  "slot_lock": {
-    "h": 69,
-    "slice": null,
-    "w": 54
-  },
-  "slot_lock_full": {
-    "h": 145,
-    "slice": null,
-    "w": 153
-  },
-  "stat_bar_empty": {
-    "h": 83,
-    "slice": [
-      34,
-      20,
-      35,
-      26
-    ],
-    "w": 430
   }
 }

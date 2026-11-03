@@ -14,9 +14,8 @@
 -- hotbar slot as its key does, USE takes a hotbar consumable in hand and eats or
 -- drinks it as the attack input would, TAKE OFF removes worn armour, MOVE then any
 -- other slot moves or swaps it there (no precise dragging), and DROP drops it.
--- Server snapshots are the only truth. World place only. With the new HUD
--- (HudMode) its own hotbar strip draws the slots; the old strip here shows only
--- with the legacy HUD.
+-- Server snapshots are the only truth. World place only. The world HUD
+-- (HudController) draws the hotbar strip from Snapshot and Changed.
 
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -27,11 +26,9 @@ local ItemCatalog = require(ReplicatedStorage.Shared.Items.ItemCatalog)
 local InventoryModel = require(ReplicatedStorage.Shared.UI.InventoryModel)
 local ItemInfo = require(ReplicatedStorage.Shared.Items.ItemInfo)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
-local Rarity = require(ReplicatedStorage.Shared.Items.Rarity)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local SiegeRules = require(ReplicatedStorage.Shared.Combat.SiegeRules)
 local Signal = require(ReplicatedStorage.Shared.Core.Signal)
-local HudMode = require(script.Parent.Parent.Hud.HudMode)
 local Kit = require(script.Parent.Parent.Hud.Kit)
 local InventoryWindow = require(script.Parent.Parent.Hud.Screens.InventoryWindow)
 local Theme = require(script.Parent.Parent.Ui.Theme)
@@ -48,8 +45,6 @@ InventoryController.Snapshot = { slots = {}, equipped = nil }
 InventoryController.BackpackToggled = Signal.new()
 
 local player = Players.LocalPlayer
-local ui = {}
-local slotButtons = { hotbar = {} }
 local ARMOR_SLOTS = InventoryModel.ARMOR_SLOTS
 -- The chosen slot in the inventory window: {area, index}; `moving` is the slot
 -- MOVE picked up, waiting for the slot to put it in.
@@ -59,15 +54,6 @@ local tab = "Backpack"
 local window = nil
 local busy = false
 local dropSelected
-
-local function make(className: string, props, parent)
-	local instance = Instance.new(className)
-	for key, value in props do
-		instance[key] = value
-	end
-	instance.Parent = parent
-	return instance
-end
 
 -- Total quantity of a stackable item in the latest snapshot.
 function InventoryController.Count(catalogId: string): number
@@ -96,16 +82,6 @@ local function invoke(name: string, ...)
 		return false, "Request failed"
 	end
 	return success, reason
-end
-
-local function describe(slot)
-	local def = ItemCatalog.Get(slot.catalogId)
-	local name = def and def.name or slot.catalogId
-	local text = name .. (slot.quantity and (" ×" .. slot.quantity) or "") .. (slot.permanent and " (Permanent)" or "")
-	if slot.qualityRoll and slot.qualityRoll ~= 0 then
-		text ..= ("  (%+.1f%%)"):format(slot.qualityRoll * 100)
-	end
-	return text, def and def.rarity or "Common"
 end
 
 local function slotAt(area: string, index: number)
@@ -245,57 +221,6 @@ local function isArmor(slot): boolean
 	return def ~= nil and def.family == ItemCatalog.Families.Armor
 end
 
-local onWindowSlot
-
--- Kept for the old on-screen hotbar strip (shown without the new HUD): a tap
--- uses the slot, or with the window open picks it there.
-local function onSlotClicked(area: string, index: number)
-	if area == "hotbar" and not (window and window:IsOpen()) then
-		task.spawn(activateHotbar, index)
-	else
-		onWindowSlot(area .. ":" .. index)
-	end
-end
-
-local function makeSlot(area: string, index: number, parent)
-	local button = make("TextButton", {
-		Text = "",
-		BackgroundColor3 = Color3.fromRGB(36, 31, 26),
-		AutoButtonColor = true,
-		LayoutOrder = index,
-	}, parent)
-	make("UICorner", { CornerRadius = UDim.new(0, 6) }, button)
-	-- Border mode: the default (Contextual) strokes the button's empty text instead.
-	local stroke = make(
-		"UIStroke",
-		{ Thickness = 2, Color = Color3.fromRGB(70, 60, 50), ApplyStrokeMode = Enum.ApplyStrokeMode.Border },
-		button
-	)
-	local label = make("TextLabel", {
-		Size = UDim2.new(1, -6, 1, -6),
-		Position = UDim2.fromOffset(3, 3),
-		BackgroundTransparency = 1,
-		TextColor3 = Color3.fromRGB(245, 236, 222),
-		TextWrapped = true,
-		Font = Enum.Font.GothamMedium,
-		TextSize = 11,
-	}, button)
-	-- Hotbar slots show the key that selects them (rebindable, so kept current).
-	local keyLabel = make("TextLabel", {
-		Text = Binds.Label("Hotbar" .. index),
-		Size = UDim2.fromOffset(40, 14),
-		BackgroundTransparency = 1,
-		TextXAlignment = Enum.TextXAlignment.Left,
-		TextColor3 = Color3.fromRGB(200, 190, 170),
-		Font = Enum.Font.GothamBold,
-		TextSize = 11,
-	}, button)
-	button.Activated:Connect(function()
-		onSlotClicked(area, index)
-	end)
-	slotButtons[area][index] = { button = button, stroke = stroke, label = label, keyLabel = keyLabel }
-end
-
 local function itemOf(slot)
 	return slot
 		and {
@@ -357,7 +282,7 @@ end
 
 -- A slot pressed in the window: while MOVE holds an item it goes there;
 -- otherwise a filled slot is chosen and an empty one clears the choice.
-function onWindowSlot(id: string)
+local function onWindowSlot(id: string)
 	local area, index = parseCell(id)
 	if area == nil or index == nil then
 		return
@@ -502,21 +427,6 @@ local function renderWindow()
 end
 
 function InventoryController.Render()
-	local equipped = InventoryController.Snapshot.equipped
-	for index, parts in slotButtons.hotbar do
-		local slot = slotAt("hotbar", index)
-		if slot then
-			local text, rarity = describe(slot)
-			parts.label.Text = text .. "\n" .. rarity
-			parts.stroke.Color = Rarity.Colors[rarity] or Color3.fromRGB(70, 60, 50)
-		else
-			parts.label.Text = ""
-			parts.stroke.Color = Color3.fromRGB(70, 60, 50)
-		end
-		local isEquipped = equipped == index
-		parts.stroke.Thickness = if isEquipped then 4 else 2
-		parts.button.BackgroundColor3 = isEquipped and Color3.fromRGB(78, 62, 40) or Color3.fromRGB(36, 31, 26)
-	end
 	if window and window:IsOpen() then
 		renderWindow()
 	end
@@ -541,56 +451,10 @@ function dropSelected()
 end
 
 local function build()
-	local gui = make("ScreenGui", { Name = "Inventory", ResetOnSpawn = false }, player:WaitForChild("PlayerGui"))
-	ui.root = make("Frame", { Size = UDim2.fromScale(1, 1), BackgroundTransparency = 1, Visible = false }, gui)
-
-	-- The old hotbar strip, for the legacy HUD only (the new HUD draws its own).
-	local hotbar = make("Frame", {
-		Name = "Hotbar",
-		AnchorPoint = Vector2.new(0.5, 1),
-		Position = UDim2.new(0.5, 0, 1, -12),
-		Size = UDim2.fromOffset(GameConstants.HOTBAR_SLOTS * 66, 62),
-		BackgroundTransparency = 1,
-		Active = true,
-	}, ui.root)
-	make("UIGridLayout", {
-		CellSize = UDim2.fromOffset(60, 60),
-		CellPadding = UDim2.fromOffset(6, 0),
-		SortOrder = Enum.SortOrder.LayoutOrder,
-	}, hotbar)
-	for index = 1, GameConstants.HOTBAR_SLOTS do
-		makeSlot("hotbar", index, hotbar)
-	end
-	ui.hotbar = hotbar
-	hotbar.Visible = not HudMode.ReplacesLegacy()
-
-	-- Right of the hotbar, above the Craft button (the XP bar owns the bottom-left).
-	local toggle = make("TextButton", {
-		Text = "Backpack",
-		AnchorPoint = Vector2.new(0, 1),
-		Position = UDim2.new(0.5, 8 + GameConstants.HOTBAR_SLOTS * 33, 1, -46),
-		Size = UDim2.fromOffset(100, 30),
-		BackgroundColor3 = Color3.fromRGB(70, 56, 40),
-		TextColor3 = Color3.fromRGB(245, 236, 222),
-		Font = Enum.Font.GothamBold,
-		TextSize = 13,
-	}, ui.root)
-	make("UICorner", { CornerRadius = UDim.new(0, 6) }, toggle)
-	toggle.Activated:Connect(function()
-		InventoryController.ToggleBackpack()
-	end)
-	-- The new HUD's hotbar spans this spot; the nav bar keeps a Backpack button.
-	toggle.Visible = not HudMode.ReplacesLegacy()
-	-- Button and slot captions name the player's current keys.
-	local function relabel()
-		toggle.Text = ("Backpack (%s)"):format(Binds.Label("Backpack"))
-		for index, parts in slotButtons.hotbar do
-			parts.keyLabel.Text = Binds.Label("Hotbar" .. index)
-		end
+	-- The window's slot captions name the player's current keys.
+	Binds.Changed:Connect(function()
 		InventoryController.Render()
-	end
-	relabel()
-	Binds.Changed:Connect(relabel)
+	end)
 
 	-- The Inventory window: Backpack, and Equipped (hotbar and armour).
 	window = InventoryWindow.new({
@@ -686,7 +550,6 @@ function InventoryController.Start()
 	Remotes.Get("InventoryChanged").OnClientEvent:Connect(function(snapshot)
 		InventoryController.Snapshot = snapshot
 		local inRun = #snapshot.slots > 0 or player:GetAttribute("SessionState") == "ActiveRun"
-		ui.root.Visible = inRun
 		bindKeys(inRun)
 		InventoryController.Render()
 		InventoryController.Changed:Fire(snapshot)
@@ -696,7 +559,6 @@ function InventoryController.Start()
 	end)
 	player:GetAttributeChangedSignal("SessionState"):Connect(function()
 		local inRun = player:GetAttribute("SessionState") == "ActiveRun"
-		ui.root.Visible = inRun
 		bindKeys(inRun)
 		-- Leaving the run closes the window over the emptied inventory.
 		if not inRun and InventoryController.IsOpen() then

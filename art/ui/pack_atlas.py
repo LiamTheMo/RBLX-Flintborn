@@ -17,7 +17,8 @@ files and ids as the fallback while an atlas is not uploaded.
 Art too big for one image (the screens' window frames) is packed as its
 tiles, each at full resolution.
 
-slice_parchment.py runs this after slicing, since it rewrites the manifest.
+Run it after slice_lobby_kit.py, glyphs.py, render_island.py or
+build_item_icons.py change a sprite's size (build_item_icons.py runs it).
 """
 import io
 import json
@@ -51,61 +52,13 @@ def item_groups():
 
 
 GROUPS = {
-    # What the lobby shows on joining (the popups' panel opens later).
-    "atlas_lobby": [
-        "pm_lobby_profile", "pm_lobby_enter", "pm_lobby_party", "pm_lobby_server",
-        "pm_lobby_coins", "pm_lobby_gems", "pm_lobby_gear", "pm_fill_xp", "pm_icon_crown",
-        "pm_button_add_friend", "pm_tile_inventory", "pm_tile_vault", "pm_tile_quests",
-        "pm_tile_shop", "pm_tile_forge", "pm_tile_trade",
-    ],
-    # What the in-world HUD shows during a run.
-    "atlas_hud": [
-        "pm_hud_compass", "pm_hud_health", "pm_hud_stamina", "pm_hud_food", "pm_hud_xp",
-        "pm_hud_slot", "pm_hud_slot_selected", "pm_hud_card", "pm_stat_chip", "pm_button_paper",
-        "compass_marker", "icon_run", "icon_storm", "icon_mountain", "icon_tower", "icon_waypoint",
-    ],
-    # The kit every window shares (ListWindow, Parchment controls, notice cards):
-    # the Market, Progress and Trade windows need only this.
-    "atlas_ui": [
-        "pm_frame_window", "pm_inset", "pm_button_leather", "pm_button_claim", "pm_tab_leather",
-        "pm_tab_paper", "pm_card", "pm_button_x", "pm_button_check", "pm_icon_coin", "pm_icon_gem",
-        "pm_stat_chip_tall", "pm_check_green", "pm_check_on", "pm_check_off", "pm_slider_knob",
-        "pm_stepper_field", "pm_stepper_minus", "pm_stepper_plus", "pm_dropdown", "pm_keycap",
-        "pm_item_slot", "pm_glyph_armor", "pm_glyph_bag", "pm_glyph_bench", "pm_glyph_diamond",
-        "pm_glyph_gamepad", "pm_glyph_gear", "pm_glyph_hammer", "pm_glyph_heart", "pm_glyph_monitor",
-        "pm_glyph_mountain", "pm_glyph_person", "pm_glyph_sound", "pm_glyph_sword", "pm_glyph_tent",
-        "pm_glyph_tools", "pm_glyph_weight",
-    ],
-    # The pieces of the Crafting, Forge, Inventory, Journal and Settings screens
-    # and the lobby's popups.
-    "atlas_pieces": [
-        "pm_panel", "pm_button_parchment", "pm_recipe_row", "pm_recipe_row_selected", "pm_queue_row",
-        "pm_queue_empty", "pm_req_card", "pm_search_box", "pm_ctab", "pm_ctab_selected",
-        "pm_button_craft", "pm_side_tab", "pm_side_tab_selected", "pm_sort_button", "pm_cat_all",
-        "pm_cat_food", "pm_cat_materials", "pm_cat_tools", "pm_button_action", "pm_button_square",
-        "pm_arrow_left", "pm_arrow_right", "pm_icon_chest", "pm_quest_row", "pm_quest_row_selected",
-        "pm_jtab_leather", "pm_jtab_paper", "pm_button_strip", "pm_icon_bolt", "pm_icon_scroll",
-        "pm_button_apply", "pm_button_reset",
-    ],
-    # The world map's frame, the map pieces the Journal shares, and the run's
-    # interaction prompt frame.
-    "atlas_map": [
-        "pm_frame_hollow", "pm_compass_rose", "pm_map_pin", "pm_map_label", "pm_button_zoom_in",
-        "pm_button_zoom_out", "frame_bar_hollow",
-    ],
-    # The island map painting (Journal and world map).
+    # The island map painting (Journal and world map), pm_map_island: the one
+    # piece of the parchment-era art still drawn (KitModel role map.island).
     "atlas_island": ["pm_map_island"],
-    # Each screen's window frame is two tiles (too wide for one image), each in
-    # an atlas of its own at full resolution.
-    **{
-        f"atlas_window_{screen}_{half}": [f"pm_window_{screen}__1_{half}"]
-        for screen in ("crafting", "forge", "inventory", "journal", "settings")
-        for half in (1, 2)
-    },
     # Lobby kit (lk_): everything the lobby HUD draws on join except item art, and
     # what the run HUD and every window share with it (slot, row, small-button and
     # dot states, badges, bars, stat frame, rings), so the lobby's first screen
-    # needs this atlas and atlas_lk_items only (docs/ui/ARCHITECTURE.md §6).
+    # needs this atlas and the item icon atlases only (docs/ui/ARCHITECTURE.md §6).
     "atlas_lk_lobby": [
         "lk_badge_count", "lk_badge_count_wide", "lk_badge_number", "lk_bar_fill_blue", "lk_bar_fill_green",
         "lk_bar_fill_orange", "lk_bar_fill_red", "lk_bar_fill_yellow", "lk_bar_frame", "lk_bar_frame_plain",
@@ -160,7 +113,11 @@ GROUPS = {
         "lk_icon_mail", "lk_icon_map", "lk_icon_map_pin", "lk_icon_mountain", "lk_icon_paw", "lk_icon_ruin",
         "lk_icon_totem", "lk_icon_treasure", "lk_icon_tree", "lk_icon_trophy",
     ],
-    # Item art (ItemInfo.ART_SPRITES): hotbar, inventory, forge, journal, rewards.
+    # Kit icons cut from the item drawings of the kit sheets. Items no longer
+    # draw them (every item has its own icon, atlas_lk_items2_*), but menus,
+    # stat rows, events, notices and the Journal still use most of them as
+    # icons (heart, star, warning, tusk, build, campfire, ...), and the atlas is
+    # uploaded, so the group keeps every sprite and its packing.
     "atlas_lk_items": [
         "lk_icon_berries", "lk_icon_bone", "lk_icon_build", "lk_icon_campfire", "lk_icon_crystals",
         "lk_icon_drumstick", "lk_icon_hatchet", "lk_icon_heart", "lk_icon_hide", "lk_icon_lightning",
@@ -207,33 +164,13 @@ GROUPS = {
         "lk_icon_portal__hi", "lk_icon_scroll__hi", "lk_icon_totem__hi", "lk_icon_treasure__hi",
         "lk_icon_trophy__hi", "lk_icon_tusk__hi",
     ],
-    # Item art's hero copies (slice_lobby_kit.py HERO, 356 px on the long side;
-    # the armour stand-in glyph from glyphs.py): the Forge / Crafting picture and
-    # the Inventory detail card. The tools the Forge and Crafting pictures show
-    # first, then the other items in three atlases.
-    "atlas_lk_items_hi_1": [
-        "lk_glyph_ink_backpack__hi", "lk_icon_build__hi", "lk_icon_campfire__hi", "lk_icon_hatchet__hi",
-        "lk_icon_pickaxe__hi", "lk_icon_spear__hi", "lk_icon_stone_axe__hi", "lk_icon_torch__hi",
-    ],
-    "atlas_lk_items_hi_2": [
-        "lk_icon_hide__hi", "lk_icon_logs__hi", "lk_icon_magma_ore__hi", "lk_icon_mushroom__hi",
-        "lk_icon_plant_fiber__hi", "lk_icon_runestone__hi", "lk_icon_tusk__hi2",
-    ],
-    "atlas_lk_items_hi_3": [
-        "lk_icon_berries__hi", "lk_icon_bone__hi", "lk_icon_crystals__hi", "lk_icon_drumstick__hi",
-        "lk_icon_lightning__hi", "lk_icon_rope__hi", "lk_icon_stone__hi",
-    ],
-    "atlas_lk_items_hi_4": [
-        "lk_icon_heart__hi", "lk_icon_plank__hi", "lk_icon_rocks__hi", "lk_icon_star__hi", "lk_icon_stones__hi",
-        "lk_icon_warning__hi",
-    ],
     # The island painting at 2040 px (render_island.py), 2 x 2 tiles of at most
     # 1024 px, each an atlas of its own: the world map draws it up to 2600 design
     # px wide, so the 1,000 px painting was magnified.
     **{f"atlas_island_hi_{row}_{col}": [f"pm_map_island__hi__{row}_{col}"] for row in (1, 2) for col in (1, 2)},
     # Every catalog item's own icon (art/ui/items/ICONS.json `atlas`), 110 px,
-    # 81 an atlas: new atlases, so atlas_lk_items keeps its bytes and rects; until
-    # they are uploaded, items draw their old kit art (Kit/Art.ItemIcon).
+    # 81 an atlas (Kit.ItemIcon; until an atlas has loaded on a client its items
+    # show their kind glyph).
     **item_groups(),
 }
 

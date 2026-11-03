@@ -34,6 +34,10 @@ RETIRED = (
         "CraftingPanel", "InventoryPanel", "ItemSlot", "JournalPanel", "LobbyHud", "LobbyPopups",
         "Parchment", "SettingsPanel",
     )),
+    # The plain fallback UI shown only when the kit HUD failed to build: the
+    # navigation button bar and the survival bars (the kit HUD draws both).
+    ("StarterPlayer", "StarterPlayerScripts", "Client", "Controllers", "NavController"),
+    ("StarterPlayer", "StarterPlayerScripts", "Client", "Controllers", "SurvivalHudController"),
 )
 # Every cloud save goes through this. Each Luau task's server inserts the engine's
 # default player scripts (a PlayerModule in StarterPlayer, RbxCharacterSounds in

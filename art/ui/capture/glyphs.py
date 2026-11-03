@@ -12,12 +12,6 @@ and prints their manifest entries for the asset artist's manifest and GROUPS.
 
 Where the sheets have no drawing of the mockup's glyph, the closest icon stands
 in (the "source" column; KIT.md lists them).
-
-Glyphs in HERO (the stand-in Kit.ItemIcon draws for armour without art) also
-get a hero copy, `<name>__hi`: the source icon resampled from its kit sheet at
-the size the Forge picture draws the glyph at 1440p (slice_lobby_kit.py HERO_PX
-x 0.62), then recoloured the same way. Its manifest entries (the glyph's `hi`
-and the copy's own) are written here; run art/ui/pack_atlas.py afterwards.
 """
 import json
 from pathlib import Path
@@ -29,7 +23,6 @@ from PIL import Image
 
 ROOT = Path(__file__).resolve().parents[3]
 SPRITES = ROOT / "art" / "ui" / "sprites"
-MANIFEST = SPRITES / "manifest.json"
 sys.path.insert(0, str(ROOT / "art" / "ui"))
 import slice_lobby_kit as kit  # noqa: E402
 COLOURS = {"ink": (0x22, 0x0A, 0x01), "white": (0xFF, 0xFF, 0xFE)}
@@ -57,10 +50,6 @@ GLYPHS = {
 }
 
 
-# Glyphs drawn in the hero boxes: Kit.ItemIcon's kind glyph is 0.62 of its box.
-HERO = {"lk_glyph_ink_backpack"}
-HERO_GLYPH_PX = int(np.ceil(int(kit.HERO_BOX * 0.62) * kit.HERO_UI))
-
 
 def build(source, mode: str, rgb):
     """The glyph of icon `source` (a PNG path, or a float RGBA array)."""
@@ -86,34 +75,7 @@ def main():
             image = build(source, mode, rgb)
             image.save(SPRITES / f"{name}.png")
             entries[name] = {"file": f"{name}.png", "w": image.width, "h": image.height, "slice": None}
-            if name in HERO:
-                hero(name, icon, mode, rgb)
     print(json.dumps(entries, indent=2))
-
-
-def hero(name: str, icon: str, mode: str, rgb):
-    """Writes glyph `name`'s hero copy from icon `icon`'s kit-sheet crop and
-    links it in the manifest."""
-    part = next(p for p in kit.PARTS if p["name"] == f"lk_icon_{icon}")
-    ctx = {}
-    base, _ = kit.build_part(part, ctx)
-    source, (ow, oh) = ctx["source"], ctx["size"]
-    f = HERO_GLYPH_PX / max(base.shape[:2])
-    up = f / min(source.shape[1] / ow, source.shape[0] / oh)
-    copy, f, _ = kit.build_copy(part, base, ctx, f, sharpen=up if up > 1 else None)
-    image = build(copy, mode, rgb)
-    copy_name = name + kit.HI_SUFFIX
-    image.save(SPRITES / f"{copy_name}.png")
-    manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
-    manifest[name]["hi"] = copy_name
-    entry = {"file": f"{copy_name}.png", "w": image.width, "h": image.height, "slice": None,
-             "scale": round(f, 4), "of": name}
-    prev = manifest.get(copy_name, {})
-    if prev.get("atlas") and (prev.get("w"), prev.get("h")) == (image.width, image.height):
-        entry["atlas"], entry["rect"] = prev["atlas"], prev["rect"]
-    manifest[copy_name] = entry
-    MANIFEST.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
-    print(f"{copy_name}: {image.width}x{image.height} x{f:.3f}")
 
 
 if __name__ == "__main__":

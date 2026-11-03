@@ -21,10 +21,10 @@ from roblox_live_publish import Cloud  # noqa: E402
 ROOT = Path(__file__).resolve().parents[1]
 IDS = ROOT / "src" / "shared" / "UI" / "UiAssetIds.json"
 DECALS = ROOT / "art" / "ui" / "uploaded_decals.json"
-# A spread of old and new sprites: the first HUD upload, the lobby, a menu
-# window, the in-world HUD and the one uploaded as an Image.
-SAMPLE = ["button_add_friend", "frame_slot", "pm_panel", "pm_lobby_enter", "pm_frame_window",
-          "pm_hud_slot", "pm_map_pin"]
+# A spread of what the game draws: the lobby and window kit, the icons, the
+# island map, both item icon atlases and one item's hero picture.
+SAMPLE = ["atlas_lk_lobby", "atlas_lk_window", "atlas_lk_icons", "atlas_island", "atlas_lk_items2_1",
+          "atlas_lk_items2_2", "lk_item_Wood__hi"]
 
 PROBE = """
 local AssetService = game:GetService("AssetService")
@@ -51,10 +51,10 @@ try("ui assets", function()
 	for _ in UiAssets.Ids do
 		count += 1
 	end
-	local window = UiAssets.sprite("pm_window_settings")
-	return ("%d ids; pm_panel %s; pm_hud_slot %s; settings window tiles %s"):format(count,
-		tostring(UiAssets.image("pm_panel")), tostring(UiAssets.image("pm_hud_slot")),
-		tostring(window and window.tiles and #window.tiles))
+	local wood = UiAssets.sprite("lk_item_Wood")
+	return ("%d ids; atlas_lk_lobby %s; lk_item_Wood in %s %s; its hero %s"):format(count,
+		tostring(UiAssets.image("atlas_lk_lobby")), tostring(wood and wood.atlas),
+		tostring(wood and UiAssets.image(wood.atlas)), tostring(UiAssets.image("lk_item_Wood__hi")))
 end)
 try("kit tokens", function()
 	local tokens = require(Shared.UI.KitTokens)
@@ -144,8 +144,8 @@ def main(argv=None):
         if str(ids.get(name) or "").isdigit():
             entries.append((name, int(ids[name])))
     # A decal id is not an image: it should fail, which shows the probe can tell.
-    if "pm_panel" in decals:
-        entries.append(("pm_panel(decal)", int(decals["pm_panel"])))
+    if "atlas_lk_lobby" in decals:
+        entries.append(("atlas_lk_lobby(decal)", int(decals["atlas_lk_lobby"])))
     table = "{" + ", ".join('{"%s", %d}' % (name, asset) for name, asset in entries) + "}"
     result = Cloud().task(PROBE.replace("ENTRIES", table, 1))
     for value in (result.get("output") or {}).get("results", []):

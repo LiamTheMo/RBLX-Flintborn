@@ -94,7 +94,7 @@ so callers write `local Kit = require(Hud.Kit)` and then `Kit.Button.new(...)`.
 |---|---|
 | `init.luau` | `Kit.Tokens`, `Kit.Art`, `Kit.Interact`, `Kit.Motion`, `Kit.Sound`, `Kit.Scale`, `Kit.Modal`, plus every component below |
 | `Tokens.luau` | Reads `src/shared/UI/KitTokens.json`. Provides `Tokens.Color(key)`, `Tokens.Font(role)`, `Tokens.TextStyle(role)`, `Tokens.Space(key)`, `Tokens.Motion(key)`, `Tokens.Order(key)` |
-| `Art.luau` | Role → `lk_*` sprite table (`Art.ROLES`), `Art.Image(role, props, parent)`, `Art.Set(holder, role)` (state swap), `Art.Icon(id)`, `Art.ItemIcon(catalogId)`, and fallbacks drawn before upload |
+| `Art.luau` | Role → `lk_*` sprite table (`Art.ROLES`), `Art.Image(role, props, parent)`, `Art.Set(holder, role)` (state swap), `Art.Icon(id)`, `Art.ItemIcon(catalogId)` (the item's own `lk_item_<id>`; its kind glyph stands in until the atlas loads), and fallbacks drawn before upload |
 | `Interact.luau` | The state machine shared by every interactive component (see 2.3) |
 | `Motion.luau` | Tween presets from tokens, `Motion.Play(inst, key, goal)` (cancels running tweens per instance/property), honours `Theme.ReducedMotion()` |
 | `Sound.luau` | `Sound.Play(key)`: hover, click, open, close, error, success. Ids come from tokens; an empty id is silent |
@@ -386,7 +386,7 @@ place and keeps its public API.
 | | |
 |---|---|
 | Module | `Hud/Screens/LobbyHud.luau` (New), replacing `Hud/LobbyHud.luau` and `Hud/LobbyPopups.luau` |
-| Controller | `Controllers/LobbyHudController.luau` (rewrite). Keeps the `HudMode.ReplacesLobby()` gate and the fallback to `LobbyController.BuildFallback()` |
+| Controller | `Controllers/LobbyHudController.luau` (rewrite). Keeps the `HudMode.ReplacesLobby()` gate; if the HUD fails to build it logs the error and calls `HudMode.SetLobbyFailed()` (the older `LobbyController.BuildFallback()` panel was removed) |
 
 | Element | Data source |
 |---|---|
@@ -522,12 +522,11 @@ There is no server selection anywhere.
 | World map | `MapController` on `Kit.Screen` / Window; `IslandMap` | `EventAnnounced`, `EventEnded`, `PortalKind`, `SafeName` | Window, IconButton zoom ±, map frame (15) |
 | Field crafting | RecipeWindow, crafting mode | §4.6 | |
 | In-world HUD | `HudController` + `Hud/Vitals`, `BottomBar`, `PartyFrames`, `Compass`, `ObjectivePanel`, `EventPanel`, `InteractionPrompt`, `DamageNumbers` (Rewrite) | Humanoid health, `Stamina`, `Food`, `MedicineLockUntil`, `FoodHealing`; inventory snapshot; events | Bar with frame "stat" (08, 20), Slot with hotkey badge (`Binds.Label("HotbarN")`), PlayerRow mini, Panel plaques, KeyCap in prompts |
-| World tiles | `NavController` | — | IconButton tile |
+| World tiles | `HudController` menu tiles (the plain `NavController` bar was removed) | — | IconButton tile |
 | Notices and toasts | `Hud/NoticeCard.luau` (Rewrite onto Kit card + Toast), `NoticeController` (`Notice`), trade and party invites | — | Toast, ConfirmDialog |
 | World menu (protected arrival) | `WorldMenuController` (`RequestPlay`, `ReturnToLobby`) | — | Window, Button play, Toast |
 | Overlays | `BoostHud`, `BossUi` (`BossAlert`), `Downed`, `Extraction`, `EventFeed`, `Tutorial`, `Loot` (`CorpseOpened`/`CorpseTake`/`DeathSummary`), `Storage` (`ChestOpened`/`ChestTake`/`ChestPut`), `Tribe` (`TribeAction`/`TribeChanged`), `Build` palette | — | Panel plaques in TopStack, Bar, Slot grids, Window, Button |
 | Deploy check | PlayController ConfirmDialog | §4.5 | |
-| `LobbyController.BuildFallback` | unchanged plain fallback | — | It must not depend on Kit: it is the fallback if Kit fails |
 
 ### 4.9 Cross-screen contracts
 
@@ -601,10 +600,13 @@ As built (`art/ui/pack_atlas.py` GROUPS): `atlas_lk_lobby`, `atlas_lk_window`,
 `atlas_lk_icons` and `atlas_lk_items` (uploaded; the planned controls, slots
 and world-HUD atlases fit into the lobby and window ones), plus
 `atlas_lk_play` (D26, its own atlas so the four uploaded ones keep their bytes
-and rects).
+and rects), the item icons' `atlas_lk_items2_1` / `_2` (every catalog item's
+own `lk_item_<id>`; `atlas_lk_items` keeps the kit icons cut from item
+drawings, which items no longer draw but menus, stat rows and events do) and
+`atlas_island` with its `atlas_island_hi_*` tiles.
 
-Old `atlas_lobby`, `atlas_hud`, `atlas_ui`, `atlas_pieces`, `atlas_map` and
-`atlas_window_*` stay until §9.
+The old `atlas_lobby`, `atlas_hud`, `atlas_ui`, `atlas_pieces`, `atlas_map` and
+`atlas_window_*` are removed (§9).
 
 ---
 
@@ -664,7 +666,7 @@ One owner per file. Ask the owner for a change; never edit another agent's file.
 | **S5 Play** | `Hud/Screens/PlayWindow.luau`, `Controllers/PlayController.luau`, `src/shared/UI/PlayModel.luau` (`LoadoutHotbar`, carrying summary) + spec, scenes `play*` |
 | **S6 Forge/Crafting** | `Hud/Screens/RecipeWindow.luau`, `Controllers/ForgeController.luau`, `Controllers/CraftingController.luau`, deletes `Hud/CraftingPanel.luau`, scenes `forge*`, `crafting*` |
 | **S7 Journal** | `Hud/Screens/JournalWindow.luau`, `Controllers/JournalController.luau`, `Hud/IslandMap.luau`, deletes `Hud/JournalPanel.luau`, scenes `journal*` |
-| **W1 World HUD** | `Controllers/HudController.luau`, `NavController.luau`, `SurvivalHudController.luau`, `CombatController.luau` (touch buttons), `Hud/Vitals`, `BottomBar`, `PartyFrames`, `Compass`, `ObjectivePanel`, `EventPanel`, `InteractionPrompt`, `DamageNumbers`, `Hud/Layout.luau`, `src/shared/UI/HudLayout.json`, `art/ui/preview_hud.py`, scenes `hud.luau`, `world_hud*` |
+| **W1 World HUD** | `Controllers/HudController.luau`, `NavController.luau` and `SurvivalHudController.luau` (both since removed, §9), `CombatController.luau` (touch buttons), `Hud/Vitals`, `BottomBar`, `PartyFrames`, `Compass`, `ObjectivePanel`, `EventPanel`, `InteractionPrompt`, `DamageNumbers`, `Hud/Layout.luau`, `src/shared/UI/HudLayout.json`, `art/ui/preview_hud.py`, scenes `hud.luau`, `world_hud*` |
 | **W2 World overlays and notices** | `Controllers/BoostHudController`, `BossUiController`, `DownedController`, `ExtractionController`, `EventFeedController`, `TutorialController`, `LootController`, `StorageController`, `TribeController`, `BuildController`, `WorldMenuController`, `NoticeController`, `Hud/NoticeCard.luau`, `src/client/Ui/Theme.luau`, scenes `notices`, `world_overlays`, `world_menu` |
 | **W3 Lists and map** | `Hud/ListWindow.luau`, `Controllers/WalletController`, `TradeController`, `ProgressionController`, `MapController`, scenes `market_flow`, `trade_flow`, `progress_flow`, `map_flow` |
 | **I1 Integration / server** | `src/shared/Net/Remotes.luau`, `src/shared/Admission/PartyRules.luau`, `src/server/Services/PartyService.luau`, `DeployService.luau`, `Controllers/LobbyController.luau`, `Hud/HudMode.luau`, `tests/luau/party_ready.spec.luau`, `tests/luau/followup_party.spec.luau` |
@@ -697,8 +699,16 @@ seen working in game.
 | `art/ui/slice_parchment.py`, `art/ui/slice_ui.py`, `art/ui/preview_hud.py` | their outputs are gone |
 | Old capture scenes (`lobby`, `lobby_phone`, `inventory`, `inventory_flow`, `vault_flow`, `settings`, `settings_flow`, `journal`, `journal_flow`, `crafting`, `crafting_flow`, `forge_flow`, `hud`) | replaced by the new scenes of the same owner |
 | Old specs `docs/ui/{Lobby,Hud,Inventory,Settings,Journal,Crafting}Screen.md`, `ListWindows.md` | replaced by the analysts |
+| The plain fallback UI shown only when the kit HUD failed to build (Gotham fonts, literal colours): `NavController` (button bar), `SurvivalHudController` (survival bars), `LobbyController.BuildFallback` and its panel, InventoryController's hotbar strip and Backpack button, CraftingController's Craft button, MapController's compass text, `Theme.FALLBACK` / `TOUCH_TARGET` | the kit HUDs are the only path: a failed build is logged (`[Hud]`, `[LobbyHud]`) |
+| The older item art: `ItemInfo.Icon` / `ICONS` / `TINTS` / `EXACT` / `TIER_TINTS` / `ART_SPRITES` / `Sprite` / `ArtStatus`, `ItemInfo.Stats` (the older stat chips), `Widgets.HasBaseArt` and the item-atlas load gate, the kit item art's hero copies (`lk_icon_*__hi`, `atlas_lk_items_hi_*`, `lk_glyph_ink_backpack__hi`; slicer `HERO`) | every catalog item draws its own `lk_item_<id>` (STYLE_GUIDE §6.5) |
 
-Uploaded decals stay on Roblox; that is harmless.
+**Status: all done.** Everything in the table is removed; `NavController` and
+`SurvivalHudController` are listed in `RETIRED` (`scripts/roblox_live_publish.py`)
+so the deploy deletes them from the places. Kept on purpose: `pm_map_island`
+with `atlas_island` and the `atlas_island_hi_*` tiles (the island painting), and
+the uploaded `atlas_lk_items` (its `lk_icon_*` sprites are menu, stat and event
+icons). Uploaded decals stay on Roblox and in `art/ui/uploaded_decals.json`;
+that is harmless, and `--resolve` skips names the manifest no longer lists.
 
 ---
 

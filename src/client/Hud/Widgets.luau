@@ -25,9 +25,11 @@ local Widgets = {}
 -- loaded on this client: until then (and for good if it never loads) the
 -- sprite draws its 1x art, which every screen already fetches, so a slow or
 -- refused new upload can never leave a screen on stand-ins. The first time a
--- copy is wanted its image is fetched in
--- the background (after every image a label is waiting on); screens built after
--- it arrives draw the copy.
+-- copy is wanted its image is fetched in the background (after every image a
+-- label is waiting on); screens built after it arrives draw the copy, and a
+-- plain image already drawn takes it in place (upgradeWhenLoaded). Only these
+-- copies are gated: every other image (an item's slot icon atlas included)
+-- draws from the moment it has an id, the kit standing in until it loads.
 local HI_ATLASES: { [string]: boolean } = {}
 for name, entry in UiAssets.Sprites do
 	if type(name) == "string" and string.find(name, "__hi", 1, true) and type(entry) == "table" then
@@ -36,15 +38,6 @@ for name, entry in UiAssets.Sprites do
 		else
 			HI_ATLASES[name] = true
 		end
-	end
-end
--- The item icon atlases (atlas_lk_items2_*) are new uploads too: an item draws
--- its new icon only once that atlas has loaded on this client, and its older
--- art until then (Art.ItemIcon asks HasBaseArt), so a slow or not-yet-served
--- upload never leaves a slot on a stand-in.
-for _, entry in UiAssets.Sprites do
-	if type(entry) == "table" and type(entry.atlas) == "string" and string.find(entry.atlas, "^atlas_lk_items2_") then
-		HI_ATLASES[entry.atlas] = true
 	end
 end
 local warming: { [string]: () -> () } = {}
@@ -218,14 +211,6 @@ function Widgets.HasArt(name: string): boolean
 	return placement(name) ~= nil
 end
 
--- True when sprite `name`'s own (1x) art is uploaded: its atlas or its own
--- image, copies aside. Art that has only a high-resolution copy uploaded would
--- draw nothing in a slot, so a caller choosing between two sprites (an item's
--- new icon or its older kit art) asks this.
-function Widgets.HasBaseArt(name: string): boolean
-	return placement(name, 0) ~= nil
-end
-
 -- Image properties a nine-piece sprite's holder passes on to its pieces.
 local PASSED_ON = { "ImageColor3", "ImageTransparency", "ZIndex" }
 
@@ -341,6 +326,33 @@ local function tiled(name: string, sprite, props, parent: Instance?): GuiObject?
 	return holder
 end
 
+-- When a sharper copy of sprite `name` would draw at magnification `mag` but
+-- its image has not loaded on this client yet (readyImage: an item's hero
+-- copy), `image` keeps the art it draws now (image `drawn`) and takes the copy
+-- in place once that image loads.
+local function upgradeWhenLoaded(image: ImageLabel, name: string, mag: number?, drawn: string)
+	local wanted = UiAssets.Placement(name, mag)
+	if wanted == nil or wanted.image == nil or wanted.image == drawn or wanted.entry.tiles ~= nil then
+		return
+	end
+	local target = wanted.image :: string
+	local stop
+	stop = SpriteLoader.OnState(target, function(state)
+		if state ~= "loaded" or image.Parent == nil then
+			return
+		end
+		stop()
+		local rect = wanted.rect
+		image.ImageRectOffset = if rect then Vector2.new(rect[1], rect[2]) else Vector2.zero
+		image.ImageRectSize = if rect then Vector2.new(rect[3], rect[4]) else Vector2.zero
+		image.Image = ""
+		SpriteLoader.Assign(image, target)
+	end)
+	image.Destroying:Connect(function()
+		stop()
+	end)
+end
+
 -- An image from the art sheets by sprite name, or its styled fallback. A sprite
 -- packed into an uploaded atlas (art/ui/pack_atlas.py) is drawn as its
 -- rectangle of the atlas, so a screen fetches one image for many sprites (phones
@@ -351,7 +363,8 @@ end
 -- passes it, other callers leave it to the drawn size in `props`.
 function Widgets.Sprite(name: string, props, parent: Instance?, sliceScale: number?, mag: number?): GuiObject
 	local whole = UiAssets.sprite(name)
-	local art = whole and placement(name, mag or magnification(whole, props, sliceScale))
+	local m = if whole then mag or magnification(whole, props, sliceScale) else nil
+	local art = whole and placement(name, m)
 	if whole == nil or art == nil then
 		return fallback(name, props, parent)
 	end
@@ -370,6 +383,9 @@ function Widgets.Sprite(name: string, props, parent: Instance?, sliceScale: numb
 		image.ImageRectSize = Vector2.new(art.rect[3], art.rect[4])
 	end
 	SpriteLoader.Assign(image, id)
+	if not sliced then
+		upgradeWhenLoaded(image, name, m, id)
+	end
 	local center = sliced and UiAssets.sliceCenter(art.name)
 	if center then
 		-- The drawn image's own pixel insets, scaled so the corners keep the

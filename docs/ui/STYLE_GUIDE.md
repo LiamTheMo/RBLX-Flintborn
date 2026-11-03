@@ -9,7 +9,7 @@ is the authority, this guide summarises it and links to it:
 | [ARCHITECTURE.md](ARCHITECTURE.md) | The contract: scaling, ScreenGuis, the Kit's structure, server work, atlas plan, file ownership. **§12 decisions (D1–D30) override everything else**, this guide included |
 | [KIT.md](KIT.md) | The Kit's API: every component's constructor, props, methods and states; roles; stand-ins; capture limits |
 | Screen specs: [LobbyScreen](LobbyScreen.md), [InventoryScreen](InventoryScreen.md), [SettingsScreen](SettingsScreen.md), [PartyScreen](PartyScreen.md), [PlayScreen](PlayScreen.md), [ForgeScreen](ForgeScreen.md), [CraftingScreen](CraftingScreen.md), [JournalScreen](JournalScreen.md), [ListWindows](ListWindows.md), [HudScreen](HudScreen.md) | Per-screen measurements, element trees, data and deviations |
-| [ITEM_ART.md](ITEM_ART.md) | Which art and tint every catalog item draws |
+| [ITEM_ART.md](ITEM_ART.md) | Every catalog item's icon: source PNG and atlas |
 | [`art/ui/kit/CATALOG.md`](../../art/ui/kit/CATALOG.md) | Every `lk_` sprite: source sheet and box, size, 9-slice insets, atlas, role (generated) |
 | [`art/reference/ui/lobby/README.md`](../../art/reference/ui/lobby/README.md) | The reference images (mockups and kit sheets) |
 | [UI_PROGRESS.md](UI_PROGRESS.md) | Status of every screen and the verification rounds |
@@ -688,22 +688,30 @@ pressed > open > focused > hover > empty > normal. Force any state with the
 | Square-button glyphs | + − ✓ ✕ and arrows on `paper` / `leather` / `small` / `round` squares | square buttons prefer `lk_glyph_<id>`; cream on leather |
 | White art | `lk_glyph_play`, `lk_glyph_check_white`, `lk_icon_backpack_white` | drawn white on leather, tinted ink on paper |
 
-### 6.5 Items: art, tint and the no-art placeholder
+### 6.5 Items: icons, stand-ins and the no-art placeholder
 
-- **Every item has its own icon**: `ItemInfo.ItemSprite(itemId)` →
-  `lk_item_<CatalogId>`, built from the owner's item art by
+- **Every item draws its own icon, and only that**: `ItemInfo.ItemSprite(itemId)`
+  → `lk_item_<CatalogId>`, built from the owner's item art by
   [`art/ui/items/build_item_icons.py`](../../art/ui/items/build_item_icons.py)
-  (§9.7). `Kit.ItemIcon` (through `Art.ItemIcon`) draws it once its 1x atlas is
-  uploaded (`Widgets.HasBaseArt`); until then the item keeps its older kit art,
-  `ItemInfo.Icon(itemId) → (icon name, tint?)` in
-  [`src/shared/Items/ItemInfo.luau`](../../src/shared/Items/ItemInfo.luau),
-  resolved by `ItemInfo.Sprite`, so a deploy before the upload never regresses.
-  [ITEM_ART.md](ITEM_ART.md) lists that older art (144 items: 12 exact, 83
-  stand-in, 49 none).
-- **Tints** are `ImageColor3` multiplies: they darken or shift a hue (iron
-  greyer, a berry redder) and can never lighten. Items that need lighter art
-  need real art.
-- **No art** (D23): the slot, row or detail picture shows a neutral kind glyph
+  (§9.7) and packed into `atlas_lk_items2_1` / `_2`. Every place an item is
+  shown (inventory and vault slots, the hotbars, list rows in the Market,
+  Trade, loot and storage windows, recipe rows, the Inventory detail card and
+  the Forge / Crafting picture) draws it through `Kit.ItemIcon` (`Art.ItemIcon`
+  → `Art.Icon`). There is no older item art behind it (the `ItemInfo.Icon`
+  kit-art table is gone; [ITEM_ART.md](ITEM_ART.md) lists every icon).
+- **While the icon's atlas loads** (§9.5; past `Art.GRACE`, so a normal load
+  never flashes) the picture shows the item's **kind glyph** (`Art.KindGlyph`: ⚒ tools and weapons, ▤ armour, ◇ everything else;
+  `Art.ITEM_KIND_GLYPH`), in `inkSoft` at the no-art fade, never a letter. The
+  icon replaces it by itself the moment `SpriteLoader` reports the atlas loaded
+  (`SpriteLoader.OnState`): nothing is rebuilt and no window has to be
+  reopened. The `item_icons_flow` capture checks this for slots, the hotbar,
+  list rows, recipe rows, the detail card and the Forge picture.
+- **Hero boxes** (the Forge / Crafting picture, the Inventory detail card) draw
+  the slot icon until the item's own 356 px hero copy `lk_item_<id>__hi` has
+  loaded on that client, which then takes its place in the same label
+  (`Widgets`, §9.7).
+- **No art** (D23): an id that is not a catalog item (or an icon missing from
+  the sprite table) shows the neutral kind glyph
   in `inkSoft` at transparency 0.6 (`Art.STAND_IN_FADE`): a hammer for tools and
   weapons, a backpack for armour, a chest for everything else. It reads as
   "picture missing", never as a real item; the item's name is in the
@@ -841,20 +849,14 @@ centres it.
 
 **Hero copies.** The hero boxes (the Forge and Crafting picture, 254 design px,
 and the Inventory detail card's 152 × 166 icon) pass `maxScale = false`: every
-item fills the box, the same size as any other. Parts in `HERO` (the item art,
-`ItemInfo.ART_SPRITES`) write a copy 356 px on its long side (`HERO_PX`: the
-Forge box at the 1440p window scale 1.4), named `lk_<name>__hi`, or
-`lk_<name>__hi2` after a `HIRES` copy, which it follows in the chain (the
-`__hi` entry's own `hi`). The sheets hold fewer pixels than that, so the copy
-is resampled from the cleaned sheet crop with premultiplied Lanczos plus a light
-unsharp mask (sigma 0.5 copy px per unit of upscale, amount 0.5), drops the
-faint Lanczos ringing outside the silhouette, then gets the same alpha snap, rim
-decontamination and colour bleed. `glyphs.py` writes the
-armour stand-in's `lk_glyph_ink_backpack__hi` the same way (0.62 of the box).
-A copy of scale s ≤ 2.1 draws once the art is magnified past 0.75; a sharper
-one past `UiAssets.HiFrom(s)` = max(1, s / 2.8), so it is never shrunk more
-than 2× at 1440p: the hero copies draw in the hero boxes only, and slots, rows
-and the Journal illustration keep their 1× (or 2×) art.
+item fills the box, the same size as any other. Only items are drawn there, so
+only the item icons have hero copies (`lk_item_<id>__hi`, 356 px: `HERO_PX`, the
+Forge box at the 1440p window scale 1.4), built by `build_item_icons.py` (§9.7);
+the kit parts have none. A copy of scale s ≤ 2.1 draws once the art is
+magnified past 0.75; a sharper one past `UiAssets.HiFrom(s)` = max(1, s / 2.8),
+so it is never shrunk more than 2× at 1440p: the hero copies draw in the hero
+boxes only, and slots, rows and the Journal illustration keep their 1× (or 2×)
+art.
 
 Re-running writes identical files; existing sprites stay byte-identical when
 only new parts are added. `python3 art/ui/slice_lobby_kit.py <name>` builds one
@@ -898,29 +900,36 @@ for new glyphs.
 | `atlas_lk_lobby` | What the lobby HUD draws on join plus what every window shares (slots, rows, small buttons, dots, badges, bars, the window frame) | uploaded |
 | `atlas_lk_window` | Window parts and controls (buttons and states, tabs, fields, checkboxes, toggles, sliders, tooltips, dialog) | uploaded |
 | `atlas_lk_icons` | Menu, section and status icons; ink and white glyphs | uploaded |
-| `atlas_lk_items` | Item art (`ItemInfo.ART_SPRITES`) | uploaded |
+| `atlas_lk_items` | Kit icons cut from the kit sheets' item drawings (heart, star, warning, tusk, build, campfire, hatchet, …). Items no longer draw them; menus, stat rows, events, notices and the Journal use them as icons, so the uploaded atlas stays as it is | uploaded |
 | `atlas_lk_play` | The sheet-21 Play art (D26), 1024 × 256 | new: uploaded by the owner |
 | `atlas_island` | The island painting | uploaded |
 | `atlas_lk_lobby_hi` | High-resolution copies: frames, bars, slots, paper buttons, pills, tile frame, round frame, toast, panel | new: uploaded by the owner |
 | `atlas_lk_window_hi` | High-resolution copies: dialog, leather buttons, tabs, plaques, inset panel, steppers, clasps, play glyph | new: uploaded by the owner |
 | `atlas_lk_journal_hi` | High-resolution Journal illustrations | new: uploaded by the owner |
-| `atlas_lk_items_hi_1` | Hero copies of the tools the Forge and Crafting pictures show (hatchet, pickaxe, spear, stone axe, torch, campfire, build) and the armour stand-in glyph | new: to upload |
-| `atlas_lk_items_hi_2` … `_4` | Hero copies of the other item art | new: to upload |
-| `atlas_lk_items2_1`, `atlas_lk_items2_2` | Every catalog item's own 110 px icon (`lk_item_<id>`, §9.7): 81 and 63 icons | new: to upload |
-| (no atlas) `lk_item_<id>__hi` | The 144 item icons' 356 px hero copies, one image each | new: to upload |
+| `atlas_lk_items2_1`, `atlas_lk_items2_2` | Every catalog item's own 110 px icon (`lk_item_<id>`, §9.7): 81 and 63 icons | uploaded |
+| (no atlas) `lk_item_<id>__hi` | The 144 item icons' 356 px hero copies, one image each | uploaded |
 | `atlas_island_hi_1_1` … `_2_2` | The island painting at 2040 px as 2 × 2 tiles | new: uploaded by the owner |
 
 - **Never change an uploaded atlas.** Once an atlas is uploaded its bytes and
   rects are live: adding a sprite to its group moves other sprites. New art goes
   into a new group (as `atlas_lk_play` did); check the old atlases' sha1 is
-  unchanged after packing.
+  unchanged after packing. A group nothing draws any more may be removed whole
+  (its sprites, PNGs and ids with it): the parchment-era atlases (`atlas_lobby`,
+  `atlas_hud`, `atlas_ui`, `atlas_pieces`, `atlas_map`, `atlas_window_*`), their
+  `pm_*` sprites and the first HUD's unprefixed sprites went that way, as did
+  the kit item art's hero copies (`atlas_lk_items_hi_*`, never switched on).
+  Their uploads stay on Roblox and in `uploaded_decals.json`, and
+  `--resolve` never brings an id back for a name the manifest no longer lists.
 - **High-resolution sheets are additive.** `Widgets` draws a `__hi` copy only
   once its sheet has actually loaded on that client (`SpriteLoader.State`);
   until then, and for good if it never loads, the 1x art draws, and the sheet is
-  fetched in the background. The high-resolution sheet ids are blank in
-  `UiAssetIds.json` (their uploads are recorded in `uploaded_decals.json`):
-  after they were switched on, the UI on a phone lost its parchment art, so they
-  stay off until they are re-enabled and checked on a phone.
+  fetched in the background. A plain (not 9-sliced) image whose copy loads
+  later takes the copy in the same label (an item's hero copy in the Forge
+  picture). The kit's high-resolution sheet ids (`atlas_lk_*_hi`,
+  `atlas_island_hi_*`) are blank in `UiAssetIds.json` (their uploads are
+  recorded in `uploaded_decals.json`): after they were switched on, the UI on a
+  phone lost its parchment art, so they stay off until they are re-enabled and
+  checked on a phone. The item hero images (`lk_item_<id>__hi`) are on.
 - An empty id `""` in `UiAssetIds.json` is a placeholder for an atlas not
   uploaded yet; the game and captures draw the 1× art meanwhile, and
   `--dry-run --atlases` lists the pending atlases. `pack_atlas.py` refuses to
@@ -948,7 +957,8 @@ for new glyphs.
   lines, glyphs and icons as a symbol in ink (KIT §7). Hover, focus and
   selection add the 3 px gold glow.
 - An uploaded image that has not arrived after `Art.GRACE` (2 s) shows the
-  stand-in until it loads, then swaps to the art (no flash on a normal load).
+  stand-in until it loads, then swaps to the art by itself (no flash on a
+  normal load, no rebuild). An item's stand-in is its kind glyph (§6.5).
 - A role with a **`fallback`** icon draws that icon while its own sprite has no
   art (the Play rune icon falls back to the portal, the crystal glyph to the
   white play glyph).
@@ -1020,13 +1030,24 @@ two or three minutes) makes, for each item:
 The hero copies are **images of their own**, not atlases (a 1024 atlas holds
 eight; 18 sheets would choke phones): `Widgets` gates a copy without an atlas
 on its own image (`readyImage`), so it draws only once loaded, fetched in the
-background when a hero box first wants it. Upload with
+background when a hero box first wants it; the box shows the slot icon until
+then and the copy takes its place in the same label when it arrives. Upload
+with
 `python3 scripts/roblox_upload_ui_assets.py --upload --only 'atlas_lk_items2_*,lk_item_*__hi'`
 (146 images; throttling waits as asked, an interrupted run continues when
 re-run). Never move an item between uploaded atlases: a new item goes into a
-new group in ICONS.json. The `item_icons_flow` capture scene checks the
-fallback and the hero gate; the `item_info` spec checks every catalog item has
-its icon and hero copy in `UiSprites.json`.
+new group in ICONS.json.
+
+The slot icons are **not** gated: `Kit.ItemIcon` draws `lk_item_<id>` from the
+moment the atlas has an id, with the item's kind glyph standing in until the
+atlas has loaded on that client (§6.5). An earlier build held the new atlases
+back until loaded and drew the older kit art meanwhile; slots built before the
+atlas arrived never redrew, so phones kept the old icons. That gate and the
+older art are gone. The `item_icons_flow` capture scene forces the atlases
+pending, then loaded, and checks every kind of item picture swaps from its kind
+glyph to its icon with nothing rebuilt, and the hero copy taking over the Forge
+picture; the `item_info` spec checks every catalog item has its icon and hero
+copy in `UiSprites.json`.
 
 ---
 
@@ -1049,7 +1070,7 @@ Captures are written to `art/ui/captures/` (not committed; rebuild with
 | World map | `MapController` + `Hud/IslandMap.luau` | `MapController` | [ListWindows](ListWindows.md#world-map-mapcontroller) | `map_flow` | `art/ui/captures/map_flow.png` |
 | In-world HUD (the HUD grid, §5.6) | `Hud/Vitals`, `BottomBar`, `PartyFrames`, `Compass`, `ObjectivePanel`, `EventPanel`, `InteractionPrompt`, `DamageNumbers`, `OverheadHealth`, `Hud/Layout.luau`; the ⚙ (`SettingsController`) and boost list (`BoostHudController`) on the same grid | `HudController` | [HudScreen](HudScreen.md) | `world_hud`, `world_hud_states`, `world_hud_phone` (844 × 390 notched, 667 × 375, 2000 × 924), `world_hud_wide`, `world_hud_flow` (each world page also builds the lobby HUD at its screen and checks the shared pieces match), `overhead_health` (the bars over hurt players) | `art/ui/captures/world_hud.png`, `world_hud_phone.png` |
 | Overlays, notices, loot, storage, world menu | `Hud/NoticeCard.luau`, overlay controllers | `NoticeController`, `LootController`, `StorageController`, `WorldMenuController`, … | ARCHITECTURE §4.8 | `notices`, `world_overlays`, `world_overlays_phone`, `world_overlays_flow`, `world_menu` | `art/ui/captures/world_overlays.png` |
-| Kit gallery | `src/client/Hud/Kit/*` | — | [KIT](KIT.md) | `kit_gallery` (9 pages), `kit_gallery_failed`, `kit_gallery_flow`, `sprite_loader_flow` | `art/ui/captures/kit_gallery.png` … `kit_gallery_9.png` |
+| Kit gallery | `src/client/Hud/Kit/*` | — | [KIT](KIT.md) | `kit_gallery` (9 pages), `kit_gallery_failed`, `kit_gallery_flow`, `sprite_loader_flow`, `item_icons_flow` (item icons: kind glyph while pending, icon once loaded) | `art/ui/captures/kit_gallery.png` … `kit_gallery_9.png` |
 
 Screens are display only: they take data through setters and report presses
 through callbacks; controllers fetch data and call remotes.

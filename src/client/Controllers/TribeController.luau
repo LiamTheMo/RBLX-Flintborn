@@ -304,7 +304,7 @@ local function build()
 	ui.screen:Watch()
 end
 
--- Opens or closes this panel (keys, and the on-screen navigation bar).
+-- Opens or closes this panel (keys, and the HUD's menu tiles).
 function TribeController.Toggle()
 	if not ui.screen:IsOpen() then
 		-- Drawn first, so the window opens with its default action chosen.
