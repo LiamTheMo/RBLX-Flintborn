@@ -234,11 +234,11 @@ follows the lobby's other windows (not specified by this reference).
 | Tab.Vault | vault items | `VaultSnapshot` | `VAULT_START_SLOTS` 25 + 25 per upgrade |
 | SearchBox | filters the grid by name | `ItemInfo.Matches(name, query)` | case-insensitive, plain text |
 | Category rows | filters by category | `ItemInfo.CATEGORIES` = All, Tools, Materials, Food; `ItemInfo.InCategory` | **Plants and Misc have no backing category** (open question 2) |
-| ItemGrid | one slot per item stack, count when quantity > 1 (mock also shows "1") | items from the snapshot; icon `item_<catalogId>` | 24 cells visible; 50 (backpack) / 25+ (vault) need a scroll region (open question 3) |
+| ItemGrid | one slot per item stack, count when quantity > 1 (mock also shows "1") | items from the snapshot; icon `lk_item_<catalogId>` (ITEM_ART.md) | 24 cells visible; 50 (backpack) / 25+ (vault) need a scroll region (open question 3) |
 | Slot count | quantity | item.quantity | mock shows "1" on single tools but nothing on the selected stone axe (open question 5) |
 | DetailIcon / ItemName | selected item art and name | ItemCatalog | — |
 | ItemDescription | flavour text | **none**: ItemCatalog has no description field | open question 6 |
-| Stat rows | Harvest Power, Attack Speed, Durability | `ItemInfo.Stats(item)` returns up to three {glyph, text} chips (damage + cooldown for weapons, "Tier n" + kind for tools, armour %, healing, food, boosts, ×quantity) | **labels and values differ** from the mock; **no durability** in the catalog (open question 7) |
+| Stat rows | Harvest Power, Attack Speed, Durability | `ItemInfo.StatRows(item)` → {icon, label, value} rows (the older `ItemInfo.Stats` chips this spec first read are removed) | **labels and values differ** from the mock; **no durability** in the catalog (open question 7) |
 | EquipButton | equips the selected item | world: `InventoryController` EQUIP/USE/PUT AWAY; lobby: no equip action exists (the old lobby screen had STORE/TAKE) | open question 8 |
 
 ## Vault tab (assumptions)
@@ -305,8 +305,8 @@ Each has the default that will be used if unanswered.
 6. **Item descriptions** don't exist in data. Default: hide the description and
    move the first rule up; or add a `description` field to `ItemCatalog`.
 7. **Stat rows**: mock labels (Harvest Power, Attack Speed, Durability) vs
-   `ItemInfo.Stats` chips. Default: three rows from `ItemInfo.Stats` (icon from
-   the chip glyph, label + value split from the chip text); durability omitted.
+   the catalog. Resolved: `ItemInfo.StatRows` (ARCHITECTURE §4.2); durability
+   omitted.
 8. **EQUIP in the lobby**: what does it do (set a loadout item for the next run?
    move to hotbar?). Default: the button shows the action the old screens had
    for that place (TAKE / STORE in the lobby), disabled when none applies.
@@ -333,8 +333,9 @@ Each has the default that will be used if unanswered.
   is not in the kit).
 - **Gamepad** (R23): when the slots arrive after the window opened on a
   gamepad, selection moves to the first slot rather than staying on ✕.
-- Items without kit art (bows, swords, daggers, armour) show the Kit's neutral
-  kind glyph; their names are in the tooltip and detail card (ITEM_ART.md).
+- Items without kit art (bows, swords, daggers, armour) showed the Kit's
+  neutral kind glyph. Every item now draws its own icon (ITEM_ART.md); the
+  kind glyph shows only while the icon's atlas loads.
 
 ## Owner feedback round: everything under All, square slots, Consumables
 

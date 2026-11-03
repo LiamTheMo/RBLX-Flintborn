@@ -1,8 +1,9 @@
--- One switch for "the new in-world HUD is in charge" (GDD §11, §25.4). Older
--- controllers ask it before showing the visuals the HUD replaces (survival bars,
--- hotbar strip, XP bar, compass text, extraction and event lists). It is true only
--- in the world place and only when the layout loads, so a place published without
--- the HUD's JSON keeps the old visuals instead of showing nothing.
+-- One switch for "the kit HUD is in charge" (GDD §11, §25.4). The world HUD
+-- (HudController) builds only in the world place and only when the layout
+-- loads; controllers ask it before showing a kit display the HUD would
+-- duplicate (the extraction and event lists, the level bar). There is no older
+-- UI behind it: when the layout is missing HudController logs the error and the
+-- run has no HUD.
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
@@ -18,23 +19,20 @@ HudMode.VisibilityChanged = Signal.new()
 local visible = false
 local lobbyFailed = false
 
-function HudMode.ReplacesLegacy(): boolean
+function HudMode.WorldHud(): boolean
 	return PlaceConfig.IsWorld() and Layout.Get() ~= nil
 end
 
--- The lobby's counterpart: true in the lobby place unless the lobby HUD failed to
--- build. Then LobbyHudController draws the profile, currency, party, navigation
--- and Play entry, and the older lobby panel, wallet label, navigation bar, XP bar
--- and settings button stay hidden. HudLayout's lobby section is not consulted:
--- the lobby HUD brings its own layout, and when it cannot build (for example a
--- missing layout) it calls SetLobbyFailed and LobbyController builds the fallback
--- panel, so the lobby is never left without Deploy.
+-- The lobby's counterpart: true in the lobby place unless the lobby HUD failed
+-- to build (LobbyHudController logs why). Then the kit's own ⚙ button, Coins and
+-- Gems pills and level bar, which the lobby HUD otherwise replaces, show
+-- instead (SettingsController, WalletController, ProgressionController).
 function HudMode.ReplacesLobby(): boolean
 	return PlaceConfig.IsLobby() and not lobbyFailed
 end
 
 -- LobbyHudController calls this when the lobby HUD fails to build, so the
--- controllers that start after it show their own lobby visuals instead.
+-- controllers that start after it show their own kit pieces instead.
 function HudMode.SetLobbyFailed()
 	lobbyFailed = true
 end

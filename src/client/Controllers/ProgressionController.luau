@@ -393,7 +393,7 @@ local function build()
 	-- pop-ups; whenever it is hidden (world menu, protected, dead) this bar shows.
 	-- In the lobby the lobby HUD's XP bar always shows the level instead.
 	local function refreshBar()
-		ui.barHolder.Visible = not ((HudMode.ReplacesLegacy() and HudMode.IsVisible()) or HudMode.ReplacesLobby())
+		ui.barHolder.Visible = not ((HudMode.WorldHud() and HudMode.IsVisible()) or HudMode.ReplacesLobby())
 	end
 	HudMode.VisibilityChanged:Connect(refreshBar)
 	refreshBar()
@@ -415,7 +415,7 @@ local function build()
 	})
 end
 
--- Opens or closes this panel (keys, and the on-screen navigation bar).
+-- Opens or closes this panel (keys, and the HUD's menu tiles).
 function ProgressionController.Toggle()
 	-- Escape and gamepad B close the question first, then the window (Kit.Modal).
 	if window.screen:IsOpen() then

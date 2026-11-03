@@ -451,7 +451,7 @@ local function build()
 	})
 end
 
--- Opens or closes this panel (keys, and the on-screen navigation bar).
+-- Opens or closes this panel (keys, and the HUD's menu tiles).
 function TradeController.Toggle()
 	if window.screen:IsOpen() then
 		close()

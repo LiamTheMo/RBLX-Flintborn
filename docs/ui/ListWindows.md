@@ -81,7 +81,8 @@ window is rebuilt when the form factor changes. A gamepad lands on Zoom in.
 
 An authored map hides the painting and the pins and keeps the live markers on
 the bare panel. The safe-camp notice is still `Hud/NoticeCard` (W2's, now on the
-kit). The legacy compass strip shows only without the new HUD.
+kit). The world HUD draws the compass (`Hud/Compass`); MapController's older
+text compass strip is removed.
 
 ## Captures
 

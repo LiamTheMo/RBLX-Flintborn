@@ -10,8 +10,7 @@
 -- (Deploy, FetchPreview); the server decides.
 --
 -- Contract (§4.9): Open(), Toggle(), IsOpen(). Lobby place only, with the lobby
--- HUD in charge (HudMode.ReplacesLobby); otherwise LobbyController's own panel
--- deploys.
+-- HUD in charge (HudMode.ReplacesLobby): its Play tile opens the window.
 
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")

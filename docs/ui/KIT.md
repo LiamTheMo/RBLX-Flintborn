@@ -35,7 +35,7 @@ python3 art/ui/capture/capture.py kit_gallery_flow   # behaviour checks + leak c
 | `src/shared/UI/KitModel.luau` | Pure rules: the **role table** (`ROLES`), the state machine (`ResolveState`, `ArtFor`), the modal stack, the maid, layout sums. Tested by `tests/luau/kit_*.spec.luau` |
 | `Kit/init.luau` | Re-exports everything below |
 | `Kit/Tokens.luau` | `Color(key)`, `Tint(key)`, `Font(key)`, `TextStyle(role)`, `Space(key)`, `Scale(key)`, `Motion(key)` (TweenInfo), `Order(key)`, `Veil()`, `Sound(key)` |
-| `Kit/Art.luau` | Roles to art: `Plate`, `Sprite`, `Icon`, `IconSprite`, `ItemSprite`, `SizeOf`, `SliceScale`, `Missing`, stand-ins |
+| `Kit/Art.luau` | Roles to art: `Plate`, `Sprite`, `Icon`, `IconSprite`, `ItemIcon`, `KindGlyph`, `SizeOf`, `SliceScale`, `Missing`, stand-ins |
 | `Kit/Core.luau` | `Make`, `Size`, `Place`, `Root`, `Label`, `SetText`, `Style`, `TextWidth`, `TextFloor`, `Dim` (also `Kit.Dim`), `SetRestFade`, `Signal`, `Maid` |
 | `Kit/Interact.luau` | The shared state machine (`attach`) |
 | `Kit/Motion.luau` | `Play(inst, key, goal, onDone?)`, `Set`, `Stop`, `Pulse`, `Reduced()` |
@@ -274,10 +274,11 @@ Icons are mostly not roles: `Kit.Icon` takes an id and resolves `lk_icon_<id>`, 
 id (`icon = "icon.playRune"` on Kit.Icon, IconButton, Window or Button): it
 draws the role's sprite, or the role's `fallback` icon while that sprite has
 no art yet (§15). `"ink:<id>"` and
-`"white:<id>"` name the flat glyphs (§10). Item art comes from
-`ItemInfo.Icon(itemId)` (icon name and optional tint, the one item-to-art
-source) through `ItemInfo.Sprite`, then `lk_item_<id>` / `item_<id>`, then the
-`icon` prop (untinted), then the item's name in ink.
+`"white:<id>"` name the flat glyphs (§10). Item art is the item's own icon
+only: `Art.ItemIcon(itemId)` → `lk_item_<id>` (`ItemInfo.ItemSprite`), drawn by
+`Art.Icon`; while its atlas has not loaded the item's kind glyph stands in and
+the icon replaces it by itself on load (STYLE_GUIDE §6.5). An id that is not a
+catalog item draws the `icon` prop, else the kind glyph.
 
 **Exact edges.** Every plate is drawn outset by its sprite's transparent
 margin (`KitModel.EDGES`, regenerate with `capture.py --edges`) times its
@@ -585,7 +586,10 @@ stand-in in the kit's style: paper `#FCDAB1` / leather `#A53A0F` plates with a
 2 px brown stroke and 8 px corners, slots with 6 px corners, windows with a
 3 px rail stroke and 10 px corners, tracks and fills as pills, glyphs and icons
 as text. Hover, focus and selection add the 3 px gold glow stroke. See
-`kit_gallery_*_fallback.png`.
+`kit_gallery_*_fallback.png`. An uploaded image that has not loaded yet shows
+the same stand-in after `Art.GRACE` and is replaced by its art the moment it
+loads; an item's stand-in is its kind glyph (⚒ ▤ ◇), never a letter
+(`item_icons_flow`).
 
 **UiSprites.json must list the `lk_` sprites** before they draw as art in game
 (sizes and 9-slice insets): the asset artist's
@@ -685,10 +689,15 @@ tan disc (`portrait.empty`, native).
 {center?})` (design-px canvas position).
 
 **Slot**: `item.itemId` accepted; `SetItem` resets the press debounce (pooled
-slots). Art and tint always come from `ItemInfo.Icon`.
+slots). The art is always the item's own icon (`Kit.ItemIcon`).
 
-**ItemIcon**: `itemId` accepted; tint from `ItemInfo.Icon`; `icon` is used
-untinted only when ItemInfo has no art.
+**ItemIcon**: `itemId` accepted; draws `lk_item_<id>` (`Art.ItemIcon`), with
+the item's kind glyph (`Art.KindGlyph`, `Art.ITEM_KIND_GLYPH`: ⚒ ▤ ◇, in
+`inkSoft` at `Art.STAND_IN_FADE`) standing in until the icon's atlas has
+loaded, then swapping by itself (`SpriteLoader.OnState`); `KitStandIn` is set
+only when the icon has no id at all. `icon` is used only for an id that is not
+a catalog item. Hero boxes (`maxScale = false`) draw the slot icon until the
+item's hero copy has loaded, which then takes over the same label.
 
 **Picture** (new): `Kit.Picture.new(parent, {rect, role, tint?, exact?})`,
 `:SetState`. Draws a role as a picture: `hud.leaf` (lk_emblem_leaf), `panel.party` (the HUD party panel frame:
@@ -833,10 +842,12 @@ items read "(Permanent)" and a rebind note reads "Sprint is now LeftShift".
   blue (the art is more saturated than the mockup); a multiply tint cannot add
   blue, so those need recoloured art.
 - **Items without art** show a neutral ink kind glyph (tools / weapons hammer,
-  armour backpack, food drumstick, else chest), never their name; the name is
-  in the `KitItemName` attribute for tooltips and detail cards (`KitStandIn`
-  marks the glyph).
-- **Widgets** keeps only Make, TextCap, HasArt and Sprite; the old Panel, Text,
+  armour backpack, else chest), never their name; the name is in the
+  `KitItemName` attribute for tooltips and detail cards (`KitStandIn` marks the
+  glyph). Every catalog item has its own icon now, so this is for ids that are
+  not catalog items; a catalog item shows the same kind glyph only while its
+  icon's atlas loads.
+- **Widgets** keeps only Make, TextCap, HasArt, ImageId and Sprite; the old Panel, Text,
   Bar, SelectionRing, Pin, SetBar, Fill and Frame builders and the parchment
   stand-ins are gone.
 - **Reasons**: TooFast, PlayerNotHere, Rejected, NotReady.

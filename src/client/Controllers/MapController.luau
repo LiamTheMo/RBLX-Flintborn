@@ -1,5 +1,5 @@
--- Compass, map and safe-zone notice (GDD §3, §25, §54). A compass strip shows
--- your heading; the Map key (N by default; DPadDown) opens the world map in a
+-- Map and safe-zone notice (GDD §3, §25, §54); the world HUD draws the compass
+-- strip (Hud/Compass). The Map key (N by default; DPadDown) opens the world map in a
 -- kit window (docs/ui/ListWindows.md): the painted island (Hud/IslandMap, the
 -- Journal's map) in an inset panel with zoom buttons, pins for the safe camps
 -- and main landmarks, the active portals and announced events, and your
@@ -21,12 +21,10 @@ local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Rarity = require(ReplicatedStorage.Shared.Items.Rarity)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local WorldState = require(ReplicatedStorage.Shared.World.WorldState)
-local HudMode = require(script.Parent.Parent.Hud.HudMode)
 local IslandMap = require(script.Parent.Parent.Hud.IslandMap)
 local Kit = require(script.Parent.Parent.Hud.Kit)
 local Layout = require(script.Parent.Parent.Hud.Layout)
 local NoticeCard = require(script.Parent.Parent.Hud.NoticeCard)
-local Theme = require(script.Parent.Parent.Ui.Theme)
 local Binds = require(script.Parent.Parent.Ui.Binds)
 
 local MapController = {}
@@ -60,7 +58,6 @@ MapController.SAFE_CHECK_SECONDS = 0.25
 MapController.MARKER_TEXT = 16
 
 local player = Players.LocalPlayer
-local ui = {}
 local screen = nil
 local map = nil
 local window = nil
@@ -71,17 +68,6 @@ local builtPhone = nil
 local events = {}
 local safeZones = {}
 local sinceSafeCheck = math.huge
-
-local HEADINGS = { "N", "NE", "E", "SE", "S", "SW", "W", "NW" }
-
-local function make(className: string, props, parent)
-	local instance = Instance.new(className)
-	for key, value in props do
-		instance[key] = value
-	end
-	instance.Parent = parent
-	return instance
-end
 
 -- The world map's live markers: authored camps, active portals and events.
 local function renderMarkers()
@@ -140,13 +126,6 @@ local function renderMarkers()
 	end
 end
 
-local function headingText(): string
-	local look = workspace.CurrentCamera.CFrame.LookVector
-	local angle = math.deg(math.atan2(look.X, -look.Z)) % 360
-	local index = math.floor((angle + 22.5) / 45) % 8 + 1
-	return ("◄  %s  ►   %d°"):format(HEADINGS[index], math.floor(angle))
-end
-
 local function inSafeZone(position: Vector3): string?
 	for zone in safeZones do
 		if zone:IsA("BasePart") then
@@ -165,7 +144,6 @@ local function inSafeZone(position: Vector3): string?
 end
 
 local function update()
-	ui.compass.Text = headingText()
 	local root = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
 	if root then
 		if screen.gui.Enabled then
@@ -206,22 +184,11 @@ end
 local buildWindow
 
 local function build()
-	local gui = make("ScreenGui", { Name = "Map", ResetOnSpawn = false }, player:WaitForChild("PlayerGui"))
-	ui.compass = make("TextLabel", {
-		Size = UDim2.fromOffset(200, 18),
-		BackgroundTransparency = 0.5,
-		BackgroundColor3 = Color3.fromRGB(20, 18, 16),
-		TextColor3 = Color3.fromRGB(240, 230, 210),
-		Font = Enum.Font.GothamBold,
-		TextSize = 12,
-		LayoutOrder = Theme.TopOrder.Compass,
-		-- The new HUD draws its own compass strip.
-		Visible = not HudMode.ReplacesLegacy(),
-	}, Theme.TopStack())
+	local gui = Kit.Core.Make("ScreenGui", { Name = "Map", ResetOnSpawn = false }, player:WaitForChild("PlayerGui"))
 	safeCard = NoticeCard.new(gui, { name = "Safe", width = 360, title = "Safe camp" })
 	safeCard.frame.AnchorPoint = Vector2.new(0.5, 1)
 	safeCard.frame.Position = UDim2.new(0.5, 0, 1, -150)
-	safeCard:SetTone("haveEnough")
+	safeCard:SetTone("toggleOn")
 
 	buildWindow()
 end
@@ -307,7 +274,7 @@ function buildWindow()
 	screen:Watch()
 end
 
--- Opens or closes this panel (keys, and the on-screen navigation bar).
+-- Opens or closes this panel (the Map key, and the HUD's Map tile).
 function MapController.Toggle()
 	-- Escape and gamepad B close it too (Kit.Modal).
 	if screen:IsOpen() then

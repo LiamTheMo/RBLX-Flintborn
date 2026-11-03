@@ -26,9 +26,6 @@ local BUTTON_H = 46
 local BUTTON_W = 160
 local KEY_H = 34
 
--- Layout colour keys the older callers pass to SetTone, as kit tokens.
-local TONES = { haveEnough = "toggleOn", haveShort = "short" }
-
 -- How many lines `text` wraps to in `width` design px in a type role.
 function NoticeCard.Lines(text: string, role: string, width: number, size: number?): number
 	local count = 0
@@ -347,10 +344,9 @@ function NoticeCard:IsShown(): boolean
 	return self.frame.Visible
 end
 
--- The colour of the title: a kit colour token, or the older layout keys
--- "haveEnough" / "haveShort".
+-- The colour of the title: a kit colour token.
 function NoticeCard:SetTone(colorKey: string)
-	self.titleText:SetColor(TONES[colorKey] or colorKey)
+	self.titleText:SetColor(colorKey)
 end
 
 -- Swaps the emblem icon (when the card was built with one).

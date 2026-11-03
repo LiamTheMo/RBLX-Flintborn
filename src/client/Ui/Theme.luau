@@ -16,17 +16,6 @@ local KitTokens = require(script.Parent.Parent.Hud.Kit.Tokens)
 
 local Theme = {}
 
--- The plain look of UI built without the kit (NavController's fallback bar, used
--- only if the kit fails to load): literal values, so it needs nothing else.
-Theme.FALLBACK = {
-	panel = Color3.fromRGB(252, 218, 177),
-	text = Color3.fromRGB(34, 10, 1),
-	font = Enum.Font.GothamBold,
-	textSize = 12,
-}
--- Roblox mobile guidance: touch targets of at least 44 px.
-Theme.TOUCH_TARGET = 44
-
 -- A colour-blind-safe rarity palette (Okabe–Ito based), applied in place so every
 -- screen reading Rarity.Colors follows the setting.
 Theme.ColourBlindRarity = {
@@ -76,7 +65,6 @@ end
 -- in the kit's design px (1672 × 941): the column carries the HUD's scale, and
 -- its gui fits itself (Settings' UI scale is folded into that scale).
 Theme.TopOrder = {
-	Compass = 1,
 	Transition = 2,
 	Horn = 3,
 	Downed = 4,

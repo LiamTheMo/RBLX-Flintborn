@@ -928,29 +928,14 @@ HIRES = {
 }
 HI_SUFFIX = "__hi"
 
-# Item art drawn in the hero boxes (the Forge and Crafting picture, 254 design
-# px, and the Inventory detail card's 152 x 166) fills the box, so it is
-# magnified up to 3x (4.2x on a 1440p screen). These parts get a copy whose
-# long side is the Forge box at the 1440p window scale (KitTokens windowMax
-# 1.4): 356 px. The sheets hold fewer pixels than that for every item, so the
-# copy is upscaled from the cleaned sheet crop (premultiplied Lanczos plus a
-# light unsharp mask scaled to the upscale, the faint ringing it leaves outside
-# the silhouette dropped), then gets the same alpha snap, rim decontamination
-# and colour bleed as every copy. It is named `__hi`, or `__hi2` after a HIRES
-# copy, which it follows in the chain (manifest `hi` of the `__hi` entry). The
-# game draws it only where the art is magnified past 1 and its scale / 2.8
-# (UiAssets.HiFrom), so slots, rows and tiles keep their 1x art.
+# The hero boxes (the Forge and Crafting picture, 254 design px, and the
+# Inventory detail card's 152 x 166) fill the box with the item's picture. Every
+# catalog item draws its own icon there, whose hero copy (HERO_PX, the Forge box
+# at the 1440p window scale, KitTokens windowMax 1.4) is built by
+# art/ui/items/build_item_icons.py; the kit parts have no hero copies.
 HERO_BOX = 254
 HERO_UI = 1.4
 HERO_PX = int(np.ceil(HERO_BOX * HERO_UI))
-HERO = {
-    # ItemInfo.ART_SPRITES
-    *(f"icon_{n}" for n in ("berries", "bone", "build", "campfire", "crystals", "drumstick", "hatchet", "heart",
-                            "hide", "lightning", "logs", "magma_ore", "mushroom", "pickaxe", "plank", "plant_fiber",
-                            "rocks", "rope", "runestone", "spear", "star", "stone", "stone_axe", "stones", "torch",
-                            "tusk", "warning")),
-}
-HERO_SUFFIX = "__hi2"
 # Unsharp mask of an upscaled copy: Gaussian sigma per unit of upscale (copy
 # pixels) and amount.
 SHARPEN_SIGMA, SHARPEN_AMOUNT = 0.5, 0.5
@@ -1027,17 +1012,6 @@ def build_hires(p, base, ctx):
     if f < 1.2:
         return None
     return build_copy(p, base, ctx, f)
-
-
-def build_hero(p, base, ctx):
-    """The hero copy of a part (HERO): (sprite, f, None) at HERO_PX on its long
-    side, upscaled past the sheet's headroom with a light unsharp mask."""
-    source, (ow, oh) = ctx["source"], ctx["size"]
-    hs, ws = source.shape[:2]
-    H, W = base.shape[:2]
-    f = HERO_PX / max(W, H)
-    up = f / min(ws / ow, hs / oh)
-    return build_copy(p, base, ctx, f, sharpen=up if up > 1 else None)
 
 
 def build_copy(p, base, ctx, f, sharpen=None):
@@ -1311,10 +1285,8 @@ def write_catalog(info, insets, stats, manifest=None, hires=None):
         "times the pixels (f = min(2, the sheet's headroom)), 9-slice insets in its own pixels and its stretched "
         "middle kept at the 1x length. The game draws it at the 1x sprite's design size wherever the art is "
         "magnified, once its atlas is uploaded (manifest `hi`, `scale`; `UiAssets.Placement`).",
-        f"- Item art (`HERO`) also has a hero copy, `<name>__hi` (`__hi2` after a HIRES copy), {HERO_PX} px on its "
-        "long side: the Forge / Crafting picture and the Inventory detail card at 1440p. The sheets hold fewer "
-        "pixels, so it is upscaled (premultiplied Lanczos plus a light unsharp mask) and drawn only where the art "
-        "is magnified past 1 and its scale / 2.8 (`UiAssets.HiFrom`).",
+        "- Items draw their own icons (`lk_item_*`, `art/ui/items/build_item_icons.py`), not these parts; their "
+        f"hero copies ({HERO_PX} px) are built there.",
         "",
         "### Button and state families",
         "",
@@ -1403,13 +1375,11 @@ def main():
         print(f"{p['name']:34s} {w:4d}x{h:<4d} scale={scale:.3f} slice={ins}")
         short = p["name"][len(PREFIX):]
         hi = build_hires(p, a, ctx) if short in HIRES else None
-        hero = build_hero(p, a, ctx) if short in HERO else None
-        for suffix, copy in ((HI_SUFFIX, hi), (HERO_SUFFIX if hi else HI_SUFFIX, hero)):
-            if copy:
-                ha, f, hins = copy
-                save(ha, OUT / f"{p['name']}{suffix}.png")
-                hires[p["name"] + suffix] = (ha.shape[1], ha.shape[0], f, hins, p["name"])
-                print(f"{'  ' + suffix:34s} {ha.shape[1]:4d}x{ha.shape[0]:<4d} x{f:.3f}  slice={hins}")
+        if hi:
+            ha, f, hins = hi
+            save(ha, OUT / f"{p['name']}{HI_SUFFIX}.png")
+            hires[p["name"] + HI_SUFFIX] = (ha.shape[1], ha.shape[0], f, hins, p["name"])
+            print(f"{'  ' + HI_SUFFIX:34s} {ha.shape[1]:4d}x{ha.shape[0]:<4d} x{f:.3f}  slice={hins}")
     if only:
         return
     # Manifest: every non-lk entry is kept as it is (same order, same values).
