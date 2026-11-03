@@ -789,8 +789,8 @@ faces at custom sizes); a count is placed after the measured width.
 have no rose).
 
 **Tokens**: `emptyDot` #CC9F77, `photoBackdrop` #C9B19B, `rarityCommon` …
-`rarityExclusive`, `phoneText` (scale 1.2 and the roles it applies to),
-`scale.phoneHudMin` 0.5.
+`rarityExclusive`, `phoneText` (scale 1.2 and the roles it applies to), and
+a 0.5 HUD floor on phones (now `phoneFloor.hud`, below).
 
 **Phones** (short touch screens: height < 500, no keyboard):
 - The HUD scale never drops below 0.5 (was 0.373 at 844 × 390); the regions
