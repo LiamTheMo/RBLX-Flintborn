@@ -21,10 +21,6 @@ function DeathRules.Split(items)
 	return body, kept
 end
 
-function DeathRules.IsExpired(createdAt: number, now: number): boolean
-	return now - createdAt >= DeathRules.BODY_SECONDS
-end
-
 -- Takes one entry out of a body's contents. Returns the entry or nil.
 function DeathRules.Take(contents, index: number)
 	if type(index) ~= "number" or index % 1 ~= 0 or contents[index] == nil then

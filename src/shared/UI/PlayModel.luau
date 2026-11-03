@@ -182,8 +182,7 @@ end
 -- One line per item in the deploy check: "• Stone Axe (Permanent)", "• Wood ×20"
 -- (plain words: Merriweather has no star glyph, STYLE_GUIDE §1.3).
 function PlayModel.ItemLine(item): string
-	local def = ItemCatalog.Get(item.catalogId)
-	local name = def and def.name or tostring(item.catalogId)
+	local name = ItemCatalog.NameOf(item.catalogId)
 	local count = if item.quantity and item.quantity > 1 then " ×" .. item.quantity else ""
 	return "• " .. name .. (if item.permanent then " (Permanent)" else "") .. count
 end

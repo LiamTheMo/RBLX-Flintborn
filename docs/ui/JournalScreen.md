@@ -3,8 +3,12 @@
 Reference: `art/reference/ui/lobby/07_quest_journal.png`. Kit: `art/reference/ui/lobby/kit/`
 (sheet numbers below are the file prefixes). Design resolution: 1672 × 941 (the image
 size); every bound is a screen pixel of the mockup, x, y, w, h from its top-left, ±1–2 px.
-Status: Draft. Source of truth for build: the reference image. This replaces the spec of
-the previous parchment Journal (All / Daily / Main tabs and the island map).
+Status: Built (`src/client/Hud/Screens/JournalWindow.luau`, data from
+`src/shared/UI/JournalModel.luau`); this is the measured spec it was built from.
+Source of truth for build: the reference image. This replaces the spec of the
+previous parchment Journal (All / Daily / Main tabs and the island map,
+`Hud/JournalPanel`, since removed); where the tables below say "current" or
+"today" they mean that build.
 
 Raw crops, font comparisons and the measuring scripts are in
 `art/ui/kit/analysis/journal/` (the shared helpers live in `art/ui/kit/analysis/forge/`).
@@ -161,7 +165,7 @@ Run from the repo root; helpers as in `ForgeScreen.md` (`art/ui/kit/analysis/for
 |---|---|---|---|---|---|---|---|
 | Side tab | parchment tile | not shown (kit 05 hover is the orange rim) | not shown | orange rim (Tab1) | for a tab with no content (see Data) | not shown | reference, kit 05 / 10 |
 | QuestRow | soft card | not shown | not shown | orange border (row 1) | — | not shown | reference |
-| QuestRow status | not shown: today's rows show finished-and-waiting / under way / claimed dots (`questReady`, `questOpen`, `questDone`) | | | | | | current JournalPanel |
+| QuestRow status | not shown: today's rows show finished-and-waiting / under way / claimed dots (`questReady`, `questOpen`, `questDone`) | | | | | | the old JournalPanel (removed) |
 | Obj.Check | empty ring (all three under way) | — | — | done: not shown | — | — | reference |
 | Claim | leather, looks enabled | kit 03 hover | kit 03 pressed | — | kit 03 disabled: needed while unfinished, claimed ("CLAIMED") or a claim is on its way | not shown | reference shows it enabled although no objective is complete |
 | Close | leather ✕ | kit 03 close hover | pressed | — | — | not shown | kit 03 |
@@ -183,7 +187,7 @@ gems?, booster?, count, needed, claimed, repeats ("Daily" | "Once"), action`.
 | Element | Shows / does | Data source | Notes |
 |---|---|---|---|
 | QuestRow title | quest name | `name` ("Gather 100 times", "Extract once", "Craft 15 items", "Defeat 10 creatures", "Open 2 caches", "Extract 3 times", "Defeat a boss", "Defeat the Guardian") | mockup names are narrative ("Gather Supplies") |
-| QuestRow subtitle | one line | **no direct source**. Options: the objective line from `JournalPanel.OBJECTIVES[action]` ("Gather from resource nodes", …); repeat + tier ("Daily · Easy"); a new description field in `QuestCatalog` | |
+| QuestRow subtitle | one line | **no direct source**. Options: the objective line from the old `JournalPanel.OBJECTIVES[action]` ("Gather from resource nodes", …; now `JournalModel.ACTIONS`); repeat + tier ("Daily · Easy"); a new description field in `QuestCatalog` | |
 | QuestRow icon, Illustration | per-quest art | **no source**; options: one icon per `action` (Harvest, Extract, Craft, Enemy, Cache, Boss, Guardian) from the kit (e.g. 17 paw / tusk for Enemy, 11 chest or 17 treasure chest for Cache, 11 portal for Extract) | |
 | DetailTitle | quest name | `name` | |
 | DetailDesc | two lines | **no source** (see subtitle options) | |
@@ -194,7 +198,7 @@ gems?, booster?, count, needed, claimed, repeats ("Daily" | "Once"), action`.
 | Daily reset, repeat type | — | `repeats`, `QuestCatalog.Period` (UTC day) | the old All / Daily / Main tabs have no counterpart in the mockup; options: a filter, section headers in the list, or the trophy tab for one-time quests |
 | Side tab: book | quests | `QuestView` | active in the mockup |
 | Side tab: trophy | no achievement system exists in the code. Options: the Progress window's content (`ProgressionController`: level, mastery tracks, titles, rebirth, perks); one-time quests (`repeats == "Once"`, e.g. Defeat the Guardian); leave disabled until achievements exist | | |
-| Side tab: map pin | Options: the island map the current Journal already draws (`Hud/IslandMap`, pins for camps and landmarks, quest places from `JournalPanel.PLACES`); the world map (`MapController`) is world-place only | | |
+| Side tab: map pin | Options: the island map the current Journal already draws (`Hud/IslandMap`, pins for camps and landmarks, quest places from the old `JournalPanel.PLACES`, now `JournalModel.PLACES`); the world map (`MapController`) is world-place only | | |
 | Side tab: party | Options: the lobby party (`LobbyController.PartyView()`, the Party screen in `04_party.png`); party or tribe quests do not exist; tribes (`TribeController`) are world-place only | | |
 
 ## Asset map

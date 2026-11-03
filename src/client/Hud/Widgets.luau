@@ -101,7 +101,8 @@ local function applyFrame(object: Instance, props)
 	return object
 end
 
-function Widgets.Make(className: string, props, parent: Instance?)
+-- Kit.Core.Make, kept local: Core requires this module.
+local function make(className: string, props, parent: Instance?)
 	local object = Instance.new(className)
 	apply(object, props)
 	object.Parent = parent
@@ -117,7 +118,7 @@ local CAPTURE = (__FlintbornCapture :: any) == true
 -- text grow far past its design; the cap follows the UIScales above the label.
 function Widgets.TextCap(label: GuiObject, maxSize: number, minSize: number?)
 	local floor = minSize or 1
-	local cap = Widgets.Make("UITextSizeConstraint", { MaxTextSize = maxSize, MinTextSize = floor }, label)
+	local cap = make("UITextSizeConstraint", { MaxTextSize = maxSize, MinTextSize = floor }, label)
 	if CAPTURE then
 		return cap
 	end
@@ -173,7 +174,7 @@ end
 -- Without art: an empty frame where the sprite would be (callers that want a
 -- look of their own check HasArt first, as the kit does).
 local function fallback(name: string, props, parent: Instance?)
-	local frame = Widgets.Make("Frame", { Name = name, BackgroundTransparency = 1, BorderSizePixel = 0 }, parent)
+	local frame = make("Frame", { Name = name, BackgroundTransparency = 1, BorderSizePixel = 0 }, parent)
 	return applyFrame(frame, props)
 end
 
@@ -233,7 +234,7 @@ local function nineSlice(
 	parent: Instance?,
 	sliceScale: number?
 ): GuiObject
-	local holder = Widgets.Make("ImageLabel", { Name = name, BackgroundTransparency = 1, Image = "" }, parent)
+	local holder = make("ImageLabel", { Name = name, BackgroundTransparency = 1, Image = "" }, parent)
 	local width, height = targetSize(props)
 	local scale = sliceScale
 		or (if width > 0 and height > 0 then HudModel.SliceScale(sprite.w, sprite.h, width, height) else 1)
@@ -265,7 +266,7 @@ local function nineSlice(
 			local w, h = xs[i + 1] - xs[i], ys[j + 1] - ys[j]
 			if w > 0 and h > 0 then
 				local column, row = columns[i], rows[j]
-				local piece = Widgets.Make("ImageLabel", {
+				local piece = make("ImageLabel", {
 					Name = "Piece" .. i .. j,
 					BackgroundTransparency = 1,
 					ImageRectOffset = Vector2.new(rx + xs[i], ry + ys[j]),
@@ -305,10 +306,10 @@ local function tiled(name: string, sprite, props, parent: Instance?): GuiObject?
 		end
 		ids[tile[1]] = id
 	end
-	local holder = Widgets.Make("Frame", { Name = name, BackgroundTransparency = 1 }, parent)
+	local holder = make("Frame", { Name = name, BackgroundTransparency = 1 }, parent)
 	applyFrame(holder, props)
 	for _, tile in sprite.tiles do
-		local image = Widgets.Make("ImageLabel", {
+		local image = make("ImageLabel", {
 			Name = tile[1],
 			BackgroundTransparency = 1,
 			ScaleType = Enum.ScaleType.Stretch,
@@ -377,7 +378,7 @@ function Widgets.Sprite(name: string, props, parent: Instance?, sliceScale: numb
 	if art.rect and sliced then
 		return nineSlice(name, whole, art, props, parent, sliceScale)
 	end
-	local image = Widgets.Make("ImageLabel", { Name = name, BackgroundTransparency = 1 }, parent)
+	local image = make("ImageLabel", { Name = name, BackgroundTransparency = 1 }, parent)
 	if art.rect then
 		image.ImageRectOffset = Vector2.new(art.rect[1], art.rect[2])
 		image.ImageRectSize = Vector2.new(art.rect[3], art.rect[4])

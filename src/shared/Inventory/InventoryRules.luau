@@ -206,18 +206,6 @@ function InventoryRules.TakeAll(inventory: Inventory, costs: { [string]: number 
 	return taken
 end
 
-function InventoryRules.FindInstance(inventory: Inventory, instanceId: string)
-	for _, area in { "hotbar", "backpack" } do
-		for index = 1, SIZES[area] do
-			local entry = inventory[area][index]
-			if entry and entry.instanceId == instanceId then
-				return area, index
-			end
-		end
-	end
-	return nil, nil
-end
-
 -- Removes and returns the entry in a hotbar or backpack slot, or nil.
 function InventoryRules.TakeAt(inventory: Inventory, area: string, index: number)
 	if not validSlot(area, index) then

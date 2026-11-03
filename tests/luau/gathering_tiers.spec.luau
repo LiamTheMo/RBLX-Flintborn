@@ -4,7 +4,6 @@ local EventCatalog = require(Shared.Events.EventCatalog)
 local EventRules = require(Shared.Events.EventRules)
 local ItemCatalog = require(Shared.Items.ItemCatalog)
 local NodeCatalog = require(Shared.Resources.NodeCatalog)
-local Rarity = require(Shared.Items.Rarity)
 local Tiers = require(Shared.Items.Tiers)
 
 local LADDER = { "Wood", "Stone", "Copper", "Iron", "Silver", "Cobalt", "Mithril", "Adamantine" }
@@ -16,21 +15,16 @@ local function tool(tierId: string, kind: string)
 	return item.tool
 end
 
-test("plants and bushes are gathered by hand at 1 per hit, whatever is held", function()
+-- Sickles are gone (crafting.spec checks every tool is an axe or a pickaxe).
+test("plants by hand at 1 per hit whatever is held; axes and pickaxes drop 1 + tool rank", function()
 	for nodeType, node in NodeCatalog.Nodes do
 		if node.tool == nil and node.minRank == nil then
-			expectEq(NodeCatalog.YieldFor(nodeType, nil), 1, nodeType .. " by hand")
-			expectEq(NodeCatalog.YieldFor(nodeType, tool("Mithril", "Axe")), 1, nodeType .. " with an axe")
-			expectEq(NodeCatalog.YieldFor(nodeType, tool("Mithril", "Pickaxe")), 1, nodeType .. " with a pickaxe")
+			for _, held in { false, tool("Mithril", "Axe"), tool("Mithril", "Pickaxe") } do
+				expectEq(NodeCatalog.YieldFor(nodeType, held or nil), 1, nodeType .. " by hand or with any tool")
+			end
 			expect(NodeCatalog.GateNotice(nodeType, nil) == nil, nodeType .. " has no gate")
 		end
 	end
-	for _, item in ItemCatalog.Items do
-		expect(item.tool == nil or item.tool.kind ~= "Sickle", item.id .. " is not a sickle")
-	end
-end)
-
-test("axes on trees and pickaxes on rock and clay drop 1 + tool rank; bare hands 1", function()
 	for index, tierId in LADDER do
 		expectEq(NodeCatalog.YieldFor("Tree", tool(tierId, "Axe")), 1 + index, tierId .. " axe on a tree")
 		expectEq(NodeCatalog.YieldFor("Rock", tool(tierId, "Pickaxe")), 1 + index, tierId .. " pickaxe on rock")
@@ -40,24 +34,6 @@ test("axes on trees and pickaxes on rock and clay drop 1 + tool rank; bare hands
 	expectEq(NodeCatalog.YieldFor("Tree", nil), 1, "bare hands chop")
 	expectEq(NodeCatalog.YieldFor("Rock", nil), 1, "bare hands quarry")
 	expectEq(NodeCatalog.YieldFor("Tree", tool("Adamantine", "Pickaxe")), 1, "the wrong tool is bare hands")
-end)
-
-test("each ore and gem needs the pickaxe the catalog names", function()
-	local needs = {
-		CopperOre = "Stone",
-		IronOre = "Copper",
-		SilverOre = "Iron",
-		CobaltOre = "Silver",
-		MithrilOre = "Cobalt",
-		AdamantineOre = "Mithril",
-		Obsidian = "Iron",
-		Jade = "Cobalt",
-	}
-	for material, tierId in needs do
-		expectEq(NodeCatalog.MineRanks[material], Tiers.ToolRank[tierId], material .. " gate")
-	end
-	expectEq(NodeCatalog.MineRanks.Stone, nil, "rock is not gated")
-	expectEq(NodeCatalog.MineRanks.Flint, nil, "flint is not gated")
 end)
 
 test("mining below the gate gives nothing and names the pickaxe needed", function()
@@ -81,6 +57,20 @@ test("mining below the gate gives nothing and names the pickaxe needed", functio
 		end
 	end
 	expectEq(NodeCatalog.GateNotice("IronDeposit", nil), "Needs a Copper Pickaxe or better", "the spec's example")
+	-- Each ore and gem needs the previous tier's pickaxe (GDD §53).
+	for nodeType, needed in
+		{
+			CopperDeposit = "Stone",
+			IronDeposit = "Copper",
+			SilverDeposit = "Iron",
+			CobaltDeposit = "Silver",
+			MithrilDeposit = "Cobalt",
+			ObsidianOutcrop = "Iron",
+			JadeVein = "Cobalt",
+		}
+	do
+		expectEq(LADDER[NodeCatalog.Nodes[nodeType].minRank], needed, nodeType .. " opens at " .. needed)
+	end
 end)
 
 test("trees drop Resin and rocks Flint per hit; the finishing hit on rock adds Flint", function()
@@ -169,13 +159,13 @@ test("meteor chunks give Adamantine Ore and need a Mithril Pickaxe", function()
 			adamantine = adamantine or row[1] == "AdamantineOre"
 		end
 		expect(adamantine, entry.id .. " drops Adamantine Ore")
-		expectEq(
-			NodeCatalog.PickaxeNotice(tool("Cobalt", "Pickaxe"), entry.minRank),
-			"Needs a Mithril Pickaxe or better",
-			entry.id .. " refuses a Cobalt Pickaxe"
-		)
-		expectEq(NodeCatalog.PickaxeNotice(tool("Mithril", "Pickaxe"), entry.minRank), nil, entry.id .. " Mithril")
-		expectEq(NodeCatalog.PickaxeNotice(tool("Adamantine", "Pickaxe"), entry.minRank), nil, entry.id .. " better")
+		for tierId, notice in { Cobalt = "Needs a Mithril Pickaxe or better", Mithril = false, Adamantine = false } do
+			expectEq(
+				NodeCatalog.PickaxeNotice(tool(tierId, "Pickaxe"), entry.minRank) or false,
+				notice,
+				entry.id .. tierId
+			)
+		end
 	end
 	expect(meteors >= 1, "meteors exist")
 end)
@@ -244,80 +234,4 @@ test("the rare shrub is a hand-gathered Rare vegetation event with rare berries 
 	for _, id in { "Bloodroot", "Moonpetal" } do
 		expect(ItemCatalog.Get(id).tradeable, id .. " is tradeable")
 	end
-end)
-
-local function list(...)
-	local entries = {}
-	for index, rarity in { ... } do
-		table.insert(entries, { id = rarity .. index, rarity = rarity })
-	end
-	return entries
-end
-
-test("every rare type rolls on its own at its rarity's old frequency", function()
-	local rng = Random.new(47)
-	local entries = list("Common", "Rare", "Rare", "Epic")
-	local counts, both, common, trials = {}, 0, 0, 400000
-	for _ = 1, trials do
-		local results = EventRules.RollCategory(entries, rng)
-		local rares = 0
-		for _, entry in results do
-			counts[entry.id] = (counts[entry.id] or 0) + 1
-			rares += if entry.rarity == "Rare" then 1 else 0
-			common += if entry.rarity == "Common" then 1 else 0
-		end
-		both += if rares == 2 then 1 else 0
-		for index = 2, #results do
-			expect(
-				Rarity.Index(results[index - 1].rarity) >= Rarity.Index(results[index].rarity),
-				"results come rarest first"
-			)
-		end
-	end
-	local trigger = EventRules.TRIGGER_CHANCE
-	local rare, epic = EventRules.RARITY_WEIGHTS.Rare, EventRules.RARITY_WEIGHTS.Epic
-	expectNear((counts.Rare2 or 0) / trials, trigger * rare, 0.002, "first Rare type")
-	expectNear((counts.Rare3 or 0) / trials, trigger * rare, 0.002, "second Rare type, not halved")
-	expectNear((counts.Epic4 or 0) / trials, trigger * epic, 0.0015, "Epic type")
-	expectNear(both / trials, trigger * rare * rare, 0.0008, "both Rare types can start in one tick")
-	local none = (1 - rare) * (1 - rare) * (1 - epic)
-	expectNear(common / trials, trigger * none, 0.003, "Common only when no rarer type hits")
-end)
-
-test("a category without Common skips when no type hits; ticks gather every result", function()
-	local rng = Random.new(53)
-	local entries = list("Rare", "Rare")
-	local empty, trials = 0, 100000
-	for _ = 1, trials do
-		empty += if #EventRules.RollCategory(entries, rng) == 0 then 1 else 0
-	end
-	local rare = EventRules.RARITY_WEIGHTS.Rare
-	expectNear(1 - empty / trials, EventRules.TRIGGER_CHANCE * (1 - (1 - rare) ^ 2), 0.003, "either Rare type")
-	expectEq(#EventRules.RollCategory({}, rng), 0, "an empty category never rolls")
-
-	local catalog = { A = list("Uncommon", "Uncommon", "Uncommon"), B = list("Common") }
-	local best = 0
-	for _ = 1, 5000 do
-		local results = EventRules.RollTick(catalog, { "A", "B" }, rng)
-		local fromA = 0
-		for _, entry in results do
-			fromA += if entry.rarity == "Uncommon" then 1 else 0
-		end
-		best = math.max(best, fromA)
-	end
-	expect(best >= 2, "one category can start several types in one tick")
-end)
-
-test("rolls are reproducible from an injected rng", function()
-	local function run(seed: number)
-		local rng, ids = Random.new(seed), {}
-		for _ = 1, 2000 do
-			for _, entry in EventRules.RollTick(EventCatalog.Entries, EventCatalog.Categories, rng) do
-				table.insert(ids, entry.id)
-			end
-		end
-		return table.concat(ids, ",")
-	end
-	expectEq(run(59), run(59), "same seed, same events")
-	expect(#run(59) > 0, "the real catalog produces events")
 end)

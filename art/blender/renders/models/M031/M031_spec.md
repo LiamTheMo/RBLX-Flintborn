@@ -54,8 +54,8 @@ the paper):
   rock faces (hue 26–31°) fall into K (≤ 1.5 points in the bottom band). Use the same scripts on both images.
 
 **Scratch study material** (no Blender), in
-`<temp>\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m031_study\`.
-Run with the scratch venv `...\scratchpad\venv22\Scripts\python.exe` (Pillow + numpy).
+`<temp>/m031_study/`.
+Run with the scratch venv `<temp>/venv22/Scripts/python.exe` (Pillow + numpy).
 - **Helpers:** `m.py` (masks `cls()`, view boxes `V`, label blanking, `stats`), `lab.py` (connected components),
   `bb.json` (silhouette boxes), `crop.py`, `grid.py`.
 - **Measurements:** `measure.py` → `measure_out.txt` (bboxes, shares, top and bottom profiles, width per height, shares
@@ -1057,9 +1057,9 @@ Skipped by decision 7: the sheet says "No additional details, variants, or effec
 
 Fresh verifier, read-only. Background session on port 9880 with `wip/M031_verify.blend` (not saved, no `build()`). Fresh
 renders came from `m031.render_views()` with `M.MODEL_RENDERS` pointed at the verifier's scratch folder
-(`scratchpad/m031_ver/renders/M031/`). The modeller's `meas.py` / `reg.py` were re-pointed at those renders; the
+(`<temp>/m031_ver/renders/M031/`). The modeller's `meas.py` / `reg.py` were re-pointed at those renders; the
 verifier's own `band.py` adds the underside band, the parts and per-class colours. Side-by-side crops are
-`scratchpad/m031_ver/pair_*.png` and `parts*.png`.
+`<temp>/m031_ver/pair_*.png` and `parts*.png`.
 
 **Result: FAIL, 6.5 / 10.** Three blockers: the underside colour blows out wherever it is lit, the rock keys are
 mauve rather than warm, and the rocks have the wrong shape. Geometry, topology, UVs, the caps and the stalks all pass.
@@ -1221,7 +1221,7 @@ Renders are identical to the modeller's: the same numbers reproduce exactly.
 
 Fresh modeller, 2026-10-29. Background session on port 9880 with `wip/M031.blend` (saved after the final build). The
 builder `m031.py` is still the source of truth; all changes are in it. Scratch tools are in
-`scratchpad/m031_r2/`: `r2.py` (rock-band top profile, bottom-20 % rock share and R-class medians per view),
+`<temp>/m031_r2/`: `r2.py` (rock-band top profile, bottom-20 % rock share and R-class medians per view),
 `band.py` (the verifier's band and parts script, pointed at `renders/models/M031/`), `bot.py` (class map of the
 bottom band), `pair.py` (side-by-side crops `pairs_fsr.png` and `pairs_parts.png`). The final numbers are in
 `final_meas.txt`. The modeller's `m031_mod/meas.py` / `reg.py` were re-run unchanged.
@@ -1317,9 +1317,9 @@ Notes on the misses:
 
 Fresh verifier, read-only; it did no other stage and was not the round-1 verifier. Background session on port 9880 with
 `wip/M031_verify.blend` (not saved; `build()` not called). Fresh renders come from `m031.render_views()` with
-`M.MODEL_RENDERS` pointed at `scratchpad/m031_ver2/renders/`. The measuring scripts are copies of the modeller's
+`M.MODEL_RENDERS` pointed at `<temp>/m031_ver2/renders/`. The measuring scripts are copies of the modeller's
 `band.py` / `r2.py` / `meas.py` and the round-1 `geo.py` / `geo2.py` / `mats.py`, re-pointed at those renders. The
-side-by-side crops are `scratchpad/m031_ver2/p_fsr.png`, `p_34.png`, `p_top_expl.png`, `p_parts1.png`, `p_parts2.png`,
+side-by-side crops are `<temp>/m031_ver2/p_fsr.png`, `p_34.png`, `p_top_expl.png`, `p_parts1.png`, `p_parts2.png`,
 `p_under.png` and `z_stalk.png`. Every number the modeller recorded reproduces exactly.
 
 **Result: PASS, 7.5 / 10.** B1–B3 are fixed. What remains is lighting, or comes from the decisions. Nothing is broken.

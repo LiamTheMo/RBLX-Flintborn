@@ -1,7 +1,7 @@
 --!nocheck
 -- Minimal stand-ins for the Roblox environment, just enough for pure-logic
--- modules under src/shared to load and run in the standalone Luau CLI. See
--- run.py for how this is bundled with the modules and a spec.
+-- modules under src/shared and src/server to load and run in the standalone
+-- Luau CLI. See run.py for how this is bundled with the modules and a spec.
 
 -- Datatypes ------------------------------------------------------------------
 

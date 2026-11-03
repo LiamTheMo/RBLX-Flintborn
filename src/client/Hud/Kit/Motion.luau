@@ -108,17 +108,6 @@ function Motion.Set(instance: Instance, goal: { [string]: any })
 	end
 end
 
--- Cancels every running tween on `instance`.
-function Motion.Stop(instance: Instance)
-	local byProp = running[instance]
-	if byProp then
-		running[instance] = nil
-		for _, tween in byProp do
-			tween:Cancel()
-		end
-	end
-end
-
 -- A repeating, reversing transparency pulse (a key cap waiting for a key).
 -- Returns a function that stops it and restores `rest`.
 function Motion.Pulse(instance: Instance, property: string, low: number, rest: number): () -> ()

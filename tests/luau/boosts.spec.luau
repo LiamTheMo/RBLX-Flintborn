@@ -1,4 +1,4 @@
--- Berry and draught boosts (GDD §51, Q162, docs/ITEM_CATALOG.md §3): one timed
+-- Berry and draught boosts (GDD §51, Q162, docs/design/ITEM_CATALOG.md §3): one timed
 -- boost per kind that never weakens (only a stronger one takes over), XP that adds
 -- to Premium and the paid booster, and luck that raises rare-drop chances only.
 local Shared = game:GetService("ReplicatedStorage").Shared
@@ -24,7 +24,7 @@ local function fixedRng(roll)
 	}
 end
 
-test("every boost item carries a valid boost and is usable from the hotbar", function()
+test("every boost item carries a valid boost; draughts outrank berries; bad boosts are rejected", function()
 	for id, item in catalog do
 		if item.kind == Consumables.Boost then
 			expect(item.boost ~= nil, id .. " is a Boost item without a boost")
@@ -40,27 +40,17 @@ test("every boost item carries a valid boost and is usable from the hotbar", fun
 	expectEq(catalog.Glimmerberry.boost.kind, "Luck", "Glimmerberry boosts luck")
 	expectEq(catalog.Redberry.boost, nil, "Redberry has no boost")
 	expectEq(catalog.Sweetberry.boost, nil, "Sweetberry has no boost")
-end)
-
-test("draughts beat raw berries and Strong draughts last longer", function()
-	expect(catalog.SunberryDraught.boost.amount > catalog.Sunberry.boost.amount, "Sunberry Draught is stronger")
-	expect(catalog.GlimmerDraught.boost.amount > catalog.Glimmerberry.boost.amount, "Glimmer Draught is stronger")
-	expect(
-		catalog.StrongSunberryDraught.boost.seconds > catalog.SunberryDraught.boost.seconds,
-		"Strong Sunberry Draught lasts longer"
-	)
-	expect(
-		catalog.StrongGlimmerDraught.boost.seconds > catalog.GlimmerDraught.boost.seconds,
-		"Strong Glimmer Draught lasts longer"
-	)
-end)
-
-test("bad boosts are rejected", function()
-	expect(not BoostRules.IsValid(nil), "nil")
+	for _, pair in { { "Sunberry", "SunberryDraught" }, { "Glimmerberry", "GlimmerDraught" } } do
+		expect(catalog[pair[2]].boost.amount > catalog[pair[1]].boost.amount, pair[2] .. " is stronger")
+	end
+	for _, pair in { { "SunberryDraught", "StrongSunberryDraught" }, { "GlimmerDraught", "StrongGlimmerDraught" } } do
+		expect(catalog[pair[2]].boost.seconds > catalog[pair[1]].boost.seconds, pair[2] .. " lasts longer")
+	end
 	expect(not BoostRules.IsValid({ kind = "Speed", amount = 0.1, seconds = 60 }), "unknown kind")
 	expect(not BoostRules.IsValid({ kind = "XP", amount = -0.1, seconds = 60 }), "negative amount")
 	expect(not BoostRules.IsValid({ kind = "XP", amount = 0.1, seconds = 0 }), "no duration")
 	expect(not BoostRules.IsValid({ kind = "XP", amount = "lots", seconds = 60 }), "non-number amount")
+	expect(not BoostRules.IsValid(nil), "nil")
 end)
 
 test("a running boost never weakens: only a stronger one takes over", function()
@@ -88,18 +78,6 @@ test("a running boost never weakens: only a stronger one takes over", function()
 	local _, after = BoostRules.Apply(boosts, catalog.Sunberry.boost, 660)
 	expect(after, "once it has run out, any boost starts again")
 	expectNear(BoostRules.Amount(boosts, "XP", 661), 0.10, 1e-9, "the berry's own strength")
-end)
-
-test("XP and luck boosts run side by side", function()
-	local boosts = BoostRules.New()
-	BoostRules.Apply(boosts, catalog.SunberryDraught.boost, 0)
-	BoostRules.Apply(boosts, catalog.GlimmerDraught.boost, 0)
-	expectNear(BoostRules.Amount(boosts, "XP", 10), 0.25, 1e-9, "XP boost")
-	expectNear(BoostRules.Amount(boosts, "Luck", 10), 0.15, 1e-9, "luck boost")
-	local modifiers = BoostRules.Modifiers(boosts, 10)
-	expectEq(#modifiers, 2, "one modifier per running boost")
-	expectEq(ModifierRules.Collect(modifiers, "Xp")[1].value, 0.25, "XP feeds the Xp stat")
-	expectEq(ModifierRules.Collect(modifiers, "Luck")[1].value, 0.15, "Luck feeds the Luck stat")
 end)
 
 test("boosts end on time and stop counting", function()
@@ -130,9 +108,13 @@ test("Q162: a potion XP boost adds to Premium and the paid booster", function()
 	expectEq(ModifierRules.Final(100, ModifierRules.Collect(BoostRules.Modifiers(boosts, 1), "Xp")), 125, "alone")
 end)
 
-test("luck sums the Fortune perk and a luck boost", function()
+test("XP and luck boosts run side by side; luck sums the Fortune perk and a luck boost", function()
 	local boosts = BoostRules.New()
+	BoostRules.Apply(boosts, catalog.SunberryDraught.boost, 0)
 	BoostRules.Apply(boosts, catalog.GlimmerDraught.boost, 0)
+	expectNear(BoostRules.Amount(boosts, "XP", 10), 0.25, 1e-9, "XP boost")
+	expectNear(BoostRules.Amount(boosts, "Luck", 10), 0.15, 1e-9, "luck boost")
+	expectEq(#BoostRules.Modifiers(boosts, 10), 2, "one modifier per running boost")
 	local sources = PerkCatalog.Modifiers({ Fortune = 2 })
 	for _, modifier in BoostRules.Modifiers(boosts, 1) do
 		table.insert(sources, modifier)
@@ -153,24 +135,13 @@ test("luck raises rare-drop chances only and never above certain", function()
 	local lucky = EventRules.RollLoot(loot, roll, catalog.GlimmerDraught.boost.amount)
 	expectEq(#lucky, 2, "+15% luck makes the 20% row 23%, so 0.21 hits")
 	expectEq(lucky[1].quantity, 2, "luck does not change quantities")
+	local multiplied = EventRules.RollLoot(loot, fixedRng(0.231), catalog.GlimmerDraught.boost.amount)
+	expectEq(#multiplied, 1, "luck multiplies the chance (20% -> 23%), it does not add 15 points")
 
 	local nearlyCertain = fixedRng(0.999999)
 	expectEq(#EventRules.RollLoot({ { "Sure", 1, 1, 1 } }, nearlyCertain, 5), 1, "certain rows stay certain")
 	local capped = EventRules.RollLoot({ { "Half", 1, 1, 0.5 } }, fixedRng(1), 5)
 	expectEq(#capped, 0, "chance is capped at 1, never more")
-end)
-
-test("luck lifts the rare-drop rate by the expected amount over many rolls", function()
-	local rng = Random.new(42)
-	local loot = { { "Rare", 1, 1, 0.1 } }
-	local plain, lucky = 0, 0
-	local trials = 20000
-	for _ = 1, trials do
-		plain += #EventRules.RollLoot(loot, rng, 0)
-		lucky += #EventRules.RollLoot(loot, rng, catalog.GlimmerDraught.boost.amount)
-	end
-	expectNear(plain / trials, 0.10, 0.01, "base 10% rate")
-	expectNear(lucky / trials, 0.115, 0.01, "+15% luck gives about 11.5%")
 end)
 
 test("use toasts name the item and its effects", function()

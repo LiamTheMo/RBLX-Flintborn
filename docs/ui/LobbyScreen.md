@@ -3,7 +3,8 @@
 Reference: `art/reference/ui/lobby/01_hud.png` (layout and sizes), kit sheets in
 `art/reference/ui/lobby/kit/` (the parts to slice; index in `art/reference/ui/lobby/README.md`).
 Design resolution: 1672 × 941 (the reference image size).
-Status: Draft (measured; open questions at the end).
+Status: Built (`src/client/Hud/Screens/LobbyHud.luau`); this is the measured spec it
+was built from (open questions at the end).
 Source of truth for build: the reference. Raw measurements, scripts and crops:
 `art/ui/kit/analysis/lobby/`.
 
@@ -230,7 +231,7 @@ darker and bluer, softened render (sky correlation drops to 0.70, texture ratio
 
 ## Measurements log
 
-Tools: `ref_tools.py` (skill scripts) for info/grid/crop/sample, plus the scripts
+Tools: `ref_tools.py` (skill scripts) for info/grid/crop/sample (`ref_tools.py` is an external reference-measuring helper from the UI modelling skill, not part of this repo; the repo's own measuring scripts are the ones in `art/ui/kit/analysis/`), plus the scripts
 in `art/ui/kit/analysis/lobby/tools/` (`m.py`: scanline runs, luminance profiles,
 ink boxes, flood fills, outward/inward edge marching; `comps.py`: alpha
 components; `tsize.py`: Merriweather render matching). Full output in

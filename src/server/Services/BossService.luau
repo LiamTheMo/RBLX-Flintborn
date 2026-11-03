@@ -23,6 +23,7 @@ local AggroRules = require(ReplicatedStorage.Shared.Enemies.AggroRules)
 local BossCatalog = require(ReplicatedStorage.Shared.Bosses.BossCatalog)
 local BossRules = require(ReplicatedStorage.Shared.Bosses.BossRules)
 local BossScaling = require(ReplicatedStorage.Shared.Bosses.BossScaling)
+local Characters = require(ReplicatedStorage.Shared.World.Characters)
 local CreatureModels = require(ReplicatedStorage.Shared.Visuals.CreatureModels)
 local EventRules = require(ReplicatedStorage.Shared.Events.EventRules)
 local ModelBuilder = require(ReplicatedStorage.Shared.Visuals.ModelBuilder)
@@ -59,10 +60,6 @@ local rng = Random.new()
 
 -- Living, at-risk, standing players outside safe zones (§3.2).
 local canTarget = NpcService.CanTarget
-
-local function rootOf(player: Player)
-	return player.Character and player.Character:FindFirstChild("HumanoidRootPart")
-end
 
 -- Level and gear of every at-risk player right now (frozen by the caller).
 local function population()
@@ -111,7 +108,7 @@ end
 
 local function hurtNear(position: Vector3, radius: number, damage: number)
 	for _, player in Players:GetPlayers() do
-		local root = rootOf(player)
+		local root = Characters.RootOf(player)
 		if root and canTarget(player) and (root.Position - position).Magnitude <= radius then
 			NpcService.DamagePlayer(player, damage)
 		end
@@ -152,7 +149,7 @@ local function bolt(boss, targetPosition: Vector3)
 		local position = origin + direction * travelled
 		orb.CFrame = CFrame.new(position)
 		for _, player in Players:GetPlayers() do
-			local root = rootOf(player)
+			local root = Characters.RootOf(player)
 			if root and canTarget(player) and (root.Position - position).Magnitude <= BossService.BOLT_RADIUS then
 				-- A slow bolt hits the first player it reaches, once.
 				NpcService.DamagePlayer(player, damage)
@@ -186,7 +183,7 @@ local function quake(boss, targetPosition: Vector3)
 end
 
 local function attack(boss, target: Player, distance: number)
-	local root = rootOf(target)
+	local root = Characters.RootOf(target)
 	if root == nil then
 		return
 	end
@@ -306,30 +303,12 @@ function BossService.Spawn(bossId: string, position: Vector3, options)
 	return boss
 end
 
+-- Only the map is ground: never climb onto pillars, walls, bases or other bodies.
 local function groundParams()
-	local params = RaycastParams.new()
-	params.FilterType = Enum.RaycastFilterType.Exclude
-	local ignore = { folder }
-	-- Only the map is ground: never climb onto pillars, walls, bases or other bodies.
-	for _, name in { "EventEnemies", "Arrows", "GuardianArena", "WorldEvents", "PlayerStructures", "ResourceNodes" } do
-		local other = workspace:FindFirstChild(name)
-		if other then
-			table.insert(ignore, other)
-		end
-	end
-	-- Solid island scenery (trunks, boulders, logs) is queryable but never ground.
-	local scenery = WorldState.Scenery()
-	if scenery then
-		table.insert(ignore, scenery)
-	end
-	for _, player in Players:GetPlayers() do
-		if player.Character then
-			table.insert(ignore, player.Character)
-		end
-	end
-	params.FilterDescendantsInstances = ignore
-	params.RespectCanCollide = true
-	return params
+	return WorldState.GroundParams(
+		{ "EventEnemies", "Arrows", "GuardianArena", "WorldEvents", "PlayerStructures", "ResourceNodes" },
+		folder
+	)
 end
 
 -- Bosses follow the terrain like other enemies.
@@ -348,7 +327,7 @@ local function step(dt: number)
 		local feet = position - Vector3.new(0, body.Size.Y / 2, 0)
 		local target, best = nil, BossService.AGGRO
 		for _, player in Players:GetPlayers() do
-			local root = rootOf(player)
+			local root = Characters.RootOf(player)
 			if root and canTarget(player) then
 				local distance = (root.Position - position).Magnitude
 				if distance <= BossService.CONTEST_RADIUS then
@@ -378,8 +357,11 @@ local function step(dt: number)
 			BossService.Heal(boss)
 		end
 		-- Bosses never leave their leash, even to chase a provoking archer.
-		local goal =
-			AggroRules.ClampToLeash(boss.home, if target then rootOf(target).Position else boss.home, BossService.LEASH)
+		local goal = AggroRules.ClampToLeash(
+			boss.home,
+			if target then Characters.RootOf(target).Position else boss.home,
+			BossService.LEASH
+		)
 		local flat = Vector3.new(goal.X - position.X, 0, goal.Z - position.Z)
 		if target and now - boss.lastAttack >= BossService.ATTACK_SECONDS then
 			boss.lastAttack = now
@@ -406,10 +388,6 @@ function BossService.TopContributor(boss): Player?
 		end
 	end
 	return best
-end
-
-function BossService.Active()
-	return bosses
 end
 
 function BossService.Start()

@@ -5,7 +5,7 @@ modeller gets its own persistent session on its own port, with its own copy of t
 run -> read back -> render -> look loop as the GUI MCP, and the scene state stays between calls. Only the GUI
 session (port 9876) is driven through the MCP tool itself; these are driven from the shell:
 
-    PY=C:/Users/Orang/.local/bin/python3.14.exe
+    PY=python3
     $PY art/blender/kit/mcp/bgmcp.py start 9877 <work.blend>      # launch (returns once the server answers)
     $PY art/blender/kit/mcp/bgmcp.py run 9877 <code.py>           # run a file; prints the JSON response
     $PY art/blender/kit/mcp/bgmcp.py run 9877 - <<'EOF'           # or code on stdin

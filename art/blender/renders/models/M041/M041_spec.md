@@ -56,7 +56,7 @@ Sheet text:
   (681,1012,1007,1239). Swatches 36 × 36 px at x 33–69, y 1288 / 1331 / 1374 / 1417 (inner boxes in `m.SW`).
 
 **Scratch study material** (no Blender), in
-`<temp>\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m041_study\`.
+`<temp>/m041_study/`.
 Run with the scratch venv `..\venv22\Scripts\python.exe` (Python 3.14, Pillow, numpy).
 - **Helpers:** `m.py` (masks `cls()`, boxes `V`/`X`/`SW`, `label()`, `preview()`), `zoom.py`, `grid.py` (zoom with a
   10-px sheet grid: `g_f34.png`, `g_f34L.png`, `g_f34R.png`, `g_main.png`, `g_front.png`, `g_r34.png`, `g_top.png`),
@@ -1116,7 +1116,7 @@ and the contact sheet `M041_views.png`.
 
 A fresh stage-7 verifier with no other stage. It worked read-only on port 9877 with `wip/M041_verify.blend`: no `build()`, no
 edits, no save (the file's timestamp is unchanged). It rendered with `m041.render_views`, with the output sent to the scratchpad
-(`…/scratchpad/m041_verify/M041/`, plus extra collar close-ups `cu_*.png` and side-by-side crops `cmp_*.png`). Every
+(`<temp>/m041_verify/M041/`, plus extra collar close-ups `cu_*.png` and side-by-side crops `cmp_*.png`). Every
 number below was re-measured with the verifier's own bmesh/BVH code unless it says "builder fn".
 
 ### Measured

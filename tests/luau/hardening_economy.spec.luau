@@ -1,5 +1,7 @@
 -- Economy hardening: codes, purchases, Center doubling, rebirth credit, trade
--- reconciliation and limits, PvP credit, tutorial skips and shop pricing.
+-- reconciliation and limits, PvP credit, tutorial skips and shop pricing. Saves
+-- made before the permanent redemption ledger and the remembered tutorial skip
+-- must not reopen the exploits those records close.
 local Server = game:GetService("ServerScriptService").Server
 local Shared = game:GetService("ReplicatedStorage").Shared
 local EconomyRules = require(Shared.Economy.EconomyRules)
@@ -46,17 +48,48 @@ local function fang(id, overrides)
 	return item
 end
 
+local redeemLaunch = strict(function(working)
+	return EconomyRules.RedeemCode(working, "FLINTBORN-LAUNCH", { gems = 25 }, 1)
+end)
+
 test("a code redeems once ever, even after the journal forgets it", function()
 	local profile = ProfileSchema.Default(0)
-	local redeem = strict(function(working)
-		return EconomyRules.RedeemCode(working, "FLINTBORN-LAUNCH", { gems = 25 }, 1)
-	end)
-	OperationJournal.Run(profile, "code:FLINTBORN-LAUNCH", "CodeRedeem", 1, redeem)
+	OperationJournal.Run(profile, "code:FLINTBORN-LAUNCH", "CodeRedeem", 1, redeemLaunch)
 	flushJournal(profile)
 	expectEq(OperationJournal.Get(profile, "code:FLINTBORN-LAUNCH"), nil, "journal trimmed")
-	local ok, reason = pcall(OperationJournal.Run, profile, "code:FLINTBORN-LAUNCH", "CodeRedeem", 9, redeem)
+	local ok, reason = pcall(OperationJournal.Run, profile, "code:FLINTBORN-LAUNCH", "CodeRedeem", 9, redeemLaunch)
 	expect(not ok and reason == "AlreadyRedeemed", "the permanent record refuses it")
 	expectEq(profile.currency.gems, 25, "25 Gems once")
+end)
+
+-- A save from before the ledger: the redemption lives only in the journal.
+local function legacyRedeemedSave()
+	local saved = ProfileSchema.Default(0)
+	saved.currency.redeemedCodes = nil
+	saved.currency.gems = 25
+	saved.operations.records["code:FLINTBORN-LAUNCH"] =
+		{ kind = "CodeRedeem", status = "committed", at = 1, result = nil }
+	table.insert(saved.operations.order, "code:FLINTBORN-LAUNCH")
+	return saved
+end
+
+test("a code redeemed before the ledger existed stays redeemed after the journal trims", function()
+	local profile, problem = ProfileSchema.Migrate(legacyRedeemedSave(), 0)
+	expectEq(problem, nil, "loads")
+	flushJournal(profile)
+	expectEq(OperationJournal.Get(profile, "code:FLINTBORN-LAUNCH"), nil, "journal trimmed")
+	local ok, reason = pcall(OperationJournal.Run, profile, "code:FLINTBORN-LAUNCH", "CodeRedeem", 9, redeemLaunch)
+	expect(not ok and reason == "AlreadyRedeemed", "the old redemption still counts")
+	expectEq(profile.currency.gems, 25, "25 Gems once")
+end)
+
+test("only committed code redemptions are copied into the ledger", function()
+	local saved = legacyRedeemedSave()
+	saved.operations.records["code:FLINTBORN-LAUNCH"] = nil
+	saved.operations.records["buy:code:x"] = { kind = "ShopBuy", status = "committed", at = 1 }
+	saved.operations.records["code:FLINTBORN-RESPEC"] = { kind = "CodeRedeem", status = "pending", at = 1 }
+	local profile = ProfileSchema.Migrate(saved, 0)
+	expectEq(next(profile.currency.redeemedCodes), nil, "nothing redeemed")
 end)
 
 test("a respec code with nothing to respec fails and grants no Gems", function()
@@ -84,36 +117,29 @@ test("a purchase retried after the journal trims never grants twice", function()
 	expectEq(profile.currency.purchaseEntitlements.P1.offer, "GemPack", "entitlement kept")
 end)
 
-test("every extracted material banks into the vault, special ones included", function()
-	local profile = ProfileSchema.Default(0)
-	ProgressionRules.StartRun(profile, "run1")
-	local receipt = ExtractionRules.Settle(profile, {
-		{ catalogId = "AncientEmber", quantity = 1 },
-		{ catalogId = "Stone", quantity = 30 },
-	}, "Center", "r1", 1)
-	expectEq(profile.vault.materials.AncientEmber, 2, "Ancient Ember is vaulted and doubled")
-	expectEq(profile.vault.materials.Stone, 60, "gathered Stone doubled")
-	expectEq(#profile.lobbyBackpack.slots, 0, "no material lands in the lobby backpack")
-	expectEq(receipt.vaulted.AncientEmber, 2, "the receipt lists it as vaulted")
-end)
-
-test("the vault's material capacity, not the backpack, decides what is deleted", function()
-	local profile = ProfileSchema.Default(0)
-	for i = 1, 50 do
-		table.insert(profile.lobbyBackpack.slots, { instanceId = "s" .. i, catalogId = "StoneSpear" })
+test(
+	"every material, special ones included, banks into the vault; its capacity, not the backpack, decides what is deleted",
+	function()
+		local profile = ProfileSchema.Default(0)
+		ProgressionRules.StartRun(profile, "run1")
+		for i = 1, 50 do
+			table.insert(profile.lobbyBackpack.slots, { instanceId = "s" .. i, catalogId = "StoneSpear" })
+		end
+		profile.vault.materials.Stone = 990
+		local receipt = ExtractionRules.Settle(profile, {
+			{ catalogId = "Stone", quantity = 30 },
+			{ catalogId = "AncientEmber", quantity = 3 },
+			{ instanceId = "late", catalogId = "StoneSpear" },
+		}, "Center", "r1", 1)
+		expectEq(profile.vault.materials.Stone, 1000, "Stone fills the vault stack")
+		expectEq(receipt.vaulted.Stone, 10, "10 of 60 fit")
+		expectEq(receipt.deleted.Stone, 50, "the rest is deleted and listed")
+		expectEq(profile.vault.materials.AncientEmber, 6, "a full backpack never deletes materials; Ember is doubled")
+		expectEq(receipt.vaulted.AncientEmber, 6, "the receipt lists it as vaulted")
+		expectEq(#profile.lobbyBackpack.slots, 50, "no material lands in the lobby backpack")
+		expectEq(receipt.deleted.StoneSpear, 1, "gear still overflows the 50-slot backpack")
 	end
-	profile.vault.materials.Stone = 990
-	local receipt = ExtractionRules.Settle(profile, {
-		{ catalogId = "Stone", quantity = 30 },
-		{ catalogId = "AncientEmber", quantity = 3 },
-		{ instanceId = "late", catalogId = "StoneSpear" },
-	}, "Center", "r1", 1)
-	expectEq(profile.vault.materials.Stone, 1000, "Stone fills the vault stack")
-	expectEq(receipt.vaulted.Stone, 10, "10 of 60 fit")
-	expectEq(receipt.deleted.Stone, 50, "the rest is deleted and listed")
-	expectEq(profile.vault.materials.AncientEmber, 6, "a full backpack never deletes materials")
-	expectEq(receipt.deleted.StoneSpear, 1, "gear still overflows the 50-slot backpack")
-end)
+)
 
 test("a Guardian Legendary counts toward rebirth on its first extraction only", function()
 	local profile = ProfileSchema.Default(0)
@@ -165,12 +191,10 @@ test("reconcile waits while the counterpart's settling server may still save", f
 	expect(a.trades.pending.t1 ~= nil, "nothing changed yet")
 	expectEq(TradeRules.Reconcile(a, "t1", bStored, DAY + 400), "RolledBack", "lease expired: never saved")
 	expectEq(a.lobbyBackpack.slots[1].instanceId, "s1", "A has the sword back")
-end)
-
-test("a counterpart reloaded on another server never saved the trade: roll back", function()
-	local a, _, bStored = settled("S")
-	bStored.sessionLease = { jobId = "X", expiresAt = DAY + 300 }
-	expectEq(TradeRules.Reconcile(a, "t1", bStored, DAY + 10), "RolledBack", "X loaded B without it")
+	-- A counterpart reloaded on another server never saved the trade: roll back.
+	local a2, _, b2Stored = settled("S")
+	b2Stored.sessionLease = { jobId = "X", expiresAt = DAY + 300 }
+	expectEq(TradeRules.Reconcile(a2, "t1", b2Stored, DAY + 10), "RolledBack", "X loaded B without it")
 end)
 
 test("reconcile settles only on a pending or Settled counterpart record", function()
@@ -250,14 +274,20 @@ test("PvP credit persists per victim and stays bounded", function()
 	expect(count <= ProgressionRules.PVP_CREDIT_MEMORY, "bounded map")
 end)
 
-test("a tutorial skip blocks rewards even after a replay", function()
-	local state = ProfileSchema.Default(0).tutorial
+test("a tutorial skip blocks rewards after a replay, also for skips saved before they were remembered", function()
 	local extract = TutorialSteps.Steps[TutorialSteps.Index.Extract]
+	local state = ProfileSchema.Default(0).tutorial
 	TutorialSteps.Advance(state, "RunStarted", 1)
 	expect(TutorialSteps.Skip(state), "skipped")
 	TutorialSteps.Replay(state)
 	expect(not state.skipped, "the replay runs")
 	expect(not TutorialSteps.ClaimReward(state, extract), "but never pays a skipper")
+	local saved = ProfileSchema.Default(0)
+	saved.tutorial = { step = 2, skipped = true, completedAt = nil, rewardsGranted = {} }
+	local legacy = ProfileSchema.Migrate(saved, 0).tutorial
+	TutorialSteps.Replay(legacy)
+	expect(not legacy.skipped, "the legacy replay runs")
+	expect(not TutorialSteps.ClaimReward(legacy, extract), "but never pays a legacy skipper")
 end)
 
 test("no shop entry is dominated by another for the same item", function()

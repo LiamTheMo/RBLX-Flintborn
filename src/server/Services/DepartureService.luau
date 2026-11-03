@@ -13,13 +13,12 @@ local RunService = game:GetService("RunService")
 local CrashRecoveryRules = require(ReplicatedStorage.Shared.Recovery.CrashRecoveryRules)
 local DeathRules = require(ReplicatedStorage.Shared.Admission.DeathRules)
 local InventoryRules = require(ReplicatedStorage.Shared.Inventory.InventoryRules)
-local ItemCatalog = require(ReplicatedStorage.Shared.Items.ItemCatalog)
 local ListingKeys = require(ReplicatedStorage.Shared.Net.ListingKeys)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local ProfileSchema = require(ReplicatedStorage.Shared.Data.ProfileSchema)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local Validation = require(ReplicatedStorage.Shared.Data.Validation)
-local DownedService = require(script.Parent.DownedService)
+local InteractionService = require(script.Parent.InteractionService)
 local InventoryService = require(script.Parent.InventoryService)
 local ProfileService = require(script.Parent.ProfileService)
 local WorldAdmissionService = require(script.Parent.WorldAdmissionService)
@@ -32,32 +31,10 @@ local bodies = {}
 local lastPositions = {}
 local handled = {}
 
-local function view(contents)
-	local entries = {}
-	for index, item in contents do
-		local def = ItemCatalog.Get(item.catalogId)
-		table.insert(entries, {
-			index = index,
-			key = ListingKeys.KeyOf(item),
-			catalogId = item.catalogId,
-			name = def and def.name or item.catalogId,
-			rarity = def and def.rarity or "Common",
-			quantity = item.quantity,
-			qualityRoll = item.qualityRoll,
-			permanent = item.permanent,
-		})
-	end
-	return entries
-end
-
 local function canLoot(player: Player, body): boolean
 	local root = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
-	local humanoid = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
 	return root ~= nil
-		and humanoid ~= nil
-		and humanoid.Health > 0
-		and WorldAdmissionService.IsAtRisk(player)
-		and not DownedService.IsDowned(player)
+		and InteractionService.CanAct(player)
 		and (root.Position - body.part.Position).Magnitude <= DepartureService.LOOT_RANGE
 end
 
@@ -82,7 +59,7 @@ local function createBody(position: Vector3, contents, ownerName: string)
 	bodies[id] = body
 	prompt.Triggered:Connect(function(looter)
 		if bodies[id] and canLoot(looter, body) then
-			Remotes.Get("CorpseOpened"):FireClient(looter, id, view(body.contents))
+			Remotes.Get("CorpseOpened"):FireClient(looter, id, ListingKeys.View(body.contents, true))
 		end
 	end)
 	-- The body and anything left in it disappear exactly 600 s after creation.
@@ -118,19 +95,18 @@ local function take(looter: Player, bodyId: any, index: any, key: any)
 		copy.ownerId = looter.UserId
 	end
 	local remaining, carried = InventoryService.Add(looter, copy)
-	if copy.instanceId then
-		if remaining > 0 then
-			return false, "NoRoom"
-		end
-		DeathRules.Take(body.contents, index)
-	elseif remaining > 0 then
+	-- Nothing taken (no room for the item, or for a single unit of the stack).
+	if remaining > 0 and (copy.instanceId or remaining == entry.quantity) then
+		return false, "NoRoom"
+	end
+	if remaining > 0 then
 		-- What stays on the body keeps its share of the carried units.
 		entry.quantity = remaining
 		InventoryRules.SetCarried(entry, carried)
 	else
 		DeathRules.Take(body.contents, index)
 	end
-	Remotes.Get("CorpseOpened"):FireClient(looter, bodyId, view(body.contents))
+	Remotes.Get("CorpseOpened"):FireClient(looter, bodyId, ListingKeys.View(body.contents, true))
 	return true, nil
 end
 

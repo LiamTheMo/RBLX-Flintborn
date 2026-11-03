@@ -1218,7 +1218,7 @@ def colour_all(objs):
 
 
 # ---- stage 4 measurement: our renders against the sheet, per region --------------------------------------------------
-SHEET_PATH = "D:/Projects/Roblox/RBLX-Flintborn/art/blender/assets/references/016.png"
+SHEET_PATH = K.REPO + "/art/blender/assets/references/016.png"
 SHEET_BOXES = {"f34": (25, 131, 450, 468), "r34": (452, 110, 795, 468), "front": (30, 545, 279, 728),
                "side": (283, 545, 510, 728), "rear": (513, 545, 762, 728), "top": (766, 545, 1018, 728)}
 REPORT_VIEWS = {"front": ("front_sheet", 0, 9), "side": ("side_sheet", 90, 9), "rear": ("rear_sheet", 180, 9),

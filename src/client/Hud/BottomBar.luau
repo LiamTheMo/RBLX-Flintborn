@@ -10,7 +10,6 @@
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local HudModel = require(ReplicatedStorage.Shared.UI.HudModel)
 local LobbyHudModel = require(ReplicatedStorage.Shared.UI.LobbyHudModel)
 local Signal = require(ReplicatedStorage.Shared.Core.Signal)
 local Kit = require(script.Parent.Kit)
@@ -18,10 +17,6 @@ local Layout = require(script.Parent.Layout)
 
 local BottomBar = {}
 BottomBar.__index = BottomBar
-
--- Beside the full bar at the level cap (short, so it stays over the hotbar;
--- the Progress window explains rebirth).
-BottomBar.MAX_TEXT = "Max level"
 
 function BottomBar.new(parent: Instance, layout)
 	local cfg = Layout.Section(layout, "bottom")
@@ -80,31 +75,19 @@ function BottomBar.new(parent: Instance, layout)
 		hit.NextSelectionLeft = left and left.control.hit
 		hit.NextSelectionRight = right and right.control.hit
 	end
-	self:SetSlotLabels({})
+	-- A slot's badge: its label (SetSlotLabels), else its number.
+	self.label = function(index: number): string
+		return self.labels[index] or tostring(index)
+	end
 	-- The badges follow the input in use.
-	self.stopWatching = Kit.Input.Watch(function()
-		self:_showLabels()
-	end)
+	self.stopWatching = Kit.Slot.WatchHotkeys(self.slots, self.label)
 	return self
-end
-
--- True while key badges mean something: a keyboard or mouse is in use.
-function BottomBar.ShowsKeys(): boolean
-	local kind = Kit.Input.Type()
-	return kind == "keyboard" or kind == "mouse"
 end
 
 -- labels[index]: the key that selects each slot ("1", or a rebound key).
 function BottomBar:SetSlotLabels(labels: { string })
 	self.labels = labels
-	self:_showLabels()
-end
-
-function BottomBar:_showLabels()
-	local show = BottomBar.ShowsKeys()
-	for index, slot in self.slots do
-		slot:SetHotkey(if show then self.labels[index] or tostring(index) else nil)
-	end
+	Kit.Slot.ShowHotkeys(self.slots, self.label)
 end
 
 -- items[index]: {itemId, quantity, permanent} or nil/false for an empty slot.
@@ -124,14 +107,14 @@ end
 
 -- view: the progression snapshot {level, xp, xpToNext}; no xpToNext = level cap.
 function BottomBar:SetProgress(view, instant: boolean?)
+	-- At the cap: the real level ("LV. 100", not "MAX") and "Max level" beside
+	-- the full bar (short, so it stays over the hotbar; the Progress window
+	-- explains rebirth).
 	local progress = LobbyHudModel.Progress(view)
-	local isMax = type(view) == "table" and view.xpToNext == nil
 	local levelledUp = self.level ~= nil and type(view) == "table" and (view.level or 0) > self.level
 	self.level = if type(view) == "table" then view.level else nil
-	-- The real level at the cap too ("LV. 100", not "MAX").
-	local level = if isMax then HudModel.LevelText(view.level) else progress.level
-	self.levelText:SetText(level)
-	self.xpText:SetText(if isMax then BottomBar.MAX_TEXT else progress.text)
+	self.levelText:SetText(progress.level)
+	self.xpText:SetText(progress.text)
 	if levelledUp and not instant then
 		-- Start the new level's bar from empty so the gain reads as a level-up.
 		self.xpBar:Set(0, true)

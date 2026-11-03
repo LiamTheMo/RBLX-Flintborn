@@ -13,7 +13,7 @@ is the authority, this guide summarises it and links to it:
 | [`art/ui/kit/CATALOG.md`](../../art/ui/kit/CATALOG.md) | Every `lk_` sprite: source sheet and box, size, 9-slice insets, atlas, role (generated) |
 | [`art/reference/ui/lobby/README.md`](../../art/reference/ui/lobby/README.md) | The reference images (mockups and kit sheets) |
 | [UI_PROGRESS.md](UI_PROGRESS.md) | Status of every screen and the verification rounds |
-| [MANUAL_VALIDATION.md](../MANUAL_VALIDATION.md#rebuilt-ui-the-shared-kit-and-the-seven-lobby-screens) | Checks that need a real device |
+| [MANUAL_VALIDATION.md](../release/MANUAL_VALIDATION.md#rebuilt-ui-the-shared-kit-and-the-seven-lobby-screens) | Checks that need a real device |
 
 Contents:
 1. [Visual identity](#1-visual-identity)
@@ -592,7 +592,7 @@ objective at the inset), and the lobby's pills with the Party panel. Corner
 pieces that stand alone (Settings, the hotbar group) are in a corner band and
 keep M. Desktop and wide screens have no insets, so every edge region sits at
 M there. Roblox's own buttons and touch controls sit inside the safe area
-(`HudModel.Thumbstick` / `JumpButton` / `ThumbstickZone` take the insets).
+(`HudModel.Thumbstick` takes the insets).
 
 **Touch hit pads.** Every interactive component's invisible hit button grows
 until it covers at least 44 screen px at the component's real scale (the art
@@ -1007,8 +1007,9 @@ for new glyphs.
 ### 9.7 Item icons
 
 The owner's item art is one 512 × 512 RGBA PNG per catalog item in
-`src/assets/Models/2D/` (named after the display name in kebab case, "/" as
-"and": `bone-legs-and-boots.png`). Rojo syncs that folder but skips PNGs.
+`art/ui/items/source/` (named after the display name in kebab case, "/" as
+"and": `bone-legs-and-boots.png`). It is source art for the icon build only;
+the game draws the packed atlases.
 [`art/ui/items/ICONS.json`](../../art/ui/items/ICONS.json) maps each catalog id
 to its display name, family, PNG and atlas group;
 [`build_item_icons.py`](../../art/ui/items/build_item_icons.py) (deterministic,
@@ -1170,4 +1171,4 @@ For every screen or change:
 
 Blur, motion, safe areas, the toast lane, real touch, gamepad focus and how the
 uploaded art draws on phones need a device: the list is in
-[MANUAL_VALIDATION.md](../MANUAL_VALIDATION.md#rebuilt-ui-the-shared-kit-and-the-seven-lobby-screens).
+[MANUAL_VALIDATION.md](../release/MANUAL_VALIDATION.md#rebuilt-ui-the-shared-kit-and-the-seven-lobby-screens).

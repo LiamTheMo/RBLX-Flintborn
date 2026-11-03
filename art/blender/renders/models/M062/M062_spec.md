@@ -75,7 +75,7 @@ exploded x 11–755, y 703–1205 (title bar to y 732); part list x 761–1012, 
 
 **Scratch study material** (no Blender) in
 `<temp>\m062_study\`.
-Run with `C:/Users/Orang/.local/bin/uv.exe run --no-project --with pillow --with numpy --with scipy python <script> < /dev/null`.
+Run with `uv run --no-project --with pillow --with numpy --with scipy python <script> < /dev/null`.
 - **Helpers:** `m.py` (boxes, `cls`, `clsimg`, `hsv`), `zoom.py` (`zoom.py x0 y0 x1 y1 scale out.png [grid]`), `probe2.py`
   (`probe2.py x,y …` → hex and HSV), `lines2.py` (frame rules), `sw2.py` (swatches).
 - **Measurements:** `measure.py` → `measure_out.txt` (bbox, W : H, fill, class shares and extents, top profile; writes
@@ -842,7 +842,7 @@ All 14 recommendations are accepted. The open questions are ruled as follows:
 
 Builder `art/blender/kit/mcp/m062.py`, `build()`; built and rendered in a background session (port 9877) on
 `art/blender/assets/kit/wip/M062.blend`. Imports only committed builders (`m012`, `m033`, `m047`); nothing from
-`m057`–`m061`. Scratch scripts (measurement, comparison, camera probe) are in `<temp>\...\scratchpad\m062w\`.
+`m057`–`m061`. Scratch scripts (measurement, comparison, camera probe) are in `<temp>/m062w/`.
 
 **Parts, each from its own function** (spec 4.1):
 - `leaf_shell(kind, …)`: one closed slab per leaf. The outline is star-shaped about the petiole hub: lobes are given as
@@ -1019,7 +1019,7 @@ Decision 13 requires R > G > B, so the palette uses red-warm greys: `#837F7E` / 
 - **Tint:** 0.03 per leaf and per twig, 0.02 per band, 0.04 per scale, 0.04 per stone facet, 0.03 per chip. All broad,
   never per-triangle. Finish: matte everywhere (roughness 0.75–0.9, low specular), no metal, no emission.
 
-**Re-measured on the final renders** (study `cls()` masks, `<temp>\...\scratchpad\m062w\meas.py`; sheet in brackets):
+**Re-measured on the final renders** (study `cls()` masks, `<temp>/m062w/meas.py`; sheet in brackets):
 
 | View | W : H | fill | G | Y | O | B | S |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -1151,7 +1151,7 @@ screen and `problems` (an empty list in the final build). `m062.hero_only()` and
 ## Stage 7 verification (round 1)
 
 Fresh verifier, read-only. Background session on port 9877, on `art/blender/assets/kit/wip/M062_verify.blend` (not
-saved). Every number below is my own measurement, made with my own scripts in `<temp>\...\scratchpad\m062v\` (topology,
+saved). Every number below is my own measurement, made with my own scripts in `<temp>/m062v/` (topology,
 contact, hover, bury, sizes, visible centroids, eight-azimuth ray grid, and image masks that reuse the study's `cls()`).
 Renders are in `art/blender/renders/models/M062/verify/`:
 - sheet views `*_sheet.png`;

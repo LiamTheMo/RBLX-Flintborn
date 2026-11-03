@@ -47,9 +47,6 @@ MapController.LAYOUTS = {
 		legendFlow = "column",
 	},
 }
-MapController.SIZE = MapController.LAYOUTS.desktop.size
-MapController.PANEL_RECT = MapController.LAYOUTS.desktop.panel
-MapController.MAP_RECT = MapController.LAYOUTS.desktop.map
 -- Marker colours (kit tokens): camps on an authored map, portals.
 MapController.CAMP_COLOR = "toggleOn"
 MapController.PORTAL_COLOR = "blue"

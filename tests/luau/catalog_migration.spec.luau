@@ -1,4 +1,4 @@
--- The rebuilt item catalog (GDD §51, docs/ITEM_CATALOG.md): pre-release saves lose
+-- The rebuilt item catalog (GDD §51, docs/design/ITEM_CATALOG.md): pre-release saves lose
 -- every item whose catalogId no longer exists, wherever the profile holds it, and
 -- the cleanup is safe on every load. Also covers the generated Permanent
 -- conversions (cost, unlock gates, tier browsing), the starter shop's prices
@@ -6,127 +6,9 @@
 -- through the real TradeService session flow against fake Roblox services.
 
 local Shared = game:GetService("ReplicatedStorage").Shared
-local Server = game:GetService("ServerScriptService").Server
 
--- Fake clock and task scheduler (TradeService waits and delays) -------------------
-
-local clock = 0
-local queue = {}
-local sequence = 0
-local threadErrors = {}
-
-local function resume(thread, ...)
-	local ok, err = coroutine.resume(thread, ...)
-	if not ok then
-		table.insert(threadErrors, tostring(err))
-	end
-end
-
-task = {}
-function task.spawn(fn, ...)
-	local thread = if type(fn) == "thread" then fn else coroutine.create(fn)
-	resume(thread, ...)
-	return thread
-end
-function task.delay(seconds, fn, ...)
-	sequence += 1
-	table.insert(
-		queue,
-		{ at = clock + (seconds or 0), sequence = sequence, thread = coroutine.create(fn), args = table.pack(...) }
-	)
-end
-function task.wait(seconds)
-	sequence += 1
-	table.insert(
-		queue,
-		{ at = clock + (seconds or 0), sequence = sequence, thread = coroutine.running(), args = table.pack() }
-	)
-	coroutine.yield()
-	return seconds
-end
-
-warn = function() end
-
-local function advance(seconds: number)
-	local target = clock + seconds
-	while true do
-		local best = nil
-		for index, entry in queue do
-			if entry.at <= target then
-				local current = best and queue[best]
-				if
-					current == nil
-					or entry.at < current.at
-					or (entry.at == current.at and entry.sequence < current.sequence)
-				then
-					best = index
-				end
-			end
-		end
-		if best == nil then
-			break
-		end
-		local entry = table.remove(queue, best)
-		clock = math.max(clock, entry.at)
-		resume(entry.thread, table.unpack(entry.args, 1, entry.args.n))
-	end
-	clock = target
-end
-
--- Fake Roblox services ------------------------------------------------------------
-
-local Players = { _list = {} }
-Players.PlayerRemoving = { Connect = function() end }
-function Players.GetPlayers(self)
-	return table.clone(self._list)
-end
-function Players.GetPlayerByUserId(self, userId)
-	for _, player in self._list do
-		if player.UserId == userId then
-			return player
-		end
-	end
-	return nil
-end
-
-local guids = 0
-local fakes = {
-	Players = Players,
-	HttpService = {
-		GenerateGUID = function()
-			guids += 1
-			return ("guid-%d"):format(guids)
-		end,
-	},
-}
-local originalGetService = game.GetService
-game.GetService = function(self, name)
-	return fakes[name] or originalGetService(self, name)
-end
-game.JobId = "job-catalog"
-workspace = {
-	GetServerTimeNow = function()
-		return clock
-	end,
-}
-
-local PlaceConfig = require(Shared.Config.PlaceConfig)
-PlaceConfig.IsLobby = function()
-	return true
-end
-local Remotes = require(Shared.Net.Remotes)
-local handlers = {}
-local pushed = {}
-Remotes.Handle = function(name, fn)
-	handlers[name] = fn
-end
-Remotes.Get = function()
-	return {
-		FireClient = function(_, player, payload)
-			pushed[player] = payload
-		end,
-	}
-end
+local lobby = require(game:GetService("ServerStorage").TestSupport.LobbyTrade).new()
+local handlers, pushed, profiles = lobby.handlers, lobby.pushed, lobby.profiles
 
 local EconomyRules = require(Shared.Economy.EconomyRules)
 local ForgeRecipes = require(Shared.Crafting.ForgeRecipes)
@@ -136,32 +18,6 @@ local ProfileSchema = require(Shared.Data.ProfileSchema)
 local Recipes = require(Shared.Crafting.Recipes)
 local ShopCatalog = require(Shared.Economy.ShopCatalog)
 local TradeRules = require(Shared.Economy.TradeRules)
-
-local ProfileService = require(Server.Services.ProfileService)
-local profiles, stored = {}, {}
-ProfileService.GetProfile = function(player)
-	return profiles[player]
-end
-ProfileService.Mutate = function(player, apply)
-	local profile = profiles[player]
-	if profile == nil then
-		return false
-	end
-	apply(profile)
-	return true
-end
-ProfileService.SaveNow = function(player)
-	stored[player.UserId] = ProfileSchema.DeepCopy(profiles[player])
-	return true
-end
-ProfileService.ReadStored = function(userId)
-	return true, stored[userId]
-end
-local CurrencyService = require(Server.Services.CurrencyService)
-CurrencyService.Publish = function() end
-
-local TradeService = require(Server.Services.TradeService)
-TradeService.Start()
 
 -- Helpers -------------------------------------------------------------------------
 
@@ -344,13 +200,10 @@ end
 
 -- Migration -----------------------------------------------------------------------
 
-test("the removed IDs really are gone from the catalog", function()
+test("loading a pre-release save deletes removed items everywhere and keeps the rest", function()
 	for _, catalogId in REMOVED do
 		expectEq(ItemCatalog.Get(catalogId), nil, catalogId .. " is not an item")
 	end
-end)
-
-test("loading a pre-release save deletes removed items everywhere and keeps the rest", function()
 	local profile = assert(ProfileSchema.Migrate(legacyProfile(), 10))
 	expectEq(idsOf(profile.lobbyBackpack.slots), "b2,FlintArrow,Redberry", "backpack")
 	expectEq(profile.lobbyBackpack.slots[1].qualityRoll, 0.02, "a kept item is untouched")
@@ -547,23 +400,16 @@ test("the browser order groups conversions by tier, weakest first", function()
 	end
 	expectEq(ForgeRules.PermanentTier(ForgeRecipes.Get("PermanentGuardianFang")), "Legendary", "the Fang")
 	expectEq(ForgeRules.PermanentTier(ForgeRecipes.Get("ForgeIronSword")), nil, "special recipes")
-	expectEq(ForgeRules.TIER_ORDER[1], "Wood", "Wood first")
-	expectEq(ForgeRules.TIER_ORDER[#ForgeRules.TIER_ORDER], "Legendary", "Legendary last")
 end)
 
 -- Shop and merchant ---------------------------------------------------------------
 
-test("no shop entry costs less than a merchant pays for it", function()
+test("the shop sells starter supplies only, each above what a merchant pays for it", function()
 	for _, entry in ShopCatalog.Stock do
 		if entry.catalogId then
 			local each = ShopCatalog.SellValue(entry.catalogId) or 0
 			expect(entry.price > each * entry.quantity, entry.id .. " cannot be bought to sell")
 		end
-	end
-end)
-
-test("the shop sells starter supplies only", function()
-	for _, entry in ShopCatalog.Stock do
 		local def = entry.catalogId and ItemCatalog.Get(entry.catalogId)
 		if def then
 			expect(def.tier == nil or def.tier == "Wood" or def.tier == "Stone", entry.id .. " is Wood or Stone")
@@ -623,7 +469,7 @@ local TRADEABLE = {
 	AncientEmber = true,
 }
 
-test("exactly the rare materials trade; ores, bars and common materials never do", function()
+test("exactly the rare materials and berries trade; ores, bars, common food and draughts never do", function()
 	for catalogId in ItemCatalog.Items do
 		if ItemCatalog.IsMaterial(catalogId) then
 			expectEq(TradeRules.IsTradeableMaterial(catalogId), TRADEABLE[catalogId] == true, catalogId)
@@ -636,9 +482,6 @@ test("exactly the rare materials trade; ores, bars and common materials never do
 		expect(not ok and reason == "NotTradeable", catalogId .. " refused")
 	end
 	expect(TradeRules.ValidateOffer(profile, { items = {}, materials = { Bloodroot = 2 } }, DAY), "Bloodroot")
-end)
-
-test("rare berries trade from the backpack; common food and draughts do not", function()
 	for _, catalogId in { "Sunberry", "Glimmerberry" } do
 		expect(TradeRules.IsTradeableSlot({ catalogId = catalogId, quantity = 3 }), catalogId .. " trades")
 	end
@@ -647,36 +490,17 @@ test("rare berries trade from the backpack; common food and draughts do not", fu
 	end
 end)
 
-local nextUserId = 100
-local function join(profile)
-	nextUserId += 1
-	local player = { UserId = nextUserId, DisplayName = "P" .. nextUserId, Parent = Players }
-	function player.SetAttribute() end
-	table.insert(Players._list, player)
-	profiles[player] = profile
-	stored[player.UserId] = ProfileSchema.DeepCopy(profile)
-	return player
-end
-
-local function trader()
-	local profile = ProfileSchema.Default(0)
-	profile.progression.level = 12
-	return profile
-end
-
 test("a session trades Sunberries and Moonpetal, merging into the partner's stack", function()
-	local giver, taker = trader(), trader()
+	local giver, taker = lobby.trader(), lobby.trader()
 	giver.lobbyBackpack.slots = { { catalogId = "Sunberry", quantity = 6 }, { catalogId = "Redberry", quantity = 5 } }
 	giver.vault.materials = { Moonpetal = 4, SilverBar = 50 }
 	taker.lobbyBackpack.slots = { { catalogId = "Sunberry", quantity = 2 } }
-	local a, b = join(giver), join(taker)
-	local ok, id = handlers.TradeRequest(a, b.UserId)
-	assert(ok, "invite")
-	assert(handlers.TradeRespond(b, id, true), "accept")
+	local a, b, id = lobby.session(giver, taker)
 	local refused, reason = handlers.TradeOffer(a, id, { "stack:Redberry" }, 0)
 	expect(not refused and reason == "NotTradeable", "common berries are refused")
 	refused, reason = handlers.TradeOffer(a, id, {}, 0, { SilverBar = 5 })
 	expect(not refused and reason == "NotTradeable", "bars are refused")
+	local ok
 	ok, reason = handlers.TradeOffer(a, id, { "stack:Sunberry" }, 0, { Moonpetal = 3 })
 	expect(ok, "Sunberries and Moonpetal offered: " .. tostring(reason))
 	expectEq(#pushed[b].theirs.items, 2, "the partner sees both")
@@ -687,22 +511,18 @@ test("a session trades Sunberries and Moonpetal, merging into the partner's stac
 	expectEq(offered["stack:Sunberry"], "Sunberry", "a backpack stack carries its catalog id")
 	expectEq(offered["mat:Moonpetal"], "Moonpetal", "a vault material carries its catalog id")
 	expectEq(pushed[a].mine.items[1].catalogId ~= nil, true, "my own side too")
-	handlers.TradeLock(a, id)
-	handlers.TradeLock(b, id)
-	advance(TradeService.COUNTDOWN_SECONDS)
-	handlers.TradeConfirm(a, id)
-	handlers.TradeConfirm(b, id)
+	lobby.lockAndConfirm(a, b, id)
 	expectEq(pushed[a].reason, "Completed", "completed")
 	expectEq(#profiles[b].lobbyBackpack.slots, 1, "one Sunberry slot")
 	expectEq(profiles[b].lobbyBackpack.slots[1].quantity, 8, "merged into the partner's stack")
 	expectEq(profiles[b].vault.materials.Moonpetal, 3, "Moonpetal lands in the vault")
 	expectEq(profiles[a].vault.materials.Moonpetal, 1, "and leaves the giver's")
 	expectEq(idsOf(profiles[a].lobbyBackpack.slots), "Redberry", "the giver keeps the Redberries")
-	expectEq(#threadErrors, 0, "no spawned thread errored")
+	lobby.scheduler:ExpectNoThreadErrors()
 end)
 
 test("a rolled-back berry trade takes back exactly what was received", function()
-	local profile = trader()
+	local profile = lobby.trader()
 	profile.lobbyBackpack.slots = { { catalogId = "Glimmerberry", quantity = 9 } }
 	profile.trades.pending.old = {
 		counterpart = 2,

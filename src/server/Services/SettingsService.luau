@@ -12,6 +12,7 @@ local CameraRules = require(ReplicatedStorage.Shared.World.CameraRules)
 local Keybinds = require(ReplicatedStorage.Shared.Settings.Keybinds)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local SettingsRules = require(ReplicatedStorage.Shared.Settings.SettingsRules)
+local Cooldown = require(script.Parent.Parent.Infrastructure.Cooldown)
 local ProfileService = require(script.Parent.ProfileService)
 
 local SettingsService = {}
@@ -28,7 +29,10 @@ local function applyAttributes(player: Player, choices)
 	player:SetAttribute("Keybinds", HttpService:JSONEncode(Keybinds.Sanitize(choices.keybinds)))
 end
 
-local lastSave = {}
+-- Camera zoom saves are throttled; extra ones are dropped silently.
+local zoomSaves = Cooldown.new(function()
+	return SettingsService.SAVE_INTERVAL
+end)
 
 function SettingsService.Start()
 	ProfileService.ProfileLoaded:Connect(function(player, profile)
@@ -51,11 +55,10 @@ function SettingsService.Start()
 		player:SetAttribute("Keybinds", HttpService:JSONEncode(clean))
 	end)
 	Remotes.Listen("SaveCamera", function(player, zoom)
-		local now = os.clock()
-		if type(zoom) ~= "number" or (lastSave[player] and now - lastSave[player] < SettingsService.SAVE_INTERVAL) then
+		-- The type is checked first, so a malformed request never starts the cooldown.
+		if type(zoom) ~= "number" or not zoomSaves:Try(player) then
 			return
 		end
-		lastSave[player] = now
 		local clamped = CameraRules.Clamp(zoom)
 		ProfileService.Mutate(player, function(profile)
 			profile.choices.camera.zoom = clamped
@@ -63,7 +66,7 @@ function SettingsService.Start()
 		player:SetAttribute("CameraZoom", clamped)
 	end)
 	Players.PlayerRemoving:Connect(function(player)
-		lastSave[player] = nil
+		zoomSaves:Forget(player)
 	end)
 end
 

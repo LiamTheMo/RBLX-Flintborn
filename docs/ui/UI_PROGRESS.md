@@ -1,6 +1,6 @@
 # UI progress
 
-Branch: `fix/final-ui-audit`   Base: `v0.18`   Updated: 2026-11-01
+Branch: merged into `v0.19`   Updated: 2026-11-03
 
 The rebuild of every screen from one parchment-and-leather kit, matched to the
 seven mockups in [`art/reference/ui/lobby/`](../../art/reference/ui/lobby/README.md)
@@ -27,16 +27,16 @@ Legend: ✅ done · 🔄 in progress · ⏳ not started or waiting · — not ap
 | Party (04) | `04_party.png` | ✅ [PartyScreen.md](PartyScreen.md) | ✅ sliced; uploaded | ✅ `Screens/PartyWindow` | ✅ `party_states` (leader with an invite on its way, Invited, full party, member view, alone, empty search) | ✅ | ✅ `PartyController`; server `createdAt`, `invited`, `fromUserId` (no Ready since D24; `party_model.spec`, `party_view.spec`); `party_flow` | ✅ `party_compare` | ✅ `party_phone`; devices ⏳ | ✅ round 1 and 2 (no High) | Fix round 4: leather tones (K2) |
 | Play (05) | `05_play.png` | ✅ [PlayScreen.md](PlayScreen.md) | ✅ sliced, island painting; uploaded | ✅ `Screens/PlayWindow` | ✅ `play_states` (busy, nil preview, full party, member caption) | ✅ | ✅ `PlayController`: deploy check, Deploy (the leader starts the run; no Ready since D24); `play_flow` | ✅ `play_compare` | ✅ `play_phone`; devices ⏳ | ✅ round 1 and 2 (no High) | Fix round 4: leather tones (K2) |
 | Ancestral Forge (06) and field Crafting | `06_forge.png` | ✅ [ForgeScreen.md](ForgeScreen.md), [CraftingScreen.md](CraftingScreen.md) | ✅ sliced; uploaded | ✅ `Screens/RecipeWindow` (modes forge, crafting) | ✅ locked, short, busy, job running | ✅ | ✅ `ForgeController` with batch count (D4; `maxCount` counts backpack room, D22; `forge.spec`, `forge_batch.spec`); `CraftingController`; `forge_flow`, `crafting_flow` | 🔄 `forge_*_compare`; verifier FAIL (V1, V2, V8, V11) in fix round 3 | ✅ verifier profiles (`verify/responsive/captures/forge`); subtitles < 9 px (R9) in fix round 3; devices ⏳ | ✅ round 1 and 2 (no High) | Fix round 4: locked rows overflow on phones, no-art placeholder, leather tones (K6, K1, K2) |
-| Quest Journal (07) | `07_journal.png` | ✅ [JournalScreen.md](JournalScreen.md) | ✅ sliced, island painting; uploaded | ✅ `Screens/JournalWindow`, `IslandMap` | ✅ claimable, claimed, side tabs (D12) | ✅ | ✅ `JournalController` (QuestView / QuestClaim); `journal_flow` | ✅ `journal_*_compare` | ✅ `journal_phone`; devices ⏳ | ✅ round 1 and 2 (no High) | Fix round 4: phone titles (K8) |
+| Quest Journal (07) | `07_quest_journal.png` | ✅ [JournalScreen.md](JournalScreen.md) | ✅ sliced, island painting; uploaded | ✅ `Screens/JournalWindow`, `IslandMap` | ✅ claimable, claimed, side tabs (D12) | ✅ | ✅ `JournalController` (QuestView / QuestClaim); `journal_flow` | ✅ `journal_*_compare` | ✅ `journal_phone`; devices ⏳ | ✅ round 1 and 2 (no High) | Fix round 4: phone titles (K8) |
 | Market, Trade, Progress, World map | none (restyle) | ✅ [ListWindows.md](ListWindows.md) | ✅ kit only | ✅ `Hud/ListWindow` on the kit | ✅ | ✅ | ✅ `WalletController`, `TradeController` (item art from server `catalogId`; invite toast with Accept / Decline, D22), `ProgressionController`, `MapController`; `market_flow`, `trade_flow`, `progress_flow`, `map_flow` | captures ✅ (no mockup) | devices ⏳ | ✅ round 1 and 2 (no High) | Fix round 4: ×20 open/close leak checks (W4) |
 | In-world HUD | none (restyle) | ✅ [HudScreen.md](HudScreen.md) | ✅ kit only | ✅ `Vitals`, `BottomBar`, `PartyFrames`, `Compass`, `ObjectivePanel`, `EventPanel` | ✅ `world_hud_states` | ✅ bars ease | ✅ `HudController`; `world_hud_flow` | captures ✅ (no mockup) | ✅ `world_hud_phone`, `world_hud_wide`; devices ⏳ | ✅ round 1 and 2 (no High) | Fix round 4: phone event title vs timer, tribe frames vs thumbstick (W1, W3) |
 | World overlays, notices, loot, storage, world menu | none (restyle) | ARCHITECTURE §4.8 | ✅ kit only | ✅ | ✅ | ✅ | ✅ `NoticeController`, `LootController` and `StorageController` (item art and rarity dot from server `catalogId`; takes by stable key with an in-flight guard, D22), `WorldMenuController`, …; `world_overlays_flow` (×20 open / close leak checks for loot, storage chest, tribe and build palette; the world menu's in `world_menu`) | captures ✅ `world_overlays`, `notices`, `world_menu` | ✅ `world_overlays_phone`; devices ⏳ | ✅ round 1 and 2 (no High) | Fix round 4: world menu NotReady text (W2); loot rows show item art (V10 closed) |
-| Atlases and upload | — | ARCHITECTURE §6 | ✅ `atlas_lk_lobby`, `atlas_lk_window`, `atlas_lk_icons`, `atlas_lk_items` uploaded, ids in `UiAssetIds.json` | — | — | — | — | `--uploaded-only` fallback pages ✅ | ⏳ | — | Uploaded; in-game look still to check on devices |
-| Removal of the old UI (§9) | — | ARCHITECTURE §9 | — | — | — | — | — | — | — | — | 🔄 Old `Hud/LobbyHud`, `LobbyPopups`, `Parchment`, `ItemSlot`, `InventoryPanel`, `SettingsPanel`, `CraftingPanel`, `JournalPanel`, the HudLayout `lobby` section and the preview scripts are gone, and the deploy removes the old modules from the places (`RETIRED` in `scripts/roblox_live_publish.py`); legacy sprites and atlases stay until the `lk_` upload is live |
+| Atlases and upload | — | ARCHITECTURE §6 | ✅ `atlas_lk_lobby`, `atlas_lk_window`, `atlas_lk_icons`, `atlas_lk_items`, `atlas_lk_play`, `atlas_lk_items2_1`, `atlas_lk_items2_2` uploaded, ids in `UiAssetIds.json` (the `*_hi` atlases with an empty id are packed but not uploaded yet) | — | — | — | — | `--uploaded-only` fallback pages ✅ | ⏳ | — | Uploaded; in-game look still to check on devices |
+| Removal of the old UI (§9) | — | ARCHITECTURE §9 | — | — | — | — | — | — | — | — | ✅ Old `Hud/LobbyHud`, `LobbyPopups`, `Parchment`, `ItemSlot`, `InventoryPanel`, `SettingsPanel`, `CraftingPanel`, `JournalPanel`, the fallback UI, the HudLayout `lobby` section, the preview scripts, the legacy sprites and atlases and the older item art are gone, and the deploy removes the old modules from the places (`RETIRED` in `scripts/roblox_live_publish.py`). Kept on purpose: `pm_map_island` and `atlas_island` (ARCHITECTURE §9) |
 
 ## Notes and blockers
 
-- **Upload.** The four `atlas_lk_*` atlases are uploaded and their ids are in
+- **Upload.** The `atlas_lk_*` atlases are uploaded and their ids are in
   `src/shared/UI/UiAssetIds.json`; nothing may add, remove or change `lk_` sprites or
   atlas images without a new upload. How they draw on real devices is a manual check.
 - **Captures, not Studio.** No Roblox Studio MCP server is connected to the build
@@ -44,7 +44,7 @@ Legend: ✅ done · 🔄 in progress · ⏳ not started or waiting · — not ap
   the game's UI code headlessly (`gui_env.luau`) and renders it (`render.py`). The
   headless environment has no layout pass, blur, rotation or RichText sizes
   (ARCHITECTURE §7); those, device safe areas, real touch and gamepad focus are
-  manual checks in [MANUAL_VALIDATION.md](../MANUAL_VALIDATION.md).
+  manual checks in [MANUAL_VALIDATION.md](../release/MANUAL_VALIDATION.md).
 - **Verification.** Round 1: visual FAIL (2 High, 13 Medium), responsive FAIL
   (7 High, 11 Medium), code PASS. Round 2 (after fix round 3), whole-screen mean ΔE2000 / SSIM
   against the mockups: HUD 1.63 / 0.937, Inventory 7.07 / 0.898, Settings
@@ -59,7 +59,8 @@ Legend: ✅ done · 🔄 in progress · ⏳ not started or waiting · — not ap
   docs, D23).
 - **Device-only checks** (toast lane, SearchBox touch growth, top-bar and jump
   clearance, thumbstick vs tribe frames, lobby gamepad entry, party view on join,
-  blur and motion) are listed in [MANUAL_VALIDATION.md](../MANUAL_VALIDATION.md).
-- **Old specs.** `HudScreen.md`, `ListWindows.md`, `CraftingScreen.md` and parts of
-  the screen specs still describe the parchment build or name removed modules; the
-  analysts replace them (ARCHITECTURE §9).
+  blur and motion) are listed in [MANUAL_VALIDATION.md](../release/MANUAL_VALIDATION.md).
+- **Old specs.** Replaced: every screen spec now describes the kit build. The
+  measured specs (Lobby, Inventory, Settings, Party, Play, Forge, Journal) keep
+  their measurement logs; where they name a removed `Hud/*Panel` module they mean
+  the parchment build it replaced (ARCHITECTURE §9).

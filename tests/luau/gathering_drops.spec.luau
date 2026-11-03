@@ -38,16 +38,12 @@ local function empty(nodeType: string, held, extraChance: number?, rng)
 end
 
 test("drops per hit are 1 + max(0, tool rank - node rank)", function()
-	expectEq(NodeCatalog.Rank("Tree"), 0, "trees are rank 0")
-	expectEq(NodeCatalog.Rank("Rock"), 0, "rocks are rank 0")
 	for index, tierId in LADDER do
 		expectEq(NodeCatalog.YieldFor("Tree", tool(tierId, "Axe")), 1 + index, tierId .. " axe")
 		expectEq(NodeCatalog.YieldFor("Rock", tool(tierId, "Pickaxe")), 1 + index, tierId .. " pickaxe")
 		expectEq(NodeCatalog.YieldFor("Tree", tool(tierId, "Pickaxe")), 1, tierId .. " pickaxe on a tree is hands")
 	end
 	expectEq(NodeCatalog.YieldFor("Tree", nil), 1, "bare hands")
-	expectEq(NodeCatalog.YieldFor("Tree", tool("Wood", "Axe")), 2, "Wooden axe 2")
-	expectEq(NodeCatalog.YieldFor("Rock", tool("Stone", "Pickaxe")), 3, "Stone pickaxe 3")
 	for nodeType, node in NodeCatalog.Nodes do
 		if node.minRank then
 			expectEq(NodeCatalog.Rank(nodeType), node.minRank, nodeType .. " rank is its gate")
@@ -110,24 +106,32 @@ test("a node's total is its health whatever the tool; the last hit drops only wh
 	expectEq((empty("Tree", tool("Stone", "Axe"), 0, rng)), 4, "Stone axe")
 end)
 
-test("node health follows the placeholders", function()
-	local expected = {
-		Tree = 12,
-		Rock = 12,
-		FiberPlant = 3,
-		HerbShrub = 3,
-		RedberryBush = 3,
-		SweetberryBush = 3,
-		CopperDeposit = 8,
-		IronDeposit = 8,
-		SilverDeposit = 8,
-		CobaltDeposit = 8,
-		MithrilDeposit = 6,
-		ObsidianOutcrop = 5,
-		JadeVein = 5,
+-- The value of the band that lists `nodeType`, or `default`.
+local function band(nodeType: string, default: number, bands): number
+	for value, nodeTypes in bands do
+		if table.find(nodeTypes, nodeType) then
+			return value
+		end
+	end
+	return default
+end
+
+test("node health follows the placeholders and nodes regrow by tier", function()
+	local health = {
+		[12] = { "Tree", "Rock" },
+		[3] = { "FiberPlant", "HerbShrub", "RedberryBush", "SweetberryBush" },
+		[8] = { "CopperDeposit", "IronDeposit", "SilverDeposit", "CobaltDeposit" },
+		[6] = { "MithrilDeposit" },
+		[5] = { "ObsidianOutcrop", "JadeVein" },
+	}
+	local regrow = {
+		[180] = { "CopperDeposit", "IronDeposit" },
+		[300] = { "SilverDeposit", "CobaltDeposit", "ObsidianOutcrop", "AmethystGeode" },
+		[480] = { "JadeVein", "MithrilDeposit", "StarstoneOutcrop", "StormglassCluster" },
 	}
 	for nodeType, node in NodeCatalog.Nodes do
-		expectEq(node.health, expected[nodeType] or 4, nodeType .. " health")
+		expectEq(node.health, band(nodeType, 4, health), nodeType .. " health")
+		expectEq(NodeCatalog.RegrowSeconds(nodeType), band(nodeType, 120, regrow), nodeType .. " regrowth")
 	end
 end)
 
@@ -176,30 +180,6 @@ test("Flint and Resin still drop from rocks and trees, Flint also when a rock is
 		expectEq(finish.removed, 1, "bonus Flint uses no health")
 	end
 	expectEq(NodeCatalog.Hit("Tree", 12, nil, 0, Random.new(1)).stacks[1].catalogId, "Wood", "material first")
-end)
-
-test("nodes regrow by tier", function()
-	local expected = {
-		Tree = 120,
-		Rock = 120,
-		FiberPlant = 120,
-		HerbShrub = 120,
-		RedberryBush = 120,
-		SweetberryBush = 120,
-		CopperDeposit = 180,
-		IronDeposit = 180,
-		SilverDeposit = 300,
-		CobaltDeposit = 300,
-		ObsidianOutcrop = 300,
-		JadeVein = 480,
-		MithrilDeposit = 480,
-		AmethystGeode = 300,
-		StarstoneOutcrop = 480,
-		StormglassCluster = 480,
-	}
-	for nodeType in NodeCatalog.Nodes do
-		expectEq(NodeCatalog.RegrowSeconds(nodeType), expected[nodeType] or 120, nodeType .. " regrowth")
-	end
 end)
 
 test("only the hitter may take a ground drop for 10 s; it lasts 2 minutes", function()

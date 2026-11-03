@@ -12,6 +12,14 @@ local VaultRules = require(Shared.Extraction.VaultRules)
 
 local DAY = 86400 * 20000
 
+local function words(text: string): { string }
+	local list = {}
+	for word in string.gmatch(text, "%S+") do
+		table.insert(list, word)
+	end
+	return list
+end
+
 local function sword(id, overrides)
 	local item = { instanceId = id, catalogId = "IronSword", ownerId = 1, location = "LobbyBackpack", qualityRoll = 0 }
 	for key, value in overrides or {} do
@@ -19,16 +27,6 @@ local function sword(id, overrides)
 	end
 	return item
 end
-
-test("quest bands are 250 / 1,000 / 3,000 Coins", function()
-	expectEq(QuestCatalog.BANDS.Easy, 250, "easy")
-	expectEq(QuestCatalog.BANDS.Normal, 1000, "normal")
-	expectEq(QuestCatalog.BANDS.Hard, 3000, "hard")
-	for _, quest in QuestCatalog.Quests do
-		expectEq(quest.coins, QuestCatalog.BANDS[quest.tier], quest.id)
-		expect((quest.gems or 25) <= 50, quest.id .. " gems around 25")
-	end
-end)
 
 test("extracting grants zero Coins and zero Gems, even at the Center", function()
 	local profile = ProfileSchema.Default(0)
@@ -60,7 +58,13 @@ test("each vault upgrade adds exactly 25 slots at the same Gem price", function(
 	expect(not ok and reason == "NotEnoughGems", "cannot afford")
 end)
 
-test("quests pay once per day and count only their own action", function()
+test("quests pay their 250 / 1,000 / 3,000 Coin band once per day and count only their own action", function()
+	local bands = QuestCatalog.BANDS
+	expectEq(("%d/%d/%d"):format(bands.Easy, bands.Normal, bands.Hard), "250/1000/3000", "the GDD bands")
+	for _, quest in QuestCatalog.Quests do
+		expectEq(quest.coins, bands[quest.tier], quest.id)
+		expect((quest.gems or 25) <= 50, quest.id .. " gems around 25")
+	end
 	local profile = ProfileSchema.Default(0)
 	EconomyRules.RecordQuest(profile, "Extract", DAY)
 	expect(EconomyRules.ClaimQuest(profile, "DailyExtract", DAY), "claimed")
@@ -72,6 +76,7 @@ test("quests pay once per day and count only their own action", function()
 		EconomyRules.RecordQuest(profile, "Extract", DAY)
 	end
 	expect(EconomyRules.ClaimQuest(profile, "DailyExtractions", DAY), "normal quest")
+	expectEq(profile.currency.coins, 250 + 1000, "normal band")
 	expect(profile.boosters.xpUntil >= DAY + 1800, "earnable XP booster")
 end)
 
@@ -106,29 +111,14 @@ test("shops sell into the lobby backpack and merchants buy at fixed prices", fun
 	expectEq(permanent, nil, "Permanent items are not sold to merchants")
 	-- Starter supplies only (GDD §51): Wood and Stone tools, Flint Arrows, basic
 	-- medicine and common berries. No metal, bars or higher gear.
-	local starter = {
-		WoodenAxe = true,
-		WoodenPickaxe = true,
-		StoneAxe = true,
-		StonePickaxe = true,
-		FlintArrow = true,
-		BasicMedicine = true,
-		Redberry = true,
-		Sweetberry = true,
-	}
+	local starter = words("WoodenAxe WoodenPickaxe StoneAxe StonePickaxe FlintArrow BasicMedicine Redberry Sweetberry")
+	local stocked = {}
 	for _, entry in ShopCatalog.Stock do
-		if entry.catalogId then
-			expect(starter[entry.catalogId] == true, entry.id .. " is a starter supply")
-		else
-			expect(entry.title ~= nil, entry.id .. " is a title")
-		end
+		expect(table.find(starter, entry.catalogId) ~= nil or entry.title ~= nil, entry.id .. " is a starter supply")
+		stocked[entry.catalogId or ""] = true
 	end
-	for catalogId in starter do
-		local stocked = false
-		for _, entry in ShopCatalog.Stock do
-			stocked = stocked or entry.catalogId == catalogId
-		end
-		expect(stocked, catalogId .. " is in stock")
+	for _, catalogId in starter do
+		expect(stocked[catalogId], catalogId .. " is in stock")
 	end
 end)
 
@@ -162,23 +152,8 @@ test("trades reject Coins and raw materials and allow Gems, gear and Permanent i
 		expect(not TradeRules.IsTradeable({ catalogId = metal .. "Ore" }), metal .. " ore never trades")
 		expect(not TradeRules.IsTradeable({ catalogId = metal .. "Bar" }), metal .. " bar never trades")
 	end
-	for _, catalogId in
-		{
-			"DireHide",
-			"ChargedCore",
-			"GlowFur",
-			"GuardianHeart",
-			"AshenOil",
-			"SiegeResin",
-			"AbyssalShard",
-			"Emberglass",
-			"Bloodroot",
-			"Moonpetal",
-			"AncientEmber",
-			"Sunberry",
-			"Glimmerberry",
-		}
-	do
+	local tradeable = "DireHide ChargedCore GlowFur GuardianHeart AshenOil SiegeResin AbyssalShard Emberglass"
+	for _, catalogId in words(tradeable .. " Bloodroot Moonpetal AncientEmber Sunberry Glimmerberry") do
 		expect(TradeRules.IsTradeable({ catalogId = catalogId }), catalogId .. " trades")
 	end
 	profile.vault.materials.IronBar = 5

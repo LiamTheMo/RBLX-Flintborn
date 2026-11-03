@@ -13,8 +13,8 @@ local NodeCatalog = require(ReplicatedStorage.Shared.Resources.NodeCatalog)
 local PropModels = require(ReplicatedStorage.Shared.Visuals.PropModels)
 local Tiers = require(ReplicatedStorage.Shared.Items.Tiers)
 local Channel = require(script.Parent.Parent.Infrastructure.Channel)
-local CacheService = require(script.Parent.CacheService)
 local DropService = require(script.Parent.DropService)
+local InteractionService = require(script.Parent.InteractionService)
 local InventoryService = require(script.Parent.InventoryService)
 local ModifierService = require(script.Parent.ModifierService)
 local ProgressionService = require(script.Parent.ProgressionService)
@@ -76,7 +76,7 @@ function MeteorService.Spawn(entry, position: Vector3, parent: Instance, onDeple
 		end)
 		local site = {}
 		Channel.Attach(prompt, MeteorService.CHUNK_SECONDS, function(player)
-			return notice(player) == nil and CacheService.CanInteract(player, chunk, MeteorService.REACH)
+			return notice(player) == nil and InteractionService.CanInteract(player, chunk, MeteorService.REACH)
 		end, function(player)
 			if not EventRules.Claim(site) then
 				return

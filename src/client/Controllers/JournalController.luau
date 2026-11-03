@@ -34,16 +34,6 @@ local session = 0
 local fetching = false
 local fetchAgain = false
 
-local function invoke(name: string, ...)
-	local ok, a, b = pcall(function(...)
-		return Remotes.Get(name):InvokeServer(...)
-	end, ...)
-	if not ok then
-		return nil, "Request failed"
-	end
-	return a, b
-end
-
 local function now(): number
 	local ok, t = pcall(function()
 		return workspace:GetServerTimeNow()
@@ -97,7 +87,7 @@ local function refresh()
 	repeat
 		fetchAgain = false
 		local token = session
-		local list = invoke("QuestView")
+		local list = Remotes.Invoke("QuestView")
 		if token == session and type(list) == "table" then
 			quests = list
 			drawQuests()
@@ -141,7 +131,7 @@ local function claim(questId: string)
 	end
 	claiming = questId
 	drawQuests()
-	local ok, reason = invoke("QuestClaim", questId)
+	local ok, reason = Remotes.Invoke("QuestClaim", questId)
 	-- Always released, even if the Journal closed meanwhile.
 	claiming = nil
 	if ok then
@@ -171,7 +161,7 @@ local function onOpened()
 	task.spawn(refresh)
 	if progress == nil then
 		task.spawn(function()
-			local snapshot = invoke("ProgressionSnapshot")
+			local snapshot = Remotes.Invoke("ProgressionSnapshot")
 			if token == session and type(snapshot) == "table" and progress == nil then
 				progress = snapshot
 				drawProgress()

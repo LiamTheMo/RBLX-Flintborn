@@ -24,7 +24,7 @@ All pixel boxes are sheet pixels `(x0, y0, x1, y1)`, top-left origin. Paper is `
 - **O:** other non-paper (the ground shadow, dark edges). Not counted in the shares.
 
 Scratch study material (pure Python, no Blender), in the session scratchpad
-`<temp>\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m017_study\`:
+`<temp>/m017_study/`:
 - `png.py` (reader, `crop`, `sample`); `m.py` (masks, view boxes `V`); `bb.json` (silhouette boxes);
 - `measure.py` (bboxes, shares, top / leaf-bottom / trunk-top profiles, width per height), `comps.py` (berry
   components, trunk runs per height), `expl.py` (exploded and close-up components), `samp.py` / `samp2.py` (median,
@@ -850,7 +850,7 @@ any object; the renders ran with vfx=True and realised nothing.
 
 Fresh verifier, read-only. Background session on port 9881 with `wip/M017_verify.blend` (not saved, `build()` not
 called). Fresh renders via `m017.render_views()` with `M.MODEL_RENDERS` pointed at the verifier's scratchpad
-(`...\scratchpad\v017\renders\M017\`), plus side-by-side crops `pair_*.png` there. Measured with `M.audit`,
+(`<temp>/v017/renders/M017/`), plus side-by-side crops `pair_*.png` there. Measured with `M.audit`,
 `M.uv_stats`, `K.check`, `m017.measure()` and my own BVH / bmesh probes.
 
 **Verdict: FAIL, 6/10.** The geometry is clean and inside budget, but two things are visibly unlike the sheet in every
@@ -1148,7 +1148,7 @@ build.
 Fresh verifier (not the round-1 verifier, no other stage), read-only. Background session on port 9880 with
 `wip/M017_verify.blend` (the main session's copy after its rebuild; not saved, `build()` not called, session stopped).
 Fresh renders via `m017.render_views()` with `M.MODEL_RENDERS` pointed at the verifier's scratchpad
-(`...\scratchpad\v017r2\renders\M017\`), side-by-side crops `pair_*.png` there. Measured with my own bmesh / BVH
+(`<temp>/v017r2/renders/M017/`), side-by-side crops `pair_*.png` there. Measured with my own bmesh / BVH
 probes (`geo.py`: 7-direction parity, front and behind tests, shells, corners, self-hits, volume), `M.uv_stats`,
 `K.check`, `m017.measure()` and a quartile colour probe on the study's masks (`col.py`), plus a facing-correlation
 test on the painted keys (`face.py`).

@@ -11,10 +11,12 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local SoundService = game:GetService("SoundService")
 
+local HudModel = require(ReplicatedStorage.Shared.UI.HudModel)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Rarity = require(ReplicatedStorage.Shared.Items.Rarity)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local Signal = require(ReplicatedStorage.Shared.Core.Signal)
+local EventPanel = require(script.Parent.Parent.Hud.EventPanel)
 local HudMode = require(script.Parent.Parent.Hud.HudMode)
 local Kit = require(script.Parent.Parent.Hud.Kit)
 local NoticeCard = require(script.Parent.Parent.Hud.NoticeCard)
@@ -24,19 +26,6 @@ local EventFeedController = {}
 
 EventFeedController.ALERT_SOUND = "rbxasset://sounds/electronicpingshort.wav"
 EventFeedController.BANNER_SECONDS = 6
-
--- The kit icon for each event category.
-EventFeedController.ICONS = {
-	Vegetation = "berry_bush",
-	Ore = "pickaxe",
-	Npc = "paw",
-	Cache = "treasure",
-	Meteor = "magma_ore",
-	Structure = "ruin",
-	Boss = "tusk",
-}
-
-local COMPASS = { "E", "NE", "N", "NW", "W", "SW", "S", "SE" }
 
 local player = Players.LocalPlayer
 local ui = {}
@@ -55,14 +44,7 @@ function EventFeedController.ActiveViews()
 	return views
 end
 
-local function make(className: string, props, parent)
-	local instance = Instance.new(className)
-	for key, value in props do
-		instance[key] = value
-	end
-	instance.Parent = parent
-	return instance
-end
+local make = Theme.Make
 
 -- Compass direction and distance from the player to `position`.
 local function bearing(position: Vector3): string
@@ -71,9 +53,8 @@ local function bearing(position: Vector3): string
 		return ""
 	end
 	local offset = position - root.Position
-	-- Roblox's -Z is north on the placeholder island.
-	local angle = math.deg(math.atan2(-offset.Z, offset.X)) % 360
-	local direction = COMPASS[math.floor((angle + 22.5) / 45) % 8 + 1]
+	-- The compass letter (HudModel: -Z is north, as on the HUD compass).
+	local direction = HudModel.HeadingLetter(HudModel.Heading(offset.X, offset.Z))
 	return ("%s, %d studs"):format(direction, math.floor(Vector3.new(offset.X, 0, offset.Z).Magnitude))
 end
 
@@ -108,7 +89,8 @@ local function banner(view)
 		size = { 560, 84 },
 		layoutOrder = Theme.TopOrder.EventBanner,
 		kind = "warn",
-		icon = EventFeedController.ICONS[view.category] or "exclamation",
+		-- The same icon the HUD event panel and the compass show for the category.
+		icon = EventPanel.ICONS[view.category] or EventPanel.DEFAULT_ICON,
 		title = title(view) .. " appeared",
 		text = bearing(view.position),
 		onClose = function()
@@ -136,10 +118,13 @@ local function refreshList()
 	local now = workspace:GetServerTimeNow()
 	local lines = {}
 	for _, event in events do
-		local left = math.max(0, math.floor(event.view.endsAt - now))
 		table.insert(
 			lines,
-			("%s — %s · %d:%02d"):format(title(event.view), bearing(event.view.position), left // 60, left % 60)
+			("%s — %s · %s"):format(
+				title(event.view),
+				bearing(event.view.position),
+				HudModel.FormatTimer(event.view.endsAt - now)
+			)
 		)
 	end
 	table.sort(lines)

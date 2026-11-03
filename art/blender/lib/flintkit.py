@@ -126,10 +126,6 @@ def palette_entry(name):
     return PALETTE[name] if name in PALETTE else KIT_PALETTE[name]
 
 
-def is_emissive(name):
-    return palette_entry(name)[3] > 0
-
-
 EMISSIVE = {k for k, v in PALETTE.items() if v[3] > 0}
 # Foliage and ground greens: a weak specular so the sky's sheen does not wash the
 # saturated greens out toward grey.

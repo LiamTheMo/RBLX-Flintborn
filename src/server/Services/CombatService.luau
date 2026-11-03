@@ -17,6 +17,7 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local ArmorRules = require(ReplicatedStorage.Shared.Combat.ArmorRules)
+local Characters = require(ReplicatedStorage.Shared.World.Characters)
 local DamageRules = require(ReplicatedStorage.Shared.Combat.DamageRules)
 local GameConstants = require(ReplicatedStorage.Shared.GameConstants)
 local HarvestRules = require(ReplicatedStorage.Shared.Resources.HarvestRules)
@@ -27,6 +28,7 @@ local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local SessionStates = require(ReplicatedStorage.Shared.Admission.SessionStates)
 local SiegeRules = require(ReplicatedStorage.Shared.Combat.SiegeRules)
 local Signal = require(ReplicatedStorage.Shared.Core.Signal)
+local Validation = require(ReplicatedStorage.Shared.Data.Validation)
 local WeaponCatalog = require(ReplicatedStorage.Shared.Combat.WeaponCatalog)
 local AntiExploitService = require(script.Parent.AntiExploitService)
 local BuildingService = require(script.Parent.BuildingService)
@@ -63,22 +65,11 @@ local lastSequence = {}
 -- When each player's run began: the first draw cannot predate it.
 local runStartedAt = {}
 
-local function rootOf(player: Player)
-	local character = player.Character
-	return character and character:FindFirstChild("HumanoidRootPart")
-end
-
-local function aliveHumanoid(player: Player): Humanoid?
-	local humanoid = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
-	return humanoid and humanoid.Health > 0 and humanoid or nil
-end
-
 local function actor(player: Player)
-	local root = rootOf(player)
 	return {
 		state = WorldAdmissionService.GetState(player),
 		tribeId = player:GetAttribute("TribeId"),
-		inSafeZone = root ~= nil and SafeZoneService.Contains(root.Position),
+		inSafeZone = SafeZoneService.ContainsPlayer(player),
 	}
 end
 
@@ -107,7 +98,7 @@ function CombatService.ApplyHit(attacker: Player, target: Player, rawDamage: num
 	if attacker == target then
 		return false
 	end
-	local humanoid = aliveHumanoid(target)
+	local humanoid = Characters.AliveHumanoid(target)
 	if humanoid == nil or DownedService.IsDowned(attacker) then
 		return false
 	end
@@ -133,7 +124,7 @@ end
 -- Damage from the world (traps, event creatures) under the same safety rules as player hits: only
 -- at-risk players outside safe zones can be hurt.
 function CombatService.ApplyEnvironmentHit(target: Player, rawDamage: number): boolean
-	local humanoid = aliveHumanoid(target)
+	local humanoid = Characters.AliveHumanoid(target)
 	local victim = actor(target)
 	if humanoid == nil or not SessionStates.IsAtRisk(victim.state) or victim.inSafeZone then
 		return false
@@ -157,13 +148,6 @@ local function acceptSequence(player: Player, sequence: any): boolean
 	return true
 end
 
-local function validDirection(direction: any): Vector3?
-	if typeof(direction) ~= "Vector3" or direction.Magnitude < 0.5 or direction.Magnitude ~= direction.Magnitude then
-		return nil
-	end
-	return direction.Unit
-end
-
 local function readyToAttack(player: Player, cooldown: number): boolean
 	local now = os.clock()
 	if not DamageRules.CooldownReady(lastAttack[player], now, cooldown) then
@@ -173,20 +157,9 @@ local function readyToAttack(player: Player, cooldown: number): boolean
 	return true
 end
 
--- Everything a line-of-sight ray ignores: characters never block a swing.
-local function characters()
-	local list = {}
-	for _, other in Players:GetPlayers() do
-		if other.Character then
-			table.insert(list, other.Character)
-		end
-	end
-	return list
-end
-
 -- True when nothing solid (structures, ground, terrain) lies between `from` and
--- `to`, other than `target` itself.
-local function clearLine(from: Vector3, to: Vector3, ignore, target: Instance?): boolean
+-- `to`, other than `target` itself. Siege throws use it too.
+function CombatService.ClearLine(from: Vector3, to: Vector3, ignore, target: Instance?): boolean
 	local params = RaycastParams.new()
 	params.FilterType = Enum.RaycastFilterType.Exclude
 	params.FilterDescendantsInstances = ignore
@@ -196,17 +169,12 @@ local function clearLine(from: Vector3, to: Vector3, ignore, target: Instance?):
 	return hit == nil or (target ~= nil and (hit.Instance == target or hit.Instance:IsDescendantOf(target)))
 end
 
-local function inSafeZone(player: Player): boolean
-	local root = rootOf(player)
-	return root ~= nil and SafeZoneService.Contains(root.Position)
-end
-
 -- The closest player in reach and arc this swing could actually hurt.
 local function bestPlayer(player: Player, root: BasePart, flatAim: Vector3, profile, canSee): Player?
 	local attacker = actor(player)
 	local best, bestDistance = nil, math.huge
 	for _, other in Players:GetPlayers() do
-		local otherRoot = other ~= player and rootOf(other)
+		local otherRoot = other ~= player and Characters.RootOf(other)
 		if otherRoot then
 			local offset = otherRoot.Position - root.Position
 			local distance = offset.Magnitude
@@ -234,8 +202,8 @@ local function structureDistance(player: Player, origin: Vector3, flatAim: Vecto
 end
 
 local function melee(player: Player, sequence: any, direction: any)
-	local aim = validDirection(direction)
-	local root = rootOf(player)
+	local aim = Validation.Direction(direction)
+	local root = Characters.RootOf(player)
 	local head = player.Character and player.Character:FindFirstChild("Head")
 	if not acceptSequence(player, sequence) or aim == nil or root == nil or head == nil then
 		return
@@ -246,7 +214,7 @@ local function melee(player: Player, sequence: any, direction: any)
 		CombatService.SiegeAttack(player, aim)
 		return
 	end
-	if aliveHumanoid(player) == nil or not WorldAdmissionService.IsAtRisk(player) then
+	if Characters.AliveHumanoid(player) == nil or not WorldAdmissionService.IsAtRisk(player) then
 		return
 	end
 	-- Reach is measured from the client-owned root, so it must also sit near where
@@ -259,9 +227,10 @@ local function melee(player: Player, sequence: any, direction: any)
 	if profile.kind ~= "Melee" or DownedService.IsDowned(player) or not readyToAttack(player, profile.cooldown) then
 		return
 	end
-	local ignore = characters()
+	-- Everything a line-of-sight ray ignores: characters never block a swing.
+	local ignore = Characters.All()
 	local function canSee(part: BasePart): boolean
-		return clearLine(head.Position, part.Position, ignore, part)
+		return CombatService.ClearLine(head.Position, part.Position, ignore, part)
 	end
 	local flatAim = Vector3.new(aim.X, 0, aim.Z)
 	local damage = DamageRules.MeleeDamage(profile, equipped and equipped.qualityRoll)
@@ -299,7 +268,7 @@ local function melee(player: Player, sequence: any, direction: any)
 		end,
 	}
 	local isWeapon = profile ~= WeaponCatalog.Hand
-	local order = HarvestRules.TargetOrder(isWeapon, inSafeZone(player))
+	local order = HarvestRules.TargetOrder(isWeapon, SafeZoneService.ContainsPlayer(player))
 	for index, kind in order do
 		structureNext = table.find(order, "Structure", index) ~= nil
 		if targets[kind]() then
@@ -319,16 +288,16 @@ local function ensureAnimator(character: Model)
 end
 
 local function shoot(player: Player, sequence: any, drawSeconds: any, direction: any)
-	local aim = validDirection(direction)
+	local aim = Validation.Direction(direction)
 	local character = player.Character
 	local head = character and character:FindFirstChild("Head")
-	if not acceptSequence(player, sequence) or aim == nil or head == nil or aliveHumanoid(player) == nil then
+	if not acceptSequence(player, sequence) or aim == nil or head == nil or Characters.AliveHumanoid(player) == nil then
 		return
 	end
 	if type(drawSeconds) ~= "number" or drawSeconds ~= drawSeconds or not WorldAdmissionService.IsAtRisk(player) then
 		return
 	end
-	if inSafeZone(player) then
+	if SafeZoneService.ContainsPlayer(player) then
 		return
 	end
 	-- The arrow leaves from the client-owned head: it must be near the validated spot.

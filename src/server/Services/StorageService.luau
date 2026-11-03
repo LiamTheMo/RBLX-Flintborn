@@ -6,7 +6,6 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local InventoryRules = require(ReplicatedStorage.Shared.Inventory.InventoryRules)
-local ItemCatalog = require(ReplicatedStorage.Shared.Items.ItemCatalog)
 local ListingKeys = require(ReplicatedStorage.Shared.Net.ListingKeys)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
@@ -24,23 +23,6 @@ StorageService.REACH = 10
 StorageService.HEAD_OFFSET = 3.5
 
 local chests = {}
-
-local function view(chest)
-	local entries = {}
-	for index, item in chest.slots do
-		local def = ItemCatalog.Get(item.catalogId)
-		table.insert(entries, {
-			index = index,
-			key = ListingKeys.KeyOf(item),
-			catalogId = item.catalogId,
-			name = def and def.name or item.catalogId,
-			rarity = def and def.rarity or "Common",
-			quantity = item.quantity,
-			permanent = item.permanent,
-		})
-	end
-	return entries
-end
 
 -- In reach and in sight: reach is measured from the HumanoidRootPart, the head
 -- must sit on the body (a client can move its own Head through a wall), and the
@@ -71,7 +53,7 @@ local function canReach(player: Player, chest): boolean
 end
 
 local function send(player: Player, id: string, chest)
-	Remotes.Get("ChestOpened"):FireClient(player, id, view(chest))
+	Remotes.Get("ChestOpened"):FireClient(player, id, ListingKeys.View(chest.slots, false))
 end
 
 -- Merging adds up the stacks' carried counts, so a chest never launders

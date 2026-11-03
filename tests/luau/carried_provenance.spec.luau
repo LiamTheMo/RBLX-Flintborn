@@ -167,98 +167,26 @@ end)
 
 -- Drops, bodies and chests against the real services ---------------------------------
 
+local TestSupport = game:GetService("ServerStorage").TestSupport
+local FakeRoblox = require(TestSupport.FakeRoblox)
+local scheduler = require(TestSupport.Scheduler).new():Install()
+-- Services report a failed handler with warn; every such report fails the spec.
 local errors = {}
 warn = function(message)
 	table.insert(errors, tostring(message))
 end
-task = {
-	spawn = function(fn, ...)
-		fn(...)
-	end,
-	defer = function(fn, ...)
-		fn(...)
-	end,
-	delay = function() end,
-	wait = function() end,
-}
-CFrame = {
-	new = function(position)
-		return { Position = position }
-	end,
-}
-
--- Instances: properties are plain fields (a CFrame moves Position too), events
--- are Signals made on first use.
-local created = {}
-local function fakeInstance(className)
-	local instance = {
-		ClassName = className,
-		Destroy = function(self)
-			self.destroyed = true
-		end,
-		IsA = function(_, name)
-			return name == className or (name == "BasePart" and className == "Part")
-		end,
-	}
-	table.insert(created, instance)
-	return setmetatable(instance, {
-		__index = function(self, key)
-			local signal = Signal.new()
-			rawset(self, key, signal)
-			return signal
-		end,
-		__newindex = function(self, key, value)
-			rawset(self, key, value)
-			if key == "CFrame" then
-				rawset(self, "Position", value.Position)
-			end
-		end,
-	})
-end
-Instance = { new = fakeInstance }
+local created = FakeRoblox.Instances()
 workspace = {
 	Raycast = function()
 		return nil
 	end,
 }
-RaycastParams = {
-	new = function()
-		return {}
-	end,
-}
-
-local Players = { PlayerRemoving = Signal.new(), PlayerAdded = Signal.new(), _list = {} }
-function Players.GetPlayerFromCharacter(_, character)
-	for _, player in Players._list do
-		if player.Character == character then
-			return player
-		end
-	end
-	return nil
-end
-function Players.GetPlayers()
-	return table.clone(Players._list)
-end
-local lastGuid = nil
-local guids = 0
-local fakes = {
-	Players = Players,
-	HttpService = {
-		GenerateGUID = function()
-			guids += 1
-			lastGuid = ("%08x-0000-4000-8000-%012x"):format(guids, guids)
-			return lastGuid
-		end,
-	},
-	RunService = { Heartbeat = Signal.new() },
-}
-local originalGetService = game.GetService
-game.GetService = function(self, name)
-	return fakes[name] or originalGetService(self, name)
-end
+local Players = FakeRoblox.Players()
+local http = FakeRoblox.Guids()
+FakeRoblox.Provide({ Players = Players, HttpService = http, RunService = { Heartbeat = Signal.new() } })
 
 local validated = {}
-local stubs = {
+local stubs = FakeRoblox.StubServices({
 	AntiExploitService = {
 		ValidatedPosition = function(player)
 			return validated[player]
@@ -288,36 +216,10 @@ local stubs = {
 			return player.atRisk
 		end,
 	},
-}
-local realRequire = require
-require = function(node)
-	local path = type(node) == "table" and rawget(node, "__path")
-	if path and path[1] == "ServerScriptService" and path[3] == "Services" and stubs[path[4]] then
-		return stubs[path[4]]
-	end
-	return realRequire(node)
-end
-
-local PlaceConfig = require(Shared.Config.PlaceConfig)
-PlaceConfig.IsWorld = function()
-	return true
-end
-local Remotes = require(Shared.Net.Remotes)
-local handlers = {}
-Remotes.Handle = function(name, fn)
-	handlers[name] = fn
-end
--- The last payload each remote sent to each player: sent[name][player] = {...}.
-local sent = {}
-Remotes.Get = function(name)
-	sent[name] = sent[name] or {}
-	return {
-		FireClient = function(_, player, ...)
-			sent[name][player] = table.pack(...)
-		end,
-		FireAllClients = function() end,
-	}
-end
+})
+FakeRoblox.Place("World")
+local net = FakeRoblox.Remotes()
+local handlers, sent = net.handlers, net.sent
 
 local InventoryService = require(Server.Services.InventoryService)
 local DropService = require(Server.Services.DropService)
@@ -327,43 +229,11 @@ for _, service in { InventoryService, DropService, DepartureService, StorageServ
 	service.Start()
 end
 
-local function newCharacter(position)
-	local humanoid = { Health = 100 }
-	local root = { Position = position, CFrame = { LookVector = Vector3.new(0, 0, 1) } }
-	local head = { Position = position + Vector3.new(0, 1.5, 0) }
-	return {
-		root = root,
-		FindFirstChild = function(_, name)
-			return if name == "HumanoidRootPart" then root elseif name == "Head" then head else nil
-		end,
-		FindFirstChildOfClass = function(_, className)
-			return if className == "Humanoid" then humanoid else nil
-		end,
-		GetPivot = function()
-			return { Position = root.Position }
-		end,
-	}
-end
-
 local nextUserId = 500
 -- A player in a run at `position`, holding `items`.
 local function inRun(items, position)
 	nextUserId += 1
-	local player = {
-		UserId = nextUserId,
-		Name = "P" .. nextUserId,
-		DisplayName = "P" .. nextUserId,
-		Parent = Players,
-		atRisk = true,
-		attributes = {},
-	}
-	function player.SetAttribute(self, key, value)
-		self.attributes[key] = value
-	end
-	function player.GetAttribute(self, key)
-		return self.attributes[key]
-	end
-	player.Character = newCharacter(position or Vector3.new(0, 5, 0))
+	local player = FakeRoblox.Player(nextUserId, { atRisk = true, Character = FakeRoblox.Character(position) }, Players)
 	table.insert(Players._list, player)
 	stubs.WorldAdmissionService.RunStarted:Fire(player, player.Character, ProfileSchema.DeepCopy(items))
 	return player
@@ -396,24 +266,13 @@ local function lastPrompt()
 	return nil
 end
 
-test("a carried stack dropped for another player stays carried for them", function()
-	local alt = inRun({ stack("IronBar", 1000, 1000) })
-	local main = inRun({})
-	local ok, reason = handlers.DropItem(alt, slotOf(alt, "IronBar"))
-	expect(ok, "dropped: " .. tostring(reason))
-	expectEq(held(alt, "IronBar"), nil, "the alt no longer has it")
-	lastPrompt().Triggered:Fire(main)
-	local bars = held(main, "IronBar")
-	expectEq(bars and bars.quantity, 1000, "the main picked up all 1,000")
-	expectEq(bars and bars.carried, 1000, "still carried")
-	expectEq(centerYield(InventoryService.Items(main), "IronBar"), 1000, "the Center never doubles them")
-end)
-
-test("a partial pickup leaves the rest on the ground with its share of the tag", function()
+test("a dropped carried stack stays carried for whoever picks it up, in part or whole", function()
 	-- 300 bars, 120 of them brought in and 180 smelted from gathered ore.
 	local alt = inRun({ stack("IronBar", 300, 120) })
 	local main = inRun({ stack("IronBar", 850) })
-	handlers.DropItem(alt, slotOf(alt, "IronBar"))
+	local ok, reason = handlers.DropItem(alt, slotOf(alt, "IronBar"))
+	expect(ok, "dropped: " .. tostring(reason))
+	expectEq(held(alt, "IronBar"), nil, "the alt no longer has it")
 	local prompt = lastPrompt()
 	prompt.Triggered:Fire(main)
 	expectEq(held(main, "IronBar").quantity, 1000, "150 fit")
@@ -422,6 +281,7 @@ test("a partial pickup leaves the rest on the ground with its share of the tag",
 	prompt.Triggered:Fire(other)
 	expectEq(held(other, "IronBar").quantity, 150, "the other 150 are picked up later")
 	expectEq(held(other, "IronBar").carried, nil, "and are all gathered: the tag was conserved, not copied")
+	expectEq(centerYield(InventoryService.Items(other), "IronBar"), 300, "so only they double at the Center")
 end)
 
 test("a gathered drop is in reach only from the server-validated position", function()
@@ -445,7 +305,7 @@ end)
 test("a body looted by another player keeps each stack's carried units", function()
 	local alt = inRun({ stack("IronBar", 500, 400), stack("Wood", 40) })
 	stubs.WorldAdmissionService.Death:Fire(alt, Vector3.new(0, 5, 0))
-	local bodyId = lastGuid
+	local bodyId = http.last
 	local main = inRun({ stack("IronBar", 700) })
 	local ok, reason = handlers.CorpseTake(main, bodyId, 1, "stack:IronBar")
 	expect(ok, "looted: " .. tostring(reason))
@@ -462,7 +322,7 @@ end)
 test("body and chest listings name each item by its catalog id", function()
 	local alt = inRun({ stack("IronBar", 50), stack("Wood", 40) })
 	stubs.WorldAdmissionService.Death:Fire(alt, Vector3.new(0, 5, 0))
-	local bodyId = lastGuid
+	local bodyId = http.last
 	local main = inRun({})
 	expect(handlers.CorpseTake(main, bodyId, 1, "stack:IronBar"), "looted")
 	local payload = sent.CorpseOpened[main]
@@ -503,7 +363,7 @@ end)
 test("a take names its entry by key, so a double press or stale index takes nothing else", function()
 	local alt = inRun({ stack("IronBar", 10), stack("Wood", 40), stack("Stone", 5) })
 	stubs.WorldAdmissionService.Death:Fire(alt, Vector3.new(0, 5, 0))
-	local bodyId = lastGuid
+	local bodyId = http.last
 	local main = inRun({})
 	expect(handlers.CorpseTake(main, bodyId, 1, "stack:IronBar"), "first press takes the bars")
 	local ok, reason = handlers.CorpseTake(main, bodyId, 1, "stack:IronBar")
@@ -532,6 +392,28 @@ test("a take names its entry by key, so a double press or stale index takes noth
 	expectEq(held(taker, "Wood"), nil, "the Wood in index 1 is untouched")
 end)
 
+test("a take that fits nothing reports NoRoom, from a body as from a chest", function()
+	local alt = inRun({ stack("IronBar", 50, 30) })
+	stubs.WorldAdmissionService.Death:Fire(alt, Vector3.new(0, 5, 0))
+	local bodyId = http.last
+	local main = inRun({ stack("IronBar", 1000) })
+	local ok, reason = handlers.CorpseTake(main, bodyId, 1, "stack:IronBar")
+	expect(not ok and reason == "NoRoom", "a full stack takes nothing from the body: " .. tostring(reason))
+	expectEq(held(main, "IronBar").quantity, 1000, "nothing fit under the cap")
+	local other = inRun({})
+	expect(handlers.CorpseTake(other, bodyId, 1, "stack:IronBar"), "the bars are still on the body")
+	expectEq(held(other, "IronBar").quantity, 50, "all 50 of them")
+	expectEq(held(other, "IronBar").carried, 30, "with their carried units")
+
+	local part = { Position = Vector3.new(3, 5, 0) }
+	stubs.BuildingService.Placed:Fire({ id = "chest-full", pieceId = "Chest", part = part, position = part.Position })
+	local storer = inRun({ stack("IronBar", 50) })
+	expect(handlers.ChestPut(storer, "chest-full", slotOf(storer, "IronBar")), "stored")
+	ok, reason = handlers.ChestTake(main, "chest-full", 1, "stack:IronBar")
+	expect(not ok and reason == "NoRoom", "a full stack takes nothing from the chest: " .. tostring(reason))
+end)
+
 test("no service handler errored", function()
 	expectEq(#errors, 0, "errors: " .. table.concat(errors, " | "))
+	scheduler:ExpectNoThreadErrors()
 end)

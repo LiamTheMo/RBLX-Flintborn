@@ -32,8 +32,6 @@ BiomeCatalog.Regions = {
 	CenterCrater = { risk = "Extreme" },
 }
 
-BiomeCatalog.TierOfRisk = { Low = "OuterRim", Medium = "InnerRing", Extreme = "CenterCrater" }
-
 BiomeCatalog.HABITATS = {
 	"Beach",
 	"Meadow",
@@ -376,9 +374,6 @@ function BiomeCatalog.RegionAt(x: number, z: number): string?
 	local zoneId = BiomeCatalog.ZoneAt(x, z)
 	return zoneId and BiomeCatalog.Zones[zoneId].tier
 end
-
--- Old name: the zone at a position.
-BiomeCatalog.BiomeAt = BiomeCatalog.ZoneAt
 
 -- The zones of one tier, in ZONE_IDS order.
 function BiomeCatalog.ZonesIn(tier: string): { string }

@@ -17,7 +17,7 @@ jobs:
     name: Validate local Rojo project (never publish)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
           persist-credentials: false
       - name: Check code-only target mappings
@@ -33,14 +33,12 @@ jobs:
       - name: Run headless Luau specs and publish-safety tests
         run: |
           python3 tests/luau/run.py
-          python3 -m unittest discover -s tests -p 'test_cloud_live_publish.py' -v
-      - uses: CompeyDev/setup-rokit@v0.1.2
+          python3 -m unittest discover -s tests -p 'test_*.py' -v
+      - uses: CompeyDev/setup-rokit@d49be92bd9502180218c3f43e7988faa945217b0 # v0.1.2
         with:
           version: v1.2.0
-      - name: Install tools and dependencies
-        run: |
-          rokit install --no-trust-check
-          if [ -f wally.toml ]; then wally install; fi
+      - name: Install tools
+        run: rokit install --no-trust-check
       - name: Validate Rojo project without publishing
         run: |
           mkdir -p build
@@ -63,7 +61,7 @@ jobs:
       matrix:
         place: [main, lobby]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
           persist-credentials: false
       - name: Preflight and update existing script instances

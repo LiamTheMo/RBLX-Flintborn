@@ -3,13 +3,13 @@
 -- and the objective/event text. No Instances here, so the headless specs and the
 -- HUD share one definition. The HUD only displays; the server owns every value.
 
-local ItemCatalog = require(script.Parent.Parent.Items.ItemCatalog)
+local GameConstants = require(script.Parent.Parent.GameConstants)
 local Keybinds = require(script.Parent.Parent.Settings.Keybinds)
 
 local HudModel = {}
 
 -- Roblox studs to metres for player-facing distances.
-HudModel.METRES_PER_STUD = 0.28
+HudModel.METRES_PER_STUD = GameConstants.METRES_PER_STUD
 
 -- Headings clockwise from north. -Z is north and +X is east on the island, the
 -- same convention as MapController and EventFeedController.
@@ -91,17 +91,6 @@ function HudModel.Compact(value: number?): string
 		end
 	end
 	return HudModel.Thousands(n)
-end
-
--- The lobby party header's count beside "PARTY": "1/8" (alone counts as a party
--- of one).
-function HudModel.PartyCount(members: number?, maxSize: number): string
-	return ("%d/%d"):format(math.clamp(math.floor(members or 1), 1, maxSize), maxSize)
-end
-
--- Small text on a full XP bar at the level cap.
-function HudModel.MaxLevelHint(level: number?): string
-	return ("Level %d (max): rebirth in the lobby to keep climbing"):format(math.max(0, math.floor(level or 0)))
 end
 
 -- Seconds as m:ss, or h:mm:ss from an hour up. Negative time reads 0:00.
@@ -276,27 +265,11 @@ function HudModel.Stack(top: number, heights: { number | false }, gap: number): 
 	end
 	return tops, foot
 end
--- Roblox's touch jump button on a screen w × h (screen px), as the default
--- PlayerModule (TouchJump) places it inside the safe area (`insets`, screen
--- px): 70 px square, 95 px from the right and 90 from the bottom when the
--- short side is 500 px or less; otherwise 120 px square, 170 from the right
--- and 210 from the bottom. Returns {x, y, size}, its top-left corner and side,
--- on the whole screen.
-function HudModel.JumpButton(width: number, height: number, insets: any?)
-	local i = safe(insets)
-	local small = math.min(width, height) <= 500
-	local size = if small then 70 else 120
-	return {
-		x = width - i.right - (size * 1.5 - 10),
-		y = height - i.bottom - (if small then size + 20 else size * 1.75),
-		size = size,
-	}
-end
 
 -- Roblox's classic touch thumbstick (the ring the "Thumbstick" movement mode
 -- draws) on a screen w × h (screen px), as the default PlayerModule
--- (ClassicThumbstick) places it inside the safe area, the mirror of the jump
--- button: 70 px square, 25 px from the left and 90 from the bottom when the
+-- (ClassicThumbstick) places it inside the safe area (`insets`, screen px),
+-- the mirror of the jump button: 70 px square, 25 px from the left and 90 from the bottom when the
 -- short side is 500 px or less; otherwise 120 px square, 60 from the left and
 -- 210 from the bottom. Returns {x, y, size}, its top-left corner and side.
 function HudModel.Thumbstick(width: number, height: number, insets: any?)
@@ -308,15 +281,6 @@ function HudModel.Thumbstick(width: number, height: number, insets: any?)
 		y = height - i.bottom - (if small then size + 20 else size * 1.75),
 		size = size,
 	}
-end
-
--- Where the default dynamic thumbstick starts on a landscape screen w × h
--- (screen px): a touch landing anywhere in the left 40 % (of the safe area)
--- below the top third (DynamicThumbstick's frame). Returns {x, y, w, h}.
-function HudModel.ThumbstickZone(width: number, height: number, insets: any?)
-	local i = safe(insets)
-	local w, h = width - i.left - i.right, height - i.top - i.bottom
-	return { x = i.left, y = i.top + h / 3, w = w * 0.4, h = h * 2 / 3 }
 end
 
 -- Where the HUDs' bottom-left corner button (the ⚙: `gear`, HudLayout's
@@ -391,40 +355,25 @@ function HudModel.HotbarStep(current: number, step: number, count: number): numb
 	return ((current - 1 + step) % count) + 1
 end
 
--- What each HUD hotbar slot shows for an inventory snapshot ({slots, equipped}):
--- index -> {name, count, rarity, equipped, permanent}, or nil for an empty
--- slot. `count` is "" for unique items and "×n" for stacks; `permanent` marks
--- Permanent items (drawn with the star art; the name stays plain, as the
--- game's fonts have no star glyph).
-function HudModel.HotbarSlots(snapshot, count: number)
-	local views = {}
+-- The hotbar's items from an inventory snapshot ({slots, equipped}):
+-- index -> {itemId, quantity, permanent}, or nil for an empty slot.
+function HudModel.HotbarItems(snapshot, count: number)
+	local items = {}
 	for _, slot in (snapshot and snapshot.slots) or {} do
 		local index = slot.index
 		if slot.area == "hotbar" and type(index) == "number" and index >= 1 and index <= count then
-			local def = ItemCatalog.Get(slot.catalogId)
-			views[index] = {
-				name = if def then def.name else tostring(slot.catalogId),
+			items[index] = {
+				itemId = slot.catalogId,
+				quantity = slot.quantity,
 				permanent = slot.permanent == true,
-				count = if slot.quantity and slot.quantity > 1 then ("×%d"):format(slot.quantity) else "",
-				rarity = if def then def.rarity else "Common",
-				equipped = snapshot.equipped == index,
 			}
 		end
 	end
-	return views
+	return items
 end
 
+-- Gamepad buttons; keyboard keys read as Keybinds shows them ("One" → "1").
 local KEY_NAMES = {
-	One = "1",
-	Two = "2",
-	Three = "3",
-	Four = "4",
-	Five = "5",
-	Six = "6",
-	Seven = "7",
-	Eight = "8",
-	Nine = "9",
-	Zero = "0",
 	ButtonA = "A",
 	ButtonB = "B",
 	ButtonX = "X",
@@ -451,20 +400,20 @@ function HudModel.KeyLabel(inputType: string, keyName: string?, fallbackKey: str
 	return KEY_NAMES[keyName] or Keybinds.Display(keyName :: string)
 end
 
--- Medicine lock, pending food healing and hunger slow: what only the
--- old survival HUD showed in words.
-function HudModel.SurvivalStatus(medicineLockLeft: number?, foodHealing: number?, slowed: boolean?): string
-	local parts = {}
+-- The status plaques for the survival state: medicine lock (hourglass), pending
+-- food healing (heart) and the hunger slow (warning), each in words.
+function HudModel.StatusChips(medicineLockLeft: number?, foodHealing: number?, slowed: boolean?)
+	local chips = {}
 	if (medicineLockLeft or 0) > 0 then
-		table.insert(parts, ("Medicine ready in %.1f s"):format(medicineLockLeft))
+		table.insert(chips, { icon = "hourglass", text = ("Medicine ready in %.1f s"):format(medicineLockLeft) })
 	end
 	if (foodHealing or 0) > 0 then
-		table.insert(parts, ("Food healing +%d"):format(foodHealing))
+		table.insert(chips, { icon = "heart", text = ("Food healing +%d"):format(foodHealing) })
 	end
 	if slowed then
-		table.insert(parts, "! Hungry: slowed")
+		table.insert(chips, { icon = "warning", text = "Hungry: slowed" })
 	end
-	return table.concat(parts, "  ·  ")
+	return chips
 end
 
 -- The objective panel for extraction. `target` is the nearest extraction:

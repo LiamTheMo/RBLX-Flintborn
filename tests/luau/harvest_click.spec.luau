@@ -14,7 +14,7 @@ local function node(x: number, z: number, w: number, h: number, d: number, activ
 	}
 end
 
-test("reach is measured to the hitbox surface, not its centre", function()
+test("reach is measured to the hitbox surface and capped at the harvest range", function()
 	-- A wide rock whose centre is 9 studs away but whose face is 4 away.
 	local rock = node(0, -9, 10, 4, 10)
 	expectNear(HarvestRules.SurfaceDistance(ORIGIN, rock.center, rock.half), 4, 1e-9, "face distance")
@@ -26,14 +26,9 @@ test("reach is measured to the hitbox surface, not its centre", function()
 	-- Height counts too: the top of a short node below the root is still close.
 	local mushrooms = node(0, -2, 2, 2, 2)
 	expectNear(HarvestRules.SurfaceDistance(ORIGIN, mushrooms.center, mushrooms.half), math.sqrt(2), 1e-9, "3D")
-	expectEq(
-		HarvestRules.SurfaceDistance(Vector3.new(0, 1, 0), node(0, 0, 4, 4, 4).center, node(0, 0, 4, 4, 4).half),
-		0,
-		"inside"
-	)
-end)
-
-test("reach follows the held item and never passes the harvest range", function()
+	local around = node(0, 0, 4, 4, 4)
+	expectEq(HarvestRules.SurfaceDistance(Vector3.new(0, 1, 0), around.center, around.half), 0, "inside")
+	-- Reach follows the held item and never passes the harvest range.
 	expectEq(HarvestRules.Reach(5), 5 + HarvestRules.REACH_ALLOWANCE, "hand reach plus slack")
 	expectEq(HarvestRules.Reach(50), NodeCatalog.HARVEST_RANGE, "capped at the harvest range")
 end)
@@ -53,7 +48,7 @@ test("only nodes inside the arc are hit; a node being touched always is", functi
 	expect(HarvestRules.InArc(ORIGIN, NORTH, log.center, log.half), "the near part of a long node counts")
 end)
 
-test("the closest node wins and depleted nodes are skipped", function()
+test("the closest node in sight wins; depleted nodes are skipped; sight is asked only of would-be winners", function()
 	local near = node(0, -3, 2, 2, 2)
 	local far = node(1, -6, 2, 2, 2)
 	expect(HarvestRules.Pick(ORIGIN, NORTH, 7, { far, near }) == near, "closest wins")
@@ -61,11 +56,8 @@ test("the closest node wins and depleted nodes are skipped", function()
 	expect(HarvestRules.Pick(ORIGIN, NORTH, 7, { far, near }) == far, "a depleted node is skipped")
 	far.active = false
 	expect(HarvestRules.Pick(ORIGIN, NORTH, 7, { far, near }) == nil, "nothing left")
-end)
-
-test("line of sight is asked only of nodes that would win", function()
-	local near = node(0, -3, 2, 2, 2)
-	local far = node(1, -6, 2, 2, 2)
+	-- Line of sight is asked only of nodes that would win.
+	near.active, far.active = nil, nil
 	local behind = node(0, 5, 2, 2, 2)
 	local asked = {}
 	local picked = HarvestRules.Pick(ORIGIN, NORTH, 7, { behind, near, far }, function(candidate)

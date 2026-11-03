@@ -50,7 +50,6 @@ Axes: Blender is Z up with fronts facing -Y; glTF and Roblox are Y up. A point
 The object's rotation and scale are baked into the mesh; its location is not.
 """
 
-import bisect
 import json
 import math
 import os
@@ -81,7 +80,6 @@ WATER = {"water", "water_deep", "water_shallow"}
 WATER_KEY = re.compile(r"[a-z]\d+_water(_[a-z0-9_]+)?")  # sheet-prefixed module water keys
 WATER_TRANSPARENCY = 0.25  # the lobby's flat water (roblox_lobby_map.py); kit water uses flintkit.water_transparency
 WATER_TILE = kitwater.TILE_STUDS  # studs per water texture tile (16)
-WATER_TEX = kitwater.SIZE         # water texture size in pixels (512)
 # SmoothPlastic, not Glass: Glass tints and reflects the sky, so the stylised
 # texture colours wash out; it hides transparent things behind it (beams,
 # particles, other water), which would hide a waterfall's Beam seen through its
@@ -374,12 +372,6 @@ def water_uvs(points):
     else:
         pick = (1, 2)
     return [(p[pick[0]] / WATER_TILE, p[pick[1]] / WATER_TILE) for p in points]
-
-
-def water_texture(hexcol, seed, size=WATER_TEX):
-    """Tileable stylised water (sRGB floats, size x size x 3, top row first); the
-    painter lives in lib/kitwater.py, shared with the Blender preview."""
-    return kitwater.pixels(hexcol, seed=seed, size=size)
 
 
 def write_water_texture(path, hexcol, key):

@@ -35,6 +35,7 @@ local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local Signal = require(ReplicatedStorage.Shared.Core.Signal)
 local SurvivalRules = require(ReplicatedStorage.Shared.Survival.SurvivalRules)
 local Validation = require(ReplicatedStorage.Shared.Data.Validation)
+local RequestLedger = require(script.Parent.Parent.Infrastructure.RequestLedger)
 local InventoryService = require(script.Parent.InventoryService)
 local ModifierService = require(script.Parent.ModifierService)
 local SurvivalService = require(script.Parent.SurvivalService)
@@ -46,28 +47,13 @@ HealingService.Used = Signal.new()
 
 HealingService.REMEMBERED_REQUESTS = 32
 
-local seenRequests = {}
+-- Remembers request IDs so a replayed or duplicated request is applied once.
+local requests = RequestLedger.new(function()
+	return HealingService.REMEMBERED_REQUESTS
+end)
 -- uses[player] = the running use (ConsumeRules.Begin) plus `applied`, the waiting
 -- request's `thread` and, for medicine, `lockBefore` (the lock it replaced).
 local uses = {}
-
--- Remembers request IDs so a replayed or duplicated request is applied once.
-local function firstTime(player: Player, requestId: string): boolean
-	local seen = seenRequests[player]
-	if seen == nil then
-		seen = { set = {}, order = {} }
-		seenRequests[player] = seen
-	end
-	if seen.set[requestId] then
-		return false
-	end
-	seen.set[requestId] = true
-	table.insert(seen.order, requestId)
-	if #seen.order > HealingService.REMEMBERED_REQUESTS then
-		seen.set[table.remove(seen.order, 1)] = nil
-	end
-	return true
-end
 
 local function heldId(player: Player): string?
 	local item = InventoryService.Equipped(player)
@@ -215,7 +201,7 @@ function HealingService.Use(player: Player, requestId: any, catalogId: any)
 	if player:GetAttribute("Downed") then
 		return false, "Downed"
 	end
-	if not firstTime(player, requestId) then
+	if not requests:FirstTime(player, requestId) then
 		return false, "Duplicate"
 	end
 	if uses[player] ~= nil then
@@ -270,7 +256,7 @@ function HealingService.Start()
 			uses[player] = nil
 			finish(player, use, use.applied == true, if use.applied then nil else "NotInRun")
 		end
-		seenRequests[player] = nil
+		requests:Forget(player)
 	end)
 end
 

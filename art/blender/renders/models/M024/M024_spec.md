@@ -45,8 +45,8 @@ in `m.py` (HSV; background = within 18 of the paper):
 - **O, other:** ground shadow, grey gaps and edges; not counted in the shares.
 
 **Scratch study material** (no Blender), in
-`<temp>\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m024_study\`.
-Run with the scratch venv `...\scratchpad\venv22\Scripts\python.exe` (Pillow + numpy).
+`<temp>/m024_study/`.
+Run with the scratch venv `<temp>/venv22/Scripts/python.exe` (Pillow + numpy).
 - **Helpers:** `m.py` (masks, view boxes `V`, `stats`), `bb.json` (silhouette boxes), `crops.py`, `gridcrop.py`.
 - **Measurements:** `measure.py` → `measure_out.txt` (bboxes, shares, top profiles, width per height, region extents);
   `comps.py` → `comps_out.txt` (thorn components per view); `wood.py` → `wood_out.txt` (wood runs per height);
@@ -914,7 +914,7 @@ use `vfx=True`, with nothing to realise.
 ## Stage 7 — Verification (round 1)
 
 Fresh verifier, read-only, background Blender on port 9877 with `wip/M024_verify.blend` (not saved; `build()` not
-called). Fresh renders went to the scratchpad (`.../scratchpad/v024/renders/`), never to this folder. Extra renders:
+called). Fresh renders went to the scratchpad (`<temp>/v024/renders/`), never to this folder. Extra renders:
 the six `*_sheet` cameras again **with the studio floor hidden** (`renders/ns/`), so the ground shadow can't enter
 the silhouette box; 960 × 800 versions (`renders/hi/`); a `(−90, 10)` side as a handedness check. Colours and
 silhouettes are re-measured with the study's own masks on both images. The bounding box uses L/T/W pixels only.
@@ -1224,7 +1224,7 @@ Fresh verifier (not the round-1 verifier; no other stage), read-only. Background
 `wip/M024_verify.blend`, not saved, `build()` not called. Port 9880 was already serving the M027 session (PID 114816),
 so my first launch there could not bind. That orphan process (PID 112824, `M024_verify.blend --port 9880`) is still
 running and idle, because I wasn't allowed to stop it; the main session should end it. My launch also truncated
-`art/blender/logs/bgmcp-9880.log`. Fresh renders went to `.../scratchpad/v024r2/renders/M024/` via
+`art/blender/logs/bgmcp-9880.log`. Fresh renders went to `<temp>/v024r2/renders/M024/` via
 `kit_models.MODEL_RENDERS`; nothing in this folder was overwritten. I used the builder's `measure()` (L/T/W bbox)
 and `compare()` there, plus my own Pillow side-by-sides (`sbs_*.png`), a hole count (enclosed paper inside the
 silhouette) and three elevated "game camera" shots (`hi/game_angles.png`).

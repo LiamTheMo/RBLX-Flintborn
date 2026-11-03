@@ -7,13 +7,12 @@
 --   { party = nil | {id, leader, createdAt, members = {{userId, name}},
 --     invited = {userId}}, invites = {{partyId, from, fromUserId}}, maxSize }
 
+local GameConstants = require(script.Parent.Parent.GameConstants)
 local ReasonText = require(script.Parent.ReasonText)
 
 local PartyModel = {}
 
-PartyModel.MAX_SIZE = 8
--- Rows the Your Party list shows before it scrolls (D5).
-PartyModel.VISIBLE_ROWS = 7
+PartyModel.MAX_SIZE = GameConstants.MAX_TRIBE_SIZE
 PartyModel.JOIN_TYPE = "Invite Only"
 PartyModel.NO_TIME = "—"
 
@@ -66,11 +65,6 @@ end
 function PartyModel.MembersText(count: number?, maxSize: number?): string
 	local cap = maxSize or PartyModel.MAX_SIZE
 	return ("%d / %d"):format(math.clamp(count or 1, 1, cap), cap)
-end
-
--- How many empty slots follow the members (the cap minus the members).
-function PartyModel.EmptySlots(count: number, maxSize: number?): number
-	return math.max(0, (maxSize or PartyModel.MAX_SIZE) - count)
 end
 
 -- The time since `createdAt` (server os.time) at `now` (workspace:

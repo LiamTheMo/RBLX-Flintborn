@@ -20,6 +20,7 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local BuildRules = require(ReplicatedStorage.Shared.Building.BuildRules)
+local Characters = require(ReplicatedStorage.Shared.World.Characters)
 local CraftingRules = require(ReplicatedStorage.Shared.Crafting.CraftingRules)
 local DamageRules = require(ReplicatedStorage.Shared.Combat.DamageRules)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
@@ -28,12 +29,11 @@ local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local Signal = require(ReplicatedStorage.Shared.Core.Signal)
 local StructureCatalog = require(ReplicatedStorage.Shared.Building.StructureCatalog)
 local AntiExploitService = require(script.Parent.AntiExploitService)
-local DownedService = require(script.Parent.DownedService)
 local ExtractionService = require(script.Parent.ExtractionService)
+local InteractionService = require(script.Parent.InteractionService)
 local InventoryService = require(script.Parent.InventoryService)
 local SafeZoneService = require(script.Parent.SafeZoneService)
 local TribeService = require(script.Parent.TribeService)
-local WorldAdmissionService = require(script.Parent.WorldAdmissionService)
 
 local BuildingService = {}
 
@@ -120,14 +120,6 @@ end
 -- arena while an encounter runs).
 function BuildingService.AddAuraSource(source)
 	table.insert(auraSources, source)
-end
-
-local function canAct(player: Player): boolean
-	local humanoid = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
-	return WorldAdmissionService.IsAtRisk(player)
-		and humanoid ~= nil
-		and humanoid.Health > 0
-		and not DownedService.IsDowned(player)
 end
 
 local function auras()
@@ -308,15 +300,9 @@ end
 -- The builder must see the spot: nothing solid between their head and the base.
 local function inSight(head: BasePart, base: Vector3, half: Vector3): boolean
 	local target = base + Vector3.new(0, math.min(0.5, half.Y), 0)
-	local ignore = {}
-	for _, other in Players:GetPlayers() do
-		if other.Character then
-			table.insert(ignore, other.Character)
-		end
-	end
 	local params = RaycastParams.new()
 	params.FilterType = Enum.RaycastFilterType.Exclude
-	params.FilterDescendantsInstances = ignore
+	params.FilterDescendantsInstances = Characters.All()
 	params.RespectCanCollide = true
 	params.IgnoreWater = true
 	local offset = target - head.Position
@@ -364,7 +350,7 @@ local function ownerName(player: Player, ownerKey: string): string
 end
 
 local function canManage(player: Player, record): boolean
-	return canAct(player) and BuildingService.IsOwnedBy(player, record)
+	return InteractionService.CanAct(player) and BuildingService.IsOwnedBy(player, record)
 end
 
 local function setupDoor(record)
@@ -442,7 +428,7 @@ local function placePiece(player: Player, pieceId: any, tier: any, position: any
 	if turn == nil then
 		return false, "BadRequest"
 	end
-	if not canAct(player) then
+	if not InteractionService.CanAct(player) then
 		return false, "NotInRun"
 	end
 	local base = position

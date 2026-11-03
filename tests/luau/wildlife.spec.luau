@@ -6,38 +6,18 @@ local EnemyCatalog = require(Shared.Enemies.EnemyCatalog)
 local ItemCatalog = require(Shared.Items.ItemCatalog)
 local WildlifeRules = require(Shared.Enemies.WildlifeRules)
 
--- The map's zones, as the world layout names them (BiomeCatalog.ZONE_IDS).
-local ZONE_IDS = {
-	"Rimlands",
-	"PinewoodWilds",
-	"MosswickForest",
-	"EmberhollowCaves",
-	"FrostpeakRidge",
-	"FallenTemple",
-	"Timberwatch",
-	"Riverlands",
-	"CraterLake",
-	"ShatteredKeep",
-}
+local ZONE_IDS = BiomeCatalog.ZONE_IDS
 
+-- The owner roster: "<role> <behaviour>" -> creatures.
 local ROSTER = {
-	WildBoar = { "Regular", "Neutral" },
-	ForestStag = { "Regular", "Passive" },
-	GreyWolf = { "Regular", "Hostile" },
-	BrownBear = { "Regular", "Neutral" },
-	RiverCrocodile = { "Regular", "Hostile" },
-	PlainsBison = { "Regular", "Neutral" },
-	MeadowRabbit = { "Regular", "Passive" },
-	IslandDodo = { "Regular", "Passive" },
-	RiverCapybara = { "Regular", "Passive" },
-	HighlandGoat = { "Regular", "Passive" },
-	ForestTapir = { "Regular", "Passive" },
-	GiantGroundSloth = { "RareEvent", "Passive" },
-	SaberToothedTiger = { "EventElite", "Hostile" },
-	WoollyMammoth = { "EventWildlife", "Neutral" },
-	IronTuskBoar = { "EventAlpha", "Hostile" },
-	AncientTortoise = { "RareEvent", "Passive" },
-	StonehideRhino = { "EventElite", "Neutral" },
+	["Regular Neutral"] = { "WildBoar", "BrownBear", "PlainsBison" },
+	["Regular Passive"] = { "ForestStag", "MeadowRabbit", "IslandDodo", "RiverCapybara", "HighlandGoat", "ForestTapir" },
+	["Regular Hostile"] = { "GreyWolf", "RiverCrocodile" },
+	["RareEvent Passive"] = { "GiantGroundSloth", "AncientTortoise" },
+	["EventElite Hostile"] = { "SaberToothedTiger" },
+	["EventElite Neutral"] = { "StonehideRhino" },
+	["EventWildlife Neutral"] = { "WoollyMammoth" },
+	["EventAlpha Hostile"] = { "IronTuskBoar" },
 }
 
 local function amount(drops, catalogId: string): number
@@ -50,12 +30,15 @@ local function amount(drops, catalogId: string): number
 end
 
 test("the owner roster is in the catalog with its type and behaviour", function()
-	for enemyId, expected in ROSTER do
-		local enemy = EnemyCatalog.Get(enemyId)
-		assert(enemy, "missing " .. enemyId)
-		expectEq(enemy.role, expected[1], enemyId .. " role")
-		expectEq(enemy.behaviour, expected[2], enemyId .. " behaviour")
-		expect(EnemyCatalog.SizeClasses[enemy.sizeClass] ~= nil, enemyId .. " has a size class")
+	for kind, enemyIds in ROSTER do
+		local role, behaviour = string.match(kind, "(%S+) (%S+)")
+		for _, enemyId in enemyIds do
+			local enemy = EnemyCatalog.Get(enemyId)
+			assert(enemy, "missing " .. enemyId)
+			expectEq(enemy.role, role, enemyId .. " role")
+			expectEq(enemy.behaviour, behaviour, enemyId .. " behaviour")
+			expect(EnemyCatalog.SizeClasses[enemy.sizeClass] ~= nil, enemyId .. " has a size class")
+		end
 	end
 	for _, oldId in { "Wolf", "Boar", "Sabertooth", "Bandit" } do
 		expectEq(EnemyCatalog.Get(oldId), nil, oldId .. " is renamed or removed")

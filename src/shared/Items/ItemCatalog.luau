@@ -6,6 +6,7 @@
 -- Values not confirmed by the GDD are starting placeholders.
 
 local Consumables = require(script.Parent.Consumables)
+local GameConstants = require(script.Parent.Parent.GameConstants)
 local Rarity = require(script.Parent.Rarity)
 local Tiers = require(script.Parent.Tiers)
 
@@ -24,7 +25,7 @@ ItemCatalog.Families = {
 
 -- Per-slot stack caps by family (material cap matches the vault stack cap).
 ItemCatalog.STACK_CAPS = {
-	Material = 1000,
+	Material = GameConstants.MATERIAL_STACK_MAX,
 	Ammo = 500,
 	Consumable = 50,
 	Siege = 10,
@@ -209,6 +210,18 @@ end
 
 function ItemCatalog.Get(catalogId: any)
 	return type(catalogId) == "string" and ItemCatalog.Items[catalogId] or nil
+end
+
+-- The item's display name; an unknown id names itself.
+function ItemCatalog.NameOf(catalogId: any)
+	local def = ItemCatalog.Get(catalogId)
+	return def and def.name or catalogId
+end
+
+-- The item's rarity; an unknown id is Common.
+function ItemCatalog.RarityOf(catalogId: any): string
+	local def = ItemCatalog.Get(catalogId)
+	return def and def.rarity or "Common"
 end
 
 -- Stack cap for stackable items, or nil for unique instances.

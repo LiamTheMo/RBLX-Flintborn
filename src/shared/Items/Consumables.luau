@@ -19,7 +19,6 @@ local food = GameConstants.FOOD
 -- rare-drop chances. A running boost never weakens: only a stronger one of the
 -- same kind takes over (BoostRules).
 Consumables.Boost = "Boost"
-Consumables.BoostKinds = { XP = "XP", Luck = "Luck" }
 
 local function boost(kind: string, amount: number, seconds: number)
 	return { kind = kind, amount = amount, seconds = seconds }

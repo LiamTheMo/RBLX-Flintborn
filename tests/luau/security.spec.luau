@@ -51,28 +51,27 @@ local function convert(profile, operationId, sourceId, recipeId)
 	end
 end
 
+-- A journaled conversion; returns pcall's ok and the refusal reason.
+local function tryForge(profile, operationId, sourceId, recipeId)
+	return pcall(
+		OperationJournal.Run,
+		profile,
+		operationId,
+		"Forge",
+		1,
+		convert(profile, operationId, sourceId, recipeId)
+	)
+end
+
 test("§24 forged Permanent IDs are rejected", function()
 	local profile = forgeReady()
-	local ok, reason =
-		pcall(OperationJournal.Run, profile, "forge:a", "Forge", 1, convert(profile, "forge:a", "forged-id"))
+	local ok, reason = tryForge(profile, "forge:a", "forged-id")
 	expect(not ok and reason == "NoSource", "unknown instance")
-	expect(
-		not PermanentRules.CanConvert(
-			{ instanceId = "p9", catalogId = "StonePickaxe", ownerId = 99, location = "Vault" },
-			7
-		),
-		"someone else's item"
-	)
+	local foreign = { instanceId = "p9", catalogId = "StonePickaxe", ownerId = 99, location = "Vault" }
+	expect(not PermanentRules.CanConvert(foreign, 7), "someone else's item")
 	-- Recipe IDs for removed or invented items are refused before anything changes.
 	for _, recipeId in { "PermanentBasicPickaxe", "PermanentSickle", "PermanentWoodChest", "PermanentStonePickaxe2" } do
-		ok, reason = pcall(
-			OperationJournal.Run,
-			profile,
-			"forge:" .. recipeId,
-			"Forge",
-			1,
-			convert(profile, "forge:" .. recipeId, "p1", recipeId)
-		)
+		ok, reason = tryForge(profile, "forge:" .. recipeId, "p1", recipeId)
 		expect(not ok and reason == "UnknownRecipe", recipeId .. " is not a recipe")
 	end
 	expectEq(profile.vault.materials.Stone, 999, "nothing charged")
@@ -97,7 +96,7 @@ end)
 test("§24 teleporting mid-operation (pending Deploy) blocks vault-side changes", function()
 	local profile = forgeReady()
 	profile.transit = { reservationId = "t1", items = {} }
-	local ok, reason = pcall(OperationJournal.Run, profile, "forge:b", "Forge", 1, convert(profile, "forge:b"))
+	local ok, reason = tryForge(profile, "forge:b")
 	expect(not ok and reason == "InTransit", "nothing converts during transit")
 	expectEq(profile.vault.materials.Stone, 999, "nothing charged during transit")
 	expect(not profile.vault.items[1].permanent, "the source stays ordinary")
@@ -234,11 +233,7 @@ test("§24 malformed remote arguments and floods are dropped", function()
 	expect(not RemoteGuard.Check(table.pack(string.rep("x", 300))), "long string")
 	expect(not RemoteGuard.Check(table.pack({ { { 1 } } })), "deep table")
 	expect(not RemoteGuard.Check(table.pack(function() end)), "function")
-	local huge = {}
-	for i = 1, 100 do
-		huge[i] = i
-	end
-	expect(not RemoteGuard.Check(table.pack(huge)), "large table")
+	expect(not RemoteGuard.Check(table.pack(table.create(100, 1))), "large table")
 	expect(not RemoteGuard.Check(table.pack(1, 2, 3, 4, 5, 6, 7, 8, 9)), "too many arguments")
 	local bucket = RemoteGuard.NewBucket(0)
 	local accepted = 0
@@ -253,14 +248,12 @@ end)
 
 test("§24 impossible movement is caught; sprinting and falling are not", function()
 	local from = Vector3.new(0, 50, 0)
-	expect(MovementRules.Plausible(from, Vector3.new(6, 0, 0), 0.25, MovementRules.MaxSpeed(false)), "sprint")
-	expect(
-		MovementRules.Plausible(from, Vector3.new(0, -200, 0) + from, 0.25, MovementRules.MaxSpeed(false)),
-		"a long fall"
-	)
-	expect(not MovementRules.Plausible(from, Vector3.new(80, 50, 0), 0.25, MovementRules.MaxSpeed(false)), "teleport")
-	expect(
-		not MovementRules.Plausible(from, Vector3.new(12, 50, 0), 0.25, MovementRules.MaxSpeed(true)),
-		"downed crawl"
-	)
+	-- One sample judged from a full latency budget.
+	local function ok(to, maxSpeed)
+		return (MovementRules.Judge(MovementRules.ALLOWANCE, from, to, 0.25, maxSpeed)) == "Ok"
+	end
+	expect(ok(Vector3.new(6, 0, 0), MovementRules.MaxSpeed(false)), "sprint")
+	expect(ok(Vector3.new(0, -200, 0) + from, MovementRules.MaxSpeed(false)), "a long fall")
+	expect(not ok(Vector3.new(80, 50, 0), MovementRules.MaxSpeed(false)), "teleport")
+	expect(not ok(Vector3.new(12, 50, 0), MovementRules.MaxSpeed(true)), "downed crawl")
 end)

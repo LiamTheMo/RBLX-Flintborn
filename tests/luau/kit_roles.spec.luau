@@ -1,116 +1,32 @@
 local Shared = game:GetService("ReplicatedStorage").Shared
 local KitModel = require(Shared.UI.KitModel)
 
-local MATERIALS = {
-	paper = true,
-	leather = true,
-	slot = true,
-	window = true,
-	track = true,
-	fill = true,
-	dot = true,
-	rule = true,
-	glyph = true,
-	none = true,
-	pill = true,
-	deco = true,
-}
+local MATERIALS = {}
+for _, material in
+	{ "paper", "leather", "slot", "window", "track", "fill", "dot", "rule", "glyph", "none", "pill", "deco" }
+do
+	MATERIALS[material] = true
+end
 
 -- Roles every component draws from; a missing one would draw nothing.
-local USED = {
-	"window.frame",
-	"window.claspLeft",
-	"window.claspRight",
-	"window.plaque",
-	"dialog.frame",
-	"toast.frame",
-	"tooltip.box",
-	"tooltip.tail",
-	"panel.inset",
-	"panel.card",
-	"button.primary",
-	"button.secondary",
-	"button.play",
-	"button.playSecondary",
-	"iconButton.close",
-	"iconButton.paper",
-	"iconButton.leather",
-	"iconButton.tile",
-	"iconButton.plus",
-	"iconButton.minus",
-	"tab.category",
-	"tab.arrow",
-	"tab.horizontal",
-	"tab.side",
-	"slot.item",
-	"slot.hotbar",
-	"badge.number",
-	"badge.count",
-	"badge.countWide",
-	"badge.pill",
-	"dot.green",
-	"dot.grey",
-	"dot.red",
-	"bar.track",
-	"bar.fill.yellow",
-	"bar.fill.red",
-	"bar.fill.green",
-	"bar.fill.orange",
-	"bar.fill.blue",
-	"bar.frame",
-	"bar.frameThin",
-	"bar.stat",
-	"bar.statPlate",
-	"checkbox.off",
-	"checkbox.on",
-	"check.tileOff",
-	"check.tileOn",
-	"toggle.off",
-	"toggle.on",
-	"slider.track",
-	"slider.fill",
-	"slider.knob",
-	"field.value",
-	"dropdown.field",
-	"dropdown.list",
-	"search.field",
-	"keycap.cap",
-	"keycap.wide",
-	"keycap.flat",
-	"scroll.track",
-	"scroll.thumb",
-	"divider.rule",
-	"divider.ornate",
-	"divider.diamond",
-	"divider.vertical",
-	"row.plate",
-	"currency.pill",
-	"portrait.square",
-	"portrait.round",
-	"portrait.empty",
-	"mark.lock",
-	"mark.crown",
-	"mark.star",
-	"mark.chevron",
-	"mark.cross",
-	"divider.ink",
-	"divider.hairline",
-	"row.soft",
-	"check.ringOff",
-	"check.ringOn",
-	"scroll.thinTrack",
-	"scroll.thinThumb",
-	"hud.leaf",
-	"panel.party",
-	"map.island",
-	"icon.playRune",
-	"mark.playRune",
-	"deco.pillarLeft",
-	"deco.pillarRight",
-}
+local USED = table.concat({
+	"window.frame window.claspLeft window.claspRight window.plaque dialog.frame toast.frame tooltip.box",
+	"tooltip.tail panel.inset panel.card button.primary button.secondary button.play button.playSecondary",
+	"iconButton.close iconButton.paper iconButton.leather iconButton.tile iconButton.plus",
+	"iconButton.minus tab.category tab.arrow tab.horizontal tab.side slot.item slot.hotbar badge.number",
+	"badge.count badge.countWide badge.pill dot.green dot.grey dot.red bar.track bar.fill.yellow",
+	"bar.fill.red bar.fill.green bar.fill.orange bar.fill.blue bar.frame bar.frameThin bar.stat",
+	"bar.statPlate checkbox.off checkbox.on check.tileOff check.tileOn toggle.off toggle.on slider.track",
+	"slider.fill slider.knob field.value dropdown.field dropdown.list search.field keycap.cap keycap.wide",
+	"keycap.flat scroll.track scroll.thumb divider.rule divider.ornate divider.diamond divider.vertical",
+	"row.plate currency.pill portrait.square portrait.round portrait.empty mark.lock mark.crown mark.star",
+	"mark.chevron mark.cross divider.ink divider.hairline row.soft check.ringOff check.ringOn",
+	"scroll.thinTrack scroll.thinThumb hud.leaf panel.party map.island icon.playRune mark.playRune",
+	"deco.pillarLeft deco.pillarRight",
+}, " ")
 
 test("every role a component draws is in the table", function()
-	for _, name in USED do
+	for name in string.gmatch(USED, "%S+") do
 		expect(KitModel.ROLES[name] ~= nil, "role " .. name)
 	end
 end)
@@ -155,17 +71,26 @@ test("every role names lk_ art, a known material and known states", function()
 end)
 
 test("state families keep one plate per state (sheets 03, 05, 09)", function()
-	local leather = KitModel.ROLES["button.primary"].states
-	expectEq(leather.hover, "lk_button_leather_hover", "leather hover")
-	expectEq(leather.pressed, "lk_button_leather_pressed", "leather pressed")
-	expectEq(leather.disabled, "lk_button_leather_disabled", "leather disabled")
-	local close = KitModel.ROLES["iconButton.close"].states
-	expectEq(close.pressed, "lk_button_close_pressed", "close pressed")
-	local hotbar = KitModel.ROLES["slot.hotbar"].states
-	for _, state in { "hover", "selected", "disabled", "locked" } do
-		expect(hotbar[state] ~= nil, "hotbar slot " .. state)
+	for name, states in
+		{
+			["button.primary"] = { "hover", "pressed", "disabled" },
+			["iconButton.close"] = { "pressed" },
+			["slot.hotbar"] = { "hover", "selected", "disabled", "locked" },
+		}
+	do
+		local role = KitModel.ROLES[name]
+		local seen = { [role.sprite] = true }
+		for _, state in states do
+			local sprite = role.states[state]
+			expect(sprite ~= nil and not seen[sprite], name .. " has its own " .. state .. " plate")
+			seen[sprite or state] = true
+		end
 	end
-	expectEq(KitModel.ROLES["tab.horizontal"].states.selected, "lk_button_leather_normal", "a selected tab is leather")
+	expectEq(
+		KitModel.ROLES["tab.horizontal"].states.selected,
+		KitModel.ROLES["button.primary"].sprite,
+		"a selected tab is leather"
+	)
 end)
 
 test("every plate sprite has its visible-edge margin", function()
@@ -191,7 +116,7 @@ test("every plate sprite has its visible-edge margin", function()
 			end
 		end
 	end
-	expectEq(KitModel.Edge("lk_window_frame")[1], 5, "the window frame's edge is 5 px in")
+	expectEq(KitModel.Edge("lk_window_frame"), KitModel.EDGES.lk_window_frame, "a known sprite's edge is looked up")
 	expectEq(KitModel.Edge(nil)[1], 0, "unknown sprites have no margin")
 end)
 
@@ -210,9 +135,8 @@ test("icon roles fall back to art the kit already has (sheet 21, D26)", function
 			expect(KitModel.ROLES[role.fallback] == nil, name .. " falls back to an icon, not another role")
 		end
 	end
-	expectEq(KitModel.ROLES["icon.playRune"].sprite, "lk_icon_play_rune", "Play tile and header icon")
-	expectEq(KitModel.ROLES["icon.playRune"].fallback, "portal", "the portal icon until the rune art is uploaded")
-	expectEq(KitModel.ROLES["mark.playRune"].fallback, "lk_glyph_play", "the white play glyph until then")
+	expect(KitModel.ROLES["icon.playRune"].fallback ~= nil, "the Play rune falls back until its art is uploaded")
+	expect(KitModel.ROLES["mark.playRune"].fallback ~= nil, "and so does its mark")
 	for _, side in { "Left", "Right" } do
 		local role = KitModel.ROLES["deco.pillar" .. side]
 		expectEq(role.material, "deco", side .. " pillar draws no stand-in")

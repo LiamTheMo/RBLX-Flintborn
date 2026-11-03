@@ -39,14 +39,6 @@ local renderToken = 0
 -- A gems change typed while a push arrives waits for the box to lose focus.
 local pending = false
 
-local function invoke(name: string, ...)
-	local ok, success, reason = pcall(Remotes.Get(name).InvokeServer, Remotes.Get(name), ...)
-	if not ok then
-		return false, "Request failed"
-	end
-	return success, reason
-end
-
 local render
 
 -- My current offer: backpack slot keys, and vault materials {[catalogId] = quantity}.
@@ -64,7 +56,7 @@ local function myOffer()
 end
 
 local function sendOffer(keys, materials, gems: number)
-	local ok, reason = invoke("TradeOffer", session.id, keys, gems, materials)
+	local ok, reason = Remotes.Invoke("TradeOffer", session.id, keys, gems, materials)
 	if not ok then
 		window:SetStatus("Offer refused: " .. Reasons.Text(reason), "warn")
 	end
@@ -127,7 +119,7 @@ local function invitePlayers()
 					label = "Invite",
 					key = "Invite",
 					onPress = function()
-						local ok, reason = invoke("TradeRequest", other.UserId)
+						local ok, reason = Remotes.Invoke("TradeRequest", other.UserId)
 						window:SetStatus(
 							if ok then "Invite sent." else ("Couldn't invite: " .. Reasons.Text(reason)),
 							if ok then "good" else "warn"
@@ -267,7 +259,7 @@ function render()
 	end
 	-- Fetch first, then clear and rebuild without yielding, so a TradeChanged push
 	-- during the round trip can't interleave and duplicate rows.
-	local view = if current then invoke("VaultSnapshot") else nil
+	local view = if current then Remotes.Invoke("VaultSnapshot") else nil
 	if token ~= renderToken or session ~= current then
 		return
 	end
@@ -304,7 +296,7 @@ function render()
 			key = "Cancel",
 			kind = "paper",
 			onPress = function()
-				invoke("TradeCancel", session.id)
+				Remotes.Invoke("TradeCancel", session.id)
 			end,
 		},
 		{
@@ -313,7 +305,7 @@ function render()
 			width = 180,
 			enabled = not session.locked.mine,
 			onPress = function()
-				invoke("TradeLock", session.id)
+				Remotes.Invoke("TradeLock", session.id)
 			end,
 		},
 		{
@@ -327,7 +319,7 @@ function render()
 					if session ~= current then
 						return
 					end
-					local ok, reason = invoke("TradeConfirm", current.id)
+					local ok, reason = Remotes.Invoke("TradeConfirm", current.id)
 					if not ok then
 						window:SetStatus("Not yet: " .. Reasons.Text(reason), "warn")
 					end
@@ -389,7 +381,7 @@ local function showInvite(from: string)
 		if inviteId then
 			local id = inviteId
 			inviteId = nil
-			local ok, reason = invoke("TradeRespond", id, accept)
+			local ok, reason = Remotes.Invoke("TradeRespond", id, accept)
 			if not ok and accept then
 				window:SetStatus("Couldn't accept: " .. Reasons.Text(reason), "warn")
 			end

@@ -29,6 +29,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local HudModel = require(ReplicatedStorage.Shared.UI.HudModel)
 local Kit = require(script.Parent.Kit)
+local NoticeCard = require(script.Parent.NoticeCard)
 
 local ListWindow = {}
 ListWindow.__index = ListWindow
@@ -69,26 +70,11 @@ local function tone(name: string?): string
 	return TONES[name or "ink"] or name or "inkLabel"
 end
 
--- How many lines `text` wraps to in `width` design px (greedy, by words, with
--- the kit's measured widths; a little slack for the engine's own wrapping).
+-- How many lines `text` wraps to in `width` design px (NoticeCard.Lines, with a
+-- little slack for the engine's own wrapping and a space never under 0.28 of
+-- the text size).
 function ListWindow.Lines(text: string, role: string, size: number?, width: number): number
-	local limit = width * 0.95
-	local space = math.max(Kit.Text.Width(" ", role, size), (size or 16) * 0.28)
-	local total = 0
-	for paragraph in (text .. "\n"):gmatch("(.-)\n") do
-		local count, used = 1, 0
-		for word in paragraph:gmatch("%S+") do
-			local ww = Kit.Text.Width(word, role, size)
-			if used > 0 and used + space + ww > limit then
-				count += 1
-				used = ww
-			else
-				used = if used > 0 then used + space + ww else ww
-			end
-		end
-		total += count
-	end
-	return math.max(total, 1)
+	return NoticeCard.Lines(text, role, width * 0.95, size, (size or 16) * 0.28)
 end
 
 local function lineHeight(size: number): number
@@ -96,7 +82,7 @@ local function lineHeight(size: number): number
 end
 
 local function buttonWidth(label: string): number
-	return math.max(104, math.ceil(Kit.Text.Width(label, "buttonS")) + 44)
+	return Kit.Button.Width(label, 104, 44)
 end
 
 -- opts: name, title, icon (header icon id), tabs ({{id, label, icon}}),
@@ -1170,10 +1156,6 @@ function ListWindow:HideConfirm()
 	if handle and not handle.dialog.closed then
 		handle.Close()
 	end
-end
-
-function ListWindow:IsConfirming(): boolean
-	return self.confirm ~= nil and not self.confirm.dialog.closed
 end
 
 -- Opening and closing ------------------------------------------------------------------------

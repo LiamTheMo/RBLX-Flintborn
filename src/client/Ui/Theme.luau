@@ -10,7 +10,9 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local UserInputService = game:GetService("UserInputService")
 
 local HudModel = require(ReplicatedStorage.Shared.UI.HudModel)
--- Only the kit's scale and tokens: the kit's components require this module.
+-- Only the kit's core, scale and tokens (none of them requires this module):
+-- the kit's components require this module.
+local KitCore = require(script.Parent.Parent.Hud.Kit.Core)
 local KitScale = require(script.Parent.Parent.Hud.Kit.Scale)
 local KitTokens = require(script.Parent.Parent.Hud.Kit.Tokens)
 
@@ -29,14 +31,8 @@ Theme.ColourBlindRarity = {
 	Exclusive = Color3.fromRGB(255, 255, 255),
 }
 
-function Theme.Make(className: string, props, parent)
-	local instance = Instance.new(className)
-	for key, value in props do
-		instance[key] = value
-	end
-	instance.Parent = parent
-	return instance
-end
+-- Creates `className` with `props` under `parent` (the kit's Core.Make).
+Theme.Make = KitCore.Make
 
 function Theme.Option(name: string): any
 	return Players.LocalPlayer:GetAttribute(name)
@@ -71,13 +67,13 @@ Theme.TopOrder = {
 	Extraction = 5,
 	BossBar = 6,
 	EventBanner = 7,
-	Receipt = 8,
-	Toast = 10,
 	Tutorial = 11,
 }
 
 -- The column's width in design px; banners are at most this wide.
 Theme.TOP_WIDTH = 640
+-- Where the column sits (top centre) unless the world HUD pushes it down.
+Theme.TOP_STACK_POSITION = UDim2.new(0.5, 0, 0, 2)
 
 local topStack = nil
 
@@ -162,7 +158,7 @@ function Theme.TopStack()
 		topStack = Theme.Make("Frame", {
 			Name = "Stack",
 			AnchorPoint = Vector2.new(0.5, 0),
-			Position = UDim2.new(0.5, 0, 0, 2),
+			Position = Theme.TOP_STACK_POSITION,
 			Size = UDim2.fromOffset(Theme.TOP_WIDTH, 0),
 			AutomaticSize = Enum.AutomaticSize.Y,
 			BackgroundTransparency = 1,
@@ -192,7 +188,7 @@ function Theme.Subtitle(text: string)
 		local gui = Theme.Make("ScreenGui", {
 			Name = "Subtitles",
 			ResetOnSpawn = false,
-			DisplayOrder = 50,
+			DisplayOrder = KitTokens.Order("subtitles"),
 			ZIndexBehavior = Enum.ZIndexBehavior.Sibling,
 		}, Players.LocalPlayer:WaitForChild("PlayerGui"))
 		local holder = Theme.Make("Frame", {

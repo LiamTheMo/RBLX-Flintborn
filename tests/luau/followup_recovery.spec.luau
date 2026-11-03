@@ -7,300 +7,21 @@
 local Shared = game:GetService("ReplicatedStorage").Shared
 local Server = game:GetService("ServerScriptService").Server
 
--- Fake clock and task scheduler ---------------------------------------------------
-
-local clock = 0
-local queue = {}
-local sequence = 0
-local threadErrors = {}
-
-local function resume(thread, ...)
-	local ok, err = coroutine.resume(thread, ...)
-	if not ok then
-		table.insert(threadErrors, tostring(err))
-	end
-end
-
-local function enqueue(at: number, thread, args)
-	sequence += 1
-	table.insert(queue, { at = at, sequence = sequence, thread = thread, args = args })
-end
-
-task = {}
-function task.spawn(fn, ...)
-	local thread = if type(fn) == "thread" then fn else coroutine.create(fn)
-	resume(thread, ...)
-	return thread
-end
-function task.defer(fn, ...)
-	local thread = coroutine.create(fn)
-	enqueue(clock, thread, table.pack(...))
-	return thread
-end
-function task.delay(seconds, fn, ...)
-	local thread = coroutine.create(fn)
-	enqueue(clock + (seconds or 0), thread, table.pack(...))
-	return thread
-end
-function task.wait(seconds)
-	enqueue(clock + (seconds or 0), coroutine.running(), table.pack())
-	coroutine.yield()
-	return seconds
-end
-
-warn = function() end
-
--- Runs everything due within the next `seconds`, in time order.
-local function advance(seconds: number)
-	local target = clock + seconds
-	while true do
-		local best = nil
-		for index, entry in queue do
-			if entry.at <= target then
-				local current = best and queue[best]
-				if
-					current == nil
-					or entry.at < current.at
-					or (entry.at == current.at and entry.sequence < current.sequence)
-				then
-					best = index
-				end
-			end
-		end
-		if best == nil then
-			break
-		end
-		local entry = table.remove(queue, best)
-		clock = math.max(clock, entry.at)
-		resume(entry.thread, table.unpack(entry.args, 1, entry.args.n))
-	end
-	clock = target
-end
-
--- Fake Roblox services ------------------------------------------------------------
-
--- Roblox runs every connection of an engine event in its own thread.
-local function engineSignal()
-	local handlers = {}
-	return {
-		Connect = function(_, fn)
-			table.insert(handlers, fn)
-			return {
-				Disconnect = function()
-					local index = table.find(handlers, fn)
-					if index then
-						table.remove(handlers, index)
-					end
-				end,
-			}
-		end,
-		Fire = function(_, ...)
-			for _, fn in table.clone(handlers) do
-				task.spawn(fn, ...)
-			end
-		end,
-	}
-end
-
-local function deepCopy(value)
-	if type(value) ~= "table" then
-		return value
-	end
-	local copy = {}
-	for key, inner in value do
-		copy[key] = deepCopy(inner)
-	end
-	return copy
-end
-
-local InMemoryDataStore = require(Server.Infrastructure.InMemoryDataStore)
-local backing = InMemoryDataStore.new()
-local LATENCY = 0.3
--- A DataStore whose writes take LATENCY seconds to land.
-local slowStore = {
-	UpdateAsync = function(_, key, transform)
-		task.wait(LATENCY)
-		return backing:UpdateAsync(key, transform)
-	end,
-	GetAsync = function(_, key)
-		task.wait(LATENCY)
-		return backing:GetAsync(key)
-	end,
-}
-
--- MemoryStore hash maps whose calls land after a per-call latency ("Map.Method").
-local memory = { maps = {}, latency = {} }
-local function hashMap(name: string)
-	local data = {}
-	memory.maps[name] = data
-	local function pause(method: string)
-		local seconds = memory.latency[name .. "." .. method]
-		if seconds and seconds > 0 then
-			task.wait(seconds)
-		end
-	end
-	return {
-		SetAsync = function(_, key, value)
-			pause("SetAsync")
-			data[key] = deepCopy(value)
-			return true
-		end,
-		GetAsync = function(_, key)
-			pause("GetAsync")
-			return deepCopy(data[key])
-		end,
-		RemoveAsync = function(_, key)
-			pause("RemoveAsync")
-			data[key] = nil
-		end,
-		UpdateAsync = function(_, key, transform)
-			pause("UpdateAsync")
-			local value = transform(deepCopy(data[key]))
-			if value ~= nil then
-				data[key] = deepCopy(value)
-			end
-			return value
-		end,
-	}
-end
-
-local Players = {
-	PlayerAdded = engineSignal(),
-	PlayerRemoving = engineSignal(),
-	CharacterAutoLoads = true,
-	_list = {},
-}
-function Players.GetPlayers(self)
-	return table.clone(self._list)
-end
-function Players.GetPlayerByUserId(self, userId)
-	for _, player in self._list do
-		if player.UserId == userId then
-			return player
-		end
-	end
-	return nil
-end
-
-local guids = 0
-local fakes = {
-	Players = Players,
-	HttpService = {
-		GenerateGUID = function()
-			guids += 1
-			return string.format("%08x-0000-4000-8000-%012x", guids, guids)
-		end,
+local world = require(game:GetService("ServerStorage").TestSupport.WorldServer).new({
+	jobId = "job-followup",
+	privateServerId = "world-followup",
+	memoryStore = true,
+	start = {
+		"CrashRecoveryService",
+		"InventoryService",
+		"LoadoutService",
+		"ProfileService",
+		"RunCheckpointService",
+		"WorldAdmissionService",
 	},
-	RunService = {
-		Heartbeat = engineSignal(),
-		IsStudio = function()
-			return false
-		end,
-	},
-	DataStoreService = {
-		GetDataStore = function()
-			return slowStore
-		end,
-		GetRequestBudgetForRequestType = function()
-			return 100
-		end,
-	},
-	TeleportService = { TeleportInitFailed = engineSignal() },
-	MemoryStoreService = {
-		GetHashMap = function(_, name)
-			return hashMap(name)
-		end,
-	},
-}
-local originalGetService = game.GetService
-game.GetService = function(self, name)
-	return fakes[name] or originalGetService(self, name)
-end
-game.JobId = "job-followup"
-game.PrivateServerId = "world-followup"
-game.PlaceId = 1
-game.BindToClose = function() end
-
-local function newCharacter()
-	local humanoid = { Health = 100, MaxHealth = 100, WalkSpeed = 16, JumpHeight = 7.2, Died = engineSignal() }
-	local root = { Position = Vector3.new(0, 5, 0), Anchored = false }
-	local character = {}
-	function character.FindFirstChildOfClass(_, className)
-		return if className == "Humanoid" then humanoid else nil
-	end
-	function character.FindFirstChild(_, name)
-		return if name == "HumanoidRootPart" then root else nil
-	end
-	function character.PivotTo() end
-	function character.GetPivot()
-		return { Position = root.Position }
-	end
-	function character.Destroy() end
-	return character
-end
-
-local function leave(player)
-	local index = table.find(Players._list, player)
-	if index then
-		table.remove(Players._list, index)
-		player.Parent = nil
-		Players.PlayerRemoving:Fire(player)
-	end
-end
-
-local function newPlayer(userId: number, reservationId: string?)
-	local player = {
-		UserId = userId,
-		Name = "Player" .. userId,
-		DisplayName = "Player" .. userId,
-		Parent = Players,
-		Character = nil,
-		attributes = {},
-	}
-	function player.SetAttribute(self, key, value)
-		self.attributes[key] = value
-	end
-	function player.GetAttribute(self, key)
-		return self.attributes[key]
-	end
-	function player.GetJoinData()
-		return { TeleportData = { reservations = { [tostring(userId)] = reservationId } } }
-	end
-	function player.Kick(self, message)
-		self.kickMessage = message
-		leave(self)
-	end
-	function player.LoadCharacter(self)
-		self.Character = newCharacter()
-	end
-	return player
-end
-
--- Real services, wired as the Loader would ----------------------------------------
-
-local PlaceConfig = require(Shared.Config.PlaceConfig)
-PlaceConfig.IsWorld = function()
-	return true
-end
-PlaceConfig.IsLobby = function()
-	return false
-end
-local Remotes = require(Shared.Net.Remotes)
-local handlers = {}
-local notices = {}
-Remotes.Handle = function(name, fn)
-	handlers[name] = fn
-end
-Remotes.Get = function(name)
-	return {
-		FireClient = function(_, player, payload)
-			if name == "Notice" then
-				table.insert(notices, { player = player, payload = payload })
-			end
-		end,
-		FireAllClients = function() end,
-	}
-end
+})
+local advance, join, play, stored, stacks = world.advance, world.join, world.play, world.stored, world.stacks
+local started = world.started
 
 local CrashRecoveryRules = require(Shared.Recovery.CrashRecoveryRules)
 local EconomyRules = require(Shared.Economy.EconomyRules)
@@ -308,100 +29,19 @@ local ForgeRules = require(Shared.Crafting.ForgeRules)
 local ProfileSchema = require(Shared.Data.ProfileSchema)
 local TradeRules = require(Shared.Economy.TradeRules)
 local TransitRules = require(Shared.Admission.TransitRules)
-local ProfileStore = require(Server.Infrastructure.ProfileStore)
 local CheckpointStore = require(Server.Infrastructure.CheckpointStore)
-local TravelService = require(Server.Services.TravelService)
-TravelService.ToLobby = function(players)
-	for _, player in players do
-		player.sentToLobby = true
-	end
-	return true
-end
-local SpawnService = require(Server.Services.SpawnService)
-SpawnService.WorldReady = function()
-	return true
-end
-SpawnService.Pick = function()
-	return "spawn"
-end
-
 local CrashRecoveryService = require(Server.Services.CrashRecoveryService)
-local InventoryService = require(Server.Services.InventoryService)
 local LoadoutService = require(Server.Services.LoadoutService)
-local ProfileService = require(Server.Services.ProfileService)
-local RunCheckpointService = require(Server.Services.RunCheckpointService)
 local WorldAdmissionService = require(Server.Services.WorldAdmissionService)
 
--- Periodic autosaves would only add noise to the timelines below.
-ProfileService.AUTOSAVE_SECONDS = 1e9
-ProfileService.Init()
-WorldAdmissionService.Init()
-for _, service in
-	{
-		CrashRecoveryService,
-		InventoryService,
-		LoadoutService,
-		ProfileService,
-		RunCheckpointService,
-		WorldAdmissionService,
-	}
-do
-	service.Start()
-end
-
-local started = {}
-WorldAdmissionService.RunStarted:Connect(function(player, _, items)
-	started[player] = items
-end)
-
+local memory = world.memory
 local checkpoints = memory.maps.FlintbornRunCheckpoints
 local beats = memory.maps.FlintbornServerHeartbeats
-
--- Helpers -------------------------------------------------------------------------
-
-local function stacks(prefix: string, count: number)
-	local items = {}
-	for index = 1, count do
-		table.insert(items, { instanceId = ("%s-%d"):format(prefix, index), catalogId = "StoneSword", ownerId = 1 })
-	end
-	return items
-end
-
-local function stored(userId: number)
-	return backing._data[ProfileStore.KeyFor(userId)]
-end
-
--- Joins this world with `profile` stored for `userId` and waits on the menu.
-local function join(userId: number, profile, reservationId: string?)
-	backing._data[ProfileStore.KeyFor(userId)] = profile
-	local player = newPlayer(userId, reservationId)
-	table.insert(Players._list, player)
-	Players.PlayerAdded:Fire(player)
-	advance(2)
-	assert(WorldAdmissionService.GetState(player) == "WorldMainMenuReady", "player reached the menu")
-	return player
-end
-
--- A profile arriving with a reserved loadout.
-local function withTransit(userId: number, items)
-	local profile = ProfileSchema.Default(0)
-	local reservationId = ("res-%d"):format(userId)
-	profile.transit = { reservationId = reservationId, items = items, createdAt = 0, status = "Reserved" }
-	return profile, reservationId
-end
 
 -- A profile whose last run, on another server, was never settled.
 local function crashedRun(profile, runId: string, jobId: string)
 	profile.progression.currentRun = { runId = runId, general = 0, mastery = {}, settled = false, jobId = jobId }
 	return profile
-end
-
-local function play(player, requestId: string)
-	local result = {}
-	task.spawn(function()
-		result.ok, result.reason = handlers.RequestPlay(player, requestId)
-	end)
-	return result
 end
 
 local function hasInstance(slots, instanceId: string): number
@@ -417,7 +57,7 @@ end
 -- Issue 1: a new run racing an unrecovered crash checkpoint ------------------------
 
 test("a crashed run's checkpoint is never overwritten: Play waits until it is restored", function()
-	local profile, reservationId = withTransit(301, stacks("new301", 2))
+	local profile, reservationId = world.transit(301, stacks("new301", 2))
 	crashedRun(profile, "run-301", "dead-301")
 	checkpoints["301"] = CrashRecoveryRules.Checkpoint("run-301", "dead-301", stacks("old301", 3), {}, os.time())
 	-- The crashed server's last heartbeat still counts as alive for a while.
@@ -484,7 +124,7 @@ test("clearing a checkpoint only removes the run it names", function()
 end)
 
 test("a restore whose delete lands late never deletes a run started meanwhile", function()
-	local profile, reservationId = withTransit(303, stacks("new303", 2))
+	local profile, reservationId = world.transit(303, stacks("new303", 2))
 	crashedRun(profile, "run-303", "dead-303")
 	checkpoints["303"] = CrashRecoveryRules.Checkpoint("run-303", "dead-303", stacks("old303", 1), {}, os.time())
 	memory.latency["FlintbornRunCheckpoints.UpdateAsync"] = 5
@@ -516,7 +156,7 @@ local function rejoinAfterCrash(fromUserId: number, toUserId: number)
 end
 
 test("a crash before the first checkpoint lands still restores the consumed loadout", function()
-	local profile, reservationId = withTransit(401, stacks("i401", 3))
+	local profile, reservationId = world.transit(401, stacks("i401", 3))
 	local player = join(401, profile, reservationId)
 	-- The first checkpoint write never lands before the server dies.
 	memory.latency["FlintbornRunCheckpoints.SetAsync"] = 1e6
@@ -527,17 +167,18 @@ test("a crash before the first checkpoint lands still restores the consumed load
 	expectEq(stored(401).transit, nil, "the consume is saved")
 	expectEq(checkpoints["401"], nil, "but no checkpoint exists yet")
 
-	rejoinAfterCrash(401, 402)
+	local again = rejoinAfterCrash(401, 402)
 	advance(1)
 	local slots = stored(402).lobbyBackpack.slots
 	for index = 1, 3 do
 		expectEq(hasInstance(slots, "i401-" .. index), 1, "loadout item " .. index .. " restored once")
 	end
-	expectEq(#notices > 0 and notices[#notices].payload.text ~= nil, true, "the player is told")
+	local notice = world.net.sent.Notice and world.net.sent.Notice[again]
+	expect(notice ~= nil and notice[1].text ~= nil, "the player is told")
 end)
 
 test("the consume names the run its checkpoint uses, and the loadout goes once checkpointed", function()
-	local profile, reservationId = withTransit(403, stacks("i403", 2))
+	local profile, reservationId = world.transit(403, stacks("i403", 2))
 	local player = join(403, profile, reservationId)
 	play(player, "req-403")
 	advance(5)
@@ -549,7 +190,7 @@ test("the consume names the run its checkpoint uses, and the loadout goes once c
 end)
 
 test("a Play cancelled after its consume saved is settled, so recovery never doubles it", function()
-	local profile, reservationId = withTransit(404, stacks("i404", 2))
+	local profile, reservationId = world.transit(404, stacks("i404", 2))
 	local player = join(404, profile, reservationId)
 	local result = play(player, "req-404")
 	task.delay(0.1, function()
@@ -649,9 +290,4 @@ test("a Deploy reservation is refused while a trade settles", function()
 	expectEq(#stored(501).lobbyBackpack.slots, 1, "the backpack is untouched")
 end)
 
-test("no spawned thread errored", function()
-	for _, err in threadErrors do
-		print("    thread error: " .. err)
-	end
-	expectEq(#threadErrors, 0, "thread errors")
-end)
+test("no spawned thread errored", world.expectNoThreadErrors)

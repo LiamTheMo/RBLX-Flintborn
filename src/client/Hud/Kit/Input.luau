@@ -75,6 +75,12 @@ function Input.IsGamepad(): boolean
 	return Input.Type() == "gamepad"
 end
 
+-- True while key badges mean something: a keyboard or mouse is in use.
+function Input.ShowsKeys(): boolean
+	local kind = Input.Type()
+	return kind == "keyboard" or kind == "mouse"
+end
+
 function Input.IsTouch(): boolean
 	return Input.Type() == "touch"
 end

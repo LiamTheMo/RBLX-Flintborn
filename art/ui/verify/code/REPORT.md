@@ -1,3 +1,5 @@
+> Round 1 (history); current state: [docs/ui/UI_PROGRESS.md](../../../../docs/ui/UI_PROGRESS.md).
+
 Code review (independent): PASS, no High.
 M1 PartyController.luau:92 + LobbyController.luau:145-155 status + LobbyHudController.luau:90-96 => double toast on failed party action. Fix: quiet path in typed wrappers when new HUD active.
 M2 Ready/invite answer state in 3 places (PartyController:133 pending+timeout, PlayController:295 toggles stale view, LobbyHudController:132 accept/decline no busy) -> centralise pending state in LobbyController.

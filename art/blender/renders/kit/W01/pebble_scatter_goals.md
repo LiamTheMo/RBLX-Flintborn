@@ -14,7 +14,7 @@ budget: hero 3656 / 4500; variants 1042 / 2040 / 3232
 vfx: none (the master shows none)
 ```
 
-## Verification (haiku verifier, own 16 goals)
+## Verification (a lighter verifier, own 16 goals)
 
 - Pass 1: 6/10. Slab was a smooth lozenge, Round Rock egg-shaped, heavy wedge moss, loose clumps, wrong piece counts.
 - Pass 2: 8/10, after a flat-topped plate slab, squat Round Rock, small tuft, clumps at the feet and 3/5/9 pieces.

@@ -23,11 +23,6 @@ local TradeService = require(script.Parent.TradeService)
 
 local ForgeService = {}
 
-local function nameOf(catalogId: string): string
-	local def = ItemCatalog.Get(catalogId)
-	return def and def.name or catalogId
-end
-
 local function requirementText(recipe): string
 	local parts = {}
 	if (recipe.unlock.extractions or 0) > 0 then
@@ -35,7 +30,7 @@ local function requirementText(recipe): string
 		table.insert(parts, if count == 1 then "extract once" else ("extract %d times"):format(count))
 	end
 	for _, catalogId in recipe.unlock.discovered or {} do
-		table.insert(parts, "extract " .. nameOf(catalogId))
+		table.insert(parts, "extract " .. ItemCatalog.NameOf(catalogId))
 	end
 	if (recipe.unlock.level or 0) > 0 then
 		table.insert(parts, ("reach level %d"):format(recipe.unlock.level))
@@ -68,7 +63,7 @@ local function snapshot(player: Player)
 		for catalogId, needed in recipe.inputs do
 			table.insert(inputs, {
 				catalogId = catalogId,
-				name = nameOf(catalogId),
+				name = ItemCatalog.NameOf(catalogId),
 				owned = ForgeRules.Owned(profile, catalogId),
 				needed = needed,
 			})
@@ -80,7 +75,8 @@ local function snapshot(player: Player)
 			id = recipe.id,
 			kind = recipe.kind,
 			category = recipe.category,
-			name = (recipe.kind == ForgeRecipes.Kinds.Permanent and "Permanent " or "") .. nameOf(recipe.output),
+			name = (recipe.kind == ForgeRecipes.Kinds.Permanent and "Permanent " or "")
+				.. ItemCatalog.NameOf(recipe.output),
 			output = recipe.output,
 			quantity = recipe.quantity,
 			unlocked = ForgeRules.IsUnlocked(profile, recipe.id),
@@ -97,7 +93,7 @@ local function snapshot(player: Player)
 			for _, item in ForgeRules.Sources(profile, recipe, player.UserId) do
 				table.insert(view.sources, {
 					instanceId = item.instanceId,
-					name = nameOf(item.catalogId),
+					name = ItemCatalog.NameOf(item.catalogId),
 					qualityRoll = item.qualityRoll,
 				})
 			end
@@ -113,7 +109,7 @@ local function snapshot(player: Player)
 end
 
 local function craft(player: Player, recipeId: any, sourceId: any, nonce: any, count: any)
-	if ForgeRecipes.Get(recipeId) == nil or not Validation.IsId(nonce) or #nonce > 50 then
+	if ForgeRecipes.Get(recipeId) == nil or not Validation.IsNonce(nonce) then
 		return false, "BadRequest"
 	end
 	if sourceId ~= nil and not Validation.IsId(sourceId) then

@@ -5,6 +5,8 @@
 -- the one that moved into that index. A unique item's key is its instance id; a
 -- stack's is its catalog id, since any stack of one material is the same take.
 
+local ItemCatalog = require(script.Parent.Parent.Items.ItemCatalog)
+
 local ListingKeys = {}
 
 ListingKeys.STACK_PREFIX = "stack:"
@@ -34,6 +36,26 @@ function ListingKeys.Resolve(list, index: any, key: any): (number?, string?)
 		end
 	end
 	return nil, "Gone"
+end
+
+-- The listing a client is sent: each entry's index, key, catalog id, name,
+-- rarity, quantity and Permanent flag, plus its quality roll when
+-- `includeQuality` (bodies show it; chests do not).
+function ListingKeys.View(list, includeQuality: boolean)
+	local entries = {}
+	for index, item in list do
+		table.insert(entries, {
+			index = index,
+			key = ListingKeys.KeyOf(item),
+			catalogId = item.catalogId,
+			name = ItemCatalog.NameOf(item.catalogId),
+			rarity = ItemCatalog.RarityOf(item.catalogId),
+			quantity = item.quantity,
+			qualityRoll = if includeQuality then item.qualityRoll else nil,
+			permanent = item.permanent,
+		})
+	end
+	return entries
 end
 
 return ListingKeys

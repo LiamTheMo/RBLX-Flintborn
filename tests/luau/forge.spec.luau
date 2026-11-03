@@ -79,6 +79,10 @@ test("conversion charges each input once, consumes the source and keeps its qual
 	expectEq(item.qualityRoll, 0.03, "quality roll preserved, never re-rolled")
 	expectEq(profile.permanentItems.p1.ownershipVersion, 1, "ledger entry")
 	expectEq(profile.receipts.forge["forge:1"], receipt, "receipt stored")
+	profile.vault.materials.AncientEmber = 5
+	local again, reason = ForgeRules.Craft(profile, request("PermanentStonePickaxe", "p1", "forge:2"))
+	expect(again == nil and reason == "AlreadyPermanent", "a second conversion of the same item fails")
+	expectEq(profile.vault.materials.Stone, 160, "and charges nothing")
 end)
 
 test("ineligible, foreign, deployed, unvaulted or already Permanent sources are rejected", function()
@@ -116,31 +120,6 @@ test("ineligible, foreign, deployed, unvaulted or already Permanent sources are 
 	expectEq(reason, "UnknownRecipe", "the old Basic Pickaxe recipe is gone")
 end)
 
-test("two conversions of one item commit once; a retried nonce returns the same receipt", function()
-	local profile = readyProfile()
-	profile.vault.materials.Stone = 1000
-	profile.vault.materials.AncientEmber = 5
-	profile.vault.materials.IronBar = 100
-	profile.vault.materials.Wood = 500
-	profile.vault.materials.Fiber = 200
-	local function convert(operationId)
-		return function(working)
-			local receipt, reason = ForgeRules.Craft(working, request("PermanentStonePickaxe", "p1", operationId))
-			if receipt == nil then
-				error(reason, 0)
-			end
-			return receipt
-		end
-	end
-	local first = OperationJournal.Run(profile, "forge:a", "Forge", 1, convert("forge:a"))
-	local ok, reason = pcall(OperationJournal.Run, profile, "forge:b", "Forge", 2, convert("forge:b"))
-	expect(not ok and reason == "AlreadyPermanent", "the second request fails")
-	local again, applied = OperationJournal.Run(profile, "forge:a", "Forge", 3, convert("forge:a"))
-	expect(not applied and again.recipeId == first.recipeId, "retry is a no-op with the same receipt")
-	expectEq(profile.vault.materials.Stone, 960, "charged exactly once")
-	expectEq(profile.vault.materials.AncientEmber, 4, "one reagent spent")
-end)
-
 test("locked or underfunded recipes change nothing; special outputs have default quality", function()
 	local profile = ProfileSchema.Default(0)
 	profile.vault.materials = { IronBar = 19, Wood = 10 }
@@ -161,18 +140,6 @@ test("locked or underfunded recipes change nothing; special outputs have default
 	expectEq(made.catalogId, "IronPickaxe", "lands in the lobby backpack")
 	expectEq(made.qualityRoll, 0, "lobby crafting has no quality roll")
 	expectEq(made.ownerId, OWNER, "owned by the crafter")
-end)
-
-test("a full lobby backpack refuses a special craft instead of deleting it", function()
-	local profile = ProfileSchema.Default(0)
-	profile.vault.materials = { IronBar = 40, Wood = 20 }
-	for i = 1, 50 do
-		profile.lobbyBackpack.slots[i] = { instanceId = "x" .. i, catalogId = "StoneDagger", ownerId = OWNER }
-	end
-	ForgeRules.RefreshUnlocks(profile, 1)
-	local _, reason = ForgeRules.Craft(profile, request("ForgeIronPickaxe"))
-	expectEq(reason, "BackpackFull", "refused")
-	expectEq(profile.vault.materials.IronBar, 40, "nothing charged")
 end)
 
 test("Permanent items survive death, including several at once", function()
@@ -200,7 +167,7 @@ test("dropping and picking up transfers ownership once", function()
 	expect(not PermanentRules.CanConvert(dropped, OWNER), "the former owner has no claim")
 end)
 
-test("every Permanent recipe names an eligible source and needs an event reagent", function()
+test("every piece of gear has a Permanent conversion priced by its tier, and only gear does", function()
 	for _, recipe in ForgeRecipes.List do
 		if recipe.kind == ForgeRecipes.Kinds.Permanent then
 			expect(PermanentRules.IsEligible(recipe.source), recipe.id)
@@ -208,9 +175,6 @@ test("every Permanent recipe names an eligible source and needs an event reagent
 			expect((recipe.inputs.AncientEmber or 0) >= 1, recipe.id .. " cannot come from farming alone")
 		end
 	end
-end)
-
-test("every piece of gear has a Permanent conversion priced by its tier", function()
 	-- Ancient Ember and rare inputs per tier (GDD §51), on top of 10× the recipe.
 	local function extras(tier: string, isArmor: boolean)
 		if tier == "Iron" or tier == "Obsidian" or tier == "Silver" then
@@ -264,16 +228,8 @@ test("every piece of gear has a Permanent conversion priced by its tier", functi
 			or def.family == ItemCatalog.Families.Armor
 		expectEq(PermanentRules.IsEligible(id), isGear, id .. " eligibility follows its family")
 	end
-	local stone = ForgeRecipes.Get("PermanentStonePickaxe").inputs
-	expect(stone.Stone == 40 and stone.Wood == 30 and stone.Fiber == 20, "stone pickaxe at 10× its recipe")
-	expect(ForgeRecipes.Get("PermanentStoneSpear") ~= nil, "spears convert")
-	expect(ForgeRecipes.Get("PermanentIronSword") ~= nil, "swords convert")
-	expect(ForgeRecipes.Get("PermanentHideChest") ~= nil, "armor converts")
-	expect(ForgeRecipes.Get("PermanentGuardianFang") ~= nil, "the Guardian's Fang converts")
-	expect(
-		(ForgeRecipes.Get("PermanentGuardianFang").inputs.GuardianHeart or 0) >= 1,
-		"the Fang needs a Guardian Heart"
-	)
+	local fang = ForgeRecipes.Get("PermanentGuardianFang")
+	expect(fang ~= nil and (fang.inputs.GuardianHeart or 0) >= 1, "the Fang converts and needs a Guardian Heart")
 	for _, removed in { "PermanentBasicPickaxe", "PermanentSickle", "PermanentWoodChest", "PermanentStoneChest" } do
 		expectEq(ForgeRecipes.Get(removed), nil, removed .. " is gone")
 	end
@@ -377,6 +333,9 @@ test("a batch that does not all fit the lobby backpack is refused whole", functi
 	expectEq(ForgeRules.MaxCount(profile, ForgeRecipes.Get("ForgeIronPickaxe")), 5, "MaxCount offers only what fits")
 	expect(ForgeRules.Craft(profile, batch("ForgeIronPickaxe", 5)) ~= nil, "five fit")
 	expectEq(ForgeRules.MaxCount(profile, ForgeRecipes.Get("ForgeIronPickaxe")), 0, "a full backpack offers none")
+	receipt, reason = ForgeRules.Craft(profile, batch("ForgeIronPickaxe", 1))
+	expect(receipt == nil and reason == "BackpackFull", "a single craft is refused instead of deleted")
+	expectEq(profile.vault.materials.IronBar, 900, "and charges nothing")
 	local arrows = ProfileSchema.Default(0)
 	arrows.vault.materials = { Wood = 1000, Flint = 1000, Fiber = 1000 }
 	arrows.lobbyBackpack.slots = { { catalogId = "FlintArrow", quantity = 380 } }

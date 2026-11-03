@@ -3,7 +3,6 @@
 
 local ModifierRules = {}
 
-ModifierRules.Additive = "Additive"
 ModifierRules.Multiplicative = "Multiplicative"
 
 -- The unrounded value; `modifiers` is a list of {op, value}.

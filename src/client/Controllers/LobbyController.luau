@@ -4,8 +4,7 @@
 --
 -- This keeps the logic; the lobby HUD and the Party and Play windows draw it:
 -- Deploy(), PartyAction() and its wrappers (Invite, Accept, Decline, Leave),
--- PartyView(), IsInvited(), Preview(), Invitable(), Status(), Changed and
--- PartyChanged.
+-- PartyView(), Preview(), Invitable(), Status(), Changed and PartyChanged.
 
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -35,6 +34,8 @@ local function setStatus(text: string)
 	LobbyController.Changed:Fire("status")
 end
 
+-- Reads the deploy preview (yields) and returns it, or nil when the server could
+-- not answer.
 local function refreshPreview()
 	local ok, items = pcall(function()
 		return Remotes.Get("DeployPreview"):InvokeServer()
@@ -43,7 +44,9 @@ local function refreshPreview()
 	if ok and type(items) == "table" then
 		previewItems = items
 		LobbyController.Changed:Fire("preview")
+		return items
 	end
+	return nil
 end
 
 -- Coalesces refresh requests: one fetch at a time, never on the caller's thread,
@@ -89,7 +92,7 @@ end
 
 -- Players in this lobby server you may invite: everyone outside your party, when
 -- you lead it or have none.
-local function invitable(): { Player }
+function LobbyController.Invitable(): { Player }
 	local party = partyView.party
 	if party ~= nil and party.leader ~= player.UserId then
 		return {}
@@ -113,7 +116,9 @@ local function refreshParty()
 	LobbyController.Changed:Fire("party")
 end
 
-local function deploy()
+-- Asks the server to deploy (the party leader takes the whole party). Yields.
+-- Progress and failures are reported through Status() and Changed("status").
+function LobbyController.Deploy()
 	if deploying then
 		return
 	end
@@ -129,12 +134,6 @@ local function deploy()
 		setStatus("Deploy failed: " .. Reasons.Text(reason or success) .. ". Nothing was lost.")
 		requestPreview()
 	end
-end
-
--- Asks the server to deploy (the party leader takes the whole party). Yields.
--- Progress and failures are reported through Status() and Changed("status").
-function LobbyController.Deploy()
-	deploy()
 end
 
 function LobbyController.IsDeploying(): boolean
@@ -175,16 +174,6 @@ function LobbyController.PartyView()
 	return partyView
 end
 
--- True while your party has an unanswered invite out to `userId` (leader only).
-function LobbyController.IsInvited(userId: number): boolean
-	local party = partyView.party
-	return party ~= nil and table.find(party.invited or {}, userId) ~= nil
-end
-
-function LobbyController.Invitable(): { Player }
-	return invitable()
-end
-
 -- The items that will enter the run ({catalogId, quantity, permanent}[]), or nil
 -- until the first read; RefreshPreview() asks again.
 function LobbyController.Preview()
@@ -197,17 +186,7 @@ end
 
 -- Reads the deploy preview now (yields) and returns it, or nil when the server
 -- could not answer; the lobby HUD asks this when Enter is pressed (GDD Q155).
-function LobbyController.FetchPreview()
-	local ok, items = pcall(function()
-		return Remotes.Get("DeployPreview"):InvokeServer()
-	end)
-	if ok and type(items) == "table" then
-		previewItems = items
-		LobbyController.Changed:Fire("preview")
-		return items
-	end
-	return nil
-end
+LobbyController.FetchPreview = refreshPreview
 
 function LobbyController.Status(): string
 	return statusText

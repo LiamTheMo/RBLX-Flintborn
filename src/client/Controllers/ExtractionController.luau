@@ -55,6 +55,11 @@ local function build()
 end
 
 local function update()
+	-- The new HUD's objective panel shows the countdowns: skip the per-frame list.
+	if HudMode.WorldHud() then
+		ui.list:Hide()
+		return
+	end
 	local root = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
 	local now = workspace:GetServerTimeNow()
 	local lines = {}
@@ -70,7 +75,7 @@ local function update()
 		local bonus = event.kind == ExtractionRules.Kinds.Center and " (2× materials)" or ""
 		table.insert(lines, ("%s%s — %ds%s"):format(event.name, bonus, remaining, where))
 	end
-	if #lines > 0 and not HudMode.WorldHud() then
+	if #lines > 0 then
 		table.sort(lines)
 		ui.list:Show(table.concat(lines, "\n"))
 	else

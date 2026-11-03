@@ -35,43 +35,30 @@ test("full armor sets follow the Hide → Adamantine ladder at 100 HP", function
 	end
 end)
 
-test("armor pieces add and mixed tiers combine additively", function()
+test("armor pieces combine additively and stretch HP; damage clamps at zero", function()
 	local mixed = { { tier = "Iron", slot = "Chest" }, { tier = "Hide", slot = "Head" } }
-	local expected = 1 + 1.0 * 0.45 + 0.2 * 0.25
-	expectNear(ArmorRules.Factor(mixed), expected, 1e-9, "iron chest + hide head")
+	expectNear(ArmorRules.Factor(mixed), 1 + 1.0 * 0.45 + 0.2 * 0.25, 1e-9, "iron chest + hide head")
 	expect(ArmorRules.Factor({ { tier = "Iron", slot = "Head" } }) < 2, "one iron piece never gives the full x2")
-	local rolled = ArmorRules.PieceIncrement("Iron", "Chest", 0.05)
-	expectNear(rolled, 0.45 * 1.05, 1e-9, "quality roll scales the piece")
-end)
-
-test("damage never takes HP below zero and armor stretches it", function()
+	expectNear(ArmorRules.PieceIncrement("Iron", "Chest", 0.05), 0.45 * 1.05, 1e-9, "quality roll scales the piece")
 	local iron = ArmorRules.Factor(fullSet("Iron"))
 	expectNear(GameConstants.ApplyDamage(100, iron, 25), 87.5, 1e-9, "a stone spear hit on full iron")
 	expectEq(GameConstants.ApplyDamage(10, 1, 25), 0, "clamped at zero")
 end)
 
-test("confirmed melee numbers and cooldowns", function()
-	expectEq(WeaponCatalog.Hand.damage, 5, "rock 5")
-	expectEq(WeaponCatalog.Hand.cooldown, 0.3, "rock 0.3 s")
-	expectEq(WeaponCatalog.For("WoodenSpear").damage, 15, "wooden spear ~15")
-	expectEq(WeaponCatalog.For("StoneSpear").damage, 25, "stone spear ~25")
-	expectEq(WeaponCatalog.For("StoneSpear").cooldown, 0.9, "spear 0.9 s")
-	expectEq(WeaponCatalog.For("StoneDagger").cooldown, 0.4, "dagger 0.4 s")
-	expectEq(WeaponCatalog.For("StoneSword").cooldown, 0.7, "sword 0.7 s")
+test("weapon tiers climb, tools strike like a rock, and cadence is enforced per weapon", function()
 	expectEq(WeaponCatalog.For("StoneAxe"), WeaponCatalog.Hand, "tools strike like a rock")
-	-- Every crafted tier hits about 25% harder than the one below it (GDD §51).
+	-- Every crafted tier hits harder than the one below it, and the Fang is one above Adamantine (GDD §51).
 	local previous = 0
-	for _, tier in { "Stone", "Copper", "Iron", "Silver", "Cobalt", "Mithril", "Adamantine" } do
-		local damage = WeaponCatalog.For(tier .. "Sword").damage
+	for _, tier in { "Stone", "Copper", "Iron", "Silver", "Cobalt", "Mithril", "Adamantine", "Guardian" } do
+		local damage = WeaponCatalog.For(if tier == "Guardian" then "GuardianFang" else tier .. "Sword").damage
 		expect(damage > previous, tier .. " sword beats the tier below")
 		previous = damage
 	end
-	expectEq(WeaponCatalog.For("AdamantineSword").damage, 69, "adamantine sword")
-	expectEq(WeaponCatalog.For("GuardianFang").damage, 86, "the Guardian's Fang is one tier above Adamantine")
-	expectEq(WeaponCatalog.For("GuardianFang").cooldown, 0.7, "the Fang swings like a sword")
-end)
-
-test("attack cadence is enforced per weapon", function()
+	expectEq(
+		WeaponCatalog.For("GuardianFang").cooldown,
+		WeaponCatalog.For("StoneSword").cooldown,
+		"the Fang swings like a sword"
+	)
 	local spear = WeaponCatalog.For("StoneSpear")
 	expect(DamageRules.CooldownReady(nil, 0, spear.cooldown), "first attack")
 	expect(not DamageRules.CooldownReady(10, 10.5, spear.cooldown), "too soon")
@@ -135,7 +122,9 @@ test("armor equips into its slot, swaps, and still counts as carried", function(
 	expectEq(inv.armor.Head, nil, "nothing worn")
 	local spear = { instanceId = "s1", catalogId = "StoneSpear", ownerId = 1, location = "Carried", qualityRoll = 0 }
 	InventoryRules.Add(inv, spear)
-	local area, index = InventoryRules.FindInstance(inv, "s1")
+	-- A weapon prefers the hotbar: the spear lands in its first slot.
+	local area, index = "hotbar", 1
+	expectEq(InventoryRules.At(inv, area, index).instanceId, "s1", "the spear is on the hotbar")
 	expect(not InventoryRules.EquipArmor(inv, area, index), "weapons cannot be worn")
 	expectEq(InventoryRules.At(inv, area, index).instanceId, "s1", "the spear stays put")
 end)

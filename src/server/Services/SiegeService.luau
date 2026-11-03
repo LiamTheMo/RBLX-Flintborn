@@ -1,4 +1,4 @@
--- Siege items (GDD §6.3, §51; docs/ITEM_CATALOG.md §5; numbers in SiegeRules).
+-- Siege items (GDD §6.3, §51; docs/design/ITEM_CATALOG.md §5; numbers in SiegeRules).
 -- Fire Bomb: with one equipped, the attack input (CombatService.SiegeAttack) throws
 -- it from the head on a slow arc (ProjectileService); the burst burns structures by
 -- material, scorches other players under the usual PvP rules (never the thrower)
@@ -18,21 +18,22 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
 
 local BuildRules = require(ReplicatedStorage.Shared.Building.BuildRules)
+local Characters = require(ReplicatedStorage.Shared.World.Characters)
 local InventoryRules = require(ReplicatedStorage.Shared.Inventory.InventoryRules)
 local MovementRules = require(ReplicatedStorage.Shared.Security.MovementRules)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local SiegeRules = require(ReplicatedStorage.Shared.Combat.SiegeRules)
+local Validation = require(ReplicatedStorage.Shared.Data.Validation)
 local AntiExploitService = require(script.Parent.AntiExploitService)
 local BuildingService = require(script.Parent.BuildingService)
 local CombatService = require(script.Parent.CombatService)
-local DownedService = require(script.Parent.DownedService)
 local ExtractionService = require(script.Parent.ExtractionService)
+local InteractionService = require(script.Parent.InteractionService)
 local InventoryService = require(script.Parent.InventoryService)
 local NpcService = require(script.Parent.NpcService)
 local ProjectileService = require(script.Parent.ProjectileService)
 local SafeZoneService = require(script.Parent.SafeZoneService)
-local WorldAdmissionService = require(script.Parent.WorldAdmissionService)
 
 local SiegeService = {}
 
@@ -66,42 +67,6 @@ local function siegeFolder(): Folder
 		folder.Parent = workspace
 	end
 	return folder
-end
-
-local function characters()
-	local list = {}
-	for _, other in Players:GetPlayers() do
-		if other.Character then
-			table.insert(list, other.Character)
-		end
-	end
-	return list
-end
-
-local function canAct(player: Player): boolean
-	local humanoid = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
-	return WorldAdmissionService.IsAtRisk(player)
-		and humanoid ~= nil
-		and humanoid.Health > 0
-		and not DownedService.IsDowned(player)
-end
-
-local function validDirection(direction: any): Vector3?
-	if typeof(direction) ~= "Vector3" or direction.Magnitude < 0.5 or direction.Magnitude ~= direction.Magnitude then
-		return nil
-	end
-	return direction.Unit
-end
-
--- True when nothing solid lies between `from` and `to`, other than `target`.
-local function clearLine(from: Vector3, to: Vector3, ignore, target: Instance?): boolean
-	local params = RaycastParams.new()
-	params.FilterType = Enum.RaycastFilterType.Exclude
-	params.FilterDescendantsInstances = ignore
-	params.RespectCanCollide = true
-	params.IgnoreWater = true
-	local hit = workspace:Raycast(from, to - from, params)
-	return hit == nil or (target ~= nil and (hit.Instance == target or hit.Instance:IsDescendantOf(target)))
 end
 
 -- Portal auras and tagged no-build zones: nothing may be set there. (The Guardian
@@ -160,7 +125,7 @@ local function burst(player: Player, result: RaycastResult, validated: Vector3?)
 	if player.Parent == nil or not SiegeRules.WithinRange(validated, center) or SafeZoneService.Contains(center) then
 		return
 	end
-	local ignore = characters()
+	local ignore = Characters.All()
 	local structures = workspace:FindFirstChild(BuildingService.FOLDER_NAME)
 	if structures then
 		local params = OverlapParams.new()
@@ -171,7 +136,7 @@ local function burst(player: Player, result: RaycastResult, validated: Vector3?)
 			if
 				record
 				and SiegeRules.InBurst(center, record.position, record.half)
-				and clearLine(center, record.position, ignore, part)
+				and CombatService.ClearLine(center, record.position, ignore, part)
 			then
 				damageStructure(player, record, SiegeRules.FireDamage(record.material))
 			end
@@ -182,7 +147,7 @@ local function burst(player: Player, result: RaycastResult, validated: Vector3?)
 		if
 			root
 			and (root.Position - center).Magnitude <= SiegeRules.BURST_RADIUS
-			and clearLine(center, root.Position, ignore)
+			and CombatService.ClearLine(center, root.Position, ignore)
 		then
 			-- PvP, tribe, downed and safe-zone rules all apply (DamageRules.CanDamage).
 			CombatService.ApplyHit(player, other, SiegeRules.BURST_PLAYER_DAMAGE)
@@ -200,7 +165,7 @@ local function burst(player: Player, result: RaycastResult, validated: Vector3?)
 		params.FilterType = Enum.RaycastFilterType.Include
 		params.FilterDescendantsInstances = creatureFolders
 		for _, part in workspace:GetPartBoundsInRadius(center, SiegeRules.BURST_RADIUS, params) do
-			if clearLine(center, part.Position, ignore, part) then
+			if CombatService.ClearLine(center, part.Position, ignore, part) then
 				NpcService.HitPart(part, SiegeRules.BURST_CREATURE_DAMAGE, player)
 			end
 		end
@@ -219,7 +184,7 @@ local function throw(player: Player, aim: Vector3): (boolean, string?)
 	local character = player.Character
 	local head = character and character:FindFirstChild("Head")
 	local root = character and character:FindFirstChild("HumanoidRootPart")
-	if head == nil or root == nil or not canAct(player) then
+	if head == nil or root == nil or not InteractionService.CanAct(player) then
 		return false, "NotInRun"
 	end
 	local held = InventoryService.Equipped(player)
@@ -346,7 +311,7 @@ local function placeCharge(player: Player, aim: Vector3): (boolean, string?)
 	local character = player.Character
 	local head = character and character:FindFirstChild("Head")
 	local root = character and character:FindFirstChild("HumanoidRootPart")
-	if head == nil or root == nil or not canAct(player) then
+	if head == nil or root == nil or not InteractionService.CanAct(player) then
 		return false, "NotInRun"
 	end
 	local validated = AntiExploitService.ValidatedPosition(player)
@@ -359,7 +324,7 @@ local function placeCharge(player: Player, aim: Vector3): (boolean, string?)
 	end
 	-- What the player looks at: the first solid thing along the aim, from the head
 	-- (so nothing can be set through a wall).
-	local ignore = characters()
+	local ignore = Characters.All()
 	table.insert(ignore, siegeFolder())
 	local params = RaycastParams.new()
 	params.FilterType = Enum.RaycastFilterType.Exclude
@@ -396,7 +361,7 @@ local function placeFromHotbar(player: Player, index: any, direction: any)
 	if type(index) ~= "number" or index % 1 ~= 0 or index < 1 or index > size then
 		return false, "BadRequest"
 	end
-	local aim = validDirection(direction)
+	local aim = Validation.Direction(direction)
 	if aim == nil then
 		return false, "BadRequest"
 	end

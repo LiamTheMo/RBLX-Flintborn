@@ -1200,7 +1200,7 @@ def _bands(img, mask, n=5):
     return out
 
 
-SHEET_PATH = "D:/Projects/Roblox/RBLX-Flintborn/art/blender/assets/references/014.png"
+SHEET_PATH = K.REPO + "/art/blender/assets/references/014.png"
 # sheet boxes per compared view (M014_spec.md §1); f34 is the sheet's "front three-quarter" = a front view
 SHEET_BOXES = {"front": (18, 525, 282, 718), "f34": (40, 106, 530, 430), "side": (287, 525, 508, 718),
                "rear": (512, 525, 768, 718), "top": (776, 522, 995, 718), "exploded_core": (285, 860, 420, 1065)}

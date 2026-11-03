@@ -10,21 +10,8 @@ test("a missing profile becomes a complete default at the current version", func
 	expectEq(profile.schemaVersion, ProfileSchema.CURRENT_VERSION, "current version")
 	expectEq(profile.profileRevision, 0, "fresh revision")
 	expectEq(profile.createdAt, 100, "creation time")
-	for _, group in
-		{
-			"vault",
-			"lobbyBackpack",
-			"permanentItems",
-			"currency",
-			"progression",
-			"rebirth",
-			"recipes",
-			"receipts",
-			"operations",
-			"choices",
-			"metrics",
-		}
-	do
+	local groups = "vault lobbyBackpack permanentItems currency progression rebirth recipes receipts operations"
+	for group in string.gmatch(groups .. " choices metrics", "%S+") do
 		expect(type(profile[group]) == "table", "has " .. group)
 	end
 	expectEq(profile.currency.coins, 0, "no coins")
@@ -81,6 +68,9 @@ test("IDs are bounded and URL-safe", function()
 	expect(not Validation.IsId(string.rep("a", 65)), "too long")
 	expect(not Validation.IsId("has space"), "spaces")
 	expect(not Validation.IsId(42), "number")
+	expect(Validation.IsNonce(string.rep("a", 50)), "a 50-character nonce")
+	expect(not Validation.IsNonce(string.rep("a", 51)), "a nonce is at most 50 characters")
+	expect(not Validation.IsNonce("has space"), "a nonce is an ID")
 end)
 
 test("item instances validate owner, location and the ±5% roll", function()

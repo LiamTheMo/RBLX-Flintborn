@@ -4,75 +4,10 @@
 local Shared = game:GetService("ReplicatedStorage").Shared
 local Server = game:GetService("ServerScriptService").Server
 
--- Fake Roblox services -------------------------------------------------------------
+local TestSupport = game:GetService("ServerStorage").TestSupport
+local FakeRoblox = require(TestSupport.FakeRoblox)
 
-local function engineSignal()
-	local handlers = {}
-	return {
-		Connect = function(_, fn)
-			table.insert(handlers, fn)
-			return { Disconnect = function() end }
-		end,
-		Fire = function(_, ...)
-			for _, fn in table.clone(handlers) do
-				fn(...)
-			end
-		end,
-	}
-end
-
-local Players = { PlayerAdded = engineSignal(), PlayerRemoving = engineSignal(), _list = {} }
-function Players.GetPlayers(self)
-	return table.clone(self._list)
-end
-function Players.GetPlayerByUserId(self, userId)
-	for _, player in self._list do
-		if player.UserId == userId then
-			return player
-		end
-	end
-	return nil
-end
-
--- A MemoryStore hash map that can be made to fail.
-local memory = { data = {}, failing = false, writes = 0 }
-local fakeMap = {
-	SetAsync = function(_, key, value)
-		if memory.failing then
-			error("MemoryStore unavailable")
-		end
-		memory.writes += 1
-		memory.data[key] = value
-		return true
-	end,
-	GetAsync = function(_, key)
-		if memory.failing then
-			error("MemoryStore unavailable")
-		end
-		return memory.data[key]
-	end,
-}
-
-local guids = 0
-local fakes = {
-	Players = Players,
-	HttpService = {
-		GenerateGUID = function()
-			guids += 1
-			return string.format("%08x-0000-4000-8000-%012x", guids, guids)
-		end,
-	},
-	MemoryStoreService = {
-		GetHashMap = function()
-			return fakeMap
-		end,
-	},
-}
-local originalGetService = game.GetService
-game.GetService = function(self, name)
-	return fakes[name] or originalGetService(self, name)
-end
-game.PrivateServerId = "world-1"
+-- PartyService's MemoryStore calls run inline; a retry does not wait.
 task = {
 	wait = function() end,
 	spawn = function(fn, ...)
@@ -81,34 +16,25 @@ task = {
 }
 warn = function() end
 
+-- A MemoryStore that can be made to fail (memory.failing).
+local memory = require(TestSupport.FakeStores).MemoryStore()
+local Players = FakeRoblox.Players()
+FakeRoblox.Provide({ Players = Players, HttpService = FakeRoblox.Guids(), MemoryStoreService = memory.service })
+game.PrivateServerId = "world-1"
+FakeRoblox.Place("Lobby")
+local handlers = FakeRoblox.Remotes().handlers
+
 local PartyRules = require(Shared.Admission.PartyRules)
-
--- Lobby party ids cannot be forged into a world tribe ----------------------------
-
-local PlaceConfig = require(Shared.Config.PlaceConfig)
-local Remotes = require(Shared.Net.Remotes)
-local handlers = {}
-Remotes.Handle = function(name, fn)
-	handlers[name] = fn
-end
-Remotes.Get = function()
-	return { FireClient = function() end, FireAllClients = function() end }
-end
-PlaceConfig.IsLobby = function()
-	return true
-end
 local PartyService = require(Server.Services.PartyService)
 PartyService.Start()
 
+-- The stored deploy record under `token`.
+local function recordOf(token)
+	return memory.maps[PartyService.MAP_NAME][token]
+end
+
 local function newPlayer(userId: number)
-	local player = { UserId = userId, Name = "P" .. userId, DisplayName = "P" .. userId, Parent = Players }
-	player.teleportData = nil
-	function player.GetJoinData(self)
-		return { TeleportData = self.teleportData }
-	end
-	table.insert(Players._list, player)
-	Players.PlayerAdded:Fire(player)
-	return player
+	return Players:Join(FakeRoblox.Player(userId, nil, Players))
 end
 
 local leader, member, decliner, stranger = newPlayer(1), newPlayer(2), newPlayer(3), newPlayer(4)
@@ -124,7 +50,7 @@ test("a deploy records the party's members under a fresh server token", function
 	local token = PartyService.RecordDeploy(leader, group, "world-1")
 	expect(PartyRules.IsGuid(token), "a token travels in teleport data")
 	expect(token ~= partyId, "the token is not the party id invitees saw")
-	local record = memory.data[token]
+	local record = recordOf(token)
 	expectEq(record and record.partyId, partyId, "the record names the party")
 	expectEq(record and #record.members, 2, "and only who deployed")
 	for _, player in group do
@@ -189,7 +115,7 @@ test("the leader deploys the whole party; there is no ready step", function()
 	local group = PartyService.DeployGroup(leader)
 	expectEq(#group, 2, "the leader deploys the party")
 	local token = PartyService.RecordDeploy(leader, group, "world-1")
-	expectEq(memory.data[token].ready, nil, "the deploy record carries no ready state")
+	expectEq(recordOf(token).ready, nil, "the deploy record carries no ready state")
 	local none, why = PartyService.DeployGroup(member)
 	expect(none == nil and why == "OnlyLeaderDeploys", "a member cannot deploy")
 	PartyService.REQUEST_COOLDOWN_SECONDS = cooldown

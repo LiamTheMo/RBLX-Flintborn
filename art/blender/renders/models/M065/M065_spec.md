@@ -84,8 +84,8 @@ x 822); ortho title bar y 457–489, cells y 490–739 with dividers x 300, 510,
     (floor hidden) S is the grey rocks only.
   - **Green tones:** light v ≥ 0.70, dark v < 0.42, mid the rest (the 061 convention).
 
-**Scratch study material** (no Blender) in `<temp>\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m065_study\`.
-Run with `C:/Users/Orang/.local/bin/uv.exe run --no-project --with pillow --with numpy --with scipy python <script> < /dev/null`.
+**Scratch study material** (no Blender) in `<temp>/m065_study/`.
+Run with `uv run --no-project --with pillow --with numpy --with scipy python <script> < /dev/null`.
 - **Helpers:** `m.py` (boxes, `cls`, `tones`, `clsimg`, `hx`, `hsvs`), `zoom.py` (`zoom.py x0 y0 x1 y1 scale out.png [grid]`),
   `probe2.py` (`probe2.py x,y …` → hex and HSV), `lines2.py` (frame rules), `sw.py` (swatches).
 - **Measurements:** `measure.py` → `measure_out.txt` (bbox, W : H, shares, fill, tones, top profile, widths per height,
@@ -97,7 +97,7 @@ Run with `C:/Users/Orang/.local/bin/uv.exe run --no-project --with pillow --with
 - **Zooms:** `z_f34.png`, `z_r34.png` (2×, gridded), `z_front.png`, `z_side.png`, `z_rear.png`, `z_top.png` (3×, gridded),
   `z_fr_stems.png` (5×: stems, crook, bud), `z_fr_rock.png`, `z_f34_ros.png` (rosette), `z_expl.png`, `z_expl_heads.png`,
   `z_expl_base.png` (cluster base), `z_cu.png`, `z_parts.png`, `z_parts_heads.png`, `z_pal.png`.
-- **On our renders:** copy 061's `meas.py` (`<temp>\...\scratchpad\m061w\meas.py`), point it at this folder's `m.py` and
+- **On our renders:** copy 061's `meas.py` (`<temp>/m061w/meas.py`), point it at this folder's `m.py` and
   use `cls()`.
 
 ## 1. Study (2a)
@@ -613,7 +613,7 @@ tip), and **roll** (rotation about its own axis: the top face stays up and outwa
 
 Reusable code: 061's `petal`, `bead`, `cup`, `stem`, `leaf` and `hub` functions (`m061.py`, uncommitted: copy, don't
 import); 059's rock builder; `m047._Solids`, `shells_report`, `contact_report`, `bury_report` (committed: import). Take
-`vis.py` from `<temp>\...\scratchpad\m061w\`.
+`vis.py` from `<temp>/m061w/`.
 
 ### 4.2 Stage 1 acceptance (render, compare every view, measure with this folder's scripts)
 
@@ -1180,7 +1180,7 @@ Collision `none` on the hero and every part (decision 8).
    about 2.5 / 4 / 0. They are already a little under the study's sizes and tucked under leaf tips.
 7. **Leaf tip angles are 61–83°** (study 50–70°): the broader kites made them blunter; they still end in a point.
 8. **Front W : H 1.24** (sheet 1.335, accepted 1.20–1.38); f34 1.17 (061 reached 1.04 with this camera).
-9. Scratch measurement scripts (`meas.py`, run inside Blender) are in `<temp>\...\scratchpad\`, not in the repo.
+9. Scratch measurement scripts (`meas.py`, run inside Blender) are in `<temp>/`, not in the repo.
 
 ## Rulings (main session, 2026-11-01)
 
@@ -1399,7 +1399,7 @@ a broad rounded-pointed petal folded on a rib, with a narrow V notch between nei
   - leaf pixels within 12° of edge-on 1.5–9.2 % (the worst is +X);
   - heads: the star is at least 0.39 of face-on, the bloom at least 0.71.
 
-Scratch scripts (`it065.py`, `bellp.py`, `build.py`) are in `<temp>\...\scratchpad\`, not in the repo.
+Scratch scripts (`it065.py`, `bellp.py`, `build.py`) are in `<temp>/`, not in the repo.
 
 ## Rulings (main session, 2026-11-02, after fix round 1)
 

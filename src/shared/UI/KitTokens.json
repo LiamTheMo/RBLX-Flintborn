@@ -154,7 +154,6 @@
     "windowMax": 1.4,
     "phoneHeight": 500,
     "phoneHud": 0.9,
-    "phoneHudMin": 0.5,
     "tabletShortSide": 900,
     "touchSmallMax": 1.25,
     "hover": 1.03,

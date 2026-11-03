@@ -1,12 +1,15 @@
 local Shared = game:GetService("ReplicatedStorage").Shared
+local HudLayout = require(Shared.UI.HudLayout)
 local HudModel = require(Shared.UI.HudModel)
 
+-- The grid tests below run on the shipped layout (D30: margin 24, gap 12, column 315).
+local GRID = HudLayout.grid
+
 test("fractions display as whole numbers 0–100", function()
-	expectEq(HudModel.Percent(1), 100, "full")
-	expectEq(HudModel.Percent(0.724), 72, "rounds down below .5")
-	expectEq(HudModel.Percent(0.726), 73, "rounds up from .5")
-	expectEq(HudModel.Percent(1.4), 100, "clamped above")
-	expectEq(HudModel.Percent(-0.2), 0, "clamped below")
+	-- Rounds to nearest, clamps both ways; missing and NaN read 0.
+	for input, shown in { [1] = 100, [0.724] = 72, [0.726] = 73, [1.4] = 100, [-0.2] = 0 } do
+		expectEq(HudModel.Percent(input), shown, "Percent " .. input)
+	end
 	expectEq(HudModel.Percent(nil), 0, "missing reads 0")
 	expectEq(HudModel.Percent(0 / 0), 0, "NaN reads 0")
 end)
@@ -33,19 +36,6 @@ test("XP fraction and level text", function()
 	expectEq(HudModel.LevelText(12), "LV. 12", "badge text")
 	expectEq(HudModel.LevelText(nil), "LV. 0", "missing level")
 	expectEq(HudModel.LevelText(50, true), "MAX", "level cap")
-	expect(string.find(HudModel.MaxLevelHint(50), "rebirth", 1, true) ~= nil, "max hint names rebirth")
-end)
-
-test("lobby currency and party header text", function()
-	expectEq(HudModel.Thousands(2450), "2,450", "thousands")
-	expectEq(HudModel.Thousands(125), "125", "under a thousand")
-	expectEq(HudModel.Thousands(1000000), "1,000,000", "millions")
-	expectEq(HudModel.Thousands(999), "999", "no leading comma")
-	expectEq(HudModel.Thousands(nil), "0", "missing reads 0")
-	expectEq(HudModel.Thousands(-5), "0", "negative reads 0")
-	expectEq(HudModel.PartyCount(nil, 8), "1/8", "alone is a party of one")
-	expectEq(HudModel.PartyCount(3, 8), "3/8", "members")
-	expectEq(HudModel.PartyCount(12, 8), "8/8", "clamped to the cap")
 end)
 
 test("timers read m:ss and h:mm:ss", function()
@@ -146,17 +136,6 @@ test("slice scale shrinks corners for small widgets", function()
 	expectEq(HudModel.SliceScale(400, 100, 800, 200, nil), 1, "no art scale: as before")
 end)
 
-test("Roblox's touch jump button", function()
-	local phone = HudModel.JumpButton(844, 390)
-	expectEq(phone.size, 70, "a phone's jump button is 70 px")
-	expectEq(phone.x, 749, "95 px from the right")
-	expectEq(phone.y, 300, "90 px from the bottom")
-	local tablet = HudModel.JumpButton(1024, 768)
-	expectEq(tablet.size, 120, "a tablet's is 120 px")
-	expectEq(tablet.x, 854, "170 px from the right")
-	expectEq(tablet.y, 558, "210 px from the bottom")
-end)
-
 test("Roblox's touch controls sit inside the device safe area", function()
 	local phone = HudModel.Thumbstick(844, 390)
 	expectEq(phone.size, 70, "a phone's thumbstick ring is 70 px")
@@ -166,25 +145,14 @@ test("Roblox's touch controls sit inside the device safe area", function()
 	expectEq(tablet.size, 120, "a tablet's is 120 px")
 	expectEq(tablet.x, 60, "60 px from the left")
 	expectEq(tablet.y, 558, "210 px from the bottom")
-	local zone = HudModel.ThumbstickZone(844, 390)
-	expectEq(zone.y, 130, "the dynamic thumbstick starts below the top third")
-	expect(math.abs(zone.w - 337.6) < 1e-6, "in the left 40 %")
 
 	-- A notched phone held sideways: 47 px side insets.
 	local notched = { left = 47, top = 0, right = 47, bottom = 0 }
 	expectEq(HudModel.Thumbstick(844, 390, notched).x, 72, "the ring 25 px inside the left inset")
-	expectEq(HudModel.JumpButton(844, 390, notched).x, 702, "the jump button 95 px inside the right inset")
-	expectEq(HudModel.ThumbstickZone(844, 390, notched).x, 47, "the zone starts at the inset")
 end)
 
-test("the HUD grid: one margin, one gap, one column width (D30)", function()
-	local layout = require(game:GetService("ReplicatedStorage").Shared.UI.HudLayout)
-	local grid = layout.grid
-	expectEq(grid.margin, 24, "M: 24 design px from every edge (12 px on a phone at scale 0.5)")
-	expectEq(grid.gap, 12, "G: 12 design px between stacked pieces")
-	expectEq(grid.column, 315, "the right-hand column's width")
-	expectEq(layout.gear.size[1], 52, "the shared ⚙ is 52 wide")
-	expectEq(layout.gear.size[2], 46, "and 46 tall")
+test("the HUD layout pins regions to grid columns (D30)", function()
+	local layout = HudLayout
 	-- Every edge-pinned region names its column instead of carrying offsets.
 	for _, key in { "vitals", "status", "objective", "event" } do
 		expectEq(layout[key].column, "right", key .. " is in the right-hand column")
@@ -199,8 +167,6 @@ test("the HUD grid: one margin, one gap, one column width (D30)", function()
 	expect(math.abs((b.xp[1] + b.xp[3] / 2) - hotbarRight / 2) <= 0.5, "the XP bar is centred over the hotbar")
 	expect(math.abs((b.popups[1] - b.xp[1])) < 1e-6 and b.popups[3] == b.xp[3], "the XP pop-ups over the bar")
 end)
-
-local GRID = { margin = 24, gap = 12, column = 315, topBand = 0.3, bottomBand = 0.25 }
 
 test("the edge rule per column: the margin in the corner bands, else the safe inset for the whole column", function()
 	-- 844 × 390: the top band ends at y 117, the bottom band starts at 292.5.
@@ -231,7 +197,7 @@ end)
 test(
 	"the corner settings button: the grid's corner, or above the thumbstick ring when it reaches the corner",
 	function()
-		local gear = { size = { 52, 46 }, ringGap = 12, pad = 44 }
+		local gear = HudLayout.gear
 		local left, bottom, where =
 			HudModel.GearCorner(GRID, gear, { width = 1672, height = 941, scale = 1, touch = false })
 		expectEq(left, 24, "desktop: the margin from the left")
@@ -284,8 +250,8 @@ test("hotbar stepping wraps", function()
 	expectEq(HudModel.HotbarStep(1, -1, 6), 6, "wraps back")
 end)
 
-test("hotbar slots show their items, stacks and the equipped one", function()
-	local views = HudModel.HotbarSlots({
+test("hotbar slots show their items, stacks and the Permanent ones", function()
+	local items = HudModel.HotbarItems({
 		equipped = 2,
 		slots = {
 			{ area = "hotbar", index = 1, catalogId = "FlintArrow", quantity = 24 },
@@ -295,18 +261,17 @@ test("hotbar slots show their items, stacks and the equipped one", function()
 			{ area = "hotbar", index = 7, catalogId = "Wood", quantity = 5 },
 		},
 	}, 6)
-	expectEq(views[1].name, "Flint Arrow", "item name")
-	expectEq(views[1].count, "×24", "stack count")
-	expectEq(views[1].equipped, false, "not equipped")
-	expectEq(views[2].name, "Iron Sword", "the name stays plain (no star glyph)")
-	expectEq(views[2].permanent, true, "Permanent items are marked for the star art")
-	expectEq(views[2].count, "", "unique items show no count")
-	expectEq(views[2].equipped, true, "the equipped slot")
-	expectEq(views[3].count, "", "a single item shows no count")
-	expectEq(views[4], nil, "backpack items stay off the hotbar")
-	expectEq(views[5], nil, "an empty slot is nil")
-	expectEq(views[7], nil, "slots past the sixth are ignored")
-	expectEq(next(HudModel.HotbarSlots(nil, 6)), nil, "no snapshot, empty hotbar")
+	expectEq(items[1].itemId, "FlintArrow", "item id")
+	expectEq(items[1].quantity, 24, "stack count")
+	expectEq(items[1].permanent, false, "not Permanent")
+	expectEq(items[2].itemId, "IronSword", "the second slot")
+	expectEq(items[2].permanent, true, "Permanent items are marked for the star art")
+	expectEq(items[2].quantity, nil, "unique items carry no count")
+	expectEq(items[3].quantity, 1, "a single item")
+	expectEq(items[4], nil, "backpack items stay off the hotbar")
+	expectEq(items[5], nil, "an empty slot is nil")
+	expectEq(items[7], nil, "slots past the sixth are ignored")
+	expectEq(next(HudModel.HotbarItems(nil, 6)), nil, "no snapshot, empty hotbar")
 end)
 
 test("prompt keycaps name the key for the input in use", function()
@@ -320,13 +285,18 @@ test("prompt keycaps name the key for the input in use", function()
 end)
 
 test("survival status keeps the medicine lock and food healing", function()
-	expectEq(HudModel.SurvivalStatus(0, 0, false), "", "nothing to show")
-	expectEq(HudModel.SurvivalStatus(3.24, 0, false), "Medicine ready in 3.2 s", "lock")
-	expectEq(
-		HudModel.SurvivalStatus(1, 5, true),
-		"Medicine ready in 1.0 s  ·  Food healing +5  ·  ! Hungry: slowed",
-		"all three"
-	)
+	expectEq(#HudModel.StatusChips(0, 0, false), 0, "nothing to show")
+	local lock = HudModel.StatusChips(3.24, 0, false)
+	expectEq(#lock, 1, "one plaque")
+	expectEq(lock[1].icon, "hourglass", "the lock's icon")
+	expectEq(lock[1].text, "Medicine ready in 3.2 s", "lock")
+	local all = HudModel.StatusChips(1, 5, true)
+	expectEq(#all, 3, "all three")
+	expectEq(all[1].text, "Medicine ready in 1.0 s", "lock first")
+	expectEq(all[2].icon, "heart", "then food healing")
+	expectEq(all[2].text, "Food healing +5", "its amount")
+	expectEq(all[3].icon, "warning", "then the hunger slow")
+	expectEq(all[3].text, "Hungry: slowed", "in words")
 end)
 
 test("the extraction objective tracks reaching and holding the zone", function()
@@ -396,14 +366,17 @@ test("the world event panel shows the soonest event", function()
 	end
 end)
 
-test("currency amounts compact past 100,000", function()
-	expectEq(HudModel.Compact(2450), "2,450", "small amounts keep separators")
-	expectEq(HudModel.Compact(99999), "99,999", "just below the threshold")
-	expectEq(HudModel.Compact(100000), "100K", "thousands")
-	expectEq(HudModel.Compact(250500), "250K", "three-digit thousands drop the decimal")
-	expectEq(HudModel.Compact(1234567), "1.2M", "millions with a decimal")
-	expectEq(HudModel.Compact(2000000), "2M", "a round million")
-	expectEq(HudModel.Compact(999999), "999K", "never rounds up to 1000K")
-	expectEq(HudModel.Compact(3400000000), "3.4B", "billions")
+test("currency text has separators, and compacts past 100,000", function()
+	for input, text in { [125] = "125", [999] = "999", [2450] = "2,450", [1000000] = "1,000,000", [-5] = "0" } do
+		expectEq(HudModel.Thousands(input), text, "Thousands " .. input)
+	end
+	expectEq(HudModel.Thousands(nil), "0", "missing reads 0")
+	-- Three-digit thousands drop the decimal and never round up to 1000K.
+	for input, text in { [2450] = "2,450", [99999] = "99,999", [100000] = "100K", [250500] = "250K", [999999] = "999K" } do
+		expectEq(HudModel.Compact(input), text, "Compact " .. input)
+	end
+	for input, text in { [1234567] = "1.2M", [2000000] = "2M", [3400000000] = "3.4B" } do
+		expectEq(HudModel.Compact(input), text, "Compact " .. input)
+	end
 	expectEq(HudModel.Compact(nil), "0", "missing reads 0")
 end)

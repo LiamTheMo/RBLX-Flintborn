@@ -26,108 +26,81 @@ local function usesColor(recipe, color: { number }): boolean
 	return false
 end
 
-local function usesMaterial(recipe, names: { string }): boolean
+-- How many of a recipe's parts pass `keep`.
+local function countParts(recipe, keep): number
+	local total = 0
 	for _, spec in recipe.parts do
-		if table.find(names, spec.material) then
-			return true
-		end
+		total += if keep(spec) then 1 else 0
 	end
-	return false
+	return total
 end
 
-test("every node type has a model, and only node types do", function()
-	for nodeType in NodeCatalog.Nodes do
-		expect(NodeModels.Get(nodeType) ~= nil, nodeType .. " has a model")
-	end
-	expectEq(NodeModels.Get("NoSuchNode"), nil, "unknown types have none")
-end)
+local function usesMaterial(recipe, material: string): boolean
+	return countParts(recipe, function(spec)
+		return spec.material == material
+	end) > 0
+end
 
-test("node recipes are well formed and light enough for ~1,400 nodes", function()
+local function isBall(spec): boolean
+	return spec.shape == "Ball"
+end
+
+test("every node type, and only a node type, has a well formed grounded model in its catalog look", function()
+	local seen = {}
 	for nodeType in NodeCatalog.Nodes do
 		local model = NodeModels.Get(nodeType)
 		assert(model, "missing " .. nodeType)
+		-- Light enough for ~1,400 nodes.
 		local problems = Recipe.Problems(model.recipe, NodeModels.MAX_PARTS)
 		expectEq(#problems, 0, nodeType .. " recipe: " .. table.concat(problems, "; "))
 		expect(#model.recipe.parts >= 2, nodeType .. " has more than one shape")
-		expect(model.hitbox[1] > 0 and model.hitbox[2] > 0 and model.hitbox[3] > 0, nodeType .. " hitbox")
-	end
-	local tree = NodeModels.Get("Tree")
-	expect(#tree.recipe.parts <= NodeModels.MAX_TREE_PARTS, "trees stay within " .. NodeModels.MAX_TREE_PARTS)
-end)
-
-test("hitboxes keep today's sizes so harvest reach is unchanged", function()
-	for nodeType in NodeCatalog.Nodes do
-		local model = NodeModels.Get(nodeType)
+		-- Hitboxes keep today's sizes so harvest reach is unchanged.
 		local size = NodeCatalog.Looks[nodeType].size
 		expectEq(model.hitbox[1], size.X, nodeType .. " hitbox x")
 		expectEq(model.hitbox[2], size.Y, nodeType .. " hitbox y")
 		expectEq(model.hitbox[3], size.Z, nodeType .. " hitbox z")
-	end
-	local tree = NodeModels.Get("Tree").hitbox
-	expect(tree[1] <= 3.5 and tree[2] >= 13, "the tree's hitbox is its trunk")
-end)
-
-test("every model stands on the ground: nothing floats or sinks", function()
-	for nodeType in NodeCatalog.Nodes do
-		local model = NodeModels.Get(nodeType)
-		local ground = -model.hitbox[2] / 2
-		expectNear(lowest(model.recipe), ground, 0.6, nodeType .. " lowest point is at the ground")
-	end
-end)
-
-test("nodes keep their catalog colour so ores and berries read apart", function()
-	local seen = {}
-	for nodeType in NodeCatalog.Nodes do
-		local model = NodeModels.Get(nodeType)
+		-- Nothing floats or sinks.
+		expectNear(lowest(model.recipe), -model.hitbox[2] / 2, 0.6, nodeType .. " lowest point is at the ground")
+		-- Nodes keep their catalog colour so ores and berries read apart.
 		local color = Recipe.Rgb(NodeCatalog.Looks[nodeType].color)
 		expect(usesColor(model.recipe, color), nodeType .. " shows its Looks colour")
 		local key = color[1] .. "," .. color[2] .. "," .. color[3]
 		expect(seen[key] == nil, nodeType .. " colour differs from " .. tostring(seen[key]))
 		seen[key] = nodeType
 	end
+	expectEq(NodeModels.Get("NoSuchNode"), nil, "unknown types have none")
 end)
 
 test("trees are a trunk under a layered canopy that spreads past it", function()
 	local tree = NodeModels.Get("Tree")
+	expect(#tree.recipe.parts <= NodeModels.MAX_TREE_PARTS, "trees stay within " .. NodeModels.MAX_TREE_PARTS)
+	expect(tree.hitbox[1] <= 3.5 and tree.hitbox[2] >= 13, "the tree's hitbox is its trunk")
 	local low, high = Recipe.Bounds(tree.recipe)
 	expect(high[2] - low[2] > tree.hitbox[2] + 3, "the canopy rises above the trunk")
 	expect(high[1] - low[1] > tree.hitbox[1] * 3, "and spreads around it")
-	local balls = 0
-	for _, spec in tree.recipe.parts do
-		if spec.shape == "Ball" then
-			balls += 1
-		end
-	end
-	expect(balls >= 3, "layered canopy of at least three balls")
+	expect(countParts(tree.recipe, isBall) >= 3, "layered canopy of at least three balls")
 end)
 
 test("gems glow or gleam; rocks and plants have the right shapes", function()
 	for _, gem in { "ObsidianOutcrop", "JadeVein", "AmethystGeode", "StormglassCluster" } do
-		expect(usesMaterial(NodeModels.Get(gem).recipe, { "Glass" }), gem .. " has glass")
+		expect(usesMaterial(NodeModels.Get(gem).recipe, "Glass"), gem .. " has glass")
 	end
 	for _, glowing in { "StarstoneOutcrop", "AmethystGeode" } do
-		expect(usesMaterial(NodeModels.Get(glowing).recipe, { "Neon" }), glowing .. " glows")
+		expect(usesMaterial(NodeModels.Get(glowing).recipe, "Neon"), glowing .. " glows")
 	end
 	local rock = #NodeModels.Get("Rock").recipe.parts
 	expect(rock >= 2 and rock <= 4, "rocks are 2-4 chunks")
 	for _, bush in { "RedberryBush", "SweetberryBush", "RaspberryBush" } do
-		local balls = 0
-		for _, spec in NodeModels.Get(bush).recipe.parts do
-			if spec.shape == "Ball" then
-				balls += 1
-			end
-		end
-		expect(balls >= 5, bush .. " has leaf balls and berry dots")
+		expect(countParts(NodeModels.Get(bush).recipe, isBall) >= 5, bush .. " has leaf balls and berry dots")
 	end
 	for _, mushroom in { "CaveMushroomPatch", "RedcapMushroomPatch", "ChestnutMushroomPatch" } do
-		local stems, caps = 0, 0
-		for _, spec in NodeModels.Get(mushroom).recipe.parts do
-			if spec.shape == "Block" then
-				stems += 1
-			elseif spec.shape == "Ball" and spec.size[1] >= 0.8 then
-				caps += 1
-			end
-		end
+		local recipe = NodeModels.Get(mushroom).recipe
+		local stems = countParts(recipe, function(spec)
+			return spec.shape == "Block"
+		end)
+		local caps = countParts(recipe, function(spec)
+			return spec.shape == "Ball" and spec.size[1] >= 0.8
+		end)
 		expect(stems >= 3 and caps >= 3, mushroom .. " has stems and caps")
 	end
 end)

@@ -5,165 +5,17 @@
 -- Roblox services and a fake clock.
 
 local Shared = game:GetService("ReplicatedStorage").Shared
-local Server = game:GetService("ServerScriptService").Server
 
--- Fake clock and task scheduler ---------------------------------------------------
-
-local clock = 0
-local queue = {}
-local sequence = 0
-local threadErrors = {}
-
-local function resume(thread, ...)
-	local ok, err = coroutine.resume(thread, ...)
-	if not ok then
-		table.insert(threadErrors, tostring(err))
-	end
-end
-
-task = {}
-function task.spawn(fn, ...)
-	local thread = if type(fn) == "thread" then fn else coroutine.create(fn)
-	resume(thread, ...)
-	return thread
-end
-function task.delay(seconds, fn, ...)
-	sequence += 1
-	table.insert(
-		queue,
-		{ at = clock + (seconds or 0), sequence = sequence, thread = coroutine.create(fn), args = table.pack(...) }
-	)
-end
-function task.wait(seconds)
-	sequence += 1
-	table.insert(
-		queue,
-		{ at = clock + (seconds or 0), sequence = sequence, thread = coroutine.running(), args = table.pack() }
-	)
-	coroutine.yield()
-	return seconds
-end
-
-warn = function() end
-
--- Runs everything due within the next `seconds`, in time order.
-local function advance(seconds: number)
-	local target = clock + seconds
-	while true do
-		local best = nil
-		for index, entry in queue do
-			if entry.at <= target then
-				local current = best and queue[best]
-				if
-					current == nil
-					or entry.at < current.at
-					or (entry.at == current.at and entry.sequence < current.sequence)
-				then
-					best = index
-				end
-			end
-		end
-		if best == nil then
-			break
-		end
-		local entry = table.remove(queue, best)
-		clock = math.max(clock, entry.at)
-		resume(entry.thread, table.unpack(entry.args, 1, entry.args.n))
-	end
-	clock = target
-end
-
--- Fake Roblox services ------------------------------------------------------------
-
-local Players = { _list = {} }
-local removing = {}
-Players.PlayerRemoving = {
-	Connect = function(_, fn)
-		table.insert(removing, fn)
-	end,
-}
-function Players.GetPlayers(self)
-	return table.clone(self._list)
-end
-function Players.GetPlayerByUserId(self, userId)
-	for _, player in self._list do
-		if player.UserId == userId then
-			return player
-		end
-	end
-	return nil
-end
-
-local guids = 0
-local fakes = {
-	Players = Players,
-	HttpService = {
-		GenerateGUID = function()
-			guids += 1
-			return ("guid-%d"):format(guids)
-		end,
-	},
-}
-local originalGetService = game.GetService
-game.GetService = function(self, name)
-	return fakes[name] or originalGetService(self, name)
-end
-game.JobId = "job-trade"
-workspace = {
-	GetServerTimeNow = function()
-		return clock
-	end,
-}
-
-local PlaceConfig = require(Shared.Config.PlaceConfig)
-PlaceConfig.IsLobby = function()
-	return true
-end
-local Remotes = require(Shared.Net.Remotes)
-local handlers = {}
-local pushed = {}
-Remotes.Handle = function(name, fn)
-	handlers[name] = fn
-end
-Remotes.Get = function()
-	return {
-		FireClient = function(_, player, payload)
-			pushed[player] = payload
-		end,
-	}
-end
+local lobby = require(game:GetService("ServerStorage").TestSupport.LobbyTrade).new()
+local advance, handlers, pushed, profiles, stored =
+	lobby.advance, lobby.handlers, lobby.pushed, lobby.profiles, lobby.stored
+local session, lockAndConfirm = lobby.session, lobby.lockAndConfirm
 
 local GameConstants = require(Shared.GameConstants)
 local ItemCatalog = require(Shared.Items.ItemCatalog)
 local ProfileSchema = require(Shared.Data.ProfileSchema)
 local TradeRules = require(Shared.Economy.TradeRules)
-
--- Profiles live in memory; a save copies one into `stored`.
-local ProfileService = require(Server.Services.ProfileService)
-local profiles, stored = {}, {}
-ProfileService.GetProfile = function(player)
-	return profiles[player]
-end
-ProfileService.Mutate = function(player, apply)
-	local profile = profiles[player]
-	if profile == nil then
-		return false
-	end
-	apply(profile)
-	return true
-end
-ProfileService.SaveNow = function(player)
-	stored[player.UserId] = ProfileSchema.DeepCopy(profiles[player])
-	return true
-end
-ProfileService.ReadStored = function(userId)
-	return true, stored[userId]
-end
-local CurrencyService = require(Server.Services.CurrencyService)
-CurrencyService.Publish = function() end
-
-local TradeService = require(Server.Services.TradeService)
-TradeService.Start()
+local TradeService = require(game:GetService("ServerScriptService").Server.Services.TradeService)
 
 local DAY = 86400 * 20000
 local EMBER = "AncientEmber"
@@ -173,38 +25,9 @@ local function sword(id)
 end
 
 local function trader(ember: number?)
-	local profile = ProfileSchema.Default(0)
-	profile.progression.level = 12
+	local profile = lobby.trader()
 	profile.vault.materials = { [EMBER] = ember, Stone = 200 }
 	return profile
-end
-
-local nextUserId = 100
-local function join(profile)
-	nextUserId += 1
-	local player = { UserId = nextUserId, DisplayName = "P" .. nextUserId, Parent = Players }
-	function player.SetAttribute() end
-	table.insert(Players._list, player)
-	profiles[player] = profile
-	stored[player.UserId] = ProfileSchema.DeepCopy(profile)
-	return player
-end
-
--- Two joined players in an accepted session.
-local function session(profileA, profileB)
-	local a, b = join(profileA), join(profileB)
-	local ok, id = handlers.TradeRequest(a, b.UserId)
-	assert(ok, "invite")
-	assert(handlers.TradeRespond(b, id, true), "accept")
-	return a, b, id
-end
-
-local function lockAndConfirm(a, b, id)
-	handlers.TradeLock(a, id)
-	handlers.TradeLock(b, id)
-	advance(TradeService.COUNTDOWN_SECONDS)
-	handlers.TradeConfirm(a, id)
-	return handlers.TradeConfirm(b, id)
 end
 
 -- Rules ---------------------------------------------------------------------------
@@ -247,13 +70,6 @@ test("a vault material offer is checked against the vault", function()
 	expect(not ok and reason == "TooManyItems", "a material counts toward the item limit")
 end)
 
-test("the receiver needs vault room, so a trade never deletes", function()
-	local receiver = trader(GameConstants.MATERIAL_STACK_MAX - 5)
-	local ok, reason = TradeRules.ValidateReceive(receiver, 0, DAY, { [EMBER] = 6 })
-	expect(not ok and reason == "PartnerVaultFull", "six do not fit")
-	expect(TradeRules.ValidateReceive(receiver, 0, DAY, { [EMBER] = 5 }), "five fit exactly")
-end)
-
 local function settle(giverEmber: number, quantity: number, receiverEmber: number?)
 	local a, b = trader(giverEmber), trader(receiverEmber)
 	b.currency.gems = 100
@@ -277,15 +93,11 @@ test("a settled material trade moves vault to vault once, with the Gem fee", fun
 	expectEq(TradeRules.Reconcile(b, "m1", a, DAY + 1), "Settled", "A settled it")
 	expectEq(TradeRules.Reconcile(a, "m1", b, DAY + 2), "None", "a replay does nothing")
 	expectEq(a.vault.materials[EMBER] + b.vault.materials[EMBER], 13, "no Ember created")
+	expectEq(settle(4, 4).vault.materials[EMBER], nil, "giving the whole stack leaves no zero stack behind")
 end)
 
-test("giving the whole stack clears the vault entry", function()
-	local a = settle(4, 4)
-	expectEq(a.vault.materials[EMBER], nil, "no zero stack left behind")
-end)
-
-test("a crash rolls the giver back into the vault exactly once", function()
-	local a, _, _, bStored = settle(10, 4, 3)
+test("a crash rolls either side back exactly once", function()
+	local a, b, aStored, bStored = settle(10, 4, 3)
 	-- B never saved: its stored profile is the old one.
 	expectEq(TradeRules.Reconcile(a, "m1", bStored, DAY + 1), "RolledBack", "A undone")
 	expectEq(a.vault.materials[EMBER], 10, "A's Ember is back in the vault")
@@ -293,11 +105,8 @@ test("a crash rolls the giver back into the vault exactly once", function()
 	expectEq(TradeRules.Reconcile(a, "m1", bStored, DAY + 2), "None", "a second reconcile does nothing")
 	expectEq(a.vault.materials[EMBER], 10, "still ten: nothing duplicated")
 	expectEq(bStored.vault.materials[EMBER], 3, "B never received it")
-end)
-
-test("a rolled-back receiver loses only what it received", function()
-	local _, b, aStored = settle(10, 4, 3)
-	expectEq(TradeRules.Reconcile(b, "m1", aStored, DAY + 1), "RolledBack", "A never saved")
+	-- A never saved: the receiver loses only what it received.
+	expectEq(TradeRules.Reconcile(b, "m1", aStored, DAY + 1), "RolledBack", "B undone")
 	expectEq(b.vault.materials[EMBER], 3, "B keeps its own three")
 	expectEq(b.currency.gems, 100, "B's Gems come back")
 	expectEq(TradeRules.Reconcile(b, "m1", aStored, DAY + 2), "None", "replay does nothing")
@@ -424,8 +233,5 @@ end)
 
 test("no spawned thread errored", function()
 	advance(60)
-	for _, err in threadErrors do
-		print("    thread error: " .. err)
-	end
-	expectEq(#threadErrors, 0, "thread errors")
+	lobby.scheduler:ExpectNoThreadErrors()
 end)

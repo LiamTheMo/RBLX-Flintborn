@@ -27,7 +27,7 @@ local function preview(player: Player)
 end
 
 local function run(player: Player, prefix: string, nonce: any, kind: string, apply)
-	if not Validation.IsId(nonce) or #nonce > 50 then
+	if not Validation.IsNonce(nonce) then
 		return false, "BadRequest"
 	end
 	local ok, result, applied = ProfileService.RunOperation(player, prefix .. nonce, kind, function(profile)

@@ -41,8 +41,8 @@ Sheet text:
 - **O, other:** ground shadow, the "UB" of the title inside the hero box, dark edges; not counted in the shares.
 
 **Scratch study material** (no Blender), in
-`<temp>\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m022_study\`.
-Run with the scratch venv `...\scratchpad\venv22\Scripts\python.exe` (uv venv on python3.14 with Pillow + numpy; the
+`<temp>/m022_study/`.
+Run with the scratch venv `<temp>/venv22/Scripts/python.exe` (uv venv on python3.14 with Pillow + numpy; the
 uv-managed interpreter itself refuses package installs).
 - **Helpers:** `m.py` (masks, view boxes `V`, `stats`), `bb.json` (silhouette boxes).
 - **Measurements:** `measure.py` → `measure_out.txt` (bboxes, shares, top profiles, width per height, region
@@ -928,7 +928,7 @@ Renders were made with `vfx=True` (nothing to realise).
 
 Independent verifier, 2026-10-28. Read-only background session on port 9882 with `wip/M022_verify.blend` (not saved,
 `build()` not called). Fresh renders by `m022.render_views()` into the scratchpad
-(`...\scratchpad\v022\renders\M022\`; the repo's render folder was untouched). Measured with `m022.measure()` (the
+(`<temp>/v022/renders/M022/`; the repo's render folder was untouched). Measured with `m022.measure()` (the
 study's masks on both images) and with my own scripts: bmesh topology, BVH ray parity for interior faces, and
 `v022\samp.py` for the colour gradients.
 
@@ -1007,7 +1007,7 @@ still read unlike the sheet: the tuft crowns, the fan's upper tier, and the rear
 - **B1. The tuft crowns read as closed, shadowed balls, and as needle fans from the side.**
   - **Sheet:** each crown is an open flame of 7–10 distinct long pointed lances. The outer blades fan out to the sides
     at about 30–45° above horizontal, the inner ones stand upright, and every face is pale. Compare `z_ref_tufts.png`
-    and `z_ours_tufts.png` in `...\scratchpad\v022\`.
+    and `z_ours_tufts.png` in `<temp>/v022/`.
   - **Ours:** T1 and T2 are compact balls. A front blade foreshortens toward the camera and leaves a grey-brown core
     (shade quartile #C99B5F against #D39E5D; hero fiber median #E6B877 against #F6C683, 16 low; the spec allows 10).
   - **From the side** (`side_sheet`), the crowns are thin spiky needle fans (pitfall 3), because the tufts are squashed
@@ -1093,7 +1093,7 @@ still read unlike the sheet: the tuft crowns, the fan's upper tier, and the rear
 
 Fresh modeller, 2026-10-28. Background session on port 9882 with `wip/M022.blend` (saved after every good build).
 Every change is in `m022.py`; `build()` runs in about 50–60 s with renders. Measured with `m022.measure()` (the study's
-masks), plus scratch scripts in `...\scratchpad\r2_022\` (`tcomp.py` for tuft components, `parts.py` for part colours,
+masks), plus scratch scripts in `<temp>/r2_022/` (`tcomp.py` for tuft components, `parts.py` for part colours,
 `chk.py` for the technical checks).
 
 ### What changed
@@ -1248,7 +1248,7 @@ The blending is unchanged: position fields only, quarter steps, broad Tint. Faci
 
 Independent verifier (not the round-1 verifier), 2026-10-28. Read-only background session on port 9882 with
 `wip/M022_verify.blend`; not saved, `build()` not called, session stopped. Fresh renders by `m022.render_views()` with
-`kit_models.MODEL_RENDERS` pointed at the scratchpad (`...\scratchpad\v2_022\renders\M022\`); the repo's render folder
+`kit_models.MODEL_RENDERS` pointed at the scratchpad (`<temp>/v2_022/renders/M022/`); the repo's render folder
 is untouched. Measured with `m022.measure()` and my own scripts (`v2_022\tech.py`, `tech3.py`, `parts.py`, `crops.py`;
 the side-by-side crops are `v2_022\cmp_*.png`).
 

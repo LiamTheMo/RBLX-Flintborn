@@ -5,7 +5,7 @@ included) draws **its own icon and nothing else**: `lk_item_<CatalogId>`, a
 110 px slot icon packed into `atlas_lk_items2_1` / `atlas_lk_items2_2`, and its
 356 px hero copy `lk_item_<CatalogId>__hi` (an image of its own) in the Forge /
 Crafting picture and the Inventory detail card. Both are built from the owner's
-512 px PNGs in `src/assets/Models/2D/` by `art/ui/items/build_item_icons.py`,
+512 px PNGs in `art/ui/items/source/` by `art/ui/items/build_item_icons.py`,
 with the mapping in `art/ui/items/ICONS.json` (STYLE_GUIDE §9.7).
 
 `Kit.ItemIcon` draws it everywhere an item is shown (`Art.ItemIcon` →
@@ -29,7 +29,7 @@ spec fails if a catalog item has no icon or hero copy in `UiSprites.json`.
 
 ## Materials
 
-| Item | Id | Source (`src/assets/Models/2D/`) | Atlas |
+| Item | Id | Source (`art/ui/items/source/`) | Atlas |
 |---|---|---|---|
 | Abyssal Shard | `AbyssalShard` | `abyssal-shard.png` | `atlas_lk_items2_1` |
 | Adamantine Bar | `AdamantineBar` | `adamantine-bar.png` | `atlas_lk_items2_1` |
@@ -81,7 +81,7 @@ spec fails if a catalog item has no icon or hero copy in `UiSprites.json`.
 
 ## Tools
 
-| Item | Id | Source (`src/assets/Models/2D/`) | Atlas |
+| Item | Id | Source (`art/ui/items/source/`) | Atlas |
 |---|---|---|---|
 | Adamantine Axe | `AdamantineAxe` | `adamantine-axe.png` | `atlas_lk_items2_2` |
 | Adamantine Pickaxe | `AdamantinePickaxe` | `adamantine-pickaxe.png` | `atlas_lk_items2_2` |
@@ -102,7 +102,7 @@ spec fails if a catalog item has no icon or hero copy in `UiSprites.json`.
 
 ## Weapons
 
-| Item | Id | Source (`src/assets/Models/2D/`) | Atlas |
+| Item | Id | Source (`art/ui/items/source/`) | Atlas |
 |---|---|---|---|
 | Adamantine Bow | `AdamantineBow` | `adamantine-bow.png` | `atlas_lk_items2_2` |
 | Adamantine Dagger | `AdamantineDagger` | `adamantine-dagger.png` | `atlas_lk_items2_2` |
@@ -145,7 +145,7 @@ spec fails if a catalog item has no icon or hero copy in `UiSprites.json`.
 
 ## Armour
 
-| Item | Id | Source (`src/assets/Models/2D/`) | Atlas |
+| Item | Id | Source (`art/ui/items/source/`) | Atlas |
 |---|---|---|---|
 | Adamantine Chest | `AdamantineChest` | `adamantine-chest.png` | `atlas_lk_items2_2` |
 | Adamantine Head | `AdamantineHead` | `adamantine-head.png` | `atlas_lk_items2_2` |
@@ -174,13 +174,13 @@ spec fails if a catalog item has no icon or hero copy in `UiSprites.json`.
 
 ## Ammunition
 
-| Item | Id | Source (`src/assets/Models/2D/`) | Atlas |
+| Item | Id | Source (`art/ui/items/source/`) | Atlas |
 |---|---|---|---|
 | Flint Arrow | `FlintArrow` | `flint-arrow.png` | `atlas_lk_items2_1` |
 
 ## Medicine, food and draughts
 
-| Item | Id | Source (`src/assets/Models/2D/`) | Atlas |
+| Item | Id | Source (`art/ui/items/source/`) | Atlas |
 |---|---|---|---|
 | Advanced Medicine | `AdvancedMedicine` | `advanced-medicine.png` | `atlas_lk_items2_1` |
 | Basic Medicine | `BasicMedicine` | `basic-medicine.png` | `atlas_lk_items2_1` |
@@ -199,14 +199,14 @@ spec fails if a catalog item has no icon or hero copy in `UiSprites.json`.
 
 ## Siege items
 
-| Item | Id | Source (`src/assets/Models/2D/`) | Atlas |
+| Item | Id | Source (`art/ui/items/source/`) | Atlas |
 |---|---|---|---|
 | Breaching Charge | `BreachingCharge` | `breaching-charge.png` | `atlas_lk_items2_1` |
 | Fire Bomb | `FireBomb` | `fire-bomb.png` | `atlas_lk_items2_1` |
 
 ## Placeables
 
-| Item | Id | Source (`src/assets/Models/2D/`) | Atlas |
+| Item | Id | Source (`art/ui/items/source/`) | Atlas |
 |---|---|---|---|
 | Portable Extraction Rune | `ExtractionRune` | `portable-extraction-rune.png` | `atlas_lk_items2_1` |
 | Workbench | `Workbench` | `workbench.png` | `atlas_lk_items2_1` |

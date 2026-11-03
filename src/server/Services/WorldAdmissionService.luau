@@ -23,7 +23,6 @@ local WorldAdmissionService = {}
 
 WorldAdmissionService.STATE_ATTRIBUTE = "SessionState"
 WorldAdmissionService.PROFILE_WAIT_SECONDS = 60
-WorldAdmissionService.CHARACTER_WAIT_SECONDS = 15
 WorldAdmissionService.DEATH_RETURN_SECONDS = 5
 
 -- Fires (player) when an at-risk player leaves the world without extracting,

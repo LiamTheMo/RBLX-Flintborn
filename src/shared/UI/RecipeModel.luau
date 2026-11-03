@@ -27,10 +27,8 @@ RecipeModel.REASONS = {
 	BadRequest = "the request was not understood",
 }
 
-function RecipeModel.NameOf(catalogId: string?): string
-	local def = ItemCatalog.Get(catalogId)
-	return def and def.name or tostring(catalogId)
-end
+-- An item's display name (its id when the catalog has no such item).
+RecipeModel.NameOf = ItemCatalog.NameOf
 
 -- Shorter stat labels for a recipe row's one-line note, which shares its line
 -- with the station ("Workbench · Harvest 4 per hit" fits a row; "Harvest

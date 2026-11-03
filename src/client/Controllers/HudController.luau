@@ -17,6 +17,7 @@ local RunService = game:GetService("RunService")
 
 local ExtractionRules = require(ReplicatedStorage.Shared.Extraction.ExtractionRules)
 local GameConstants = require(ReplicatedStorage.Shared.GameConstants)
+local Geometry = require(ReplicatedStorage.Shared.Core.Geometry)
 local HudModel = require(ReplicatedStorage.Shared.UI.HudModel)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local PoiCatalog = require(ReplicatedStorage.Shared.World.PoiCatalog)
@@ -45,10 +46,6 @@ local Theme = require(script.Parent.Parent.Ui.Theme)
 
 local HudController = {}
 
--- Fires (index) when the selected hotbar slot changes. The selection follows the
--- equipped slot, and every key press or tap on a slot also uses it.
-HudController.SelectionChanged = Signal.new()
-
 -- The menu tiles (left, the lobby's 2 × 3 grid): {id, icon, bind action named
 -- in the tooltip, controller, function}. Touch players have no keys, so every
 -- panel with a key has a tile.
@@ -60,6 +57,9 @@ HudController.MENU = {
 	{ "Map", "map", "Map", "MapController", "Toggle" },
 	{ "Progress", "trophy", "Progression", "ProgressionController", "Toggle" },
 }
+
+-- The selected hotbar slot. The selection follows the equipped slot, and every
+-- key press or tap on a slot also uses it.
 HudController.Selected = 1
 
 -- Status text ticks fast (the medicine countdown); party, objective and event
@@ -70,7 +70,7 @@ HudController.SLOW_SECONDS = 0.25
 -- ZoneRadius attribute and the catalog has no entry.
 HudController.DEFAULT_ZONE_RADIUS = 10
 -- Where Theme's shared top column sits when the HUD is not pushing it down.
-HudController.TOP_STACK_POSITION = UDim2.new(0.5, 0, 0, 2)
+HudController.TOP_STACK_POSITION = Theme.TOP_STACK_POSITION
 -- Compass waypoint icons per kind of point (events use their category's icon).
 HudController.WAYPOINT_ICONS = {
 	landmark = "mountain",
@@ -105,38 +105,10 @@ local function hotbarLabels(count: number): { string }
 	return labels
 end
 
--- The status plaques for the survival state: medicine lock (hourglass), pending
--- food healing (heart) and the hunger slow (warning), each in words.
-function HudController.StatusChips(medicineLockLeft: number?, foodHealing: number?, slowed: boolean?)
-	local chips = {}
-	if (medicineLockLeft or 0) > 0 then
-		table.insert(chips, { icon = "hourglass", text = ("Medicine ready in %.1f s"):format(medicineLockLeft) })
-	end
-	if (foodHealing or 0) > 0 then
-		table.insert(chips, { icon = "heart", text = ("Food healing +%d"):format(foodHealing) })
-	end
-	if slowed then
-		table.insert(chips, { icon = "warning", text = "Hungry: slowed" })
-	end
-	return chips
-end
-
--- The hotbar's items from an inventory snapshot ({slots, equipped}):
--- index -> {itemId, quantity, permanent}, or nil for an empty slot.
-function HudController.HotbarItems(snapshot, count: number)
-	local items = {}
-	for _, slot in (snapshot and snapshot.slots) or {} do
-		local index = slot.index
-		if slot.area == "hotbar" and type(index) == "number" and index >= 1 and index <= count then
-			items[index] = {
-				itemId = slot.catalogId,
-				quantity = slot.quantity,
-				permanent = slot.permanent == true,
-			}
-		end
-	end
-	return items
-end
+-- The status plaques and the hotbar's items (pure rules in HudModel; the
+-- capture scenes call them here).
+HudController.StatusChips = HudModel.StatusChips
+HudController.HotbarItems = HudModel.HotbarItems
 
 local player = Players.LocalPlayer
 local layout = nil
@@ -153,18 +125,9 @@ local portals = {}
 local waypointPositions = {}
 local hotbarBound = false
 
-local function instantMotion(): boolean
-	return Kit.Motion.Reduced()
-end
-
 local function rootPart(): BasePart?
 	local character = player.Character
 	return character and character:FindFirstChild("HumanoidRootPart") :: BasePart?
-end
-
-local function flatDistance(a: Vector3, b: Vector3): number
-	local dx, dz = a.X - b.X, a.Z - b.Z
-	return math.sqrt(dx * dx + dz * dz)
 end
 
 -- Scale and top inset ----------------------------------------------------------
@@ -308,20 +271,16 @@ function HudController.PlaceTop(regions, bar, screen)
 	return placed
 end
 
--- GuiService.TopbarInset (the top bar's free area), or nil on an engine
--- without it.
-local function topbarInset(): Rect?
-	local ok, value = pcall(function()
-		return GuiService.TopbarInset
-	end)
-	return if ok and typeof(value) == "Rect" then value else nil
-end
-
 local function applyTop()
 	scale = uiScale.Scale
 	local screen = Kit.Scale.HudScreen(gui, scale)
-	local bar =
-		HudController.TopBar(Kit.Scale.TopInset(gui), screen.width, scale, topbarInset(), gui.AbsolutePosition.X)
+	local bar = HudController.TopBar(
+		Kit.Scale.TopInset(gui),
+		screen.width,
+		scale,
+		Kit.Scale.TopbarInset(),
+		gui.AbsolutePosition.X
+	)
 	local placed = HudController.PlaceTop(tops, bar, screen)
 	-- While the HUD shows, banners in the shared top column start below the
 	-- compass and its waypoints; otherwise they keep their usual place.
@@ -373,14 +332,14 @@ local function updateHealth(instant: boolean?)
 	local maxHealth = humanoid and humanoid.MaxHealth or GameConstants.BASE_MAX_HEALTH
 	local fraction, shown = HudModel.Health(humanoid and humanoid.Health or 0, maxHealth)
 	local cap = math.ceil(if maxHealth > 0 then maxHealth else 100)
-	widgets.vitals:Set("health", fraction, ("%d/%d"):format(shown, cap), instant or instantMotion())
+	widgets.vitals:Set("health", fraction, ("%d/%d"):format(shown, cap), instant or Kit.Motion.Reduced())
 end
 
 -- Stamina and Food replicate as 0–1 fractions (SurvivalService); shown out of 100.
 local function updateFraction(key: string, attribute: string, instant: boolean?)
 	local value = player:GetAttribute(attribute)
 	local fraction = HudModel.Clamp01(if type(value) == "number" then value else 1)
-	widgets.vitals:Set(key, fraction, ("%d/100"):format(HudModel.Percent(fraction)), instant or instantMotion())
+	widgets.vitals:Set(key, fraction, ("%d/100"):format(HudModel.Percent(fraction)), instant or Kit.Motion.Reduced())
 end
 
 local function updateStatus()
@@ -467,7 +426,7 @@ local function nearestExtraction(position: Vector3?)
 	local now = workspace:GetServerTimeNow()
 	local best, bestDistance = nil, math.huge
 	for _, event in ExtractionController.Events do
-		local distance = flatDistance(position, event.position)
+		local distance = Geometry.FlatDistance(position, event.position)
 		if distance < bestDistance then
 			bestDistance = distance
 			best = {
@@ -486,7 +445,7 @@ local function nearestExtraction(position: Vector3?)
 		return best
 	end
 	for part in portals do
-		local distance = flatDistance(position, part.Position)
+		local distance = Geometry.FlatDistance(position, part.Position)
 		if distance < bestDistance then
 			bestDistance = distance
 			local kind = part:GetAttribute("PortalKind")
@@ -585,7 +544,6 @@ end
 local function selectSlot(index: number)
 	HudController.Selected = index
 	widgets.bottom:Select(index)
-	HudController.SelectionChanged:Fire(index)
 end
 
 local function bindHotbar(active: boolean)
@@ -626,23 +584,6 @@ local function bindHotbar(active: boolean)
 end
 
 -- Build ------------------------------------------------------------------------
-
-local function newGui(name: string, order: number): (ScreenGui, Frame)
-	local screen = Instance.new("ScreenGui")
-	screen.Name = name
-	screen.ResetOnSpawn = false
-	screen.DisplayOrder = order
-	screen.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-	-- The layout uses full-screen design px on the whole screen and keeps clear
-	-- of the top bar and of notches itself (applyTop, the HUD grid: D30).
-	Kit.Scale.FullScreen(screen)
-	local frame = Instance.new("Frame")
-	frame.Name = "Root"
-	frame.BackgroundTransparency = 1
-	frame.Size = UDim2.fromScale(1, 1)
-	frame.Parent = screen
-	return screen, frame
-end
 
 -- The gamepad button bound to a menu tile's action (a KeyCode name), if any.
 function HudController.GamepadKey(action: string): string?
@@ -730,7 +671,9 @@ local function openTile(entry)
 end
 
 local function build()
-	gui, root = newGui("FlintbornHud", Kit.Tokens.Order("hud"))
+	-- Both guis use full-screen design px on the whole screen and keep clear of
+	-- the top bar and of notches themselves (applyTop, the HUD grid: D30).
+	gui, root = Kit.Scale.HudGui("FlintbornHud", Kit.Tokens.Order("hud"))
 	gui.Enabled = false
 	widgets = HudController.Mount(root, layout, openTile)
 	tops = HudController.TopRegions(widgets)
@@ -741,7 +684,7 @@ local function build()
 	-- XP pop-ups live in their own always-enabled gui, laid out like the bottom
 	-- group, so pop-ups outside a run (protected extraction, tutorial) still show.
 	local overlayRoot
-	overlay, overlayRoot = newGui("FlintbornHudOverlay", Kit.Tokens.Order("hud") + 1)
+	overlay, overlayRoot = Kit.Scale.HudGui("FlintbornHudOverlay", Kit.Tokens.Order("hud") + 1)
 	local group = Instance.new("Frame")
 	group.Name = "BottomGroup"
 	group.BackgroundTransparency = 1
@@ -771,10 +714,6 @@ local remounted = Signal.new()
 -- Fires after the regions are mounted again (the world ⚙ re-links to the hotbar).
 HudController.Remounted = remounted
 
--- Registers `object` as the HUD's navigation target (it is never selected here).
-local function registerHudDefault(object: GuiObject?)
-	Kit.Input.SetHudDefault(object)
-end
 -- The form factor ("phone", "tablet", "desktop") the regions were mounted for.
 local mountedForm = "desktop"
 local function bindRelease(active: boolean)
@@ -782,7 +721,8 @@ local function bindRelease(active: boolean)
 		return
 	end
 	releaseBound = active
-	registerHudDefault(if active then widgets.tiles[1].control.hit else nil)
+	-- The HUD's navigation target (it is never selected here).
+	Kit.Input.SetHudDefault(if active then widgets.tiles[1].control.hit else nil)
 	if not active then
 		ContextActionService:UnbindAction("FlintbornHudRelease")
 		local selected = GuiService.SelectedObject
@@ -831,7 +771,7 @@ local function remount()
 	tops = HudController.TopRegions(widgets)
 	watchRegions()
 	if releaseBound then
-		registerHudDefault(widgets.tiles[1].control.hit)
+		Kit.Input.SetHudDefault(widgets.tiles[1].control.hit)
 	end
 	remounted:Fire()
 	applyTop()
@@ -878,7 +818,7 @@ function HudController.Start()
 	-- Level and XP from the same snapshots ProgressionController receives; its XP
 	-- pop-ups appear just above the bar.
 	ProgressionController.Changed:Connect(function(view)
-		widgets.bottom:SetProgress(view, instantMotion())
+		widgets.bottom:SetProgress(view, Kit.Motion.Reduced())
 	end)
 	ProgressionController.MountPopups(widgets.popups)
 
@@ -964,7 +904,7 @@ function HudController.Start()
 			local now = workspace:GetServerTimeNow()
 			local views = EventFeedController.ActiveViews()
 			local members, total = partyMembers()
-			widgets.party:Set(members, instantMotion(), total)
+			widgets.party:Set(members, Kit.Motion.Reduced(), total)
 			widgets.objective:Set(HudModel.ExtractionObjective(nearestExtraction(position)))
 			local event = HudModel.WorldEvent(views, now, position and position.X, position and position.Z)
 			widgets.event:Set(event, event and eventCategory(views, event.id))

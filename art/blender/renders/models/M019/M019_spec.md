@@ -38,8 +38,8 @@ paper is `#F2EDE7` (242, 237, 231). The masks are defined in `m.py` `cls()` and 
 - **O, other:** the ground shadow and dark edges. Not counted in the shares.
 
 **Scratch study material.** Pure Python with no Blender. It is in the session scratchpad
-`<temp>\3f83a1be-3b3d-4e4b-ae5a-7b04dbb75bdc\scratchpad\m019_study\`.
-Run the scripts with `C:/Users/Orang/.local/bin/python3.14.exe`.
+`<temp>/m019_study/`.
+Run the scripts with `python3.14`.
 - **Helpers and measurements:**
   - `png.py`: PNG reader and `crop`.
   - `m.py`: the masks and the view boxes `V`.

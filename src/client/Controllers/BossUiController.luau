@@ -9,6 +9,7 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local SoundService = game:GetService("SoundService")
 
+local HudModel = require(ReplicatedStorage.Shared.UI.HudModel)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local Kit = require(script.Parent.Parent.Hud.Kit)
@@ -35,14 +36,7 @@ local player = Players.LocalPlayer
 local ui = {}
 local hornSpawnAt = nil
 
-local function make(className: string, props, parent)
-	local instance = Instance.new(className)
-	for key, value in props do
-		instance[key] = value
-	end
-	instance.Parent = parent
-	return instance
-end
+local make = Theme.Make
 
 local function cue(text: string)
 	if ui.cue then
@@ -102,7 +96,7 @@ local function update()
 	if hornSpawnAt then
 		local left = math.max(0, math.floor(hornSpawnAt - workspace:GetServerTimeNow()))
 		if left > 0 then
-			ui.horn:Show(("The Guardian rises in the Center Crater in %d:%02d"):format(left // 60, left % 60))
+			ui.horn:Show("The Guardian rises in the Center Crater in " .. HudModel.FormatTimer(left))
 		else
 			ui.horn:Hide()
 		end
