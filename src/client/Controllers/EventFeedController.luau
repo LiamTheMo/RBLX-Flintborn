@@ -16,6 +16,7 @@ local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Rarity = require(ReplicatedStorage.Shared.Items.Rarity)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local Signal = require(ReplicatedStorage.Shared.Core.Signal)
+local EventPanel = require(script.Parent.Parent.Hud.EventPanel)
 local HudMode = require(script.Parent.Parent.Hud.HudMode)
 local Kit = require(script.Parent.Parent.Hud.Kit)
 local NoticeCard = require(script.Parent.Parent.Hud.NoticeCard)
@@ -25,17 +26,6 @@ local EventFeedController = {}
 
 EventFeedController.ALERT_SOUND = "rbxasset://sounds/electronicpingshort.wav"
 EventFeedController.BANNER_SECONDS = 6
-
--- The kit icon for each event category.
-EventFeedController.ICONS = {
-	Vegetation = "berry_bush",
-	Ore = "pickaxe",
-	Npc = "paw",
-	Cache = "treasure",
-	Meteor = "magma_ore",
-	Structure = "ruin",
-	Boss = "tusk",
-}
 
 local player = Players.LocalPlayer
 local ui = {}
@@ -99,7 +89,8 @@ local function banner(view)
 		size = { 560, 84 },
 		layoutOrder = Theme.TopOrder.EventBanner,
 		kind = "warn",
-		icon = EventFeedController.ICONS[view.category] or "exclamation",
+		-- The same icon the HUD event panel and the compass show for the category.
+		icon = EventPanel.ICONS[view.category] or EventPanel.DEFAULT_ICON,
 		title = title(view) .. " appeared",
 		text = bearing(view.position),
 		onClose = function()
