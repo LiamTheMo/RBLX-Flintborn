@@ -39,20 +39,8 @@ end)
 
 test("only ActiveRun and ExtractionHolding carry inventory risk", function()
 	local risky = { ActiveRun = true, ExtractionHolding = true }
-	for _, state in
-		{
-			"LobbySafe",
-			"TeleportPending",
-			"StagingLoading",
-			"WorldMainMenuReady",
-			"PlayRequested",
-			"ActiveRun",
-			"ExtractionHolding",
-			"ExtractionProtected",
-			"MaintenancePreserved",
-			"Dead",
-		}
-	do
+	local states = "LobbySafe TeleportPending StagingLoading WorldMainMenuReady PlayRequested ActiveRun"
+	for state in string.gmatch(states .. " ExtractionHolding ExtractionProtected MaintenancePreserved Dead", "%S+") do
 		expect(SessionStates.IsState(state), state .. " is a state")
 		expectEq(SessionStates.IsAtRisk(state), risky[state] == true, state .. " risk")
 	end
@@ -76,7 +64,7 @@ test("deploy reserves every unvaulted item and consumes it exactly once", functi
 	expect(not pcall(TransitRules.Consume, profile, "res-1"), "cannot consume twice")
 end)
 
-test("materials deploy with everything else (GDD §53)", function()
+test("materials deploy with everything else (GDD §53); any failure before Play rolls it all back", function()
 	local profile = ProfileSchema.Default(0)
 	profile.lobbyBackpack.slots = {
 		{ catalogId = "Wood", quantity = 40 },
@@ -92,17 +80,9 @@ test("materials deploy with everything else (GDD §53)", function()
 	for _, item in profile.transit.items do
 		expect(TransitRules.Deployable(item), "deployable: " .. item.catalogId)
 	end
-	TransitRules.Rollback(profile)
-	expectEq(#profile.lobbyBackpack.slots, 6, "a rollback returns every reserved item")
-end)
-
-test("any failure before Play rolls every item back", function()
-	local profile = ProfileSchema.Default(0)
-	profile.lobbyBackpack.slots = { { catalogId = "WoodenBow" } }
-	TransitRules.Reserve(profile, "res-1", 10)
-	expectEq(TransitRules.Rollback(profile), 1, "one item returned")
-	expectEq(#profile.lobbyBackpack.slots, 1, "back in the lobby backpack")
-	expectEq(profile.lobbyBackpack.slots[1].catalogId, "WoodenBow", "same item")
+	expectEq(TransitRules.Rollback(profile), 6, "a rollback returns every reserved item")
+	expectEq(#profile.lobbyBackpack.slots, 6, "back in the lobby backpack")
+	expectEq(profile.lobbyBackpack.slots[2].instanceId, "spear-1", "the same items")
 	expectEq(TransitRules.Rollback(profile), 0, "rollback with nothing reserved is a no-op")
 end)
 
