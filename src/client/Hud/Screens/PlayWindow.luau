@@ -587,8 +587,7 @@ function PlayWindow:_slotText(index: number): string?
 	if item == nil then
 		return nil
 	end
-	local def = ItemCatalog.Get(item.catalogId)
-	local name = if def then def.name else tostring(item.catalogId)
+	local name = ItemCatalog.NameOf(item.catalogId)
 	return if (item.quantity or 1) > 1 then ("%s ×%d"):format(name, item.quantity) else name
 end
 

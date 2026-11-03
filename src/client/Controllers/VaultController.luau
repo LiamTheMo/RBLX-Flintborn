@@ -386,8 +386,7 @@ end
 local function listOf(map): string
 	local parts = {}
 	for catalogId, quantity in map do
-		local def = ItemCatalog.Get(catalogId)
-		table.insert(parts, ("%s ×%d"):format(def and def.name or catalogId, quantity))
+		table.insert(parts, ("%s ×%d"):format(ItemCatalog.NameOf(catalogId), quantity))
 	end
 	table.sort(parts)
 	return if #parts > 0 then table.concat(parts, ", ") else "nothing"

@@ -104,9 +104,8 @@ end
 local function costLine(cost): string
 	local parts = {}
 	for catalogId, quantity in cost do
-		local def = ItemCatalog.Get(catalogId)
 		local owned = InventoryController.Count(catalogId)
-		local text = ("%s %d/%d"):format(def and def.name or catalogId, math.min(owned, quantity), quantity)
+		local text = ("%s %d/%d"):format(ItemCatalog.NameOf(catalogId), math.min(owned, quantity), quantity)
 		if owned < quantity then
 			text = ('<font color="%s">%s</font>'):format(Kit.Tokens.Data.colors.short, text)
 		end
