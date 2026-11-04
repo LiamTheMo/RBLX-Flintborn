@@ -380,7 +380,9 @@ Each has the default that will be used if unanswered.
   button held; a finger holds the slot 0.3 s first (moving sooner scrolls the
   grid). The item's picture follows the pointer, the slot under it lights up
   (hover state) when it would take the item, and letting go there moves it;
-  anywhere else, or Escape, cancels. Gamepads keep MOVE / EQUIP / WEAR.
+  anywhere else, or Escape, cancels. While carrying, the mouse wheel still
+  scrolls the grid (to reach the armour rows or the vault); a finger's drag
+  locks it. Gamepads keep MOVE / EQUIP / WEAR.
 - **Run** (group `run`): the window's backpack, hotbar and armour cells and the
   HUD hotbar's six slots. Any item swaps between backpack and hotbar slots
   (`MoveItem`; the held item stays held where it goes); armour drops only on its

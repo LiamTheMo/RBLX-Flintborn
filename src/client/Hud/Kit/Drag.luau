@@ -13,7 +13,6 @@
 --   Kit.Drag.Attach(slot, { group = "run", id = function() return "hotbar:1" end,
 --       canDrop = function(from, to) return true end, onDrop = function(from, to) ... end })
 
-local GuiService = game:GetService("GuiService")
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
 
@@ -51,25 +50,19 @@ local pending = nil
 local active = nil
 local connected = false
 
--- The input's place on the whole screen (an input's Position leaves out the top
--- bar's inset; GUI rects drawn on the whole screen include it).
+-- The input's place, in AbsolutePosition's space. Both leave out the top bar's
+-- inset whatever a gui's IgnoreGuiInset: a gui drawn over the whole screen sits
+-- at a negative AbsolutePosition.Y instead.
 local function pointOf(input: InputObject): Vector2
-	local inset = GuiService:GetGuiInset()
-	return Vector2.new(input.Position.X, input.Position.Y) + inset
+	return Vector2.new(input.Position.X, input.Position.Y)
 end
 
 local function screenGuiOf(object: Instance): ScreenGui?
 	return object:FindFirstAncestorWhichIsA("ScreenGui")
 end
 
--- `object`'s rect on the whole screen.
 local function rectOf(object: GuiObject): (Vector2, Vector2)
-	local position = object.AbsolutePosition
-	local gui = screenGuiOf(object)
-	if gui and not gui.IgnoreGuiInset then
-		position += GuiService:GetGuiInset()
-	end
-	return position, object.AbsoluteSize
+	return object.AbsolutePosition, object.AbsoluteSize
 end
 
 local function contains(object: GuiObject, point: Vector2): boolean
@@ -142,8 +135,10 @@ end
 
 local function place(point: Vector2)
 	if active then
+		-- Offsets inside the drag gui count from its own corner.
+		local at = point - active.gui.AbsolutePosition
 		local size = active.ghost.AbsoluteSize
-		active.ghost.Position = UDim2.fromOffset(point.X - size.X / 2, point.Y - size.Y / 2)
+		active.ghost.Position = UDim2.fromOffset(at.X - size.X / 2, at.Y - size.Y / 2)
 	end
 end
 
@@ -188,9 +183,10 @@ local function begin(point: Vector2)
 	local icon = ItemIcon.new(ghost, { name = "Item", rect = { 0, 0, size.X, size.Y }, catalogId = catalogId })
 	Core.Dim(icon.root, Drag.GHOST_FADE)
 	gui.Parent = Players.LocalPlayer:FindFirstChildOfClass("PlayerGui")
-	-- A finger dragging inside a scrolling list must not scroll it meanwhile.
+	-- A finger dragging inside a scrolling list must not scroll it meanwhile; a
+	-- mouse keeps its wheel, to reach cells scrolled out of view.
 	local scrolls = {}
-	local node = press.slot.root.Parent
+	local node = if press.touch then press.slot.root.Parent else nil
 	while node do
 		if node:IsA("ScrollingFrame") then
 			scrolls[node] = node.ScrollingEnabled
