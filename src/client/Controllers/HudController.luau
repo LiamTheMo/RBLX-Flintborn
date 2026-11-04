@@ -852,6 +852,18 @@ function HudController.Start()
 			selectSlot(index)
 			task.spawn(InventoryController.ActivateHotbar, index)
 		end)
+		-- Hotbar items drag to other hotbar slots, and to and from the Inventory
+		-- window's cells (the same "hotbar:i" ids).
+		for index, slot in widgets.bottom.slots do
+			Kit.Drag.Attach(slot, {
+				group = "run",
+				id = function()
+					return "hotbar:" .. index
+				end,
+				canDrop = InventoryController.CanDrop,
+				onDrop = InventoryController.Drop,
+			})
+		end
 		widgets.bottom:SetProgress(ProgressionController.View(), true)
 		selectSlot(HudController.Selected)
 		showItems(InventoryController.Snapshot)

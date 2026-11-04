@@ -126,7 +126,10 @@ InventoryWindow.CELL = CELL
 InventoryWindow.PITCH = PITCH
 
 -- props: tabs ({{id, label, icon, iconSelected?}}), onTab(id), onSlot(cellId),
--- onAction(actionId), onAmount(value), onToolbar(id), onClose(), name, parent.
+-- onAction(actionId), onAmount(value), onToolbar(id), onClose(), name, parent,
+-- drag ({group, canDrop(fromCellId, toCellId), onDrop(fromCellId, toCellId)}:
+-- items can be dragged between cells, and to and from other slots of that
+-- Kit.Drag group, such as the HUD hotbar).
 function InventoryWindow.new(props)
 	local w, h = InventoryWindow.SIZE[1], InventoryWindow.SIZE[2]
 	local screen = Kit.Screen.new(props.name or "FlintbornInventory", { size = { w, h }, parent = props.parent })
@@ -421,6 +424,18 @@ function InventoryWindow:_slot(index: number)
 			zIndex = 14,
 		})
 		slot.rarity.root.Visible = false
+		local drag = self.props.drag
+		if drag then
+			Kit.Drag.Attach(slot, {
+				group = drag.group,
+				id = function()
+					local cell = self.slotCells[index]
+					return if cell and slot.root.Visible then cell.id else nil
+				end,
+				canDrop = drag.canDrop,
+				onDrop = drag.onDrop,
+			})
+		end
 		return slot
 	end)
 end

@@ -72,17 +72,19 @@ test("hotbar shows what lands in the run's hotbar", function()
 	expectEq(slots[1], false, "unknown preview shows empty slots")
 	slots = LobbyHudModel.Hotbar({
 		{ catalogId = "Wood", quantity = 40 },
-		{ catalogId = "StoneAxe", quantity = 1, permanent = true },
-		{ catalogId = "StoneSpear", quantity = 1 },
+		{ catalogId = "StoneAxe", quantity = 1, permanent = true, loadoutSlot = "hotbar:1" },
+		{ catalogId = "StoneSpear", quantity = 1, loadoutSlot = "hotbar:4" },
+		{ catalogId = "StonePickaxe", quantity = 1 },
 	})
-	-- Tools and weapons prefer the hotbar; materials go to the backpack first.
-	expectEq(slots[1] and slots[1].itemId, "StoneAxe", "axe first")
+	-- The lobby hotbar as it is; backpack items (even tools) stay in the backpack.
+	expectEq(slots[1] and slots[1].itemId, "StoneAxe", "axe in slot 1")
 	expectEq(slots[1] and slots[1].permanent, true, "permanent kept")
-	expectEq(slots[2] and slots[2].itemId, "StoneSpear", "spear second")
+	expectEq(slots[4] and slots[4].itemId, "StoneSpear", "spear in slot 4")
+	expectEq(slots[2], false, "the backpack's pickaxe stays out")
 	expectEq(slots[3], false, "wood stays in the backpack")
 	local many = {}
-	for _ = 1, 8 do
-		table.insert(many, { catalogId = "StoneAxe", quantity = 1 })
+	for index = 1, 8 do
+		table.insert(many, { catalogId = "StoneAxe", quantity = 1, loadoutSlot = "hotbar:" .. math.min(index, 6) })
 	end
 	slots = LobbyHudModel.Hotbar(many)
 	expectEq(#slots, 6, "never more than six")

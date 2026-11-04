@@ -20,7 +20,8 @@ local DEFINITIONS = {
 	PartyAction = "RemoteFunction",
 	PartyChanged = "RemoteEvent", -- server -> client: party view {party?, invites, maxSize}
 	Deploy = "RemoteFunction", -- () -> ok, reason
-	DeployPreview = "RemoteFunction", -- () -> list of items that will enter the run
+	DeployPreview = "RemoteFunction", -- () -> list of items that will enter the run (loadoutSlot: hotbar/armour place)
+	LobbyMove = "RemoteFunction", -- (fromArea, fromKey, toArea, toKey?) -> ok, reason (lobby backpack, hotbar, armour)
 	-- World
 	RequestPlay = "RemoteFunction", -- (requestId) -> ok, reason
 	ReturnToLobby = "RemoteFunction", -- () -> ok, reason
@@ -34,6 +35,7 @@ local DEFINITIONS = {
 	Notify = "RemoteEvent", -- server -> client: short message
 	EquipArmor = "RemoteFunction", -- (area, index) -> ok, reason
 	UnequipArmor = "RemoteFunction", -- (slot) -> ok, reason
+	UnequipArmorTo = "RemoteFunction", -- (slot, area, index) -> ok, reason (drag onto a slot)
 	Attack = "RemoteEvent", -- client -> server: (sequence, aimDirection); also throws/sets a held siege item
 	Shoot = "RemoteEvent", -- client -> server: (sequence, drawSeconds, aimDirection)
 	-- server -> client: ("Hit" | "Hurt", amount, hitPosition?) | ("Harvest", quantity, nodeCenter, catalogId)

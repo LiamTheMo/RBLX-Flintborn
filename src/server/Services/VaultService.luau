@@ -8,6 +8,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local GameConstants = require(ReplicatedStorage.Shared.GameConstants)
 local ItemCatalog = require(ReplicatedStorage.Shared.Items.ItemCatalog)
+local LobbyLoadoutRules = require(ReplicatedStorage.Shared.Inventory.LobbyLoadoutRules)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local Signal = require(ReplicatedStorage.Shared.Core.Signal)
@@ -79,7 +80,36 @@ local function snapshot(player: Player)
 	for _, item in profile.lobbyBackpack.slots do
 		table.insert(view.backpack, itemView(item))
 	end
+	-- The lobby hotbar and worn armour, in slot order (false: empty), outside the
+	-- backpack's slots.
+	view.hotbar, view.armor = {}, {}
+	for index = 1, LobbyLoadoutRules.HOTBAR_SLOTS do
+		local item = LobbyLoadoutRules.HotbarAt(profile, index)
+		view.hotbar[index] = if item then itemView(item) else false
+	end
+	for index, slot in LobbyLoadoutRules.ARMOR_SLOTS do
+		local item = LobbyLoadoutRules.ArmorAt(profile, slot)
+		view.armor[index] = if item then itemView(item) else false
+	end
 	return view
+end
+
+-- Gives a profile from before the lobby hotbar its first arrangement (tools onto
+-- the hotbar, as runs used to start), once, outside any Deploy.
+local function arrange(player: Player, profile)
+	if profile.transit ~= nil or LobbyLoadoutRules.Arranged(profile) then
+		return
+	end
+	ProfileService.RunOperation(
+		player,
+		"arrange:" .. HttpService:GenerateGUID(false),
+		"ArrangeLoadout",
+		function(working)
+			if working.transit == nil then
+				LobbyLoadoutRules.Arrange(working)
+			end
+		end
+	)
 end
 
 local function operate(player: Player, kind: string, apply)
@@ -132,7 +162,18 @@ function VaultService.Start()
 		return
 	end
 	ProfileService.ProfileLoaded:Connect(showReceipt)
+	ProfileService.ProfileLoaded:Connect(arrange)
 	Remotes.Handle("VaultSnapshot", snapshot)
+	-- Moves an item between the lobby backpack, hotbar and worn armour (drag and
+	-- drop, EQUIP / WEAR / UNEQUIP): LobbyLoadoutRules.Move checks every argument.
+	Remotes.Handle("LobbyMove", function(player, fromArea, fromKey, toArea, toKey)
+		if type(fromArea) ~= "string" or type(toArea) ~= "string" then
+			return false, "BadRequest"
+		end
+		return operate(player, "LobbyMove", function(profile)
+			return LobbyLoadoutRules.Move(profile, fromArea, fromKey, toArea, toKey)
+		end)
+	end)
 	-- A material deposit that would go past the vault's capacity is refused with
 	-- the amount it would delete, until the client confirms the loss (GDD §53).
 	-- The confirmation names the material and the loss shown, so a stack that

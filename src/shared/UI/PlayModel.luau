@@ -32,10 +32,11 @@ PlayModel.LINE_UNREAD =
 PlayModel.LINE_VAULT = "Items in your vault always stay safe."
 PlayModel.MEMBER_CAPTION = "The party leader starts the run."
 
--- The run hotbar `items` (the deploy preview, {catalogId, quantity, permanent}[])
--- lands in: InventoryRules.FromItems, the packing InventoryService applies at run
--- start (LoadoutService.carriedPart). Returns slot -> item for slots 1–6 and how
--- many more stacks go to the run backpack (or stay behind when it is full).
+-- The run hotbar `items` (the deploy preview, {catalogId, quantity, permanent,
+-- loadoutSlot}[]) lands in: InventoryRules.FromLoadout, the packing
+-- InventoryService applies at run start (LoadoutService.carriedPart): the lobby
+-- hotbar as it is. Returns slot -> item for slots 1–6 and how many more stacks go
+-- to the run backpack (or stay behind when it is full); worn armour is neither.
 function PlayModel.LoadoutHotbar(items): ({ [number]: any }, number)
 	if type(items) ~= "table" then
 		return {}, 0
@@ -46,7 +47,8 @@ function PlayModel.LoadoutHotbar(items): ({ [number]: any }, number)
 			table.insert(copies, table.clone(item))
 		end
 	end
-	local inventory, leftovers = InventoryRules.FromItems(copies)
+	-- The lobby hotbar as it is (loadoutSlot tags), the rest in the backpack.
+	local inventory, leftovers = InventoryRules.FromLoadout(copies)
 	local hotbar = {}
 	for index = 1, PlayModel.HOTBAR_SLOTS do
 		local entry = inventory.hotbar[index]

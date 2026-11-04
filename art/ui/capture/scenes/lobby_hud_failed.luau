@@ -31,10 +31,10 @@ do
 	local _, root, hud = page()
 	hud:SetParty(LobbyHudModel.Party({ party = nil, invites = {}, maxSize = 8 }, ME))
 	hud:SetHotbar(LobbyHudModel.Hotbar({
-		{ catalogId = "StoneAxe", quantity = 1 },
-		{ catalogId = "StoneSpear", quantity = 1 },
-		{ catalogId = "Redberry", quantity = 5 },
-		-- Materials pack into the backpack, so Plant Fiber stays out of the hotbar.
+		{ catalogId = "StoneAxe", quantity = 1, loadoutSlot = "hotbar:1" },
+		{ catalogId = "StoneSpear", quantity = 1, loadoutSlot = "hotbar:2" },
+		{ catalogId = "Redberry", quantity = 5, loadoutSlot = "hotbar:3" },
+		-- Backpack items stay out of the hotbar.
 		{ catalogId = "Fiber", quantity = 12 },
 	}))
 	__dump(root, W, H, BACKGROUND)

@@ -92,8 +92,9 @@ function LobbyHudModel.Party(view, me: { userId: number, name: string }, busy: {
 end
 
 -- What lands in the run's hotbar for the deploy preview ({catalogId, quantity,
--- permanent}[]): the same packing the server applies at run start
--- (InventoryRules.FromItems, as LoadoutService does). A list of
+-- permanent, loadoutSlot}[]): the same packing the server applies at run start
+-- (InventoryRules.FromLoadout, as LoadoutService does: the lobby hotbar as it
+-- is). A list of
 -- HOTBAR_SLOTS entries, each an item ({itemId, quantity, permanent}; the Kit
 -- takes its art and tint from ItemInfo) or false for an empty slot; all empty
 -- while the preview is unknown (nil).
@@ -102,7 +103,7 @@ function LobbyHudModel.Hotbar(items): { any }
 	if type(items) ~= "table" then
 		return slots
 	end
-	local inventory = InventoryRules.FromItems(items)
+	local inventory = InventoryRules.FromLoadout(items)
 	for index = 1, LobbyHudModel.HOTBAR_SLOTS do
 		local entry = inventory.hotbar[index]
 		if entry then

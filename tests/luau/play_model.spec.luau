@@ -10,18 +10,19 @@ local ME = { userId = 1, name = "LiamTheMo" }
 
 test("the hotbar matches the run's own packing", function()
 	local items = {
-		{ catalogId = "StoneAxe", permanent = true },
+		{ catalogId = "StoneAxe", permanent = true, loadoutSlot = "hotbar:1" },
 		{ catalogId = "Wood", quantity = 40 },
-		{ catalogId = "StoneSpear" },
+		{ catalogId = "StoneSpear", loadoutSlot = "hotbar:3" },
 		{ catalogId = "Fiber", quantity = 8 },
 	}
 	local hotbar, more = PlayModel.LoadoutHotbar(items)
-	local inventory = InventoryRules.FromItems(items)
+	local inventory = InventoryRules.FromLoadout(items)
 	for index = 1, PlayModel.HOTBAR_SLOTS do
 		local expected = inventory.hotbar[index]
 		expectEq(hotbar[index] and hotbar[index].catalogId, expected and expected.catalogId, "slot " .. index)
 	end
-	expectEq(hotbar[1].catalogId, "StoneAxe", "tools go to the hotbar first")
+	expectEq(hotbar[1].catalogId, "StoneAxe", "the lobby hotbar's slot 1")
+	expectEq(hotbar[3].catalogId, "StoneSpear", "and its slot 3")
 	expectEq(hotbar[1].permanent, true, "Permanent flag kept")
 	local inBackpack = 0
 	for _, entry in inventory.backpack do
@@ -35,8 +36,9 @@ end)
 
 test("a full hotbar spills into the backpack count", function()
 	local items = {}
-	for _ = 1, 8 do
-		table.insert(items, { catalogId = "StoneAxe" })
+	for index = 1, 8 do
+		-- Six on the lobby hotbar, two more in the backpack.
+		table.insert(items, { catalogId = "StoneAxe", loadoutSlot = if index <= 6 then "hotbar:" .. index else nil })
 	end
 	local hotbar, more = PlayModel.LoadoutHotbar(items)
 	local filled = 0

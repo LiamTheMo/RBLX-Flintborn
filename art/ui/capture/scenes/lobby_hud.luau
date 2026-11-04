@@ -80,10 +80,10 @@ do
 	local _, root, hud = page()
 	hud:SetParty(LobbyHudModel.Party({ party = nil, invites = {}, maxSize = 8 }, ME))
 	hud:SetHotbar(LobbyHudModel.Hotbar({
-		{ catalogId = "StoneAxe", quantity = 1 },
-		{ catalogId = "StoneSpear", quantity = 1 },
-		{ catalogId = "Redberry", quantity = 5 },
-		-- Materials pack into the backpack, so Plant Fiber stays out of the hotbar.
+		{ catalogId = "StoneAxe", quantity = 1, loadoutSlot = "hotbar:1" },
+		{ catalogId = "StoneSpear", quantity = 1, loadoutSlot = "hotbar:2" },
+		{ catalogId = "Redberry", quantity = 5, loadoutSlot = "hotbar:3" },
+		-- Backpack items stay out of the hotbar.
 		{ catalogId = "Fiber", quantity = 12 },
 	}))
 	check(root, hud)
@@ -110,12 +110,12 @@ do
 	hud:SetNotice("Game update: your items were saved and return on your next Play.")
 	xpPopups(hud, "lobby_hud")
 	hud:SetHotbar(LobbyHudModel.Hotbar({
-		{ catalogId = "StoneAxe", quantity = 1, permanent = true },
-		{ catalogId = "StonePickaxe", quantity = 1 },
-		{ catalogId = "StoneSpear", quantity = 1 },
-		{ catalogId = "WoodenBow", quantity = 1 },
-		{ catalogId = "FlintArrow", quantity = 40 },
-		{ catalogId = "Workbench", quantity = 1 },
+		{ catalogId = "StoneAxe", quantity = 1, permanent = true, loadoutSlot = "hotbar:1" },
+		{ catalogId = "StonePickaxe", quantity = 1, loadoutSlot = "hotbar:2" },
+		{ catalogId = "StoneSpear", quantity = 1, loadoutSlot = "hotbar:3" },
+		{ catalogId = "WoodenBow", quantity = 1, loadoutSlot = "hotbar:4" },
+		{ catalogId = "FlintArrow", quantity = 40, loadoutSlot = "hotbar:5" },
+		{ catalogId = "Workbench", quantity = 1, loadoutSlot = "hotbar:6" },
 	}))
 	check(root, hud)
 	__dump(root, W, H)
