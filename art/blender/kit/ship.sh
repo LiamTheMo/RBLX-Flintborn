@@ -69,8 +69,9 @@ BUILD_CODE="import bpy, importlib, sys, time
 ns = bpy.app.driver_namespace
 assert 'KIT' in ns, 'kit helpers not installed in this Blender: run kit_mcp.install() first'
 assert bpy.path.basename(bpy.data.filepath) == 'FlintbornWorldKit.blend', 'open file is ' + bpy.data.filepath
-import kit_models, $MOD
-importlib.reload(kit_models); importlib.reload($MOD)
+import kit_models, kit_parts, kit_verify, kit_build, $MOD
+for m in (kit_models, kit_parts, kit_verify, kit_build, $MOD):
+    importlib.reload(m)
 t0 = time.time()
 out = $MOD.build() or {}
 bpy.ops.wm.save_mainfile()

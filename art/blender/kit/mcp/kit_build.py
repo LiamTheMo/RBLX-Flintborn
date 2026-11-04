@@ -46,6 +46,7 @@ Builds give the same objects in the GUI kit file and in a background session (bg
 """
 import importlib
 import json
+import os
 import time
 
 import bmesh
@@ -550,7 +551,15 @@ class Model:
                 if ground:
                     ground.hide_render = True
             try:
-                return orig(group, path, azimuth, elevation)
+                try:
+                    return orig(group, path, azimuth, elevation)
+                except RuntimeError as e:
+                    # Windows sometimes refuses to overwrite a PNG another process has just touched
+                    # ("cannot save"); removing the old file first lets the second try write it.
+                    if "cannot save" not in str(e) or not os.path.exists(path):
+                        raise
+                    os.remove(path)
+                    return orig(group, path, azimuth, elevation)
             finally:
                 cam.lens = lens
                 if ground:
