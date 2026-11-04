@@ -37,6 +37,34 @@ function MatchmakingRules.IsJoinable(world: World, userIds: { number }, now: num
 		and not isExcluded(world, userIds)
 end
 
+-- A world's next registry entry from its report: `old` (its current entry, or nil
+-- when it has none) updated with its player count, the time and its exclusions.
+-- With no entry it lists itself again from `accessCode` (its recorded code), or
+-- stays unlisted (nil) when the code is unknown: an entry without the code would
+-- send nobody anywhere. Returns (entry | nil, relisted).
+function MatchmakingRules.Refresh(
+	old: World?,
+	privateServerId: string,
+	accessCode: string?,
+	players: number,
+	now: number,
+	excluded: { [string]: boolean }
+): (World?, boolean)
+	local relisted = false
+	local entry = old
+	if entry == nil then
+		if type(accessCode) ~= "string" or accessCode == "" then
+			return nil, false
+		end
+		entry = { privateServerId = privateServerId, accessCode = accessCode, players = 0, updatedAt = now }
+		relisted = true
+	end
+	entry.players = players
+	entry.updatedAt = now
+	entry.excludedUserIds = excluded
+	return entry, relisted
+end
+
 -- Prefers the fullest joinable world so players meet others; ties break by ID for
 -- determinism. Returns nil when a new world must be reserved.
 function MatchmakingRules.Pick(worlds: { World }, userIds: { number }, now: number): World?

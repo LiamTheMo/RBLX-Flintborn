@@ -125,6 +125,24 @@ test("matchmaking keeps parties together within capacity and exclusions", functi
 	expectEq(pick.privateServerId, "a", "the fullest world with room")
 	expectEq(MatchmakingRules.Pick(worlds, table.create(12, 5), now), nil, "no world fits twelve: reserve a new one")
 	expect(not MatchmakingRules.IsJoinable(worlds[4], { 1 }, now), "stale worlds are ignored")
+	-- A friend's lone world still beats reserving a new one.
+	local lone = { { privateServerId = "e", accessCode = "E", players = 1, updatedAt = now } }
+	expectEq(MatchmakingRules.Pick(lone, { 2 }, now).privateServerId, "e", "join the one-player world")
+end)
+
+test("a world reports into its entry, and lists itself again from its code if the entry is gone", function()
+	local now = 2000
+	local old = { privateServerId = "w", accessCode = "W", players = 3, updatedAt = now - 30 }
+	local entry, relisted = MatchmakingRules.Refresh(old, "w", "W", 5, now, { ["9"] = true })
+	expectEq(entry.players, 5, "player count")
+	expectEq(entry.updatedAt, now, "reported now")
+	expect(entry.excludedUserIds["9"] == true and not relisted, "exclusions, not a re-listing")
+	entry, relisted = MatchmakingRules.Refresh(nil, "w", "W", 2, now, {})
+	expect(relisted and entry.accessCode == "W" and entry.privateServerId == "w", "listed again with its code")
+	expect(MatchmakingRules.IsJoinable(entry, { 1 }, now), "and lobbies can pick it")
+	entry, relisted = MatchmakingRules.Refresh(nil, "w", nil, 2, now, {})
+	expect(entry == nil and not relisted, "no code: stays unlisted rather than list an entry nobody can join")
+	expectEq(MatchmakingRules.Refresh(nil, "w", "", 2, now, {}), nil, "an empty code counts as none")
 end)
 
 test("parties invite, accept, cap at eight and hand over leadership", function()
