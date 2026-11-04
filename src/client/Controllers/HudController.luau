@@ -52,7 +52,7 @@ local HudController = {}
 HudController.MENU = {
 	{ "Backpack", "backpack", "Backpack", "InventoryController", "ToggleBackpack" },
 	{ "Craft", "hammer", "Craft", "CraftingController", "Toggle" },
-	{ "Build", "build", "Build", "BuildController", "Toggle" },
+	{ "Build", "icon.build", "Build", "BuildController", "Toggle" },
 	{ "Tribe", "party", "Tribe", "TribeController", "Toggle" },
 	{ "Map", "map", "Map", "MapController", "Toggle" },
 	{ "Progress", "trophy", "Progression", "ProgressionController", "Toggle" },

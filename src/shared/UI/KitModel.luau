@@ -285,6 +285,9 @@ KitModel.ROLES = {
 	-- tile icon, the white play glyph). Decorations (`deco`) draw nothing
 	-- until their art arrives: they are never a stand-in shape.
 	["icon.playRune"] = { sprite = "lk_icon_play_rune", material = "glyph", glyph = "▶", fallback = "portal" },
+	-- The hammer and planks lifted whole (atlas_lk_build); lk_icon_build's planks
+	-- are cut off at the right.
+	["icon.build"] = { sprite = "lk_icon_build2", material = "glyph", glyph = "⚒", fallback = "build" },
 	["mark.playRune"] = {
 		sprite = "lk_icon_play_rune_small",
 		material = "glyph",

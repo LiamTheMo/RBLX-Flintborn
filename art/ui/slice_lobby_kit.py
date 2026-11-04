@@ -758,9 +758,17 @@ for nm, (box, seeds) in {"spear": ((992, 735, 1109, 817), ()), "rope": ((855, 82
     inner = (x0 + 6, y0 + 5, x1 - 6, y1 - 5)
     part(f"icon_{nm}", "02", box, 1.0, ops=[("lift", inner, 0.33, seeds)], fill="all" if nm != "rope" else "small",
          hole_max=40, role="Item icon (inventory grid)", note="Lifted off its item tile.")
-for nm, box in {"flag": (773, 767, 970, 949), "build": (1019, 767, 1218, 949)}.items():
+# The lift box's inset from each side of the tile (left, top, right, bottom). The
+# build icon's planks end at x 1190, 2 px past a 30 px right inset, which cut
+# them off square; build2 lifts it whole (the frame's inner border starts at
+# 1205). lk_icon_build stays as cut: it is packed into the uploaded
+# atlas_lk_items, whose image may not change (pack_atlas.py).
+for nm, (box, inset) in {"flag": ((773, 767, 970, 949), (30, 30, 30, 28)),
+                         "build": ((1019, 767, 1218, 949), (30, 30, 30, 28)),
+                         "build2": ((1019, 767, 1218, 949), (30, 30, 22, 28))}.items():
     x0, y0, x1, y1 = box
-    part(f"icon_{nm}", "19", box, 0.75, ops=[("lift", (x0 + 30, y0 + 30, x1 - 30, y1 - 28), 0.33)], fill="all",
+    l, t, r, b = inset
+    part(f"icon_{nm}", "19", box, 0.75, ops=[("lift", (x0 + l, y0 + t, x1 - r, y1 - b), 0.33)], fill="all",
          role="Status icon", note="Lifted off its framed tile.")
 part("icon_lock", "13", (1136, 805, 1200, 888), 1.0, keep="largest", role="Locked status")
 part("icon_cursor", "13", (1543, 802, 1608, 893), 1.0, keep="largest", role="Pointer cursor")
