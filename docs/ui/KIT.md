@@ -375,7 +375,7 @@ group:Select("Gameplay")
 `:SetItem({catalogId, quantity?, permanent?, icon?} | nil)`, `:SetCount(n)`,
 `:SetHotkey(text | nil)`, `:SetState("normal" | "locked" | "disabled")`,
 `:SetSelected`, `:SetEnabled`. Count bottom-right (hidden for 1), Permanent star
-top-right, leather number badge top-left. `icon` shows an icon id when the item
+bottom-right too (Permanent items never stack), leather number badge top-left. `icon` shows an icon id when the item
 has no art of its own yet. `Kit.Slot.WatchHotkeys(slots, label?)` shows a row's
 badges (`label(index)`, default the slot's number) only while
 `Kit.Input.ShowsKeys()` and returns a stop function; `Kit.Slot.ShowHotkeys`

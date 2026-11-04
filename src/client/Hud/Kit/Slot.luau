@@ -69,7 +69,8 @@ function Slot.new(parent: Instance, props)
 	self.star = Core.Make("Frame", {
 		Name = "Permanent",
 		BackgroundTransparency = 1,
-		Position = UDim2.fromOffset(w - 30, 6),
+		-- Bottom right, where a count would be: Permanent items never stack.
+		Position = UDim2.fromOffset(w - 30, h - 30),
 		Size = UDim2.fromOffset(24, 24),
 		Visible = false,
 		ZIndex = base.z + 3,
