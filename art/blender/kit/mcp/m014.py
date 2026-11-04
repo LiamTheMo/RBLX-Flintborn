@@ -19,8 +19,9 @@ sheet owns Starstone / StarstoneStoneShell / StarstoneStarlightCore / StarstoneB
 
 The hero is pasted together from the finished part meshes (m011._paste; the eleven base rocks are scaled, turned,
 some mirrored copies of the foot rock) and unioned into one closed shell, floor-cut flat at the ground.
-Stages 5+6 (CAP_NEON, NEON_FACETS, CRYSTAL_LIGHT, HALO_POS, GLINTS, _vfx): two cap facets are Neon; the finished
-hero carries a crystal_glow light, a crystal_halo and three ore_glint sockets fitted to the crystal's ridges.
+Stages 5+6 (NEON_FACETS, _vfx): since the 2026-11-04 touch-up for the restyled sheet ("solid colors only; no
+textures or glow") the crystal is solid flat cyan with no Neon facets, and the hero carries no sockets (the
+crystal_glow light, the crystal_halo and the three ore_glint emitters are gone).
 Stage 1 gives one placeholder key per region (crystal cap / belt / taper, shell, foot rock); stage 4's colour()
 regrades them by position fields (calibrated keys, blends, spill, Tint). See M014_spec.md ("Study (2a)", "Stage 1 -
 Modelling", "Stage 4 - Materials, colour and texture").
@@ -88,7 +89,9 @@ CAP_NEON = "#7AFBFD"
 # top face stays lit (graded pale by height: the sheet's pale top face is lit, and a Neon top would be a flat lid,
 # the light bulb round 1 warned of); the left top face and the back-right facet glow - they share no corner, one on
 # each side of the top face.)
-NEON_FACETS = ((-0.522, -0.779, 0.346), (0.567, 0.696, 0.44))
+# (touch-up 2026-11-04: the restyled sheet has no glow, so no facet is Neon; the cap faces all take the crystal
+# ladder. Were ((-0.522, -0.779, 0.346), (0.567, 0.696, 0.44)).)
+NEON_FACETS = ()
 NEON_TOL = 4.0
 
 
@@ -96,11 +99,9 @@ def palette():
     # stage 4 (targets, calibrated hexes, re-measures and method in M014_spec.md, "Stage 4"): see PALETTE_NOTES.
     # stage 5: CORE_GLOW (only the NEON_FACETS, see colour()) is Neon: CAP_NEON at emission NEON, previewed unshaded
     # (_glow_mats); every other crystal key stays solid.
+    # (touch-up 2026-11-04: CORE_GLOW is a plain solid key now, only the stage 1 placeholder of the cap faces)
     for k, (hexcol, rough) in PALETTE.items():
-        if k == CORE_GLOW:
-            K.set_colour(k, CAP_NEON, rough=rough, emit=NEON)
-        else:
-            K.set_colour(k, hexcol, rough=rough)
+        K.set_colour(k, hexcol, rough=rough)
     for k in PALETTE:
         if _restyle(k):
             K.fk().material(k)
@@ -168,7 +169,11 @@ TARGETS = {CORE_GLOW: ((0x7A, 0xFB, 0xFD), "vivid"), CORE_LIGHT: ((0x6E, 0xFB, 0
 #   per group): the light key pale aqua (r 0x84: its facets render r 140-150, their lit quartile g / b <= 250), the
 #   core key under the clip at its median (was #40D2E6: the belt's own median clipped), the deep key a saturated deep
 #   teal for the shade quartile. Was light #4ADCF0, core #40D2E6, deep #16B7D4.
-PALETTE = {CORE_GLOW: ("#47B2C6", CAP_ROUGH), CORE_LIGHT: ("#84B0BA", CRYS_ROUGH), CORE: ("#34B0C8", CRYS_ROUGH),
+#   Touch-up 2026-11-04 (restyled sheet, no crystal_glow light, CRYS_FLAT): CORE alone colours the crystal, refitted
+#   on the hero against the new sheet's crystal medians (front #41E1EC, f34 #45E5F0): #2CC8DA rendered #30CCD5 /
+#   #35D3DE, #44DFEA clipped the lit facets (g / b 255 on 46 % of the front's pixels), #3AD4E8 renders #3FD8E3 /
+#   #3CE1EE. Was #34B0C8 (with the light on). CORE_LIGHT, CORE_DEEP and CORE_GLOW are unused while CRYS_FLAT is set.
+PALETTE = {CORE_GLOW: ("#47B2C6", CAP_ROUGH), CORE_LIGHT: ("#84B0BA", CRYS_ROUGH), CORE: ("#3AD4E8", CRYS_ROUGH),
            CORE_DEEP: ("#04889F", CRYS_ROUGH), SHELL: ("#8E8181", SHELL_ROUGH), SHELL_COOL: ("#78747B", SHELL_ROUGH),
            SHELL_INNER: ("#595860", SHELL_ROUGH), SPILL: ("#4A7C90", SHELL_ROUGH), FOOT: ("#7F7272", FOOT_ROUGH),
            FOOT_DARK: ("#5C5555", FOOT_ROUGH)}
@@ -556,11 +561,8 @@ NOTES = {
     "StarstoneNode": "starstone resource node: a cyan skewed hexagonal gem (the Starlight Core) wedged in the cleft "
                      "between two big leaning rock shells (a tall diamond-section left shell, a long thick right slab "
                      "falling to the right and back over the crystal), eleven faceted dome rocks round the foot; one "
-                     "closed mesh, flat base. Glow: two facets of the crystal's cap are Neon (pale cyan). VFX: "
-                     "crystal_glow (steady "
-                     "teal PointLight in front of the crystal's belt, shadows on), crystal_halo (the faint pale cyan "
-                     "starlight halo behind the model) and 3 ore_glint (sparse pale cyan twinkles on the cap ridge, "
-                     "the right shoulder and the left belt ridge)",
+                     "closed mesh, flat base. The crystal is solid flat cyan facets (light / mid / deep); no glow, "
+                     "no VFX",
     "StarlightCore": "Starlight Core (reusable): skewed hexagonal gem - short slanted cap with an off-centre apex and "
                      "a long ridge, broad six-facet belt, long taper to a blunt point",
     "StarstoneShellLeft": "Left Rock Shell (reusable): tall chunky slab, lopsided diamond section (narrow shade face, "
@@ -828,6 +830,9 @@ STEPS = 3               # K.blend's mode="blend": 25 / 50 / 75 % in-between keys
 # noise. Deep -> core over CRYS_DEEP_BAND, core -> light over CRYS_LIGHT_BAND (one 9-step ladder, so neighbouring
 # facets differ by a step, never palest against deepest).
 CRYS_LATERAL, CRYS_NOISE, CRYS_SCALE, CRYS_SEED = 0.12, 0.08, 0.5, 14061
+# Touch-up 2026-11-04: the restyled sheet's core is "Solid color, flat shaded" (one cyan; its light and dark facets
+# come from the lighting), so every crystal face takes CORE and the ladder below is unused while CRYS_FLAT is set
+CRYS_FLAT = True
 CRYS_DEEP_BAND = (0.15, 0.40)
 CRYS_LIGHT_BAND = (0.48, 0.66)
 # contact: a crystal face within d of the rock surface goes no lighter than ladder step i (0 deep ... 4 core ... 8)
@@ -849,7 +854,10 @@ INNER_CONTACT = (0.3, 0.5)
 # front view, median #7B939A, where the sheet's teal rock is 14 % and #596D75: the bands are twice as wide and dark)
 # The faces are broad, so the share jumps with the bands: (0.3 / 0.6 / 0.9) gave 45 % (top view 118 %), (0.25 / 0.5 /
 # 0.7) 31 %, (0.2 / 0.4 / 0.6) 21 %, (0.18 / 0.35 / 0.52) 9 % in the front view.
-SPILL_RAMP = ((0.2, 0.75), (0.4, 0.5), (0.6, 0.25))
+# (touch-up 2026-11-04: the restyled sheet has no teal spill - 204 teal pixels within 5 px of its f34 crystal, the
+# anti-aliased rim, against 13077 crystal pixels - since the glow went, so no rock face takes SPILL. Was
+# ((0.2, 0.75), (0.4, 0.5), (0.6, 0.25)).)
+SPILL_RAMP = ()
 # shell feet among the base rocks: hero z below -> mix towards FOOT_DARK
 SHELL_FEET = ((0.6, 0.5), (1.3, 0.25))
 # broad warm <-> cool weathering on the shells' open faces
@@ -1029,7 +1037,7 @@ def colour(o, pieces=None, trees=None):
                     if d is not None and d < lim:
                         i = min(i, top)
                         break
-                f.material_index = p._mi(lad[i])
+                f.material_index = p._mi(CORE if CRYS_FLAT else lad[i])
             _tint(p, f, PIECE_TINT["Core"], "crystal", q)
             continue
         if floor:
@@ -1349,92 +1357,14 @@ def report(views=None, out_dir=None, light=True):
     return out
 
 
-# ---- stages 5+6: light and VFX sockets on the hero (M014_spec.md §6 and "Stage 5+6") -------------------------------
-# All points are in the build frame (front -Y, ground z 0); _vfx() adds them to the FINISHED hero at
-# build point - h[OFF] (hero-local studs), so the glint boxes are fitted to the final mesh, not a probe.
-# crystal_glow: one steady teal PointLight in the open in front of the crystal's belt, above F1. Gives the self-lit
-# shade side and the teal spill in Roblox, which keys alone can't guarantee under in-game light. The study's
-# (0.9, -3.6, 3.6) is 0.72 stud from the belt (0.80 for the preview light, which sits 0.25 above its socket).
-# Tried with vfx on (report(), front / f34): at (0.9, -3.8, 3.6) (0.91 clear) brightness 1.0 the belt's lower bands
-# went #3DD5E3 / #27BBCE -> #40FFFF / #28D6EE (sheet #32C9D6 / #1CAEBE), a hot patch on the facets facing the light;
-# 0.6 there still #3EF1FF. Here, 1.80 stud from the nearest surface (the belt), brightness 0.7: #3EEDFE / #27CAE1,
-# spread evenly; the spill median #7D8D99 -> #7E8E9B (sheet #79858E), the rock +1-2 levels. Any teal light lifts the
-# crystal's g / b, so it stays soft. Shadows on, so the shells keep it off the rear.
-# (verifier round 1, A1: 0.7 -> 0.45, so the light no longer lifts the belt into clipped g / b; stage 4's crystal keys
-# are refitted with this light on)
-CRYSTAL_LIGHT = dict(pos=(0.9, -4.6, 4.0), color="#6EF2F8", brightness=0.45, range=12.0, shadows=True)
-# crystal_halo: the sheet's "Starlight Glow" panel (a pale cyan starburst behind the whole model, ~1.3x its width).
-# Behind the crystal's centre, inside the rock, so the rock in front hides the billboard's middle and the glow shows
-# round the silhouette. The kind's defaults are this sheet's values (vfx.KINDS["crystal_halo"]).
-# (verifier round 1, C2: at (0.6, -0.6, 4.2) the socket sat 0.86 inside the rock and its 12-14 stud camera-facing
-# billboards cut through the shells. vfx.py's emitter spec has no ZOffset key (the README's spec -> ParticleEmitter
-# table has none, and the exporter passes the spec through unchanged), so the socket moved instead: behind the model,
-# outside the rock (3.5 studs clear; the model's back is at y 4.1), 2.4 behind its back. From the front (az 0, el 4-13)
-# and the front three-quarter (az -28, el 12) every hero vertex inside the largest billboard (14 x 14) is in front of
-# it (margins 1.6 / 2.2 / 0.1 studs), so the rock hides the middle and the glow shows round the silhouette; seen
-# from el 13 it centres between the crystal's middle and its top (the sheet's "upper half"). From the rear and from
-# above it sits in front of / over the rock: a faint additive veil (transparency >= 0.82), as any billboard there.)
-# (final fix, verifier round 2: from the rear the 12-14 stud billboards at (0.6, 6.5, 3.4), behind the model, sat in
-# front of the rock as a cyan haze. The crystal_halo kind places its socket inside the asset: now inside the hero's
-# solid right behind the crystal, at its mid-height, 0.74 stud from the nearest surface (ray parity: inside), so the
-# rock hides the billboard's middle from every side and the glow shows round the silhouette.)
-HALO_POS = (0.9, 0.3, 3.4)
-# ore_glint: the sheet's pale ridge glints, on three crystal ridges (hero edges between two crystal faces), each
-# (ridge end a, ridge end b, where along it, rate / s, peak size). a and b snap to the nearest hero crystal vertices.
-# The box is the ridge from t - GLINT_REACH to t + GLINT_REACH studs along it, padded by GLINT_PAD, so every spawn
-# point is within about 0.3 stud of the ridge. (The cap's apex itself is in the right shell's union crease, so the
-# cap glint sits a quarter of the way down the cap's main ridge, clear of the slab.)
-# (stage 1 fixes: the ends are given in the core's own construction frame - the ridge's +X end, the +X / back
-# shoulder points, the left belt ridge - and placed through _core_matrix(), so they follow any change of the core's
-# placement; round 1 gave them in the hero frame.)
-# (final fix, verifier round 2: the ends are the kite gem's named corners (CORE_PTS) - the top edge T-R, the front
-# ridge F-R from the front corner up to the right shoulder (the sheet's brightest ridge), and the left ridge F-L1.)
-GLINTS = (("cap ridge", "T", "R", 0.4, 0.5, 0.6),
-          ("shoulder ridge", "F", "R", 0.7, 0.35, 0.45),
-          ("left ridge", "F", "L1", 0.5, 0.25, 0.45))
-GLINT_REACH = 0.3       # (0.4 left the cap box's corners 0.43 off the crystal: the cap ridge runs diagonally)
-GLINT_PAD = 0.06
-GLINT = {"name": "Glint", "texture": "spark_diamond", "color": ["#F2FFFF", "#8CF8FD"], "transparency": [0.1, 1.0],
-         "lifetime": [0.5, 0.8], "speed": [0, 0], "spread": 0, "light_emission": 1.0, "rotation": [0, 90]}
-
-
-def _glint_boxes(h):
-    """[(label, lo, hi, rate, size)] in the build frame, fitted to h's crystal ridges (GLINTS)."""
-    off = Vector(h[OFF])
-    mats = [m.name if m else "" for m in h.data.materials]
-    bm = bmesh.new()
-    bm.from_mesh(h.data)
-    cry = [v for v in bm.verts if any("_core" in mats[f.material_index] for f in v.link_faces)]
-    out = []
-    cm = _core_matrix()
-    for label, a, b, t, rate, size in GLINTS:
-        a, b = (cm @ (core_point(x) if isinstance(x, str) else Vector(x)) for x in (a, b))
-        va = min(cry, key=lambda v: (v.co + off - a).length)
-        vb = min(cry, key=lambda v: (v.co + off - b).length)
-        pa, pb = va.co + off, vb.co + off
-        n = (pb - pa).length
-        s0, s1 = max(0.0, t - GLINT_REACH / n), min(1.0, t + GLINT_REACH / n)
-        pts = [pa.lerp(pb, s0), pa.lerp(pb, s1)]
-        lo = Vector([min(p[i] for p in pts) - GLINT_PAD for i in range(3)])
-        hi = Vector([max(p[i] for p in pts) + GLINT_PAD for i in range(3)])
-        out.append((label, lo, hi, rate, size))
-    bm.free()
-    return out
-
-
+# ---- stages 5+6: light and VFX sockets on the hero ------------------------------------------------------------------
+# Touch-up 2026-11-04: the restyled sheet drops the "Starlight Glow" panel and the ridge glints and says "solid colors
+# only; no textures or glow", so under the house rule (no light or VFX the sheet doesn't show) the hero carries no
+# sockets: the crystal_glow PointLight (CRYSTAL_LIGHT), the crystal_halo (HALO_POS) and the three ore_glint emitters
+# (GLINTS) are gone. The crystal keys were refitted without the light (PALETTE).
 def _vfx(h):
-    """Stages 5+6: the hero's sockets, light first, then the halo and the glints. Returns the sockets."""
-    off = Vector(h[OFF])
-    light = {k: CRYSTAL_LIGHT[k] for k in ("color", "brightness", "range", "shadows")}
-    light["flicker"] = False
-    made = [K.socket(h, "crystal_glow", Vector(CRYSTAL_LIGHT["pos"]) - off, light=light),
-            K.socket(h, "crystal_halo", Vector(HALO_POS) - off)]
-    for label, lo, hi, rate, size in _glint_boxes(h):
-        d = hi - lo
-        em = dict(GLINT, rate=rate, size=[0, size, 0],
-                  shape=[round(d.x, 2), round(d.z, 2), round(d.y, 2)])    # Roblox XYZ: x, height, depth
-        made.append(K.socket(h, "ore_glint", Vector([round(c, 3) for c in (lo + hi) / 2]) - off, emitters=[em]))
-    return made
+    """Stages 5+6: the hero's sockets: none. Returns the sockets."""
+    return []
 
 
 def build(render=True):
@@ -1557,7 +1487,6 @@ def render_views(objs):
                  "rear_sheet": ([h], 180, 13), "top_el75": ([h], 0, 75), "exploded": (shown, -12, 14)}
         for o in parts:
             extra["part_" + o.name.replace("Starstone", "").replace("Starlight", "").lower()] = ([o], -25, 18)
-        extra["front34_halo"] = ([h],) + M.VIEWS["front34"]      # the one shot with the halo's stand-in
         return _views(NUM, [h], extra=extra)
     finally:
         for c in shown:

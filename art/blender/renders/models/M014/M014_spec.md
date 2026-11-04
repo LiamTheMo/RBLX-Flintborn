@@ -1390,3 +1390,58 @@ one shot with the halo's (oversized) preview stand-in.
 ## Follow-up (main session, 2026-10-28)
 
 - `m014._hull` passes `dissolve_limit` a Python set of edges. A set iterates in memory-address order, so a rebuild can produce a slightly different core (found and fixed in `m015._hull` with `_edges_in_order`). Apply the same fix to m014 the next time 014 is rebuilt, then re-check the core and the Neon facet pick.
+
+## Touch-up for the restyled sheet (2026-11-04)
+
+The owner restyled `references/014.png` (same design; the "Starlight Glow" panel and the ridge glints are gone, and the notes say "Consistent, solid colors only; no textures or glow"; the palette calls the core "Solid color, flat shaded"). The compare pass found only colour and effect changes, so the mesh is unchanged: hero 910 tris, core 16, shells 40 / 84, base rock 46, same sizes.
+
+- **Solid flat cyan core.** `CRYS_FLAT = True`: every crystal face takes `m014_core`, so the light / mid / deep facets come from the lighting, as the sheet's palette says. The pale grey-aqua light key (`#84B0BA`, fitted with the old light on) no longer shows, so the core no longer reads pale and see-through. `m014_core` was refitted on the hero without the light: `#34B0C8` → `#3AD4E8`. `#2CC8DA` rendered too dark (`#30CCD5` front); `#44DFEA` clipped the lit facets to `#4BFFFF` on 46 % of the front's crystal pixels. `CORE_LIGHT`, `CORE_DEEP` and the ladder stay in the builder but are unused.
+- **No Neon.** `NEON_FACETS = ()`, and `CORE_GLOW` is a plain key now, used only as the stage 1 placeholder. The two Neon cap facets are gone, and so is the export's `StarstoneNode_glow_m014_core_glow` glow piece (and the core part's).
+- **No teal spill.** `SPILL_RAMP = ()`. The restyled sheet has 204 teal pixels within 5 px of its f34 crystal (the anti-aliased rim) against 13 077 crystal pixels, so the spill was the old glow's light on the rock. Before this change our front view had spill faces on 6 % of the crystal's pixel count.
+- **Sockets removed:** `crystal_glow` (PointLight), `crystal_halo` and the three `ore_glint` emitters (`CRYSTAL_LIGHT`, `HALO_POS`, `GLINTS`, `_glint_boxes`). The hero has no sockets. The `front34_halo` shot and its PNG are gone.
+- **Materials no longer used** (dropped by `_drop_unused`): `m014_core_glow` (Neon), `m014_core_light`, `m014_core_deep`, every crystal ladder mix and every `*_x_spill_*` mix.
+
+Colour measures (crystal pixels: `sheet_stats()` on the new sheet; ours from `report()`, label-masked, no sockets), as median / lit quartile / shade quartile:
+
+| View | Sheet | Ours |
+| --- | --- | --- |
+| Front | `#41E1EC` / `#95FAFD` / `#20BDC8` | `#3FD8E3` / `#40F8FF` / `#28A4AE` |
+| Front three-quarter | `#45E5F0` / `#A0FBFD` / `#21BCC8` | `#3CE1EE` / `#46FBFF` / `#3AA3AC` |
+| Side | `#46E1EA` / `#8EFAFD` / `#35DAE4` | `#38E1EE` / `#39E1EE` / `#36DAE6` |
+| Top | `#4FEAF3` / `#89F9FD` / `#1AA9B5` | `#3FF7FF` / `#40F8FF` / `#3FF7FF` |
+| Swatch "Starlight Core" | `#65F5FE` | key `#3AD4E8` |
+
+The medians match within about 10 levels. The sheet's lit facets go pale (r 0x8E–0xA0) where ours stay saturated and clip b at 255 (clip share 0.46 front, 0.90 top at el 75), and our shaded belt is darker (`#28A4AE` against `#3AD9E3`). Both are studio-lighting splits on a single flat key, recorded, not scored (house rules, Colour). The rock is unchanged except where spill faces were.
+
+Checks: `build()` problems `[]`, including `K.check`. The first try kept the height ladder with the old Neon cap facets now on it, and that tripped the baked-shading test on `StarlightCore` (corr 0.67); the flat key passes. `kit_verify.run(cls="asset")` on the hero and four parts: 0 problems. Renders in this folder were re-made by `build()`.
+
+## Touch-up verification (2026-11-04)
+
+**Result: PASS, 8.5 / 10.** The core is a solid flat cyan, with no Neon, halo, glints, light or teal spill. No blockers.
+
+Method: read-only, in a background Blender on a copy of the work file with the touch-up build in it. `kit_verify.run(cls="asset", sockets=[])` on the hero and four parts, a comparison against the pre-touch-up objects in `FlintbornWorldKit.blend`, and `compare.compare` on the new sheet's cells (f34 (15,135,530,438), rear34 (533,135,1008,438), front (15,470,285,690) and side (288,470,512,690) at el 13, top (775,470,1008,690)). Renders went to `<temp>/...`.
+
+### Technical
+- `kit_verify`: **0 problems.** StarstoneNode 910 / 3999 tris, 11.61 × 8.90 × 7.79. Parts: StarlightCore 16, ShellLeft 40, ShellRight 84, FootRock 46. Each part is one shell, with 0 floating and 0 buried; the thinnest corner is 5.10°. No sockets on the hero (the `sockets=[]` check passes).
+- **Only colour changed.** The geometry is identical to the pre-touch-up kit objects: the vertex order differs but the nearest-vertex and face-centre distances are 0.0 on all five objects, and the foot rock is unchanged. Every changed face either went from a crystal ladder or glow key to `m014_core` (13 on the core part, 29 on the hero) or from a `*_x_spill_*` mix to a plain shell or foot mix. There are no other material changes.
+- **No emissive material** is used by any 014 object. `FB_m014_core_glow` (emission 1.0) still exists in the work file as an orphan that no object uses. The exporter reads materials per object, so nothing exports as Neon.
+- The builder diff matches the spec: `NEON_FACETS = ()`, `SPILL_RAMP = ()`, `CRYS_FLAT = True`, `_vfx` returns `[]`, and `CRYSTAL_LIGHT`, `HALO_POS`, `GLINTS`, `_glint_boxes` and the `front34_halo` shot are removed. No dangling references.
+
+### Colours against the sheet (crystal pixels: median / lit quartile / shade quartile)
+
+| Cell | Sheet | Ours |
+| --- | --- | --- |
+| f34 | `#46E6F0` / `#A0FBFD` / `#22BDC9` | `#39E1ED` / `#41F7FF` / `#34A3AD` |
+| front (el 13) | `#43E2ED` / `#95FAFD` / `#21BFCB` | `#3FD8E4` / `#40F8FF` / `#28A4AE` |
+| side (el 13) | `#57E1EB` / `#8EFAFD` / `#35DBE4` | `#3CE8FB` / `#5EF4FF` / `#30A4AE` |
+| top | `#50EAF3` / `#89F9FD` / `#1CB2BE` | `#41F6FF` / `#41F7FF` / `#3CE4F8` |
+
+Swatch "Starlight Core" `#65F5FE`; key `#3AD4E8`. The medians agree within about 12 levels. The core reads as one cyan, as the sheet's "Solid color, flat shaded" core does. Teal-tinted rock pixels next to the crystal: sheet 90, ours 146 in f34; both are anti-aliased rim, so there is no spill.
+
+### Blockers
+None.
+
+### Minors
+- One narrow upper-left cap facet catches the studio key light and renders near-white in the f34 (258 px with r > 215 and g, b > 235, against 41 on the sheet). The sheet's lit facets are pale cyan (`#A0FBFD`). This is a studio-lighting split on a flat key, so it is recorded, not scored. Roblox lighting decides it in game.
+- Our lit facets stay saturated (`#41F7FF`) where the sheet's go pale, and our shade belt is darker (`#28A4AE` against `#21BFCB`–`#35DBE4`). These are lighting splits, as the touch-up notes.
+- Housekeeping only: the `CAP_NEON` and `_glow_mats` comments and calls in `m014.py` now describe a Neon cap that no longer exists. They are harmless and can go at the next rebuild.
