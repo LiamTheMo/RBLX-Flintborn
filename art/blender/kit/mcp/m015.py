@@ -81,10 +81,12 @@ NEON = 1.0              # the exporter's GLOW_EMISSION threshold: core and core_
 # sheet's and the lit quartile 20-30 under; round b, after the tone seed change: medians ~10 over, the shade quartile
 # 15-25 over the sheet's #373134), deep x 1.3 (the front and f34 rims read 40-57 % dark lip L against the sheet's
 # thin lip), the base rocks x 0.89 (front / f34 rocks 9-19 levels over, top 5 under).
+# Touch-up 2026-11-04: the restyled sheet says "No textures, glow, or particles; solid flat colors only": ember_wall,
+# core and core_hot are solid (emission 0, was NEON), so nothing exports as Neon.
 PALETTE = {SHELL: ("#534F5B", 0.88, 0.0, False), SHELL_LIGHT: ("#88828E", 0.88, 0.0, False),
            SHELL_DARK: ("#2A2732", 0.9, 0.0, False), SHELL_WARM: ("#5C535B", 0.88, 0.0, False),
-           LIP: ("#522420", 0.85, 0.0, True), WALL: ("#C95E2A", 0.75, NEON, False),
-           CORE: ("#FB7430", 0.5, NEON, False), HOT: ("#FBAB4E", 0.5, NEON, False),
+           LIP: ("#522420", 0.85, 0.0, True), WALL: ("#C95E2A", 0.75, 0.0, False),
+           CORE: ("#FB7430", 0.5, 0.0, False), HOT: ("#FBAB4E", 0.5, 0.0, False),
            DEEP: ("#C4481E", 0.5, 0.0, True), BASE: ("#887875", 0.92, 0.0, False),
            BASE_LIGHT: ("#978986", 0.92, 0.0, False), BASE_DARK: ("#6C5E59", 0.92, 0.0, False)}
 
@@ -323,7 +325,11 @@ OPENINGS = {
     # (round-1 fixes: tried keeping every opening's inner top under a crown shaft started at 5.2, to close the last
     # grazing sightlines over the core (3-4 px, under 0.05 stud wide); the shaft's floor ring then made the Slab and
     # Chunk polish cross faces and the hero lost its core - reverted)
-    "front": dict(c=(XC + 0.35, YC - 1.0, 3.5), d=(0.1, -1.0, 0.0), hw=2.2, hh=2.5, flare=1.22, up=(0.0, 0.0, 1.0)),
+    # (touch-up 2026-11-04: the restyled sheet shows a large exposed core between chunky slabs, not a diamond
+    # window: a tall six-sided gap with near-vertical sides, hw 2.2 -> 2.7, hh 2.5 -> 2.7, from the rocks up to just
+    # under the core's crown (5.6: higher, it joined the crown opening and the rear window into sightlines over the core)
+    "front": dict(c=(XC + 0.7, YC - 1.0, 3.05), d=(0.1, -1.0, 0.0), hw=2.6, hh=2.6, flare=1.22, up=(0.0, 0.0, 1.0),
+                  n=6, rot=90.0),
     # (build fixes, verifier round 1: rear hw 1.95 -> 2.3, side hw 1.35 -> 1.8 and moved forward, the side view's
     # sheet window being f 0.62-0.87; glow shares were side 8.3 / 15.8 %, rear 17.5 / 22.8 %)
     # (and its centre 3.7 -> 3.1: with its top above the core's crown (5.67) the front window, the crown shaft and the
@@ -346,9 +352,12 @@ def _opening(a, key):
     up = (up - d * up.dot(d)).normalized()
     side = d.cross(up).normalized()
     pts = []
+    n, rot = o.get("n", 4), math.radians(o.get("rot", 0.0))      # (n 4, rot 0: the diamond side / up / -side / -up)
     for dist, sc in ((0.0, 1.0), (OPEN_LEN, o["flare"])):
         q = c + d * dist
-        pts += [q + side * o["hw"] * sc, q + up * o["hh"] * sc, q - side * o["hw"] * sc, q - up * o["hh"] * sc]
+        for k in range(n):
+            t = rot + 2 * math.pi * k / n
+            pts.append(q + side * (o["hw"] * sc * math.cos(t)) + up * (o["hh"] * sc * math.sin(t)))
     vs, _ = _hull(a, pts, 0.0)
     a._finish(vs, LIP, tint=1.0)
     return vs
@@ -708,13 +717,37 @@ def _rock_place(k, part):
             Matrix.Diagonal((w / pd.x, d / pd.y, (h + ROCK_SINK) / pd.z, 1.0)) @ pre)
 
 
+# Touch-up 2026-11-04: the restyled sheet (and the old one) draws chunky separate shell slabs over a large exposed
+# core, not one dome. In the hero the two front pieces lean apart sideways, about a horizontal axis through the
+# dome's centre at the ground: (direction az deg, lean deg). FL leans along the left seam (185) and FR along the right
+# seam (355), so those hairlines keep their width and only the front seam opens: the meteor splits open over the
+# large front gap, wider toward the crown, with a notch in the outline. Tried and dropped (straight sightlines past
+# the core): the pieces leaning out along their bisectors, 2-3 deg (views (0, 89) 116-192 px down the side seams,
+# (-135, 20) and (-45, 45) 27-110 px over the crown); the back pair leaning back; FL / FR at 3-4 deg (74-173 px at
+# (-135, 20)); and overlapping the side seams low down to close them (sliver pockets where the leaning faces cross).
+# The parts are unchanged; colour() maps the hero's shell faces back through the lean (_unsplay).
+SPLAY = {"FL": (185.0, 2.0), "FR": (355.0, 2.0)}
+MX = Matrix.Translation((2 * XC, 0, 0)) @ Matrix.Diagonal((-1.0, 1.0, 1.0, 1.0))     # the mirror about x = XC
+
+
+def _splay(key):
+    """The lean of one piece in the build frame (BL: the mirror of BR's)."""
+    if key == "BL":
+        return MX @ _splay("BR") @ MX
+    az, deg = SPLAY.get(key, (0.0, 0.0))
+    d = Vector((math.cos(math.radians(az)), math.sin(math.radians(az)), 0.0))
+    p = Vector((XC, YC, 0.0))
+    return (Matrix.Translation(p) @ Matrix.Rotation(math.radians(deg), 4, Vector((0, 0, 1)).cross(d)) @
+            Matrix.Translation(-p))
+
+
 def placements():
     """name -> (part object name, matrix from the part's mesh coordinates into the hero's build frame)."""
     out = {}
     for key, (part, _fn) in PIECE_PART.items():
-        out[key] = (part, Matrix.Translation((0, 0, -SINK)) @ _frame(bpy.data.objects[part]))
+        out[key] = (part, Matrix.Translation((0, 0, -SINK)) @ _splay(key) @ _frame(bpy.data.objects[part]))
     br = bpy.data.objects["EmberMeteorChunk"]
-    out["BL"] = (br.name, MIRROR @ _frame(br))
+    out["BL"] = (br.name, MIRROR @ _splay("BR") @ _frame(br))
     out["Core"] = ("EmberCore", Matrix.Translation(CORE_AT) @ _frame(bpy.data.objects["EmberCore"]))
     rock = bpy.data.objects["EmberMeteorBaseRock"]
     for k, r in enumerate(ROCKS):
@@ -728,10 +761,10 @@ def hero(a):
 
 
 NOTES = {
-    "EmberMeteorDeposit": "ember meteor event node: one rounded fractured meteor dome of four thick dark shell pieces "
-                          "round a faceted ember core, which glows through a main front opening, small back / side / "
-                          "crown openings and thin seams and cracks with real depth; a ring of low pale stones; one "
-                          "closed mesh, flat base",
+    "EmberMeteorDeposit": "ember meteor event node: a fractured meteor of four thick dark shell pieces, the front two "
+                          "leaning apart, round a large faceted ember core, exposed in a tall front gap and seen "
+                          "through small back / side / crown openings and thin seams and cracks with real depth; a "
+                          "ring of low pale stones; solid flat colours, no glow; one closed mesh, flat base",
     "EmberMeteorSlab": "Shell Piece A (front-left): thick curved sector of the meteor dome, wrapping from the front "
                        "opening round the left side, with a glowing crack slot down its front",
     "EmberMeteorCap": "Shell Piece B (front-right): thick sector of the meteor dome between the front and side openings",
@@ -2045,11 +2078,27 @@ def _tint(p, groups, level, mottle, pos):
                 l[p.tint_layer] = (k, k, k, 1.0)
 
 
+def _unsplay(p, g):
+    """The hero's face positions for the colour pass (touch-up 2026-11-04): a shell face is mapped back through its
+    sector's lean (SPLAY), so it lies on the construction surfaces again; the core and the base rocks don't lean."""
+    at0 = p.at
+    inv = {k: _splay(k).inverted() for k in ("FL", "FR", "BR", "BL")}
+
+    def at(f):
+        c = at0(f)
+        if p.key(f).startswith(BASE) or _on(g["core"], c, ON_TOL):
+            return c
+        return inv[_sector_of(c)] @ c
+    p.at = at
+
+
 def colour(o):
     """Stage 4 on one finished M015 object (hero or part). Returns the face count per key."""
     g = _geo()
     kind = KIND[o.name]
     p = m009._paint(o, _paint_off(o))           # every Tint reset to 1 first, so the pass repeats
+    if kind == "hero":
+        _unsplay(p, g)
     cls = _classify(o, p)
     by = {}
     for f, cl in cls.items():
@@ -2425,7 +2474,9 @@ EMBER_FX = {"name": "Embers", "texture": "ember_dot", "color": ["#FEBD79", "#FD6
             "speed": [0.6, 1.4], "spread": 70, "light_emission": 1.0, "drag": 0.6, "acceleration": [0, 0.5, 0]}
 # (kind, build-frame point, emitter overrides, light): shapes are Roblox (x, height, depth); every spawn box's 5^3
 # grid lies outside the hero (fx_check)
-SOCKETS = (
+# Touch-up 2026-11-04: no sockets. The restyled sheet drops the VFX panel and says "No textures, glow, or particles";
+# the house rule removes glow and VFX the sheet no longer shows. The old list is kept for reference (SOCKETS_OLD).
+SOCKETS_OLD = (
     ("heat_glow", FRONT_LIGHT["pos"], {"shape": [1.8, 2.4, 0.4]}, FRONT_LIGHT),
     ("heat_glow", BACK_LIGHT["pos"], {"rate": 2.0, "shape": [1.4, 2.2, 0.4]}, BACK_LIGHT),
     ("embers", (0.3, 0.0, 8.4), {"shape": [4.0, 0.6, 3.5]}, None),
@@ -2436,6 +2487,7 @@ SOCKETS = (
     ("embers", (-5.6, -0.3, 4.0), {"rate": 1.5, "shape": [0.8, 3.6, 3.0]}, None),
     ("embers", (6.4, -0.3, 4.0), {"rate": 1.5, "shape": [0.8, 3.6, 3.0]}, None),
 )
+SOCKETS = ()
 
 
 def _vfx(h):

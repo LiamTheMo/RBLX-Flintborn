@@ -1958,3 +1958,79 @@ against `sheet_stats`); lip, wall and rock from my own patch masks on both image
     Standalone, those parts are not the sheet's solid lozenge and elbow slab; this follows the main session's
     dome-sector mapping.
 11. **Minor: the hero has 138 tris of headroom** (3862 / 4000), so any later geometry fix (1, 2) must trade tris.
+
+## Touch-up for the restyled sheet (2026-11-04)
+
+The restyled sheet keeps the design. Its notes say "No textures, glow, or particles; solid flat colors only", and it has no VFX panel. Glow and VFX the sheet no longer shows are removed (house rule).
+
+**Glow and particles removed.**
+- `ember_wall`, `core` and `core_hot` now have emission 0, so nothing exports as Neon. Their hexes are unchanged. `_restyle` rebuilds the three materials as ordinary tinted ones.
+- `SOCKETS = ()`: the two `heat_glow` sockets (with their PointLights) and the four `embers` sockets are gone. The old list is kept as `SOCKETS_OLD`.
+- The stale `vfx_f34 / vfx_front34 / vfx_rear / vfx_top.png` renders are deleted.
+
+**Large exposed core, separate slabs.** The build was a tall dome with vertical seams and the core showing through a diamond window. Both sheets draw chunky separate shell slabs over a large exposed core. The touch-up moves toward that within the existing builder:
+- **Front opening.** It is now a tall six-sided gap (`_opening` takes `n` / `rot`; the other openings stay diamonds) with near-vertical sides:
+  - hw 2.2 → 2.6, hh 2.5 → 2.6;
+  - centre x XC+0.35 → XC+0.7, z 3.5 → 3.05;
+  - it runs from z 0.45, among the rocks, to 5.65, just under the core's crown.
+  - A top above the core's crown (tried up to 6.7) joined the crown opening and rear window into straight sightlines over the core. A wider or more leftward gap cut into crack 1 and holed the Slab.
+- **Rear window.** Unchanged. A six-sided rear window broke the hero union at the back seam's overlap (1126 interior faces).
+- **Lean.** In the hero, FL and FR lean apart sideways by 2° about a horizontal axis through the dome's centre at the ground (`SPLAY`, `_splay` in `placements()`). FL leans along the left seam (185°) and FR along the right seam (355°), so the front seam opens toward the crown and the outline gets a notch there. The parts themselves are unchanged. `colour()` maps the hero's shell faces back through the lean (`_unsplay`) so they lie on the construction surfaces again. All four pieces still overlap the core (`gaps()`).
+- **Tried and dropped.** Each of these opened straight sightlines past the core or broke the union:
+  - leaning the pieces out along their bisectors by 2–3°: (0, 89) 116–192 px down the side seams, and (−45, 45) / (−135, 20) 27–110 px over the crown;
+  - leaning the back pair back;
+  - leaning 3–4° sideways: 74–173 px at (−135, 20);
+  - overlapping the side seams low down: sliver pockets where the leaning faces cross;
+  - a smaller crown opening: the hero lost its core.
+- **Not done.** This is still the one-dome construction. The core shows much more (front share 0.231 → 0.249, top 0.205 → 0.212) and the top view reads as slabs round an open core. But the front three-quarter still reads more as a split dome than as the sheet's separate rounded boulder-slabs. Fully separate chunky slabs would mean rebuilding the pieces as their own convex masses (on the shared library), which is beyond a touch-up. That is for the main session to decide.
+
+| | Before | After |
+| --- | --- | --- |
+| EmberMeteorDeposit (hero) | 3862 (11.1 × 10.5 × 7.55) | 3842 (11.1 × 10.5 × 7.55) |
+| EmberMeteorSlab | 682 | 688 |
+| EmberMeteorCap | 442 | 474 |
+| EmberMeteorChunk | 796 | 794 |
+| EmberCore / EmberMeteorBaseRock | 58 / 58 | 58 / 58 |
+
+- **`m015.build()` problems, in this work file:**
+  - before: hero see-through `{'180,7': 3, '-45,45': 4}`, Slab `{'0,78': 5}`, and the Cap part's see-through (it is an open piece with two windows, as always);
+  - after: hero `{'0,78': 4, '-135,20': 7, '-45,45': 4}` (3–7 px each, about 0.005 sq stud), no Slab entry, and the Cap's unchanged.
+  - No crossings, interior faces, thin corners, bowties or UV problems. The core is present.
+- `kit_verify.run(objs, cls="asset")`: no problems, before and after.
+- **Removed:** six sockets (2 `heat_glow` with lights, 4 `embers`) and the Neon emission on three keys. No part or material was removed or renamed.
+
+## Main session ruling (2026-11-04)
+
+The touch-up's glow and particle removal stands. The shape change to separate chunky slabs over a large exposed core
+is only partly reached, and that's accepted for now: the build was already off its old sheet in this respect. A full
+rebuild on the shared library is queued. The touch-up verifier judges the glow removal and checks for regressions,
+not the slab shape.
+
+## Touch-up verification (2026-11-04)
+
+**Result: PASS, 7/10.** As ruled, this judges the glow removal, the more open front and regressions; the slab shape waits for the queued rebuild. Glow and particles are fully gone. The front gap is taller and shows a little more core. Nothing regressed visibly.
+
+**Technical** (`kit_verify.run`, cls asset, on the work copy; the committed kit objects were appended read-only for comparison):
+- **0 problems** on the hero and all five parts, before and after. EmberMeteorDeposit 3842 tris (was 3862), 11.08 × 10.50 × 7.55, 1 shell. Slab 688 (was 682), Cap 474 (was 442), Chunk 794, Core 58, BaseRock 58.
+- **Glow.** `glow_keys` is empty on every object; the committed hero had core, core_hot and ember_wall. All three materials have emission strength 0 and spec `[rough, 0, 0]`; the committed ones had emission 1.0.
+- **Sockets.** None on the hero, no `VFX_EmberMeteorDeposit_*` object and no light in the work copy; `m015.SOCKETS == ()`. The committed kit file holds 2 `heat_glow` and 4 `embers` socket empties under the hero.
+- **See-through** (`m015.see_through`, read-only), new against committed:
+  - new `{'0,78': 4, '-135,20': 7, '-45,45': 4}` px; committed `{'180,7': 3, '-45,45': 4}`;
+  - **pre-existing:** `-45,45`. **Gone:** `180,7`. **New with the touch-up:** `0,78` and `-135,20`;
+  - `0,78` looks down the front gap to z 0.2–0.5 between the rocks, so the ground fills it in game;
+  - `-135,20` is a sightline about 0.07 stud wide over the crown. It doesn't show in an 1800 px, 3×-lens render of that view;
+  - so the new spots are not visible. Minor.
+
+**Against the sheet** (compare at f34 (−14, 10), front (0, 7), side (90, 7), rear (180, 7), top (0, 78), r34 (166, 10); new and committed hero side by side; high-resolution f34 and (−45, 30) shots, `<temp>/.../M015/`):
+- **Glow.** The core renders as plain orange facets with lighting shade, no Neon: front median #C95F29 (committed, with emission, #FF7429; sheet #F4621A). The lit yellow share drops to 0.7–0.9 % (sheet 7–8 %). Inside the shell the core sits in the studio's shadow, so this is lighting (recorded, not scored). Check the core's brightness in Studio.
+- **Front opening.** The six-sided gap runs from the rocks to under the crown and shows more of the core than the diamond did. Core share (orange) f34 0.139 (was 0.137, sheet 0.166) and front 0.157 (was 0.156, sheet 0.187), plus the shaded core 0.041 / 0.059 (was 0.022 / 0.035). The gain is modest, and the front still reads as a split dome (out of scope by ruling).
+- **Lean.** The front seam opens toward the crown and shows a narrow notch of ember wall at the top. It reads as one more glowing crack, like the sheet's. No crossings: self-hits 0.
+- **Colours unchanged:** shell f34 #655C64 against the sheet's #514846 (pre-existing: the shell is lighter than the restyled sheet); base rock #B0978C against #907C7B.
+
+**Blockers:** none.
+
+**Minors:**
+1. Two new 4–7 px see-through spots, not visible (above).
+2. The core reads duller than the sheet without emission. This is lighting, recorded. If Studio shows it dull, raise the core keys' lightness rather than bring back Neon.
+3. Stale comment in `m015.py` at OPENINGS "front": it says hw / hh 2.2 → 2.7 and 2.5 → 2.7, but the code (and the spec) use 2.6.
+4. **Main session, shipping.** `ship.sh` deletes the sheet's objects by `kit_sheet`, but socket empties don't carry `kit_sheet`. The six `VFX_EmberMeteorDeposit_*` empties will survive in the kit file as unparented orphans. The exporter reads only the hero's children, so they don't export. The kit file already holds such orphans from the shipped 014 and 019 touch-ups (`VFX_StarstoneNode_*` × 5, `VFX_ResinBranchNode_*` × 2). Fix: have `ship.sh` also delete the `children_recursive` of the sheet's objects before the build, and remove the existing orphans once.
