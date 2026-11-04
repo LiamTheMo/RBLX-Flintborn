@@ -84,7 +84,7 @@ outside the `lk_` kit.
 | Put every word in a live label (localisable, honest) | Bake text into art (the slicer paints words out of plates) |
 | Use the parchment / leather pairing: ink on paper, cream on leather | Put cream text on paper, or dark ink on leather |
 | Use one primary (leather) action per window; secondary actions on parchment | Use several leather buttons of equal weight side by side (except an answer pair such as Accept / Decline) |
-| Use `ink:<id>` flat glyphs on parchment and `white:<id>` on leather | Use full-colour icons as small section glyphs, or flat glyphs as menu tiles |
+| Use full-colour icons (`lk_icon_*`) for window titles, section headers and side tabs (owner, 2026-11-04: the black ink glyphs read as missing art); keep `ink:<id>` / `white:<id>` glyphs for the ⚙ and stand-ins | Use flat glyphs as menu tiles |
 | Let state art and kit tints show states (hover, pressed, selected glow) | Add native `UIStroke` / `UICorner` / gradients for looks (only stand-ins and the gold glow use them) |
 | Build from design numbers | Lay out from `AbsoluteSize` (the capture harness has none, and it changes with the scale) |
 | Keep strings to characters Merriweather has ("(Permanent)", "Sprint is now LeftShift") | Use ★ or → in UI strings (Merriweather lacks them) |
@@ -683,7 +683,7 @@ pressed > open > focused > hover > empty > normal. Force any state with the
 |---|---|---|
 | Full-colour icons (`lk_icon_*`) | Menu tiles, HUD buttons, window headers, toasts, detail rows, items | `icon = "backpack"` resolves `lk_icon_backpack` |
 | Role icons | Art that has a role and a fallback (the Play rune art) | `icon = "icon.playRune"` / `"mark.playRune"` (§9.6) |
-| Flat ink glyphs (`ink:<id>`) | Section header and tab glyphs on parchment; the "picture missing" glyph | `lk_glyph_ink_<id>`, built by `glyphs.py` |
+| Flat ink glyphs (`ink:<id>`) | The ⚙ and Settings tabs; the "picture missing" glyph (the Journal and Party window use full-colour icons) | `lk_glyph_ink_<id>`, built by `glyphs.py` |
 | Flat white glyphs (`white:<id>`) | The same glyphs on leather (a selected tab, a button) | `lk_glyph_white_<id>` |
 | Square-button glyphs | + − ✓ ✕ and arrows on `paper` / `leather` / `small` / `round` squares | square buttons prefer `lk_glyph_<id>`; cream on leather |
 | White art | `lk_glyph_play`, `lk_glyph_check_white`, `lk_icon_backpack_white` | drawn white on leather, tinted ink on paper |

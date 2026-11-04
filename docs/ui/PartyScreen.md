@@ -283,8 +283,8 @@ Scripts: `art/ui/kit/analysis/party/measure_party.py` → `measure_log.txt`.
 ## Final audit fixes
 
 - **List section headings** in the invite column (INVITATIONS, PLAYERS) are
-  drawn like the window's column headings: a flat ink glyph (`ink:people`,
-  `ink:magnifier`) before the capitals and the ink rule at their foot.
+  drawn like the window's column headings: a full-colour icon (`party`,
+  `magnifier`) before the capitals and the ink rule at their foot.
 - **Phones and touch tablets**: every member row, the leader's included, is
   64 tall (`PartyWindow.FRAMES_PHONE`; the leader keeps the regular portrait
   there), so the boosted name and "LV." lines do not crowd and the list reads

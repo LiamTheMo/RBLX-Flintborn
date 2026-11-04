@@ -213,13 +213,13 @@ function PartyWindow.new(props: Props)
 
 	-- Your Party ----------------------------------------------------------------------
 	local pv = panel(v, "YourParty", M.party)
-	self.partyHeader = header(pv, 360, "Your Party", { "ink:people", 19, 18, 36, 26 }, 69, { 16, 52, 329 }, "1/8")
+	self.partyHeader = header(pv, 360, "Your Party", { "party", 19, 18, 36, 26 }, 69, { 16, 52, 329 }, "1/8")
 	-- 7 rows show (the leader row and six at the mockup pitch); the 8th scrolls.
 	self.memberList = list(pv, "Members", { 16, 57, PartyWindow.LIST_W.party, 389 }, 0)
 
 	-- Invite Players ------------------------------------------------------------------
 	local iv = panel(v, "InvitePlayers", M.invite)
-	self.inviteHeader = header(iv, 371, "Invite Players", { "ink:magnifier", 23, 17, 26, 27 }, 67, { 17, 52, 336 })
+	self.inviteHeader = header(iv, 371, "Invite Players", { "magnifier", 23, 17, 26, 27 }, 67, { 17, 52, 336 })
 	self.search = Kit.SearchBox.new(iv, {
 		name = "Search",
 		rect = { 15, 69, 340, 42 },
@@ -266,7 +266,7 @@ function PartyWindow.new(props: Props)
 	local dv = panel(v, "PartyDetails", M.details)
 	-- The mockup's circled "i" is not in the kit; the book (a record of the
 	-- party) is the closest neutral glyph (the "!" read as a warning).
-	header(dv, 322, "Party Details", { "ink:book", 18, 16, 30, 30 }, 63, { 16, 52, 290 })
+	header(dv, 322, "Party Details", { "journal", 18, 16, 30, 30 }, 63, { 16, 52, 290 })
 	-- The rows are drawn by SetData (a line row sizes its value when built).
 	self.detailsVisual = dv
 	self.detailRows = {}
@@ -594,7 +594,7 @@ function PartyWindow:_invites(data)
 	end
 	local incoming = data.invites or {}
 	if #incoming > 0 then
-		section("Invitations", "ink:people")
+		section("Invitations", "party")
 		for _, entry in incoming do
 			height += frameH
 			table.insert(rows, {
@@ -646,7 +646,7 @@ function PartyWindow:_invites(data)
 			})
 		end
 		if #data.inviteRows > 0 then
-			section("Players", "ink:magnifier")
+			section("Players", "magnifier")
 		end
 	end
 	for _, entry in data.inviteRows do

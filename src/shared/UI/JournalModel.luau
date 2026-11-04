@@ -20,8 +20,8 @@ local JournalModel = {}
 
 -- The side tabs, top to bottom.
 JournalModel.TABS = { "quests", "progress" }
--- Flat glyph ids (drawn "ink:<id>", the selected tab "white:<id>" in leather).
-JournalModel.TAB_ICONS = { quests = "book", progress = "trophy" }
+-- The kit's full-colour icon ids (lk_icon_<id>).
+JournalModel.TAB_ICONS = { quests = "journal", progress = "trophy" }
 
 -- Per quest action: the row icon, the detail illustration, the row's line, and
 -- the objective's title and description (what the server counts).

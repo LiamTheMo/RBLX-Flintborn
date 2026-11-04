@@ -64,13 +64,13 @@ function JournalWindow.new(parent: Instance?, handlers)
 	local screen = Kit.Screen.new("FlintbornJournal", { size = JournalWindow.SIZE, parent = parent })
 	self.screen = screen
 	self.maid:Give(screen)
-	-- The header as the mockup draws it: the flat compass, QUEST JOURNAL, the
-	-- rule under both the full width, and the ✕.
+	-- The header: the compass (the kit's full-colour icon, not the mockup's flat
+	-- glyph), QUEST JOURNAL, the rule under both the full width, and the ✕.
 	local window = Kit.Window.new(screen.window, {
 		-- The kit draws the frame on its rect: 3 px shorter matches M07's frame.
 		rect = { JournalWindow.MARGIN, 0, JournalWindow.FRAME[1], JournalWindow.FRAME[2] - 3 },
 		title = "Quest Journal",
-		icon = "ink:compass_rose",
+		icon = "compass",
 		iconRect = { 64, 9, 84, 88 },
 		titleRect = { 155, 16, 700, 70 },
 		titleSize = 47,
@@ -111,9 +111,7 @@ function JournalWindow:_tabs(v: Frame)
 				JournalWindow.TAB_SIZE[1],
 				JournalWindow.TAB_SIZE[2],
 			},
-			icon = "ink:" .. JournalModel.TAB_ICONS[id],
-			selectedIcon = "white:" .. JournalModel.TAB_ICONS[id],
-			selectedIconTint = "leather",
+			icon = JournalModel.TAB_ICONS[id],
 			iconSize = 50,
 			variant = "side",
 			zIndex = Z + 4,
