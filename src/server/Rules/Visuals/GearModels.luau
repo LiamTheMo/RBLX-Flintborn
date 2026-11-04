@@ -50,7 +50,7 @@ local TIERS = {
 	Cobalt = { color = { 40, 92, 192 }, material = "Metal", trim = { 120, 168, 240 } },
 	Jade = { color = { 70, 172, 112 }, material = "Marble", trim = { 150, 226, 176 } },
 	Mithril = { color = { 150, 230, 236 }, material = "Foil", trim = { 220, 252, 255 } },
-	Adamantine = { color = { 128, 30, 70 }, material = "Metal", trim = { 208, 72, 120 } },
+	Adamantine = { color = { 120, 10, 24 }, material = "Metal", trim = { 240, 72, 76 } },
 }
 GearModels.Tiers = TIERS
 

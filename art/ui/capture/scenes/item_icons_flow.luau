@@ -1,6 +1,6 @@
 -- Item icons (art/ui/items/build_item_icons.py): every catalog item draws its
 -- own lk_item_<id> and nothing else. While the icon's atlas
--- (atlas_lk_items2_*) is still pending on this client, each item picture shows
+-- (atlas_lk_items3_*) is still pending on this client, each item picture shows
 -- its kind glyph (Art.KindGlyph: never a letter); when the atlas loads, the
 -- same picture swaps to the icon by itself, with nothing rebuilt. The hero copy
 -- (an image of its own) replaces the slot icon in a hero box once it has
@@ -44,9 +44,9 @@ for id in ItemCatalog.Items do
 	end
 end
 check(#missing == 0, "every catalog item draws its own icon (" .. table.concat(missing, ", ") .. ")")
-check(atlases.atlas_lk_items2_1 and atlases.atlas_lk_items2_2, "packed into the atlas_lk_items2 atlases")
+check(atlases.atlas_lk_items3_1 and atlases.atlas_lk_items3_2, "packed into the atlas_lk_items3 atlases")
 check(
-	UiAssets.image("atlas_lk_items2_1") ~= nil and UiAssets.image("atlas_lk_items2_2") ~= nil,
+	UiAssets.image("atlas_lk_items3_1") ~= nil and UiAssets.image("atlas_lk_items3_2") ~= nil,
 	"both icon atlases have ids"
 )
 check(ItemInfo.Icon == nil and ItemInfo.ART_SPRITES == nil, "no older item art is left in ItemInfo")
@@ -104,7 +104,7 @@ for _, picture in pictures do
 	pending[atlasOf(picture[3])] = true
 end
 check(
-	pending[UiAssets.image("atlas_lk_items2_1")] and pending[UiAssets.image("atlas_lk_items2_2")],
+	pending[UiAssets.image("atlas_lk_items3_1")] and pending[UiAssets.image("atlas_lk_items3_2")],
 	"both atlases in use"
 )
 for atlas in pending do

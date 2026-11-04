@@ -693,7 +693,7 @@ pressed > open > focused > hover > empty > normal. Force any state with the
 - **Every item draws its own icon, and only that**: `ItemInfo.ItemSprite(itemId)`
   → `lk_item_<CatalogId>`, built from the owner's item art by
   [`art/ui/items/build_item_icons.py`](../../art/ui/items/build_item_icons.py)
-  (§9.7) and packed into `atlas_lk_items2_1` / `_2`. Every place an item is
+  (§9.7) and packed into `atlas_lk_items3_1` / `_2`. Every place an item is
   shown (inventory and vault slots, the hotbars, list rows in the Market,
   Trade, loot and storage windows, recipe rows, the Inventory detail card and
   the Forge / Crafting picture) draws it through `Kit.ItemIcon` (`Art.ItemIcon`
@@ -908,7 +908,7 @@ for new glyphs.
 | `atlas_lk_lobby_hi` | High-resolution copies: frames, bars, slots, paper buttons, pills, tile frame, round frame, toast, panel | new: uploaded by the owner |
 | `atlas_lk_window_hi` | High-resolution copies: dialog, leather buttons, tabs, plaques, inset panel, steppers, clasps, play glyph | new: uploaded by the owner |
 | `atlas_lk_journal_hi` | High-resolution Journal illustrations | new: uploaded by the owner |
-| `atlas_lk_items2_1`, `atlas_lk_items2_2` | Every catalog item's own 110 px icon (`lk_item_<id>`, §9.7): 81 and 63 icons | uploaded |
+| `atlas_lk_items3_1`, `atlas_lk_items3_2` | Every catalog item's own 110 px icon (`lk_item_<id>`, §9.7): 81 and 63 icons (replace `atlas_lk_items2_*` for the red Adamantine art) | not uploaded yet (empty ids) |
 | (no atlas) `lk_item_<id>__hi` | The 144 item icons' 356 px hero copies, one image each | uploaded |
 | `atlas_island_hi_1_1` … `_2_2` | The island painting at 2040 px as 2 × 2 tiles | new: uploaded by the owner |
 
@@ -1036,7 +1036,7 @@ on its own image (`readyImage`), so it draws only once loaded, fetched in the
 background when a hero box first wants it; the box shows the slot icon until
 then and the copy takes its place in the same label when it arrives. Upload
 with
-`python3 scripts/roblox_upload_ui_assets.py --upload --only 'atlas_lk_items2_*,lk_item_*__hi'`
+`python3 scripts/roblox_upload_ui_assets.py --upload --only 'atlas_lk_items3_*,lk_item_*__hi'`
 (146 images; throttling waits as asked, an interrupted run continues when
 re-run). Never move an item between uploaded atlases: a new item goes into a
 new group in ICONS.json.

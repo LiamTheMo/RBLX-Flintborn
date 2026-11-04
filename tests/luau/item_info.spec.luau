@@ -108,8 +108,8 @@ test("every catalog item has its own icon and hero copy", function()
 		if entry then
 			expect(entry.w == entry.h, id .. ": a square icon")
 			expect(
-				type(entry.atlas) == "string" and string.find(entry.atlas, "^atlas_lk_items2_") ~= nil,
-				id .. ": packed into an atlas_lk_items2 atlas"
+				type(entry.atlas) == "string" and string.find(entry.atlas, "^atlas_lk_items3_") ~= nil,
+				id .. ": packed into an atlas_lk_items3 atlas"
 			)
 			expect(Ids[entry.atlas] ~= nil, id .. ": its atlas has an id or a placeholder")
 			local hero = Sprites[entry.hi]

@@ -34,7 +34,7 @@ like a toy catalogue. Nothing is realistic and nothing shows injury.
   Flint #484A54 / #828694, Obsidian #1A1622 / #5A5078 (glassy sharp facets),
   Jade #46AC70 / #96E2B0 (polished, rounded facets), Copper #CD763A / #EEA868,
   Iron #768296 / #BEC8D8, Silver #D6DCE6 / #FAFCFF, Cobalt #2A5CC0 / #78A8F0,
-  Mithril #96E6EC / #DCFCFF, Adamantine #801E46 / #D04878.
+  Mithril #96E6EC / #DCFCFF, Adamantine #780A18 / #F0484C.
   Armor only: Hide #8C623A / #5C3E24.
 - Rarity colours (accents only): Uncommon #60C060, Rare #468CE6,
   Epic #A05ADC, Legendary #F0AA28.

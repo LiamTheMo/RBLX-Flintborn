@@ -35,7 +35,7 @@ sheet layout exactly.
   Mythic #E64646, Secret #28DCD2.
 - Metal tier colours (base / trim): Copper #CD763A / #EEA868,
   Iron #768296 / #BEC8D8, Silver #D6DCE6 / #FAFCFF, Cobalt #2A5CC0 / #78A8F0,
-  Mithril #96E6EC / #DCFCFF, Adamantine #801E46 / #D04878.
+  Mithril #96E6EC / #DCFCFF, Adamantine #780A18 / #F0484C.
 
 === SHEET LAYOUT (every sheet) ===
 Portrait 2:3 (1024 x 1536). Warm off-white parchment background (#F4EFE4),
@@ -154,7 +154,7 @@ colour as solid accents only.
     crystals at the base.
 186 HEARTSTONE SEAM (Mythic): the rarest ore. A tall jagged rock with a deep
     crimson-red heart crystal (#E64646) at its centre, dark adamantine chunks
-    (#801E46 / #D04878) and mithril flecks; unique silhouette.
+    (#780A18 / #F0484C) and mithril flecks; unique silhouette.
 187 STARFALL LOTUS (Secret): a large water-lily-like bloom with teal (#28DCD2)
     star-shaped petals, a pale gold centre and broad lily pads on a small
     pond-edge base.

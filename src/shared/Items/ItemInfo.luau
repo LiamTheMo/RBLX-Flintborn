@@ -234,7 +234,7 @@ end
 -- Item art (docs/ui/ITEM_ART.md): every catalog item's own icon
 -- (art/ui/items/ICONS.json, built by art/ui/items/build_item_icons.py from the
 -- owner's item art): lk_item_<id>, a 110 px slot icon packed into the
--- atlas_lk_items2_* atlases, whose `hi` copy lk_item_<id>__hi (356 px, an image
+-- atlas_lk_items3_* atlases, whose `hi` copy lk_item_<id>__hi (356 px, an image
 -- of its own) draws only in the hero boxes. Kit.ItemIcon draws it everywhere an
 -- item is shown.
 ItemInfo.ITEM_SPRITE_PREFIX = "lk_item_"

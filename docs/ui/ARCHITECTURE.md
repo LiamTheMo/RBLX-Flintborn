@@ -600,7 +600,7 @@ As built (`art/ui/pack_atlas.py` GROUPS): `atlas_lk_lobby`, `atlas_lk_window`,
 `atlas_lk_icons` and `atlas_lk_items` (uploaded; the planned controls, slots
 and world-HUD atlases fit into the lobby and window ones), plus
 `atlas_lk_play` (D26, its own atlas so the four uploaded ones keep their bytes
-and rects), the item icons' `atlas_lk_items2_1` / `_2` (every catalog item's
+and rects), the item icons' `atlas_lk_items3_1` / `_2` (every catalog item's
 own `lk_item_<id>`; `atlas_lk_items` keeps the kit icons cut from item
 drawings, which items no longer draw but menus, stat rows and events do) and
 `atlas_island` with its `atlas_island_hi_*` tiles.

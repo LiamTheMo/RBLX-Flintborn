@@ -114,7 +114,7 @@ GROUPS = {
         "lk_icon_totem", "lk_icon_treasure", "lk_icon_tree", "lk_icon_trophy",
     ],
     # Kit icons cut from the item drawings of the kit sheets. Items no longer
-    # draw them (every item has its own icon, atlas_lk_items2_*), but menus,
+    # draw them (every item has its own icon, atlas_lk_items3_*), but menus,
     # stat rows, events, notices and the Journal still use most of them as
     # icons (heart, star, warning, tusk, build, campfire, ...), and the atlas is
     # uploaded, so the group keeps every sprite and its packing.

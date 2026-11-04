@@ -65,7 +65,7 @@ sheet, like a toy catalogue. Nothing is realistic and nothing shows injury.
   Secret #28DCD2.
 - Metal tier colours (base / trim): Copper #CD763A / #EEA868,
   Iron #768296 / #BEC8D8, Silver #D6DCE6 / #FAFCFF, Cobalt #2A5CC0 / #78A8F0,
-  Mithril #96E6EC / #DCFCFF, Adamantine #801E46 / #D04878.
+  Mithril #96E6EC / #DCFCFF, Adamantine #780A18 / #F0484C.
 
 === SHEET LAYOUT (unless the style sample shows a different one) ===
 Portrait 2:3 (1024 x 1536). Warm off-white parchment background (#F4EFE4),
