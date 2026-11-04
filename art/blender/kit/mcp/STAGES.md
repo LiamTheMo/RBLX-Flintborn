@@ -18,7 +18,7 @@
 - **Every agent starts with a fresh context** (a new agent, never a fork or a continuation of a finished one). It loads exactly what its job needs: the `roblox-blender-model` skill (Skill tool), this file, the model's spec, and the reference. Modellers also read the builder. Fixes after a failed verification go to a fresh modeller.
 - Each modeller still runs every check listed for its stages below and records each stage in the spec under its own heading.
 - Verification findings go back to a modeller (a fresh one if the first has finished). A model gets at most 2 verification rounds; after that the main session commits it with the leftovers noted, unless something is actually broken or the model's defining feature still reads clearly unlike the sheet. In those cases a targeted third round fixes only the named blockers (018's leaf rosette was the first).
-- Each passed model gets its own commit, straight on the active version branch (no feature branch or PR; owner's decision, 2026-11-04), pushed as it lands.
+- Each passed model gets its own commit, straight on the active version branch (no feature branch or PR; owner's decision, 2026-11-04). Commits stay local: the owner pushes.
 
 ## Parallel sessions
 
