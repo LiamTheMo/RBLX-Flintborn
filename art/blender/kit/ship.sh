@@ -72,6 +72,23 @@ assert bpy.path.basename(bpy.data.filepath) == 'FlintbornWorldKit.blend', 'open 
 import kit_models, kit_parts, kit_verify, kit_build, $MOD
 for m in (kit_models, kit_parts, kit_verify, kit_build, $MOD):
     importlib.reload(m)
+# Windows sometimes refuses to overwrite a render PNG ('cannot save'); older builders render through the kit's
+# render_group directly, so retry there once after removing the old file (kit_build does the same for library builds)
+import os
+kit = ns['KIT']
+if not getattr(kit['render_group'], 'ship_retry', False):
+    def _retry(rg):
+        def render_group(group, path, *a, **k):
+            try:
+                return rg(group, path, *a, **k)
+            except RuntimeError as e:
+                if 'cannot save' not in str(e) or not os.path.exists(path):
+                    raise
+                os.remove(path)
+                return rg(group, path, *a, **k)
+        render_group.ship_retry = True
+        return render_group
+    kit['render_group'] = _retry(kit['render_group'])
 # drop the sheet's old objects first, so parts a rebuild retires don't survive in the kit file and the export
 for o in [o for o in bpy.data.objects if o.get('kit_sheet') == '$CODE']:
     bpy.data.objects.remove(o, do_unlink=True)
