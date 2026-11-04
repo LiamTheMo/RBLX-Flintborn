@@ -57,6 +57,16 @@ Bar.STAT_GAP = 0.1
 Bar.STAT_INSET = 0.22
 Bar.STAT_TEXT = 0.72
 
+-- The well {x, y, w, h} in an x, y, w × h box from its insets in px (left, top,
+-- right, bottom), each rounded on its own so equal insets stay equal and the fill
+-- stays centred. (Rounding the sum instead turned the XP track's 0.57 + 0.57 px
+-- into 1 + 0, so the fill sat a pixel low over the bottom rim.)
+local function wellIn(x: number, y: number, w: number, h: number, l: number, t: number, r: number, b: number)
+	local left, top = math.floor(l + 0.5), math.floor(t + 0.5)
+	local right, bottom = math.floor(r + 0.5), math.floor(b + 0.5)
+	return { x + left, y + top, w - left - right, h - top - bottom }
+end
+
 -- props: rect | size, fill, frame ("track"), icon (stat frame), text (value
 -- text over the bar: the stat frame's in cream with an ink outline, else in
 -- textColor, default ink), textSize (stat frame), value (0-1), zIndex, name.
@@ -98,12 +108,7 @@ function Bar.new(parent: Instance, props)
 		local out = Art.Outset(frame[1], sprite, track[3], track[4])
 		local l, t = frame[2] * k - out[1], frame[3] * k - out[2]
 		local r, b = frame[4] * k - out[3], frame[5] * k - out[4]
-		well = {
-			track[1] + math.floor(l + 0.5),
-			track[2] + math.floor(t + 0.5),
-			track[3] - math.floor(l + r + 0.5),
-			track[4] - math.floor(t + b + 0.5),
-		}
+		well = wellIn(track[1], track[2], track[3], track[4], l, t, r, b)
 		-- The value sits in the track, over the fill and the empty part.
 		self.label = Core.Label(base.visual, {
 			name = "Value",
@@ -128,12 +133,7 @@ function Bar.new(parent: Instance, props)
 		local out = Art.Outset(frame[1], sprite, w, h)
 		local l, t = frame[2] * k - out[1], frame[3] * k - out[2]
 		local r, b = frame[4] * k - out[3], frame[5] * k - out[4]
-		well = {
-			math.floor(l + 0.5),
-			math.floor(t + 0.5),
-			w - math.floor(l + r + 0.5),
-			h - math.floor(t + b + 0.5),
-		}
+		well = wellIn(0, 0, w, h, l, t, r, b)
 	end
 	self.well = well
 	local fillSprite = Art.ROLES[fillRole].sprite
