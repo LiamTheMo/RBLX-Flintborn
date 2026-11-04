@@ -3,7 +3,8 @@ A-frame canvas tent with its camp dressing. Two X frames of crossed square timbe
 crossing, both frames leaning out 4 deg), each crossing tied with a ridge lashing (three wraps round both poles and a
 turn round each pole below them) and every pole with a two-turn rope band low down; a cream canvas of closed 0.10 slabs (the
 two sagging side panels folded over the ridge as one chevron slab, a closed back, two front door flaps with turned-back
-edges, the front gable open above a rolled door flap); a lantern hanging inside the doorway from the ridge; hem ties,
+edges, the front gable open above a rolled door flap set between the front poles); a lantern hanging on a hook from
+the front lashing, just outside the frame; hem ties,
 flap ties, four pegs; a teal mat, a bedroll and a plank chest inside; outside a braced crate, two banded barrels, a
 ground lantern on a stake and two pale stones. See M064_spec.md.
 
@@ -52,7 +53,7 @@ PALETTE = {
     ROPE: ("#EBB24A", 0.95, 0.0, 0.0, True),
     ROPE_DEEP: ("#C58A34", 0.95, 0.0, 0.0, True),
     MAT: ("#457068", 0.95, 0.0, 0.0, True),
-    BEDROLL: ("#9E784A", 0.95, 0.0, 0.0, True),
+    BEDROLL: ("#AA814F", 0.95, 0.0, 0.0, True),         # round 1: lightened toward the sheet's tan
     METAL: ("#4A4D50", 0.55, 0.4, 0.0, False),
     GLOW: ("#F8B80A", 0.5, 0.0, 1.0, False),
     STONE: ("#908A8C", 0.92, 0.0, 0.0, True),
@@ -86,7 +87,8 @@ WE = -W_IN + GAP                # canvas end outer face at w = -WE
 CT = 0.10                       # canvas thickness
 WCAP = -(WE - 0.005)            # roof slab end caps, 0.005 proud of the end pieces
 ZR = 10.50                      # roof outer ridge
-Z_HEM = 0.205                   # canvas hem (bottom of the slabs), 0.005 over the floor mat (MAT_T 0.20)
+Z_HEM = 0.195                   # canvas hem (bottom of the slabs), seated 0.005 into the floor mat (MAT_T 0.20): no
+                                # grazing light slit at the side and back hems (round 1 minor)
 SQ = math.sqrt(1.0 + KS * KS)
 XI = CT * SQ                    # inner surface inset (horizontal)
 ZRI = ZR - XI / KS              # inner ridge
@@ -159,9 +161,16 @@ def pole(a, end, which, name):
 LASH_R = 0.14
 LASH_DH = {"hi": 0.40, "lo1": -0.30, "lo2": -0.30 - (2 * LASH_R - 0.02)}
 RING_DH = 0.75                  # the lower lobes' centres below the lowest wrap (in-plane)
+WRAP_PTS, WRAP_SIDES = 12, 6    # the three wraps round both poles: rounder (six-sided rope, the hull's chamfered
+                                # corners kept) so they read as rope hugging the X, not flat bars (round 1 minor)
 
 
-def wrap(a, end, loop, r, up, name, kind):
+def lash_key(end):
+    """The back lashing a shade deeper (by position: the back frame's lashing renders brighter than the sheet's)."""
+    return mix(ROPE, ROPE_DEEP, 0.75) if end > 0 else ROPE
+
+
+def wrap(a, end, loop, r, up, name, kind, sides=5, key=ROPE):
     """A rope turn round the poles from a closed hull loop. The canvas end lies right behind the inner pole, so the
     run behind it is left out: the loop is cut where it crosses w = W_IN + r (each end beside the inner pole's side
     face, its cap flush with the pole's back face, the strands sunk P.SINK). A loop that never passes behind the
@@ -171,7 +180,7 @@ def wrap(a, end, loop, r, up, name, kind):
     w = [(p - O).dot(N) for p in loop]
     n = len(loop)
     if min(w) >= W_IN - 0.02:
-        return P.rope(a, loop, r, ROPE, ROPE_DEEP, sides=5, closed=True, twist=True, up=up, name=name, kind=kind)
+        return P.rope(a, loop, r, key, ROPE_DEEP, sides=sides, closed=True, twist=True, up=up, name=name, kind=kind)
     k0 = next(i for i in range(n) if w[i] >= lim and w[(i - 1) % n] < lim)      # first point back in front
     path = []
     for j in range(n + 1):
@@ -186,7 +195,7 @@ def wrap(a, end, loop, r, up, name, kind):
             path.append(loop[i1].lerp(loop[i], t))
             break
     path = [p for k, p in enumerate(path) if k == 0 or (p - path[k - 1]).length > 0.03]
-    return P.rope(a, path, r, ROPE, ROPE_DEEP, sides=5, twist=True, up=up, name=name, kind=kind)
+    return P.rope(a, path, r, key, ROPE_DEEP, sides=sides, twist=True, up=up, name=name, kind=kind)
 
 
 def lashing(a, end, tag):
@@ -197,13 +206,13 @@ def lashing(a, end, tag):
     lines = POLE_LINES[(end, "A")] + POLE_LINES[(end, "B")]
     for k, dh in LASH_DH.items():
         c = fp(end, 0.0, HC + dh, 0.0)
-        loop = P.hull_loop(cut(lines, c, U), c, U, X, LASH_R - P.SINK, 10)
-        wrap(a, end, loop, LASH_R, U, f"{tag}lash_{k}", "rope_lash")
+        loop = P.hull_loop(cut(lines, c, U), c, U, X, LASH_R - P.SINK, WRAP_PTS)
+        wrap(a, end, loop, LASH_R, U, f"{tag}lash_{k}", "rope_lash", sides=WRAP_SIDES, key=lash_key(end))
     for which in ("A", "B"):                             # the figure-eight's lower lobes: a turn square round
         foot, d, w, sx = pole_axis(end, which)           # each pole below the wraps (joint detail)
         c = foot + d * ((HC + LASH_DH["lo2"] - RING_DH - (-w * SL / CL)) / (d.dot(U)))
         loop = P.hull_loop(cut(POLE_LINES[(end, which)], c, d), c, d, N, LASH_R - P.SINK, 10)
-        wrap(a, end, loop, LASH_R, d, f"{tag}lash_ring{which}", "rope_lash")
+        wrap(a, end, loop, LASH_R, d, f"{tag}lash_ring{which}", "rope_lash", key=lash_key(end))
 
 
 BAND_R, BAND_Z = 0.13, 1.70
@@ -348,34 +357,59 @@ def flap(a, s):
     return end_sheet(a, -1, pts, tris, 4, keys, f"flap{s:+d}")
 
 
-ROLL_R, ROLL_Z, ROLL_W = 0.38, 7.40, W_IN - 0.42     # its outer side 0.04 behind the inner pole
+ROLL_R, ROLL_Z, ROLL_W = 0.37, 7.39, 0.60      # in the doorway plane between the front poles, in the outer pole's
+                                                # depth (w 0.21-0.99; its front 0.08 proud of the pole's front face):
+                                                # the further forward, the less the leaning outer pole hides its top
+                                                # from the hero camera (w 0.455: 61 %, 0.60: 68 % with no lantern)
+ROLL_SEAT = 0.015                               # the -X end sunk into the outer pole's side face
+ROLL_BAND_X = 0.55
 
 
-def roll(a, roof_piece):
-    """The rolled door flap across the top of the doorway: a 10-sided log whose upper end corners stop 0.008 short of
-    the roof's (sagging) inner surface, measured by rays along X; a darker rolled core proud of each end; two rope
-    bands."""
-    zt = ROLL_Z + ROLL_R
-    y = y_at(-1, ROLL_Z, ROLL_W)
-    tree = P.tree_of(roof_piece)
-    reach = []
-    for dy in (-ROLL_R, -0.12, 0.0, 0.12, ROLL_R):
-        for dz in (0.0, -0.12):
-            h = tree.ray_cast(Vector((0.0, y + dy, zt + dz)), X, 9.0)
-            if h[0] is not None:
-                reach.append(h[0].x)
-    LR = min(reach) - 0.008
-    P.log(a, (-LR, y, ROLL_Z), (LR, y, ROLL_Z), ROLL_R, CANVAS, sides=10, end_key=mix(CANVAS, CANVAS_DEEP, 0.4),
-          name="roll", kind="roll")
+def pole_side(end, which):
+    """The side face of a pole that faces the doorway (toward x 0 below the crossing): (point, unit normal). The face
+    contains the pole direction and the frame normal, so it does not depend on the pole's w."""
+    foot, d, w, sx = pole_axis(end, which)
+    _, U, N = basis(end)
+    u = N.cross(d).normalized()
+    n = u if u.x * sx < 0 else -u                      # pointing toward the doorway
+    return foot + n * PH, n
+
+
+def roll(a):
+    """The rolled door flap across the top of the doorway, in the doorway plane between the front poles (round 1:
+    it sat behind the inner pole, hidden by the roof edge from the hero view and in shade from the side). It lies in
+    the outer pole's depth: further back, the leaning outer pole hides its top from the hero camera. A 10-sided roll
+    (flat underneath, underside 7.02) whose -X end is cut along the outer pole A's side face and sunk ROLL_SEAT into
+    it; its +X end is cut along the mirrored face, which is the inner pole B's side face carried forward (it stands
+    clear in front of that pole, so from the front it ends at B's edge); that end a darker rolled-canvas key; two
+    rope bands."""
+    c0, n0 = pole_side(-1, "A")                         # the outer pole A stands on the -X side below the crossing
+    yc = y_at(-1, ROLL_Z, ROLL_W)
+    rv = ROLL_R / math.cos(math.pi / 10)
+    sec = [(rv * math.cos(math.radians(-72 + 36 * k)), rv * math.sin(math.radians(-72 + 36 * k))) for k in range(10)]
+
+    def x_face(y, z):                                   # x where (x, y, z) meets A's side face (negative)
+        q = Vector((0.0, y, z))
+        return -(q - c0).dot(n0) / n0.x
+    rings = [[Vector((x_face(yc + du, ROLL_Z + dv) - ROLL_SEAT, yc + du, ROLL_Z + dv)) for du, dv in sec],
+             [Vector((-x_face(yc + du, ROLL_Z + dv), yc + du, ROLL_Z + dv)) for du, dv in sec]]
+    pts = rings[0] + rings[1]
+    faces, keys = [], []
+    for k in range(10):
+        k1 = (k + 1) % 10
+        faces.append([k, 10 + k, 10 + k1, k1])
+        keys.append(None)
+    end_k = mix(CANVAS, CANVAS_DEEP, 0.4)
+    faces += [list(reversed(range(10))), list(range(10, 20))]
+    keys += [None, end_k]
+    P.shell(a, pts, faces, CANVAS, keys=keys, name="roll", kind="roll", amp=0.02)
     for s in (-1, 1):
-        x0 = s * (LR - 0.01)
-        P.log(a, (x0, y, ROLL_Z), (x0 + s * 0.03, y, ROLL_Z), 0.20, CANVAS_DEEP, sides=8, name=f"roll_core{s:+d}",
-              kind="roll")
-        c = Vector((s * 0.62, y, ROLL_Z))
-        ring = P.ngon(c, Vector((0, 1, 0)), Z, ROLL_R / math.cos(math.pi / 10) + 0.07 - P.SINK, 8, math.pi / 8)
+        c = Vector((s * ROLL_BAND_X, yc, ROLL_Z))
+        ring = P.ngon(c, Vector((0, 1, 0)), Z, rv + 0.07 - P.SINK, 8, math.pi / 8)
         P.rope(a, ring, 0.08, ROPE, ROPE_DEEP, sides=4, closed=True, twist=True, up=X, name=f"roll_band{s:+d}",
                kind="rope_band")
-    P.GEO["roll"] = {"underside": round(ROLL_Z - ROLL_R, 3), "length": round(2 * LR, 3)}
+    P.GEO["roll"] = {"underside": round(ROLL_Z - ROLL_R, 3), "top": round(ROLL_Z + ROLL_R, 3),
+                     "half_len_mid": round(-x_face(yc, ROLL_Z), 3), "w": round(ROLL_W, 3), "y": round(yc, 3)}
 
 
 def canvas_all(a):
@@ -383,7 +417,7 @@ def canvas_all(a):
     back_piece(a)
     for s in (-1, 1):
         flap(a, s)
-    roll(a, rp)
+    roll(a)
     return rp
 
 
@@ -425,26 +459,41 @@ def ties(a, roof_piece):
 # ---- lanterns -----------------------------------------------------------------------------------------------------------
 LANT = dict(w=1.05, plate=0.12, gw=0.78, gh=0.95, band=0.12, roof=0.30, fin=0.12, bar=0.12)
 LANT_H = LANT["plate"] + LANT["gh"] + LANT["band"] + LANT["roof"] + LANT["fin"] + 0.51     # to the ring top
-RING_TOP, LANT_Y = 9.78, -1.95          # the hanging lantern's ring top and axis: inside the gable, just behind the
-                                        # roll, under the ridge (its bottom 7.66, over the 6.9 headroom)
-
-
-def hang_point():
-    """Where the hanger meets the canvas: the inner ridge over the lantern, sunk 0.07 into the fold."""
-    return Vector((0.0, LANT_Y, ZRI - 0.07))
+LANT_X, LANT_Y, LANT_BOT = 0.50, -6.55, 8.30    # the hanging lantern (round 1: it hung 3 studs inside the gable, hidden
+                                                # from the hero view): just in front of the front frame's outer face
+                                                # under the crossing, on a hook from the second wrap. The studio key
+                                                # light and the hero camera both come from the front left, so the
+                                                # lantern hides and shades whatever lies behind and right of it: hung
+                                                # 0.5 right of the crossing and with its bottom 0.54 over the roll's
+                                                # top, the hero camera sees 63 % of the roll (centred, bottom 7.91:
+                                                # 33 %) and the key light reaches it (lantern shadow on 43 % of the
+                                                # roll's visible area when centred). Its back clears the outer pole,
+                                                # the lashing and the inner pole's lower turn by 0.05+.
+RING_TOP = LANT_BOT + LANT_H
+HOOK_R = 0.045
 
 
 def lantern_base():
-    return Vector((0.0, LANT_Y, RING_TOP - LANT_H))
+    return Vector((LANT_X, LANT_Y, LANT_BOT))
 
+
+def hook_points(ring_top):
+    """The iron hook from the front of the second lashing wrap (its start sunk into the rope) out over the lantern and
+    down into the top of its ring (the sheet's short dark hook under the lashing)."""
+    top = Vector(ring_top)
+    x0 = max(-0.6, min(0.15, top.x))                    # on the wrap's straight front run (along the outer pole)
+    w0 = PN + PH + LASH_R - P.SINK                       # the wrap's front run (centreline)
+    p0 = fp(-1, x0, HC + LASH_DH["lo1"], w0)
+    p0 = p0 + Vector((0.0, -1.0, 0.0)) * (LASH_R - 0.02)  # its start 0.02 inside the rope's front
+    return [p0, Vector(((x0 + top.x) / 2, (p0.y + top.y) / 2 - 0.06, top.z + 0.16)),
+            Vector((top.x, top.y, top.z + 0.16)), top - Vector((0.0, 0.0, 0.035))]
 
 
 def hanging_lantern(a, base, hanger=True):
     out = P.lantern(a, base, METAL, GLOW, ring_axis=(1, 0, 0), name="lantern", **LANT)
-    if hanger:                          # a short rope from the ring up to the ridge (the sheet's hook)
-        top = out["ring_top"]
-        P.rope(a, [top - Vector((0, 0, 0.01)), hang_point()], 0.05, ROPE, ROPE_DEEP, sides=4, name="hanger",
-               kind="rope")
+    if hanger:
+        P.tube(a, hook_points(out["ring_top"]), HOOK_R, 4, False, METAL, up=(1, 0, 0), name="hook", kind="lmetal",
+               amp=0.03)
     return out
 
 
@@ -462,13 +511,14 @@ def ground_lantern(a):
 MAT_T = 0.20
 MAT_X = x_out(Z_HEM) + 0.08             # the floor mat runs under the hems (sheet floor plan: the whole floor)
 MAT_Y = y_at(1, MAT_T, -WE) + 0.01          # and 0.01 past the end pieces' outer faces (short of the poles)
-BED_X, BED_Y, BED_R = -0.90, (-2.60, 0.90), 0.55
+BED_X, BED_Y, BED_R = 1.30, (-3.00, 0.50), 0.55   # on the +X half, where the hero camera sees it through the door
+                                                 # (round 1: at x -0.9 the left flap hid it)
 CHEST = dict(x=2.0, y=(2.75, 3.90), z=1.55)
 
 
 def mat(a):
     """The teal floor mat (the whole floor, under the hems and end pieces: the sheet's "Walkable Floor") and the
-    bedroll lying along Y on the -X half: tan with a teal band, a darker rolled core proud of its front end."""
+    bedroll lying along Y on the +X half: tan with a teal band, a darker rolled core proud of its front end."""
     zc = MAT_T / 2
     m = P.plank(a, (0.0, -MAT_Y, zc), (0.0, MAT_Y, zc), 2 * MAT_X, MAT_T, MAT, ch=0.0, name="mat", kind="mat",
                 amp=0.02)
@@ -478,8 +528,8 @@ def mat(a):
     st = (0.30 * L, 0.62 * L)
     teal = mix(MAT, BEDROLL, 0.15)
     P.log(a, (BED_X, BED_Y[0], zb), (BED_X, BED_Y[1], zb), BED_R, BEDROLL, sides=10, stations=st,
-          end_key=mix(BEDROLL, WOOD_DARK, 0.25), band_keys=[None, teal, None], name="bedroll", kind="bedroll")
-    P.log(a, (BED_X, BED_Y[0] + 0.01, zb), (BED_X, BED_Y[0] - 0.03, zb), 0.30, mix(BEDROLL, WOOD_DARK, 0.45), sides=8,
+          end_key=mix(BEDROLL, WOOD_DARK, 0.1), band_keys=[None, teal, None], name="bedroll", kind="bedroll")
+    P.log(a, (BED_X, BED_Y[0] + 0.01, zb), (BED_X, BED_Y[0] - 0.03, zb), 0.30, mix(BEDROLL, WOOD_DARK, 0.3), sides=8,
           name="bedroll_core", kind="bedroll")
 
 
@@ -503,8 +553,10 @@ PEGS = {"fl": ((-5.0, -7.1), 8.0), "fr": ((5.0, -7.1), -6.0), "bl": ((-5.0, 7.1)
 
 
 def crate(a, c=(0.0, 0.0), rot=0.0):
-    """The braced storage crate (closed lid) with iron bolts at the frame corners of every side."""
-    out = P.crate(a, c, WOOD_DARK, WOOD_DEEP, rot=rot, W=2.30, H=2.20, open_top=False, frame_t=(0.1, 0.25),
+    """The braced storage crate (closed lid) with iron bolts at the frame corners of every side. Its body and frame
+    keys sit a step lighter than the barrel's wood (round 1: the crate rendered darker than the sheet's)."""
+    # mixed here, not at import: the palette is only registered once build() runs
+    out = P.crate(a, c, mix(WOOD_DARK, TIMBER, 0.25), mix(WOOD_DEEP, WOOD_DARK, 0.4), rot=rot, W=2.30, H=2.20, open_top=False, frame_t=(0.1, 0.25),
                   name="crate")
     P.paint(a, [out[0].fs[0]], mix(WOOD_DARK, WOOD_DEEP, 0.3))          # the base like the frame, not a dark shade
     for f in out[0].fs:                                 # one Tint on the body (per-face random tints read as facing)
@@ -594,9 +646,10 @@ NOTES = {
     HERO: "Walk-in A-frame canvas tent (remade sheet): two X frames of 0.9 square poles (tips 12.0, crossing 10.26, "
           "leaning out 4 deg) with ridge lashings and foot bands; a cream canvas of closed 0.10 slabs (sagging side "
           "panels folded over the ridge, closed back, two front door flaps with turned-back edges, open gable above a "
-          "rolled door flap); a Neon lantern hanging inside the doorway from the ridge; hem and flap ties; teal mat, "
+          "rolled door flap between the front poles); a Neon lantern hanging on a hook from the front lashing; hem "
+          "and flap ties; teal mat, "
           "bedroll and a plank chest inside; a braced crate, two barrels, a ground lantern on a stake, two stones and "
-          "four pegs outside. Doorway 3.6 clear to 7.0 (roll underside 7.02, lantern 7.76); collision precise, "
+          "four pegs outside. Doorway 3.6 clear to 7.0 (roll underside 7.02, lantern 8.30); collision precise, "
           "walk-in Requires Manual Validation.",
     FRAME_P: "A-Frame Pole: one X of two 0.9 square poles side by side, ridge lashing (three wraps, two diagonals), a "
              "two-turn rope band low on each pole",
@@ -627,15 +680,21 @@ CLOSE = {"lash_cu": dict(at=(0.0, -3.9, 10.2), r=1.3, az=-25, el=10),
          "door_cu": dict(cam=(1.5, -12.0, 4.5), look=(0.0, -2.0, 4.5), lens=24.0),
          "inside_cu": dict(cam=(0.8, -2.5, 4.0), look=(-0.5, 3.5, 3.0), lens=14.0)}
 
-ESC_Y = 2.30                                        # inside both end pieces up to the box top, and clear of the
-                                                    # space under the pole tips (outside the canvas, roofed by poles)
-ESC_BOX = ((-6.0, -ESC_Y, 0.3), (6.0, ESC_Y, 10.2))  # the inside over the mat (points outside the canvas are not
-ESCAPE = {"box": ESC_BOX, "floor": False,           # enclosed, so they are skipped; x +-6.0 keeps the space under
-          "allow": {"door": ((-6.05, -ESC_Y - 0.05, 0.25), (6.05, -ESC_Y + 0.05, 10.25)),   # the hem ties out); the
-                    "gable": ((-6.05, -ESC_Y - 0.05, 10.15), (6.05, -1.0, 10.25)),          # mat is the floor. Allowed:
-                    "door_floor": ((-6.05, -ESC_Y - 0.05, 0.25), (6.05, -1.5, 0.35))}}      # door, gable, sill rays
-WALK = {"paths": [[(1.0, -9.5), (1.0, -4.0), (1.0, 1.8)], [(1.0, -9.5), (1.0, -3.0), (1.3, 1.0)]], "skip": ("mat",),
-        "turn": [(1.4, -0.2, MAT_T)]}
+ESC_Y = 3.85                    # the whole interior (round 1: the box covered only y +-2.3 and skipped the floor):
+                                # inside both leaning end pieces at every height (their inner faces at |y| 3.91 at
+                                # the ridge, 4.60 at the hem), so no grid point lies outside the canvas under the pole
+                                # tips; x +-6.0 leaves the space under the hem ties out; floor rays on (the mat).
+                                # `wall` 1.0 sends seam rays through every vertex line of the end pieces down to the
+                                # hem junctions (|y| 4.6-4.7) and of the side panels' hems.
+ESC_BOX = ((-6.0, -ESC_Y, 0.25), (6.0, ESC_Y, 10.2))
+ESCAPE = {"box": ESC_BOX, "floor": True, "wall": 1.0,
+          "allow": {"door": ((-6.05, -ESC_Y - 0.05, 0.2), (6.05, -ESC_Y + 0.05, 10.25)),     # the front face: the
+                    "gable": ((-6.05, -ESC_Y - 0.05, 10.15), (6.05, -2.0, 10.25)),           # doorway and the gable;
+                    "sill": ((-3.4, -ESC_Y - 0.05, 0.2), (3.4, -1.0, 0.3))}}                 # grazing floor rays that
+                                                                                             # leave by the doorway
+WALK = {"paths": [[(-1.0, -9.5), (-1.0, -4.0), (-1.0, 1.8)], [(-1.0, -9.5), (-1.0, -3.0), (-1.3, 1.0)]],
+        "skip": ("mat",),
+        "turn": [(-1.4, -0.2, MAT_T)]}
 VERIFY = dict(cls="structure", walk=WALK, escape=ESCAPE, stored=["m064_door", "m064_inside"],
               sockets={HERO: ["heat_glow", "heat_glow"], LANTERN_P: ["heat_glow"]})
 
@@ -644,7 +703,8 @@ DOOR_FULL = 6.5
 
 
 def door_check(objs):
-    """House rules: headroom >= 6.9 over the walk-in lane (rays up from the floor, x 0.45-1.55: the head over the walk path, door to mat centre);
+    """House rules: headroom >= 6.9 over the walk-in lane (rays up from the floor, x -1.55 to -0.45: the head over the walk
+    path, door to mat centre, beside the bedroll on +X);
     the doorway (rays along +Y from y -9 to the front canvas plane: nothing hit) clear 3.6 wide to DOOR_FULL (the
     poles converge above it, spec departure) and 2.0 wide (+-1.0) to 7.0."""
     h = objs[HERO]
@@ -652,7 +712,7 @@ def door_check(objs):
     tree = BVHTree.FromPolygons([h.matrix_world @ v.co for v in me.vertices], [list(p.vertices) for p in me.polygons])
     z0 = h.matrix_world.translation.z - h[MODEL.OFF][2]
     head = 99.0
-    for x in (0.45, 1.0, 1.55):
+    for x in (-0.45, -1.0, -1.55):
         y = -9.0
         while y <= 1.0:
             hit = tree.ray_cast(MODEL.at(h, (x, y, MAT_T + 0.02)), Z, 50.0)[0]
