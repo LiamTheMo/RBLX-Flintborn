@@ -1631,3 +1631,60 @@ the exploded view, the underside and the VFX panel. Shares are with VFX off; bol
 ## Main session after verification round 2 (2026-10-28)
 
 Applied m3: `POD_PART_BANDS` (deep 0.2, hot 0.74) for the Pod part only. Face keys went from 60/52/32 at deep 0.35 to 46/72/26 (deep / mid / hot), against the sheet's mostly-mid part. The hero is unchanged: 1470 tris, one shell, 0 bowties, `problems` empty. Export: 0 problems. m1, m2 and m4–m8 are recorded in MODEL_PROGRESS.md.
+
+## Touch-up for the restyled sheet (2026-11-04)
+
+The owner restyled `references/025.png` (same design; the VFX panel is gone, and the notes say "No textures, no glow or particles"; the swatch calls the seedpod "Bright orange/yellow"). The compare pass found only colour and effect changes, so the mesh is unchanged: hero 1470 tris, pod 144, petal 100, rock base 866; same sizes.
+
+- **Plain faceted seedpod.** `SEED_FLAT = True`: every seed diamond takes `m025_seed` (the mount peg's buried foot stays dirt), so the yellow / red diamond checker is gone and the light and dark facets come from the lighting. The pod part follows, since it uses the same painter.
+- **No Neon.** The three seed keys are solid (emission 0, so `_restyle` rebuilt their materials with the Tint node). `m025_seed` was refitted on the hero against the new sheet's seed: `#FC7425` (Neon) → `#F27C1A`. `#F27418` rendered `#FF7717` front; `#F5801C` rendered `#FF851B`. `m025_seed_deep` and `m025_seed_hot` stay in `PALETTE` but are unused, so their materials are dropped. The export's Neon seed pieces go with them.
+- **Sockets removed:** `crystal_glow` (`GLOW_LIGHT`), `crystal_halo` (`HALO_POS`, `HALO_SCALE`, `HALO_COLOR`) and `embers` (`CRYSTALS_FX`, `CRYSTALS_POS`). The hero has no sockets. The `vfx_halo` shot and its PNG are gone.
+
+Colour measures (seed pixels by `measure()`'s seed mask, median / lit quartile / shade quartile):
+
+| View | Sheet | Ours |
+| --- | --- | --- |
+| Front | `#FB7F19` / `#FDBE38` / `#CC3E0B` | `#FF8019` / `#FF981F` / `#C15C11` |
+| Front three-quarter | `#FB7E19` / `#FDC73D` / `#C6390C` | `#FF8F19` / `#FF9A1F` / `#F77213` |
+| Side | `#FB7E1A` / `#FDB434` / `#D23E0C` | `#F77517` / `#FF8223` / `#B1500B` |
+| Rear | `#FC821C` / `#FDB636` / `#D5430C` | `#FF7B19` / `#FF8422` / `#E86D11` |
+| Rear three-quarter | `#FC7B18` / `#FDB534` / `#CC3A0B` | `#FF7B18` / `#FF8321` / `#E86D12` |
+| Top | `#FC8E1B` / `#FDBE3A` / `#D4490A` | `#FF811C` / `#FF991F` / `#EF7017` |
+| Swatch "Seedpod" | `#FD8018` | key `#F27C1A` |
+
+The medians match within about 6 levels, except the front three-quarter (+17 g). The sheet's lit facets turn yellow (`#FDBE38`) where ours stay orange (`#FF981F`), and its shade facets are redder. That is the sheet's lighting on one flat colour, and the studio doesn't copy it; recorded, not scored (house rules, Colour). A second key to paint yellow tops would be the old diamond pattern again.
+
+Checks: `build()` problems `[]` (`K.check`, self-hits, sizes, the seed present). `kit_verify.run(cls="asset")` on the hero and three parts reports one problem: `EmberbloomNode shell 0 (rock#0): parity-inward 3`. It is a geometry check, and this touch-up doesn't change the mesh (colour and sockets only), so it is left for the next rebuild; `build()`'s own checks report 0 winding errors and 0 self-hits. Renders in this folder were re-made by `build()`.
+
+## Touch-up verification (2026-11-04)
+
+**Result: PASS, 8/10.** Fresh verifier, read-only, in a background session on a copy of the work file with the touch-up built (`TOUCH_Av2.blend`); nothing rebuilt or saved. The touch-up matches the restyled sheet: a plain faceted orange seedpod, no Neon, no sockets. No blockers.
+
+Technical:
+- `kit_verify.run(cls="asset", sockets=[])` on the hero and three parts: hero 1470 / 3999, pod 144, petal 100, rock base 866; one shell each; sizes 6.96 × 5.69 × 5.50 (hero); 0 floating, 0 buried; min corner 5.02°. One problem: `EmberbloomNode shell 0 (rock#0): winding 0, self-hits 0, parity-inward 3`.
+- **That problem is pre-existing.** All four meshes are vertex-for-vertex identical to the committed kit file's builds (same vertex and tri counts, max sorted-coordinate difference 0.0). The three faces (areas 0.004–0.014) sit at z 0.47 near (−0.3, −1.1): two `leaf_dark` faces facing down lie on a `dirt` face facing up, a back-to-back contact between a leaf underside and the slab top. Zero thickness and sandwiched, so nothing shows from outside.
+- Sockets: none on the hero or the parts. Materials: the hero's only seed key is `m025_seed`; `m025_seed_deep` and `m025_seed_hot` are on no object (the kit file's build still uses all three). Every seed material has emission 0.
+- Nothing else changed: leaves, rocks and dirt keep their keys and geometry.
+
+Colours against the sheet (`compare.compare` cells f34 (-20, 14), r34 (200, 14), front (0, 8), side (90, 8), rear (180, 8), top (0, 89); seed mask hue 14–50°, s > 0.6, v > 0.55; median / lit quartile / shade quartile):
+
+| View | Sheet | Ours |
+| --- | --- | --- |
+| Front | `#FC801A` / `#FDBF39` / `#D4420C` | `#FF8019` / `#FF981F` / `#C05E11` |
+| Front three-quarter | `#FC7F19` / `#FDC73D` / `#D9420F` | `#FF8F19` / `#FF991F` / `#F87313` |
+| Side | `#FC801A` / `#FDB434` / `#DE480D` | `#F67417` / `#FF8222` / `#B1500B` |
+| Rear | `#FC831D` / `#FDB736` / `#E0480E` | `#FF7B19` / `#FF8422` / `#E86D11` |
+| Top | `#FC8F1C` / `#FDBE3A` / `#D54A0A` | `#FF811C` / `#FF981E` / `#EF7018` |
+
+The seed medians match within about 6 levels (front three-quarter +16 g). They agree with the modeller's table.
+
+Blockers: none.
+
+Minors:
+1. **The pod reads plainer than the sheet's.** The sheet's lit facets turn yellow (`#FDBE38`–`#FDC73D`) and its shade facets red-orange (`#D4420C`). Ours stay within orange (`#FF981F` lit; the shade is `#F87313` in the front three-quarter). There the facets nearly vanish, and the "orange-yellow" read is mostly orange. That is the house-rule trade-off (no colour by facing). If the owner wants more, a height blend inside the pod is allowed and is not the old checker: `SEED_HOT` over the top third, blended `steps=3` into `SEED_MID`, refitted to the medians above. Optionally add a little per-face `tint_var` on the seed so the facets separate under the studio light.
+2. Parity-inward 3 on the hero's rock shell (above): pre-existing and invisible. Clear it at the next mesh rebuild by seating the two leaf undersides 0.002–0.05 into the slab instead of on it.
+3. `m025_seed_deep` and `m025_seed_hot` stay in `PALETTE` unused. They are harmless, because the exporter reads the object's slots.
+
+Silhouette and leaf colour are unchanged from the passed build and not re-scored.
+
+Scratch renders: `<temp>/.../cmp/M025/`.

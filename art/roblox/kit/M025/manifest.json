@@ -497,23 +497,7 @@
    },
    {
     "key": "m025_seed",
-    "hex": "#FC7425",
-    "levels": [
-     1.0
-    ],
-    "used": true
-   },
-   {
-    "key": "m025_seed_deep",
-    "hex": "#F24C18",
-    "levels": [
-     1.0
-    ],
-    "used": true
-   },
-   {
-    "key": "m025_seed_hot",
-    "hex": "#FDA835",
+    "hex": "#F27C1A",
     "levels": [
      1.0
     ],
@@ -552,216 +536,21 @@
     {
      "file": "meshes/EmberbloomNode.glb",
      "kind": "solid",
-     "tris": 1366,
+     "tris": 1470,
      "offset": [
       0.0,
-      1.8475,
+      2.75,
       0.0
      ],
      "size": [
       6.9642,
-      3.695,
+      5.5,
       5.6872
      ]
-    },
-    {
-     "file": "meshes/EmberbloomNode_glow_m025_seed.glb",
-     "kind": "glow",
-     "tris": 28,
-     "offset": [
-      -0.052,
-      3.6494,
-      -0.1935
-     ],
-     "size": [
-      2.156,
-      3.2463,
-      2.2182
-     ],
-     "key": "m025_seed",
-     "color": "#FC7425",
-     "material": "Neon",
-     "collision": {
-      "CollisionFidelity": "Box",
-      "CanCollide": false,
-      "CanQuery": false,
-      "CanTouch": false,
-      "CastShadow": false
-     }
-    },
-    {
-     "file": "meshes/EmberbloomNode_glow_m025_seed_deep.glb",
-     "kind": "glow",
-     "tris": 46,
-     "offset": [
-      -0.0238,
-      3.3852,
-      -0.1935
-     ],
-     "size": [
-      2.2125,
-      4.2296,
-      2.2182
-     ],
-     "key": "m025_seed_deep",
-     "color": "#F24C18",
-     "material": "Neon",
-     "collision": {
-      "CollisionFidelity": "Box",
-      "CanCollide": false,
-      "CanQuery": false,
-      "CanTouch": false,
-      "CastShadow": false
-     }
-    },
-    {
-     "file": "meshes/EmberbloomNode_glow_m025_seed_hot.glb",
-     "kind": "glow",
-     "tris": 30,
-     "offset": [
-      -0.0238,
-      4.2222,
-      -0.0542
-     ],
-     "size": [
-      2.2125,
-      2.5557,
-      1.9396
-     ],
-     "key": "m025_seed_hot",
-     "color": "#FDA835",
-     "material": "Neon",
-     "collision": {
-      "CollisionFidelity": "Box",
-      "CanCollide": false,
-      "CanQuery": false,
-      "CanTouch": false,
-      "CastShadow": false
-     }
     }
    ],
-   "vfx": [
-    {
-     "name": "VFX_EmberbloomNode_crystal_glow_1",
-     "kind": "crystal_glow",
-     "position": [
-      -0.0251,
-      6.0,
-      1.0095
-     ],
-     "vfx_scale": 1.0,
-     "trigger": null,
-     "spec": {
-      "emitters": [],
-      "light": {
-       "color": "#FF8A2A",
-       "brightness": 0.6,
-       "range": 9.0,
-       "flicker": false,
-       "shadows": true
-      }
-     }
-    },
-    {
-     "name": "VFX_EmberbloomNode_crystal_halo_1",
-     "kind": "crystal_halo",
-     "position": [
-      -0.0251,
-      4.4,
-      -0.4905
-     ],
-     "vfx_scale": 0.45,
-     "trigger": null,
-     "spec": {
-      "emitters": [
-       {
-        "name": "Halo",
-        "texture": "glow_soft",
-        "color": [
-         "#FFD9A8",
-         "#FF9A3C"
-        ],
-        "size": [
-         12,
-         14
-        ],
-        "transparency": [
-         1.0,
-         0.82,
-         1.0
-        ],
-        "lifetime": [
-         2,
-         3
-        ],
-        "rate": 0.8,
-        "speed": [
-         0,
-         0
-        ],
-        "spread": 0,
-        "light_emission": 1.0
-       }
-      ],
-      "light": null
-     }
-    },
-    {
-     "name": "VFX_EmberbloomNode_embers_1",
-     "kind": "embers",
-     "position": [
-      -0.0251,
-      6.2,
-      -0.1905
-     ],
-     "vfx_scale": 1.0,
-     "trigger": null,
-     "spec": {
-      "emitters": [
-       {
-        "name": "Crystals",
-        "texture": "spark_diamond",
-        "color": [
-         "#FFE34A",
-         "#FECE16"
-        ],
-        "size": [
-         0.8,
-         0.3
-        ],
-        "transparency": [
-         0.1,
-         1.0
-        ],
-        "lifetime": [
-         1.8,
-         3.0
-        ],
-        "rate": 1.5,
-        "speed": [
-         0.3,
-         0.8
-        ],
-        "spread": 40,
-        "light_emission": 1.0,
-        "drag": 0.6,
-        "acceleration": [
-         0,
-         0.3,
-         0
-        ],
-        "shape": [
-         2.0,
-         0.6,
-         2.0
-        ]
-       }
-      ],
-      "light": null
-     }
-    }
-   ],
-   "notes": "Emberbloom event node: a tall faceted 8-sided ember seed (Neon: deep red-orange, orange, hot amber facets) rising from a squat lotus of six thick faceted red crystal leaves pointed at both ends, on a ring of ten chunky brown-grey boulders and three pebbles round a faceted dirt slab with a shallow underside recess; one closed mesh. VFX: crystal_halo (warm halo round the upper seed), crystal_glow (warm light above the tip), embers (yellow diamond crystals floating above the tip)"
+   "vfx": [],
+   "notes": "Emberbloom event node: a tall faceted 8-sided ember seed (one solid orange key, no glow) rising from a squat lotus of six thick faceted red crystal leaves pointed at both ends, on a ring of ten chunky brown-grey boulders and three pebbles round a faceted dirt slab with a shallow underside recess; one closed mesh. No VFX"
   },
   {
    "name": "EmberbloomPetal",
@@ -823,83 +612,23 @@
    },
    "pieces": [
     {
-     "file": "meshes/EmberbloomPod_glow_m025_seed.glb",
-     "kind": "glow",
-     "tris": 72,
+     "file": "meshes/EmberbloomPod.glb",
+     "kind": "solid",
+     "tris": 144,
      "offset": [
       0.0,
-      2.3633,
+      2.285,
       0.0
      ],
      "size": [
       2.3435,
-      4.4135,
+      4.57,
       2.3206
-     ],
-     "key": "m025_seed",
-     "color": "#FC7425",
-     "material": "Neon",
-     "collision": {
-      "CollisionFidelity": "Box",
-      "CanCollide": false,
-      "CanQuery": false,
-      "CanTouch": false,
-      "CastShadow": false
-     }
-    },
-    {
-     "file": "meshes/EmberbloomPod_glow_m025_seed_deep.glb",
-     "kind": "glow",
-     "tris": 46,
-     "offset": [
-      -0.1261,
-      0.9973,
-      -0.0294
-     ],
-     "size": [
-      2.0912,
-      1.9945,
-      1.9289
-     ],
-     "key": "m025_seed_deep",
-     "color": "#F24C18",
-     "material": "Neon",
-     "collision": {
-      "CollisionFidelity": "Box",
-      "CanCollide": false,
-      "CanQuery": false,
-      "CanTouch": false,
-      "CastShadow": false
-     }
-    },
-    {
-     "file": "meshes/EmberbloomPod_glow_m025_seed_hot.glb",
-     "kind": "glow",
-     "tris": 26,
-     "offset": [
-      -0.0301,
-      3.2308,
-      -0.0705
-     ],
-     "size": [
-      2.0182,
-      2.6785,
-      2.1797
-     ],
-     "key": "m025_seed_hot",
-     "color": "#FDA835",
-     "material": "Neon",
-     "collision": {
-      "CollisionFidelity": "Box",
-      "CanCollide": false,
-      "CanQuery": false,
-      "CanTouch": false,
-      "CastShadow": false
-     }
+     ]
     }
    ],
    "vfx": [],
-   "notes": "Seedpod (reusable): elongated 8-sided faceted gem, diamond facets, long pointed top, short lower cone and blunt nub; Neon deep / mid / hot facets"
+   "notes": "Seedpod (reusable): elongated 8-sided faceted gem, diamond facets, long pointed top, short lower cone and blunt nub; one solid orange key"
   },
   {
    "name": "EmberbloomRockBase",
@@ -943,15 +672,15 @@
  ],
  "stats": {
   "assets": 4,
-  "pieces": 9,
-  "solid": 3,
+  "pieces": 4,
+  "solid": 4,
   "water": 0,
-  "glow": 6,
+  "glow": 0,
   "tris": 2580,
-  "vfxSockets": 3,
-  "paletteColours": 21,
-  "paletteLevels": 359,
-  "meshBytes": 242560
+  "vfxSockets": 0,
+  "paletteColours": 19,
+  "paletteLevels": 357,
+  "meshBytes": 237336
  },
  "problems": []
 }

@@ -1,4 +1,4 @@
-"""025 Emberbloom (references/025.png): a squat lotus of six thick faceted red crystal leaves round a tall glowing
+"""025 Emberbloom (references/025.png): a squat lotus of six thick faceted red crystal leaves round a tall
 faceted orange seed, on a low ring of ten chunky brown-grey boulders round a faceted dirt slab.
 
     import importlib, kit_models, m025; importlib.reload(kit_models); importlib.reload(m025); m025.build()
@@ -7,7 +7,7 @@ Parts as on the sheet's Exploded Construction / Parts Breakdown, each built by i
 (studs; front -Y, +X right, ground z = 0, origin = the seed's axis on the ground). R08 owns Emberbloom*, so the names
 are (M025_spec.md section 8, decision 12):
 - EmberbloomPod (pod_part): the seed: an 8-sided gem of half-step offset rings (diamond facets), a long pointed top,
-  a short lower cone ending in a blunt nub. Three Neon keys (deep / mid / hot) by a position field.
+  a short lower cone ending in a blunt nub. One solid seed key since the 2026-11-04 touch-up (SEED_FLAT).
 - EmberbloomPetal (petal_part): one leaf: a thick faceted bicone shard (the convex hull of a pointed 12-point outline,
   a top ridge and apex, and a keel), pointed at both ends, with its hexagonal joining peg.
 - EmberbloomRockBase (rock_base_part): the dirt slab (14-sided, sloped sides, raised top, a shallow faceted recess in
@@ -16,9 +16,9 @@ are (M025_spec.md section 8, decision 12):
 The hero (EmberbloomNode) is built from the same builders: slab, boulders and pebbles, then the six leaves, then the
 seed (whose hidden nub runs down into the slab), united one shell at a time (exact booleans, fine merge), floor-cut
 flat at the ground with the recess kept open. Colour (stage 4) is painted by position fields inside the builders
-before the union (the union and cleanup keep each face's key and Tint). Stages 5-6: the seed keys are Neon; the
-finished hero carries a crystal_halo (inside the upper seed), a crystal_glow light above the tip and an embers socket
-of yellow diamond crystals above the tip. See M025_spec.md.
+before the union (the union and cleanup keep each face's key and Tint). Stages 5-6: nothing since the 2026-11-04
+touch-up for the restyled sheet ("No textures, no glow or particles"): the seed is one solid faceted orange key, no
+Neon, and the hero carries no sockets. See M025_spec.md.
 """
 import json
 import math
@@ -48,7 +48,7 @@ SEED_KEYS = (SEED_DEEP, SEED_MID, SEED_HOT)
 
 UV = dict(angle=45.0, method="ANGLE_BASED", margin=0.008, min_angle=45.0)
 POLISH_LIM = 5.0
-NEON = 1.0              # the exporter's GLOW_EMISSION threshold: the three seed keys export as Neon pieces
+NEON = 1.0              # the exporter's GLOW_EMISSION threshold (no key reaches it since the 2026-11-04 touch-up)
 
 # key -> (hex, roughness, emission, low specular). Stage 1 placeholders are the study's 5.4 starting hexes; stage 4
 # writes the calibrated values here (targets in TARGETS, passes in M025_spec.md "Stage 4").
@@ -67,8 +67,13 @@ NEON = 1.0              # the exporter's GLOW_EMISSION threshold: the three seed
 # leaf #9A252F (191,40,48 / BE2930), leaf_tip #B02F3A (221,51,60 / DC333B), leaf_dark #831C28 (160,31,41 / A02229).
 # Then leaf x 1.03 and leaf_tip x 1.05 (part shot median #AF242E -> #B0252E against #BC2931, exploded lit #D6343C ->
 # #E0363F against #F03A43); x 1.07 / 1.15 (tried) pushed the front median to +53 over the sheet and read pink.
-PALETTE = {SEED_DEEP: ("#F24C18", 0.5, NEON, True), SEED_MID: ("#FC7425", 0.5, NEON, True),
-           SEED_HOT: ("#FDA835", 0.5, NEON, True),
+# Touch-up 2026-11-04 (restyled sheet: a plain faceted orange-yellow seedpod, no glow): the seed keys are solid (no
+# emission) and only SEED_MID paints the seed (SEED_FLAT); its light and dark facets come from the lighting. SEED_MID
+# refitted on the hero views against the new sheet's seed medians (#FB7F19 front, swatch #FD8018): #F27418 rendered
+# #FF7717 front, #F27C1A renders #FF8019, #F5801C #FF851B. Were
+# deep #F24C18, mid #FC7425, hot #FDA835, all Neon.
+PALETTE = {SEED_DEEP: ("#F24C18", 0.5, 0.0, True), SEED_MID: ("#F27C1A", 0.5, 0.0, True),
+           SEED_HOT: ("#FDA835", 0.5, 0.0, True),
            LEAF: ("#9F2731", 0.65, 0.0, True), LEAF_TIP: ("#B8323D", 0.65, 0.0, True),
            LEAF_DARK: ("#831C28", 0.7, 0.0, True),
            ROCK: ("#69524B", 0.92, 0.0, False), ROCK_LIGHT: ("#886F66", 0.92, 0.0, False),
@@ -219,6 +224,7 @@ SEED_POST_R = 0.3       # its radius fraction there (round 2, B1c: 0.6 left oran
 # and five noise seeds: the side view stays deep-heavy in every variant, as a few big diamonds face it)
 SEED_COL = dict(lat=0.03, dir=(-1.0, -0.3), nz=0.10, chk=0.18, deep=0.58, hot=0.78, seed=25011, cap_h=0.72, cap_k=0.3,
                 lat_top=0.25)
+SEED_FLAT = True         # touch-up 2026-11-04: every seed diamond takes SEED_MID (the restyled sheet's plain pod)
 SEED_FOOT_Z = 1.5        # (hero; 1.2 left one orange speck under P1 in the side view) seed diamonds centred below this z are the mount peg's dirt (round 2, B1c)
 SEED_INFO = {}
 
@@ -297,6 +303,8 @@ def _paint_seed(a, faces, ring_of, z0, H, foot=None):
             lat = c["lat_top"] * (q.normalized().dot(lat_dir) if q.length > 1e-6 else 0.0)
         u = hh + lat + c["nz"] * nf(p) + c["chk"] * (1 if par else -1)
         k = SEED_DEEP if u < c["deep"] else SEED_MID if u < c["hot"] else SEED_HOT
+        if SEED_FLAT:
+            k = SEED_MID      # touch-up 2026-11-04: one plain faceted seed key, no deep / hot diamond pattern
         if foot is not None and p.z < foot:
             # (round 2, B1c) the hero seed's buried foot reads as the sheet's mount peg (Seedpod Mount close-up), not
             # as orange specks between the leaf bases and the slab: dirt, a solid key
@@ -705,13 +713,12 @@ def _seed_probe():
 
 
 NOTES = {
-    HERO: "Emberbloom event node: a tall faceted 8-sided ember seed (Neon: deep red-orange, orange, hot amber facets) "
+    HERO: "Emberbloom event node: a tall faceted 8-sided ember seed (one solid orange key, no glow) "
           "rising from a squat lotus of six thick faceted red crystal leaves pointed at both ends, on a ring of ten "
           "chunky brown-grey boulders and three pebbles round a faceted dirt slab with a shallow underside recess; "
-          "one closed mesh. VFX: crystal_halo (warm halo round the upper seed), crystal_glow (warm light above the "
-          "tip), embers (yellow diamond crystals floating above the tip)",
+          "one closed mesh. No VFX",
     POD: "Seedpod (reusable): elongated 8-sided faceted gem, diamond facets, long pointed top, short lower cone and "
-         "blunt nub; Neon deep / mid / hot facets",
+         "blunt nub; one solid orange key",
     PETAL: "Leaf (reusable): thick faceted red crystal shard, pointed at both ends, darker base to brighter tip, "
            "hexagonal joining peg under its base",
     BASE: "Base (Rock Cluster, reusable): faceted dirt slab with a shallow faceted underside recess, ten squat dome "
@@ -920,31 +927,14 @@ def _fused_ok(o):
 
 
 # ---- stages 5 + 6 (spec section 7) -------------------------------------------------------------------------------------
-# Stage 5: the three seed keys are Neon (emission NEON, previewed unlit by _glow_mats); one warm steady PointLight in
-# the open above the tip and a little in front (crystal_glow). Stage 6: crystal_halo inside the upper seed (the mesh
-# hides the billboard's middle; the glow shows round the silhouette) and embers re-textured as the VFX panel's floating
-# yellow 4-point diamond crystals, spawned in the open above and beside the tip.
-GLOW_LIGHT = dict(pos=(0.0, -1.2, 6.0), color="#FF8A2A", brightness=0.6, range=9.0, flicker=False, shadows=True)
-HALO_POS = (0.0, 0.3, 4.4)
-HALO_SCALE = 0.45
-HALO_COLOR = ["#FFD9A8", "#FF9A3C"]
-CRYSTALS_POS = (0.0, 0.0, 6.2)
-CRYSTALS_FX = {"name": "Crystals", "texture": "spark_diamond", "color": ["#FFE34A", "#FECE16"], "size": [0.8, 0.3],
-               "transparency": [0.1, 1.0], "lifetime": [1.8, 3.0], "rate": 1.5, "speed": [0.3, 0.8], "spread": 40,
-               "light_emission": 1.0, "drag": 0.6, "acceleration": [0, 0.3, 0], "shape": [2.0, 0.6, 2.0]}
-
-
+# Touch-up 2026-11-04: the restyled sheet says "No textures, no glow or particles" and drops its VFX panel, so under the
+# house rule there is no Neon (the seed keys are solid) and the hero carries no sockets: the crystal_glow light
+# (GLOW_LIGHT), the crystal_halo (HALO_POS) and the embers crystals (CRYSTALS_FX) are gone.
 def _vfx(h):
-    """The hero's three sockets (replacing any it has), at build-frame points - h[OFF] (hero-local studs)."""
-    import vfx as V
+    """The hero's sockets: none (any it has are removed)."""
     for c in [c for c in h.children if c.get("vfx_kind")]:
         bpy.data.objects.remove(c, do_unlink=True)
-    off = Vector(h[OFF])
-    halo = dict(V.KINDS["crystal_halo"]["emitters"][0], color=HALO_COLOR)
-    light = {k: GLOW_LIGHT[k] for k in ("color", "brightness", "range", "flicker", "shadows")}
-    return [K.socket(h, "crystal_glow", Vector(GLOW_LIGHT["pos"]) - off, light=light),
-            K.socket(h, "crystal_halo", Vector(HALO_POS) - off, scale=HALO_SCALE, emitters=[halo]),
-            K.socket(h, "embers", Vector(CRYSTALS_POS) - off, emitters=[dict(CRYSTALS_FX)])]
+    return []
 
 
 def _inside_fn(tree):
@@ -1157,7 +1147,6 @@ def render_views(objs, close=True):
     shown = _exploded(objs) if len(objs) > 1 else []
     try:
         extra = {k: ([h], az, el) for k, (az, el) in SHEET_VIEWS.items()}
-        extra["vfx_halo"] = ([h], 0, 10)
         if shown:
             extra["exploded"] = (shown, -12, 16)
         for o in objs[1:]:
