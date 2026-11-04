@@ -6,6 +6,8 @@
 --   "option" a compact row for dropdown lists
 -- Selected draws the gold-glow plate; locked draws the disabled plate with a
 -- lock in place of the chevron and stays selectable (tooltips say why).
+-- Greyed (:SetGreyed, a recipe short of materials) only fades the title, note
+-- and icon: the row keeps its plate and stays fully usable.
 --
 --   Kit.ListRow.new(list, { size = { 300, 72 }, variant = "card", icon = "pickaxe",
 --       title = "Iron Pickaxe", subtitle = "Mine stone and ore.", chevron = true, onPress = pick })
@@ -237,8 +239,11 @@ function ListRow:_render(state: string)
 	if self.chevron then
 		self.chevron.Visible = not locked
 	end
-	local dim = drawn == "disabled" or drawn == "locked"
+	local dim = drawn == "disabled" or drawn == "locked" or self.greyed == true
 	self.title.TextColor3 = Tokens.Color(if dim then "inkSoft" else "inkLabel")
+	if self.subtitle then
+		self.subtitle.TextTransparency = if self.greyed then 0.35 else 0
+	end
 	-- The icon (an item's art, or its faded stand-in glyph) keeps its own fade.
 	Core.Dim(self.icon, if dim then 0.4 else 0)
 end
@@ -275,6 +280,14 @@ end
 function ListRow:SetEnabled(enabled: boolean)
 	if self.control then
 		self.control:SetEnabled(enabled)
+	end
+end
+
+-- Fades the row's text and icon (still selectable), or brings them back.
+function ListRow:SetGreyed(greyed: boolean)
+	if self.greyed ~= greyed then
+		self.greyed = greyed
+		self:_render(self.root:GetAttribute("KitState") or "normal")
 	end
 end
 

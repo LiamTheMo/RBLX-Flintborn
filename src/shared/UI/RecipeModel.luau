@@ -146,6 +146,20 @@ function RecipeModel.Blocker(entry, count: number): string?
 	return nil
 end
 
+-- True when one of `entry` can be paid for from what is owned (a Permanent
+-- conversion also needs its source). Lists grey out the rest.
+function RecipeModel.Affordable(entry): boolean
+	if entry.kind == "Permanent" and #(entry.sources or {}) == 0 then
+		return false
+	end
+	for _, input in entry.inputs do
+		if input.owned < input.needed then
+			return false
+		end
+	end
+	return true
+end
+
 -- What `count` crafts of `entry` cost: {catalogId, name, owned, need, short}.
 function RecipeModel.Cost(entry, count: number)
 	local cost = {}

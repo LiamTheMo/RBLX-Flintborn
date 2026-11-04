@@ -215,3 +215,12 @@ test("carried materials and station text", function()
 	expectEq(RecipeModel.StationsText({}), "None in reach", "none")
 	expectEq(RecipeModel.JobText("Copper Bar", 2, 5, 6.2), "Copper Bar 2 / 5 · 7 s left", "job line")
 end)
+
+test("recipes short of materials are not affordable (the list greys them)", function()
+	local enough = { kind = "Craft", inputs = { input("Wood", "Wood", 3, 3), input("Stone", "Stone", 5, 2) } }
+	local short = { kind = "Craft", inputs = { input("Wood", "Wood", 3, 3), input("Bone", "Bone", 1, 2) } }
+	expect(RecipeModel.Affordable(enough), "every input owned")
+	expect(not RecipeModel.Affordable(short), "one input short")
+	expect(not RecipeModel.Affordable({ kind = "Permanent", inputs = {}, sources = {} }), "a conversion with no source")
+	expect(RecipeModel.Affordable({ kind = "Permanent", inputs = {}, sources = { {} } }), "a conversion with one")
+end)

@@ -512,7 +512,7 @@ place their regions on **one grid**, defined once in
 | `grid.gap` (**G**) | 12 (6 on a phone) | between stacked or neighbouring HUD pieces |
 | `grid.column` | 315 | the width of the right-hand column's pieces in both HUDs |
 | `grid.topBand` / `bottomBand` | 0.30 / 0.25 | the corner bands of the edge rule (§5.7) |
-| `gear` | 52 × 46, ring gap 12, pad 44 | the ⚙ both HUDs draw |
+| `gear` | 52 × 52 (square: the tile frame with the ink gears glyph), ring gap 12, pad 44 | the ⚙ both HUDs draw |
 
 A region names its column (`"column": "right"`, `"left"` or `"bottom"`)
 instead of carrying offsets; `Hud/Layout.ForScreen` resolves it, and

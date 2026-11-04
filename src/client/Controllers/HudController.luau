@@ -60,8 +60,10 @@ HudController.MENU = {
 
 -- The selected hotbar slot, or nil for none. The selection follows the equipped
 -- slot (and clears when the held item is put away, used up or dropped), and
--- every key press or tap on a slot also uses it.
-HudController.Selected = 1 :: number?
+-- every key press or tap on a slot also uses it. Nothing is selected until
+-- something is (empty hands show no highlight), and a key or tap on an empty
+-- slot puts the held item away and clears it.
+HudController.Selected = nil :: number?
 
 -- Status text ticks fast (the medicine countdown); party, objective and event
 -- panels refresh a little slower.
@@ -547,6 +549,17 @@ local function selectSlot(index: number?)
 	widgets.bottom:Select(index)
 end
 
+-- What a key press or tap on hotbar slot `index` selects: the slot when it holds
+-- something, else nothing (it empties the hands).
+local function pressedSlot(index: number): number?
+	for _, slot in InventoryController.Snapshot.slots do
+		if slot.area == "hotbar" and slot.index == index then
+			return index
+		end
+	end
+	return nil
+end
+
 local function bindHotbar(active: boolean)
 	if active == hotbarBound then
 		return
@@ -575,7 +588,7 @@ local function bindHotbar(active: boolean)
 			local index = slotKeys[input.KeyCode]
 			local step = HOTBAR_STEP_KEYS[input.KeyCode]
 			if index then
-				selectSlot(index)
+				selectSlot(pressedSlot(index))
 			elseif step then
 				-- From no selection, a step forward lands on the first slot and a
 				-- step back on the last.
@@ -849,7 +862,7 @@ function HudController.Start()
 	-- Fills freshly mounted regions (at start and after a remount).
 	local function fill()
 		widgets.bottom.SlotPressed:Connect(function(index)
-			selectSlot(index)
+			selectSlot(pressedSlot(index))
 			task.spawn(InventoryController.ActivateHotbar, index)
 		end)
 		-- Hotbar items drag to other hotbar slots, and to and from the Inventory
