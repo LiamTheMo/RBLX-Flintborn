@@ -26,8 +26,12 @@ SHELL_SIZE = (7.0, 6.4, 5.8)         # near-round footprint: reads as a chunky n
 # inserts: (name, centre on the shell surface direction (azimuth deg, height frac), length, width, height, roll)
 # inserts: (name, azimuth deg (-90 = front), height frac, radius, height, roll). Spread round the dome so they
 # show at the silhouette from the front, side, rear and top, as on the sheet.
-INSERTS = (("Large", -160, 0.38, 1.35, 2.7, 0.5), ("Medium", -80, 0.78, 1.15, 2.4, -0.35),
-           ("Small", -8, 0.44, 1.0, 2.1, 0.3))
+# (touch-up 2026-11-04: heights 2.7 / 2.4 / 2.1 -> 1.7 / 1.5 / 1.3 and SHARD_SIDE: flat wedge shards standing about
+# 0.9 out of shallow recesses, as both sheets draw them, not pyramid spikes)
+INSERTS = (("Large", -160, 0.38, 1.6, 1.7, 0.5), ("Medium", -80, 0.78, 1.4, 1.5, -0.35),
+           ("Small", -8, 0.44, 1.2, 1.3, 0.3))   # radii x1.2 after the touch-up verification: the sheet's flint share
+UV = dict(angle=45.0, method="ANGLE_BASED", margin=0.008, min_angle=25.0)
+SHARD_SIDE = 0.9                    # the shard's width across its long axis, x its length (a wedge, not a round gem)
 BASE_ROCKS = ((-2.5, -2.1, 1.8, 1.6, 1.2), (0.6, -2.6, 1.5, 1.4, 1.0), (2.9, -1.1, 1.7, 1.5, 1.1),
               (-1.4, 2.6, 1.6, 1.4, 1.0))
 
@@ -79,7 +83,7 @@ def surface_point(az_deg, hfrac):
 
 
 def shard(a, base, normal, radius, height, roll, seed):
-    """A chunky faceted flint crystal (about 24 facets): a five-sided base ring, a wider twisted waist and a
+    """A flat faceted flint wedge shard (about 24 facets): a five-sided base ring, a wider twisted waist and a
     short three-point crown to a lopsided tip, sunk 45% into the surface so it sits in a real recess."""
     rng = random.Random(seed)
     n = Vector(normal).normalized()
@@ -87,7 +91,7 @@ def shard(a, base, normal, radius, height, roll, seed):
     along = up - n * up.dot(n)
     along = along.normalized() if along.length > 1e-4 else Vector((1, 0, 0))
     along = Matrix.Rotation(roll, 3, n) @ along
-    side = n.cross(along).normalized()
+    side = n.cross(along).normalized() * SHARD_SIDE
     c = Vector(base) - n * height * 0.45
     pts = []
     for k in range(5):
@@ -152,9 +156,9 @@ NOTES = {
              "shallow recesses on its front faces, and three pale base rocks at the foot; parts unioned into one "
              "closed mesh",
     "FlintLimestoneShell": "Limestone Shell (main body) alone, with the three shallow insert recesses",
-    "FlintInsertLarge": "Flint Insert (Large): chunky dark faceted crystal",
-    "FlintInsertMedium": "Flint Insert (Medium): chunky dark faceted crystal",
-    "FlintInsertSmall": "Flint Insert (Small): chunky dark faceted crystal (exported as FlintInsertSmallM002: R01 owns the plain name)",
+    "FlintInsertLarge": "Flint Insert (Large): flat dark faceted wedge shard",
+    "FlintInsertMedium": "Flint Insert (Medium): flat dark faceted wedge shard",
+    "FlintInsertSmall": "Flint Insert (Small): flat dark faceted wedge shard (exported as FlintInsertSmallM002: R01 owns the plain name)",
     "FlintBaseRocks": "Base Rocks (x3): three small pale rocks for the foot, one piece",
 }
 
@@ -195,7 +199,10 @@ def build(render=True):
     objs = [M.mk(SHEET, n, fn, subject=TITLE, role=r, notes=NOTES[n], budget=b, collision=c)
             for n, r, fn, b, c in specs]
     subtract_inserts(objs[1])
-    audits = [M.finish(o, union=o.get("kit_role") == "hero" or o.name == "FlintBaseRocks" and False) for o in objs]
+    # (touch-up 2026-11-04: the flatter shards' recesses folded the shell's default Smart UV (9 overlaps): angle-based
+    # islands as the later builders use)
+    audits = [M.finish(o, union=o.get("kit_role") == "hero" or o.name == "FlintBaseRocks" and False, uv=UV)
+              for o in objs]
     M.display(NUM, objs, TITLE)
     out = {"audit": audits, "problems": K.check(objs)}
     if render:
