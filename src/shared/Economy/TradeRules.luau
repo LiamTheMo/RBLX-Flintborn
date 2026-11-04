@@ -12,6 +12,7 @@
 -- (sales, Forge crafts, Gem spending, a Deploy) may consume what it received.
 
 local GameConstants = require(script.Parent.Parent.GameConstants)
+local InventoryRules = require(script.Parent.Parent.Inventory.InventoryRules)
 local ItemCatalog = require(script.Parent.Parent.Items.ItemCatalog)
 local PermanentRules = require(script.Parent.Parent.Items.PermanentRules)
 local Validation = require(script.Parent.Parent.Data.Validation)
@@ -213,25 +214,7 @@ end
 -- slot per type (Q128); whatever is over the cap gets its own slot, since a trade
 -- never deletes.
 local function land(slots, item)
-	local cap = if item.instanceId == nil then ItemCatalog.StackCap(item.catalogId) else nil
-	if cap then
-		local quantity = item.quantity or 0
-		for _, slot in slots do
-			if quantity <= 0 then
-				break
-			end
-			if slot.instanceId == nil and slot.catalogId == item.catalogId and slot.quantity < cap then
-				local added = math.min(quantity, cap - slot.quantity)
-				slot.quantity += added
-				quantity -= added
-			end
-		end
-		if quantity <= 0 then
-			return
-		end
-		item.quantity = quantity
-	end
-	table.insert(slots, item)
+	InventoryRules.Land(slots, item)
 end
 
 local function give(profile, taken, receiverId: number, now: number)

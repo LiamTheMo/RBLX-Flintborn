@@ -15,6 +15,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local ItemCatalog = require(ReplicatedStorage.Shared.Items.ItemCatalog)
 local InventoryModel = require(ReplicatedStorage.Shared.UI.InventoryModel)
+local InventoryRules = require(ReplicatedStorage.Shared.Inventory.InventoryRules)
 local ItemInfo = require(ReplicatedStorage.Shared.Items.ItemInfo)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
@@ -409,6 +410,12 @@ local function backpackFull(): boolean
 	return view ~= nil and #view.backpack >= (view.backpackCapacity or 50)
 end
 
+-- Whether all of a stack fits into the stacks of its type in `list` (the backpack
+-- or the vault's items), so moving it there takes no slot (InventoryRules.Land).
+local function mergesInto(list, entry): boolean
+	return type(entry.quantity) == "number" and InventoryRules.TopUpRoom(list, entry.catalogId) >= entry.quantity
+end
+
 -- Whether the item in cell `fromId` can be dropped on cell `toId`: anything between
 -- the backpack, hotbar and worn armour (armour on its own slot only; a worn piece
 -- swaps only with a piece for the same slot); backpack items into the vault, and
@@ -428,14 +435,21 @@ function VaultController.CanDrop(fromId: string, toId: string): boolean
 		if from.area == "armor" and to.entry and armorSlotOf(to.entry) ~= ARMOR_SLOTS[from.index] then
 			return false
 		end
-		-- The hotbar and armour take no backpack slots: the end of the backpack needs a free one.
-		if to.area == "backpack" and to.key == nil and from.area ~= "backpack" and backpackFull() then
+		-- The hotbar and armour take no backpack slots: the end of the backpack needs
+		-- a free one, unless the backpack's stack of that type takes it all.
+		if
+			to.area == "backpack"
+			and to.key == nil
+			and from.area ~= "backpack"
+			and backpackFull()
+			and not mergesInto(view.backpack, from.entry)
+		then
 			return false
 		end
 		return true
 	end
 	if from.area == "backpack" and (to.area == "vault" or to.area == "material") then
-		return ItemCatalog.IsMaterial(from.entry.catalogId) or not vaultFull()
+		return ItemCatalog.IsMaterial(from.entry.catalogId) or not vaultFull() or mergesInto(view.items, from.entry)
 	end
 	return (from.area == "vault" or from.area == "material") and to.area == "backpack"
 end
@@ -502,7 +516,7 @@ local function onAction(id: string)
 	elseif id == "equip" and choice.kind == "backpack" then
 		equip(choice)
 	elseif id == "unequip" and (choice.kind == "hotbar" or choice.kind == "armor") then
-		if backpackFull() then
+		if backpackFull() and not mergesInto(view.backpack, choice.entry) then
 			refused("BackpackFull")
 			return
 		end

@@ -328,6 +328,86 @@ function InventoryRules.Store(slots, item, maxSlots: number): boolean
 	return true
 end
 
+local function sameStack(slot, catalogId: string): boolean
+	return type(slot) == "table"
+		and slot.instanceId == nil
+		and slot.catalogId == catalogId
+		and type(slot.quantity) == "number"
+end
+
+-- How many more units of a stackable type the stacks of it already in a list of
+-- slots (the lobby backpack, the vault's items) can take before reaching the cap.
+function InventoryRules.TopUpRoom(slots, catalogId: string): number
+	local cap = ItemCatalog.StackCap(catalogId)
+	local room = 0
+	if cap == nil then
+		return 0
+	end
+	for _, slot in slots do
+		if sameStack(slot, catalogId) then
+			room += math.max(0, cap - slot.quantity)
+		end
+	end
+	return room
+end
+
+-- Puts an item at the end of a list of slots, a stack first topping up the stacks
+-- of its type already there (in order, up to the cap; carried units move first)
+-- so identical items stack. Only what is left takes a new slot, so a list never
+-- holds two part-full stacks of one type. No room check: callers that have a slot
+-- limit check it first (TopUpRoom). Returns true when the item took a new slot.
+function InventoryRules.Land(slots, item): boolean
+	local cap = if item.instanceId == nil then ItemCatalog.StackCap(item.catalogId) else nil
+	if cap ~= nil and type(item.quantity) == "number" then
+		local quantity = item.quantity
+		local carried = InventoryRules.Carried(item)
+		for _, slot in slots do
+			if quantity <= 0 then
+				break
+			end
+			if sameStack(slot, item.catalogId) and slot.quantity < cap then
+				local added = math.min(quantity, cap - slot.quantity)
+				local addedCarried = math.min(carried, added)
+				local slotCarried = InventoryRules.Carried(slot) + addedCarried
+				slot.quantity += added
+				InventoryRules.SetCarried(slot, slotCarried)
+				quantity -= added
+				carried -= addedCarried
+			end
+		end
+		if quantity <= 0 then
+			return false
+		end
+		item.quantity = quantity
+		InventoryRules.SetCarried(item, carried)
+	end
+	table.insert(slots, item)
+	return true
+end
+
+-- Merges the part-full stacks of one type in a list of slots (lists saved before
+-- Land merged them), keeping the order of first appearance. Unique items stay as
+-- they are. Returns how many entries were merged away.
+function InventoryRules.Consolidate(slots): number
+	if type(slots) ~= "table" then
+		return 0
+	end
+	local before = #slots
+	local merged = {}
+	for _, item in slots do
+		if type(item) == "table" and type(item.catalogId) == "string" then
+			InventoryRules.Land(merged, item)
+		else
+			table.insert(merged, item)
+		end
+	end
+	table.clear(slots)
+	for index, item in merged do
+		slots[index] = item
+	end
+	return before - #slots
+end
+
 -- Where a lobby item sits in the player's loadout ("hotbar:3" or "armor:Head"),
 -- carried on the item through a deploy (`loadoutSlot`) so the run starts with the
 -- same hotbar and worn armour. Returns (area, key) — a hotbar slot number or an

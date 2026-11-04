@@ -128,11 +128,20 @@ local function put(profile, area: string, key: any, item)
 	end
 end
 
+-- Whether all of a stack fits into the backpack's stacks of its type, so moving it
+-- there takes no slot.
+function LobbyLoadoutRules.Merges(profile, item): boolean
+	return item.instanceId == nil
+		and type(item.quantity) == "number"
+		and InventoryRules.TopUpRoom(profile.lobbyBackpack.slots, item.catalogId) >= item.quantity
+end
+
 -- Moves the item at (fromArea, fromKey) to (toArea, toKey), swapping with what is
 -- there. Areas: "backpack" (key: list index; a nil target key puts it at the end),
 -- "hotbar" (1–6) and "armor" (an armour slot name). Armour goes only onto its own
 -- armour slot, and a worn piece swaps only with a piece for the same slot. A move
--- from the hotbar or armour to the end of the backpack needs a free backpack slot.
+-- from the hotbar or armour to the end of the backpack joins the backpack's stack
+-- of its type, and needs a free backpack slot only for what that cannot take.
 -- Returns (ok, reason).
 function LobbyLoadoutRules.Move(profile, fromArea: any, fromKey: any, toArea: any, toKey: any): (boolean, string?)
 	if not validKey(profile, fromArea, fromKey, false) or not validKey(profile, toArea, toKey, true) then
@@ -171,10 +180,12 @@ function LobbyLoadoutRules.Move(profile, fromArea: any, fromKey: any, toArea: an
 		put(profile, toArea, toKey, item)
 	elseif toArea == backpack then
 		if toKey == nil then
-			if #slots >= LobbyLoadoutRules.BACKPACK_SLOTS then
+			-- A stack joins the backpack's stack of its type; only what that cannot
+			-- take needs a free slot.
+			if not LobbyLoadoutRules.Merges(profile, item) and #slots >= LobbyLoadoutRules.BACKPACK_SLOTS then
 				return false, "BackpackFull"
 			end
-			table.insert(slots, item)
+			InventoryRules.Land(slots, item)
 		else
 			slots[toKey] = item
 		end
@@ -230,7 +241,8 @@ end
 
 -- Puts an item that comes back from transit where it was: a tagged item to its
 -- hotbar slot or armour slot when that is free, anything else to the end of the
--- backpack (as rollbacks always have, whatever its size). The tag is removed.
+-- backpack (as rollbacks always have, whatever its size), a stack joining the
+-- backpack's stack of its type. The tag is removed.
 function LobbyLoadoutRules.Return(profile, item)
 	local area, key = InventoryRules.LoadoutPlace(item.loadoutSlot)
 	item.loadoutSlot = nil
@@ -243,7 +255,7 @@ function LobbyLoadoutRules.Return(profile, item)
 			return
 		end
 	end
-	table.insert(profile.lobbyBackpack.slots, item)
+	InventoryRules.Land(profile.lobbyBackpack.slots, item)
 end
 
 return LobbyLoadoutRules

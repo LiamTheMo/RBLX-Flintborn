@@ -17,6 +17,7 @@
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+local InventoryRules = require(ReplicatedStorage.Shared.Inventory.InventoryRules)
 local PermanentRules = require(ReplicatedStorage.Shared.Items.PermanentRules)
 local ProgressionRules = require(ReplicatedStorage.Shared.Progression.ProgressionRules)
 
@@ -173,8 +174,9 @@ function CrashRecoveryRules.Restore(profile, checkpoint, now: number)
 					profile.permanentItems[copy.instanceId] = PermanentRules.LedgerEntry(copy, now)
 				end
 			end
-			-- Recovered items always land: recovery never deletes for lack of room.
-			table.insert(profile.lobbyBackpack.slots, copy)
+			-- Recovered items always land (a stack joining its type's stack): recovery
+			-- never deletes for lack of room.
+			InventoryRules.Land(profile.lobbyBackpack.slots, copy)
 			restored += 1
 		end
 	end

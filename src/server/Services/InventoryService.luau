@@ -184,7 +184,7 @@ local function keepInLobby(player: Player, leftovers)
 				end
 				-- The next Play tags what it takes from the lobby afresh (GDD §53).
 				item.carried = nil
-				table.insert(profile.lobbyBackpack.slots, item)
+				InventoryRules.Land(profile.lobbyBackpack.slots, item)
 			end
 		end
 	)

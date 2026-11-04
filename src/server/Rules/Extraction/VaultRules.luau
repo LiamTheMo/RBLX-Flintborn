@@ -11,6 +11,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local GameConstants = require(ReplicatedStorage.Shared.GameConstants)
 local ItemCatalog = require(ReplicatedStorage.Shared.Items.ItemCatalog)
 local ExtractionRules = require(ReplicatedStorage.Shared.Extraction.ExtractionRules)
+local InventoryRules = require(ReplicatedStorage.Shared.Inventory.InventoryRules)
 
 local VaultRules = {}
 
@@ -101,14 +102,31 @@ function VaultRules.Deposit(profile, backpackIndex: number, now: number?, confir
 		end
 		return true, nil
 	end
-	if #profile.vault.items >= VaultRules.ItemCapacity(profile) then
+	local vaultItems = profile.vault.items
+	if item.instanceId == nil and ItemCatalog.IsStackable(item.catalogId) then
+		-- A stack tops up the vault's stacks of its type first (InventoryRules.Land),
+		-- so it needs a free slot only for what they cannot take.
+		local merges = InventoryRules.TopUpRoom(vaultItems, item.catalogId) >= amount
+		if not merges and #vaultItems >= VaultRules.ItemCapacity(profile) then
+			return false, "VaultFull"
+		end
+		local part = table.clone(item)
+		part.quantity = amount
+		InventoryRules.Land(vaultItems, part)
+		if amount >= owned then
+			table.remove(slots, backpackIndex)
+		else
+			item.quantity = owned - amount
+		end
+		return true, nil
+	end
+	if #vaultItems >= VaultRules.ItemCapacity(profile) then
 		return false, "VaultFull"
 	end
 	if amount < owned then
-		-- Part of a stack: that many go in as their own vault entry.
 		local part = table.clone(item)
 		part.quantity = amount
-		table.insert(profile.vault.items, part)
+		table.insert(vaultItems, part)
 		item.quantity = owned - amount
 		return true, nil
 	end

@@ -328,6 +328,10 @@ function ProfileSchema.Migrate(data: any, now: number?)
 	backfillRedeemedCodes(profile)
 	migrateCarriedIn(profile)
 	ProfileSchema.PruneRetiredItems(profile)
+	-- Vault deposits and some returns to the lobby used to add a stack beside
+	-- the one of its type; merge those so identical items stack. Safe on every load.
+	InventoryRules.Consolidate(profile.vault.items)
+	InventoryRules.Consolidate(profile.lobbyBackpack.slots)
 	return profile, nil
 end
 
