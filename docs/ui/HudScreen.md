@@ -152,8 +152,9 @@ the rules are pure in `src/shared/UI/OverheadHealthModel.luau`
   Everyone's bar is red: a green tint for tribe-mates was left out because green
   is the stamina fill, and the tribe frames already list tribe-mates' health.
 - **Names:** the name tag stays Roblox's (Show Names). Roblox's own overhead
-  health bar (shown when damaged) is turned off on every character on this
-  client (`HealthDisplayType` AlwaysOff), so there is one bar. The bar's foot sits
+  health bar (shown when damaged) never shows: `CoreGuiController` sets the local
+  player's `HealthDisplayDistance` to 0 at start in both places, and each watched
+  character's `HealthDisplayType` is AlwaysOff as well, so there is one bar. The bar's foot sits
   `STUDS_ABOVE_HEAD` (1.5) studs over the head's top plus a 14 px lift, above the
   name tag.
 - **Size and range:** drawn in screen px (`Content` at the billboard's UIScale),
