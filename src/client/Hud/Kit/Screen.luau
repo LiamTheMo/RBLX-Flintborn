@@ -2,8 +2,8 @@
 -- window holder fitted to the screen (Kit.Scale.Window). Opening registers it
 -- with Kit.Modal (one window at a time; Escape / B close it), fades the veil in
 -- and pops the window from 0.94 to 1; closing reverses that and then disables
--- the gui. A click or tap on the veil, outside the window, closes the top layer
--- the way Escape does (`dismissOutside = false` turns that off).
+-- the gui. A mouse click on the veil, outside the window, closes the top layer
+-- the way Escape does (`dismissOutside = false` turns that off); a tap does not.
 --
 --   local screen = Kit.Screen.new("FlintbornInventory", { size = { 1187, 652 } })
 --   local window = Kit.Window.new(screen, { title = "Inventory", icon = "backpack" })
@@ -102,11 +102,11 @@ function Screen.new(name: string, props: Props)
 		maid = Core.Maid(),
 	}, Screen)
 	self.maid:Give(gui)
-	-- A press on the veil (anywhere outside the window) closes the top layer.
+	-- A click on the veil (anywhere outside the window) closes the top layer. Mouse
+	-- only: on touch screens the X is within easy reach, and a stray tap would close.
 	self.dismissOutside = props.dismissOutside ~= false
 	self.maid:Give(veil.InputBegan:Connect(function(input: InputObject)
-		local kind = input.UserInputType
-		if kind == Enum.UserInputType.MouseButton1 or kind == Enum.UserInputType.Touch then
+		if input.UserInputType == Enum.UserInputType.MouseButton1 then
 			self:PressOutside(Vector2.new(input.Position.X, input.Position.Y))
 		end
 	end))
