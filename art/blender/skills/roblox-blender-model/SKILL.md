@@ -31,13 +31,46 @@ All Blender work is done by writing and executing bpy scripts through the Blende
 
 Do not assume any existing model is correct. Audit every one against its reference. Rebuild from scratch when the existing mesh is a worse starting point than a clean rebuild.
 
+### 1b. Set up for speed before a batch (once, while no modellers run)
+
+Batches of dozens or hundreds of models need this setup first. In this repo it exists: `art/blender/kit/mcp/STAGES.md`, `HOUSE_RULES.md`, `BRIEF_TEMPLATE.md`, `kit_parts.py`, `kit_build.py`, `kit_verify.py`, `compare.py`, `make_workfile.py` and `art/blender/kit/ship.sh`. Use those; elsewhere, build their equivalents first.
+
+- **House rules.** Write the standing answers to the questions every model raises once:
+  - scale conventions (doors, floors, seats, headroom, tiling pitch);
+  - triangle budget by class;
+  - how to read sheets whose views disagree;
+  - defaults (no ground dressing, enterable buildings, windows, lights, collision);
+  - naming, colour sampling and foliage rules.
+
+  Models then need no per-model rulings.
+- **Shared parts library and builder scaffold.** Put pieces every model repeats in one library:
+  - planks and light-tight plank walls, posts, logs, stairs;
+  - rope turns and lashings, canvas;
+  - crates, barrels, banners, lanterns;
+  - stone blocks, rocks, leaves, ivy, moss.
+
+  Put the cleanup, UV, origin, socket, part, check and render code in a scaffold. A builder is then a few hundred lines of model-specific code, not thousands. Add a genuinely new reusable piece to the library only between batches, never while modellers run.
+- **One-call verify suite.** Put every technical check from 2c in one function that returns numbers and a problems list, so nobody rewrites checks per model:
+  - budgets, topology, winding and parity;
+  - floating, unchained, buried and piercing shells;
+  - UVs, colour-by-normal, sockets and stored points.
+
+  Add optional checks too:
+  - a foliage edge-on sweep;
+  - an inside light-escape scan for enterable buildings;
+  - a walk proxy for anything players walk on or into;
+  - tiling seams.
+- **Compare sheet.** One image that crops every reference cell and sets it beside a render from the matching camera.
+- **Light work file.** Modellers work in a small file holding only the studio, cameras and palette, not the full kit file. It opens and renders about 3× faster and saves about 5× faster.
+- **Ship script.** One command builds a passed model into the main file, saves, exports, refuses on export problems or stray temp paths and assistant names, and commits exactly that model's files. First it deletes the sheet's old objects, their socket empties and its exported meshes, so parts a rebuild drops don't survive.
+
 ## Step 2: Work one MODEL at a time (not one sheet at a time)
 
 A sheet may contain several models. Finish and verify one model completely before starting the next, even if the next is on the same sheet.
 
-### 2a. Study the reference
+### 2a. Brief from the reference
 
-Before editing, analyze the model's reference individually and write down:
+Before editing, write a one-page brief (in this repo, `BRIEF_TEMPLATE.md`) as the first section of the model's spec. Don't write a long study. Answer everything the sheet doesn't decide from the house rules. Note each departure with a one-line reason and carry on; don't wait for rulings, which the main session can override. Analyse the model's reference individually and note:
 
 - Silhouette and overall proportions (measured against a known dimension)
 - Every distinct part and sub-part, and how they connect
@@ -48,9 +81,14 @@ Before editing, analyze the model's reference individually and write down:
 - All views provided (front, side, back, top, 3/4) - use every one
 - Classification: full asset or accessory/small prop (sets the triangle budget)
 
-### 2b. Split work across specialist subagents
+### 2b. Modeller subagents, in parallel
 
-Use a dedicated subagent per discipline. Give each the reference image(s), the notes from 2a, relevant design-doc rules, the technical requirements in 2c, and the previous stage's output.
+One modeller subagent, with a fresh context, does every stage below for one model, in its own background Blender session (own port, own copy of the light work file).
+- **Parallel modellers:** run a few at once, plus fix modellers and verifiers on top, within the machine's limits. This repo runs two modellers and at most five Blender agents in all.
+- **The main session is the hub:** it starts agents, rules on reports, ships, and owns the main file.
+- **Library builds:** modellers build on the shared library and scaffold, and copy the helpers they need into their own builder; they never edit shared files.
+- **Family builders:** sheets that are variants of one design (ore deposits, depleted states, building sets, gear tiers, armor sets) get one parametric builder for the family.
+- **What a modeller gets:** the reference, the brief, the house rules and the technical requirements in 2c.
 
 1. Modeling: low-poly hard-surface geometry matching the reference 1:1 in silhouette, proportions, and detail. No subdivision modifiers (level 0); detail comes from deliberate edge placement, not density.
 2. Optimization and cleanup: hit the triangle budget while preserving silhouette; meet every topology requirement.
@@ -103,7 +141,7 @@ Skip a stage only if the reference clearly has nothing for it, and note that.
 
 ### 2d. Inspect via MCP
 
-After building and cleaning each model, query through MCP and record:
+After building and cleaning each model, run the verify suite through MCP; its problems list must be empty. Render only the views the sheet has, plus an exploded view and a scale view. Render close-ups only when a detail needs one. Record:
 
 - Triangle, face, and vertex count per object and total
 - Object names, dimensions in studs, origin location
@@ -113,22 +151,27 @@ After building and cleaning each model, query through MCP and record:
 
 ### 2e. Independent verification before moving on
 
-Launch a separate verifier subagent that did NOT work on this model. It must:
+Launch a separate verifier subagent that did NOT work on this model, read-only, on a copy of the modeller's saved work file. It must:
 
-- Render the model from the same angles as the reference views and compare side by side
-- Check silhouette, proportions, part count, colors (hex match), materials, and details against the reference
-- Independently re-check every requirement in 2c through MCP (don't trust the builder's numbers)
-- Return pass/fail with an itemized list of every discrepancy
+- Re-run the verify suite itself; don't trust the builder's numbers. Add its own probes only where the suite doesn't reach.
+- Make the compare sheet, and spend most of its time on the visual comparison: silhouette, proportions, part count, colours (hex medians of matching regions), materials and details against every reference view.
+- Not fail the model for anything the house rules or the main session's rulings settle.
+- Return pass/fail with a score and an itemised list, separating true blockers (broken, or clearly reads unlike the sheet) from minors.
 
-On fail, send findings to the relevant specialist(s), fix, and re-verify with a fresh verifier. Repeat until pass. Only then confirm the model is ready for FBX/OBJ export, mark it done, and start the next model.
+Size verification to the model:
+
+- **Small models** (props and assets with nothing to walk into): one verifier checks 3–4 at once, in one round. A fail goes to a fresh fix modeller. If the blocker was technical, the main session confirms the fix with the suite and compare sheet; if it was visual, a fresh verifier does.
+- **Large models** (structures, buildings, landmarks, anything enterable): one model per verifier, at most two rounds, each fix by a fresh fix modeller. After two rounds, commit with the minors noted, unless something is broken or the model's defining feature still reads unlike the sheet. Then a targeted third round fixes only those blockers.
+
+Only after a pass, ship the model (the ship script, or build into the main file, export, check, commit), mark it done, and start the next one. Cheap one-line minors (a constant, a colour) may be applied at ship time.
 
 "Perfect" means: a reviewer comparing render and reference side by side finds no visible differences in shape, proportion, color, or detail, and every technical requirement is met.
 
 ## Step 3: Version control (when working in a repository)
 
-- Before editing, identify the active version branch and create a descriptive working branch from it. Never work directly on main or a version branch.
-- Commit regularly with clear messages (e.g. one commit per finished model). Use Git LFS for .blend and texture files if the repo is set up for it.
-- When complete and validated: push the working branch, check CI, merge into the originating version branch, validate, then merge into main.
+- Follow the repository's own branch rules (AGENTS.md, README) when it has them. This repo commits straight to the active version branch with no feature branches, keeps commits local, and leaves pushing and merging into main to the owner.
+- Without such rules: identify the active version branch, create a descriptive working branch from it, and don't work directly on main or a version branch. When complete and validated, push the working branch, check CI, merge into the originating version branch, validate, then merge into main.
+- Commit regularly with clear messages: one commit per finished model. Use Git LFS for .blend and texture files if the repo is set up for it.
 - Never delete, force-push, or rewrite main or any version branch.
 - Nothing deploys or publishes to Roblox except from main.
 
