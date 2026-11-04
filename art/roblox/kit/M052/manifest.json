@@ -8,483 +8,120 @@
  "palette": {
   "file": "palette.png",
   "width": 512,
-  "height": 512,
+  "height": 128,
   "cell": 16,
   "columns": 32,
   "uv": "row i, level j: u = (j + 0.5) / columns, v = 1 - (i + 0.5) * cell / height (v up from the bottom of the image); a row's spare cells repeat its last level",
   "rows": [
    {
-    "key": "m052_brass",
-    "hex": "#F2CC86",
+    "key": "m052_bolt",
+    "hex": "#EC8E3A",
     "levels": [
-     0.97236,
-     0.97449,
-     0.97764,
-     1.0,
-     1.00602,
-     1.00864,
-     1.01093,
-     1.01742,
-     1.01874,
-     1.02426,
-     1.0263,
-     1.02927,
-     1.03221,
-     1.04325,
-     1.04616,
-     1.04893
-    ],
-    "used": true
-   },
-   {
-    "key": "m052_rope",
-    "hex": "#AD6F31",
-    "levels": [
-     0.98,
-     0.98665,
-     1.00989
-    ],
-    "used": true
-   },
-   {
-    "key": "m052_rope_x_wood_deep_70",
-    "hex": "#8C501D",
-    "levels": [
-     0.98665,
-     1.00989
+     0.96537,
+     0.97574,
+     0.98422,
+     0.99178,
+     0.99842,
+     1.00114,
+     1.00464,
+     1.02956,
+     1.04244,
+     1.04632,
+     1.04837
     ],
     "used": true
    },
    {
     "key": "m052_wood",
-    "hex": "#B26C2B",
+    "hex": "#BE7531",
     "levels": [
-     0.95151,
-     0.96027,
-     0.96512,
-     0.96939,
-     0.97058,
-     0.97163,
-     0.97419,
-     0.97769,
-     0.98264,
-     0.98451,
-     0.98635,
-     0.98904,
-     0.99051,
-     0.99335,
-     0.99573,
-     0.9989,
-     1.0,
-     1.00261,
-     1.00454,
-     1.00592,
-     1.01189,
-     1.01466,
-     1.01812,
-     1.02185,
-     1.02564,
-     1.02859,
-     1.03065,
-     1.03376,
-     1.03744,
-     1.03927,
-     1.04218,
-     1.05066
+     0.9502,
+     0.95315,
+     0.95803,
+     0.95969,
+     0.96208,
+     0.96705,
+     0.96925,
+     0.97092,
+     0.97369,
+     0.97815,
+     0.98243,
+     0.98686,
+     0.98965,
+     0.995,
+     1.00204,
+     1.00469,
+     1.00661,
+     1.0093,
+     1.01523,
+     1.01879,
+     1.02261,
+     1.02646,
+     1.02899,
+     1.0331,
+     1.03508,
+     1.03741,
+     1.04049,
+     1.04296,
+     1.0466,
+     1.04868
     ],
     "used": true
    },
    {
     "key": "m052_wood_deep",
-    "hex": "#7E4315",
+    "hex": "#965520",
     "levels": [
-     0.97072,
-     0.97732,
-     0.97968,
-     0.9841,
-     0.98734,
-     0.99104,
-     0.99533,
-     0.9979,
-     0.99986,
-     1.00216,
-     1.00453,
-     1.00783,
-     1.01081,
-     1.01571,
-     1.01748,
-     1.02028,
-     1.02608,
-     1.03005,
-     1.03376,
-     1.04133,
-     1.04888,
-     1.05307
-    ],
-    "used": true
-   },
-   {
-    "key": "m052_wood_deep_x_wood_10",
-    "hex": "#834717",
-    "levels": [
-     0.95843,
-     0.96094,
-     0.97549,
-     0.97806,
-     0.98294,
-     0.98609,
-     0.98767,
-     0.99239,
-     0.99679,
-     1.00087,
-     1.00747,
-     1.01096,
-     1.01808,
-     1.02085,
-     1.02394,
-     1.02587,
-     1.02912,
-     1.03672,
-     1.04372,
-     1.04724
-    ],
-    "used": true
-   },
-   {
-    "key": "m052_wood_deep_x_wood_20",
-    "hex": "#884B19",
-    "levels": [
-     0.96192,
-     0.96885,
-     0.9719,
-     0.97612,
-     0.98023,
-     0.98432,
-     0.98713,
-     0.99092,
-     0.99732,
-     1.00039,
-     1.00415,
-     1.00576,
-     1.00964,
-     1.0149,
-     1.01894,
-     1.02372,
-     1.027,
-     1.02915,
-     1.03184,
-     1.03399,
-     1.03712,
-     1.04011,
-     1.04436,
-     1.04829
-    ],
-    "used": true
-   },
-   {
-    "key": "m052_wood_deep_x_wood_40",
-    "hex": "#93531E",
-    "levels": [
-     0.96345,
-     0.96506,
-     0.96809,
-     0.97119,
-     0.97328,
-     0.97592,
-     0.97826,
-     0.97999,
-     0.98401,
-     0.98625,
-     0.98851,
-     0.99176,
-     0.99457,
-     0.9963,
-     1.00085,
-     1.00367,
-     1.00549,
-     1.00794,
-     1.01045,
-     1.01206,
-     1.01433,
-     1.01822,
-     1.02212,
-     1.02395,
-     1.02715,
-     1.03027,
-     1.03154
-    ],
-    "used": true
-   },
-   {
-    "key": "m052_wood_deep_x_wood_50",
-    "hex": "#985820",
-    "levels": [
-     0.95285,
-     0.96224,
-     0.96461,
-     0.96832,
-     0.97345,
-     0.97546,
-     0.97869,
-     0.9825,
-     0.98457,
-     0.9875,
-     0.99082,
-     0.99261,
-     0.99485,
-     0.99676,
-     1.00011,
-     1.00248,
-     1.00424,
-     1.00667,
-     1.01057,
-     1.02269,
-     1.02576,
-     1.02948
-    ],
-    "used": true
-   },
-   {
-    "key": "m052_wood_deep_x_wood_dark_35",
-    "hex": "#723C16",
-    "levels": [
-     0.94889,
-     0.95439,
-     0.9566,
-     0.96687,
-     0.97212,
-     0.97595,
-     0.97707,
-     0.97921,
-     0.97939,
-     0.98269,
-     0.98399,
-     0.98957,
-     0.99107,
-     0.99178,
-     0.99329,
-     0.99665,
-     0.99868,
-     1.00093,
-     1.00235,
-     1.00505,
-     1.00611,
-     1.00916,
-     1.01082,
-     1.01261,
-     1.01344,
-     1.01454,
-     1.02032,
-     1.02536,
-     1.03109,
-     1.03751,
-     1.0409,
-     1.05786
-    ],
-    "used": true
-   },
-   {
-    "key": "m052_wood_deep_x_wood_dark_60",
-    "hex": "#6A3817",
-    "levels": [
-     0.95584,
-     0.95875,
-     0.96165,
-     0.96517,
-     0.96762,
-     0.96966,
-     0.97332,
-     0.97578,
-     0.97797,
-     0.98024,
-     0.98333,
-     0.98585,
-     0.98876,
-     0.99088,
-     0.99342,
-     0.99584,
-     0.99783,
-     1.00133,
-     1.00285,
-     1.00534,
-     1.0076,
-     1.00995,
-     1.01233,
-     1.01401,
-     1.01589,
-     1.01923,
-     1.02394,
-     1.02524,
-     1.02844
-    ],
-    "used": true
-   },
-   {
-    "key": "m052_wood_deep_x_wood_light_20",
-    "hex": "#90511E",
-    "levels": [
-     0.96404,
-     0.96731,
-     0.97901,
-     0.98497,
-     0.99066,
-     0.9943,
-     0.99845,
-     1.00441,
-     1.00999,
-     1.0144,
-     1.02303,
-     1.02448,
-     1.03039,
-     1.03387,
-     1.0509,
-     1.05791
-    ],
-    "used": true
-   },
-   {
-    "key": "m052_wood_deep_x_wood_light_45",
-    "hex": "#A66328",
-    "levels": [
-     0.9666,
-     0.97042,
-     0.97383,
-     0.98297,
-     0.98544,
-     0.9904,
-     0.99452,
-     0.99739,
-     1.00452,
-     1.00863,
-     1.01175,
-     1.01648,
-     1.02047,
-     1.02351,
-     1.02762,
-     1.03327,
-     1.03653,
-     1.04832,
-     1.05705
-    ],
-    "used": true
-   },
-   {
-    "key": "m052_wood_deep_x_wood_light_75",
-    "hex": "#C27835",
-    "levels": [
-     0.96592,
-     0.96829,
-     0.9724,
-     0.97433,
-     0.97925,
-     0.98226,
-     0.98544,
-     0.98826,
-     1.00138,
-     1.00431,
-     1.01005,
-     1.01326,
-     1.01586,
-     1.01791,
-     1.02008,
-     1.02179,
-     1.02602,
-     1.0286,
-     1.03183,
-     1.03588,
-     1.03904,
-     1.04211,
-     1.04643,
-     1.05186,
-     1.05517
-    ],
-    "used": true
-   },
-   {
-    "key": "m052_wood_x_deep_15",
-    "hex": "#AA6628",
-    "levels": [
-     0.94967,
+     0.95135,
      0.95309,
-     0.95432,
-     0.95614,
-     0.95822,
-     0.95863,
-     0.96057,
-     0.9623,
-     0.96384,
-     0.97815,
-     0.98788,
-     0.98965,
-     0.99159,
-     0.99761,
-     1.00169,
-     1.00602,
-     1.00654,
-     1.00923,
-     1.01771,
-     1.02044,
-     1.02199,
-     1.02583,
-     1.0282,
-     1.0304,
-     1.03235,
-     1.03471,
-     1.03603,
-     1.04256,
-     1.04501,
-     1.04925,
-     1.05693,
-     1.06053
+     0.95677,
+     0.96319,
+     0.97057,
+     0.97661,
+     0.98007,
+     0.98602,
+     0.9888,
+     0.99202,
+     0.99846,
+     1.005,
+     1.01225,
+     1.0162,
+     1.01831,
+     1.02163,
+     1.02598,
+     1.03158,
+     1.03608,
+     1.03896,
+     1.04437,
+     1.04753
     ],
     "used": true
    },
    {
-    "key": "m052_wood_x_deep_30",
-    "hex": "#A26024",
+    "key": "m052_wood_light",
+    "hex": "#E19348",
     "levels": [
-     0.97999,
-     0.98836,
-     0.99078,
-     0.99786,
-     1.00177,
-     1.00409,
-     1.0067
+     0.95765,
+     0.98241,
+     1.00134,
+     1.00706,
+     1.01479,
+     1.02186,
+     1.02799
     ],
     "used": true
    },
    {
-    "key": "m052_wood_x_light_35",
-    "hex": "#BF7632",
+    "key": "m052_wood_x_light_50",
+    "hex": "#D0843C",
     "levels": [
-     0.96629,
-     0.97724,
-     0.97875,
-     0.98249,
-     0.9864,
-     0.99234,
-     0.99583,
-     1.02579,
-     1.02791,
-     1.03201,
-     1.03465,
-     1.04342,
-     1.04967,
-     1.05536
-    ],
-    "used": true
-   },
-   {
-    "key": "m052_wood_x_light_35_x_wood_deep_15",
-    "hex": "#B56E2E",
-    "levels": [
-     0.97131,
-     0.97336,
-     0.97623,
-     0.98128,
-     0.99454,
-     1.00328,
-     1.01019
+     0.95765,
+     0.98241,
+     1.00134,
+     1.00706,
+     1.01479,
+     1.02186,
+     1.02799
     ],
     "used": true
    }
@@ -504,12 +141,12 @@
    "subject": "Boardwalk",
    "role": "hero",
    "size": [
-    37.8,
-    9.0,
-    11.14
+    18.748,
+    5.15,
+    6.9
    ],
-   "tris": 2484,
-   "budget": 4000,
+   "tris": 1864,
+   "budget": 6000,
    "collision": {
     "CollisionFidelity": "PreciseConvexDecomposition",
     "CanCollide": true,
@@ -521,21 +158,21 @@
     {
      "file": "meshes/TimberBoardwalk.glb",
      "kind": "solid",
-     "tris": 2484,
+     "tris": 1864,
      "offset": [
       0.0,
-      4.5,
+      2.575,
       0.0
      ],
      "size": [
-      37.8,
-      9.0,
-      11.14
+      18.748,
+      5.15,
+      6.9
      ]
     }
    ],
    "vfx": [],
-   "notes": "Timber boardwalk (post centres 8 x 28.24, deck 32 x 9.5 with its top at 5.6, posts to 9.0; about 37.8 x 11.1 x 9.0): a raised walkway of 17 chunky orange planks across the width (notched round the rail posts) on six full-height rail posts and two support posts, side beams, crossbeams and end headers; a chunky rail (6.85-7.75) along the +Y side and across the +X end, the -Y side open; four two-board treads on cut stringers down from the -X end (risers 1.12); bolt blocks with brass hex bolts, V / knee / X braces, a twisted rope tie on the near-right post. Origin at the bbox bottom centre: the deck centre is at x +2.90. Seams: feet z 0, deck top 5.6, open side y -4.75, deck ends x -16 / +16. No VFX"
+   "notes": "Boardwalk (remade sheet): a 16-stud raised deck module 6.0 wide, 12 planks across the width (deck top 3.00), 8 support posts with bolt blocks and square bolts, side beams, joists and end headers, 14 braces; 5 back rail posts (to 5.15) with a rail and end stubs; open front long side; a three-step stair (three slabs, rises 0.75) at the -X end."
   },
   {
    "name": "TimberBoardwalkBrace",
@@ -543,11 +180,11 @@
    "subject": "Boardwalk",
    "role": "part",
    "size": [
-    3.5179,
-    2.4,
-    1.5
+    1.3604,
+    1.3404,
+    0.3
    ],
-   "tris": 24,
+   "tris": 12,
    "budget": 1000,
    "collision": {
     "CollisionFidelity": "Hull",
@@ -560,21 +197,21 @@
     {
      "file": "meshes/TimberBoardwalkBrace.glb",
      "kind": "solid",
-     "tris": 24,
+     "tris": 12,
      "offset": [
       0.0,
-      1.2,
+      0.6702,
       0.0
      ],
      "size": [
-      3.5179,
-      2.4,
-      1.5
+      1.3604,
+      1.3404,
+      0.3
      ]
     }
    ],
    "vfx": [],
-   "notes": "Brace (reusable): an L of a short leg piece and a knee board"
+   "notes": "Brace: a 45 deg knee brace from a post face up to the beam"
   },
   {
    "name": "TimberBoardwalkCrossbeam",
@@ -582,11 +219,11 @@
    "subject": "Boardwalk",
    "role": "part",
    "size": [
-    0.9,
-    1.32,
-    4.78
+    3.8733,
+    0.62,
+    0.5
    ],
-   "tris": 12,
+   "tris": 28,
    "budget": 1000,
    "collision": {
     "CollisionFidelity": "Box",
@@ -599,21 +236,21 @@
     {
      "file": "meshes/TimberBoardwalkCrossbeam.glb",
      "kind": "solid",
-     "tris": 12,
+     "tris": 28,
      "offset": [
       0.0,
-      0.66,
+      0.31,
       0.0
      ],
      "size": [
-      0.9,
-      1.32,
-      4.78
+      3.8733,
+      0.62,
+      0.5
      ]
     }
    ],
    "vfx": [],
-   "notes": "Crossbeam (reusable): a 0.9 x 1.32 crossbeam between the side beams"
+   "notes": "Crossbeam: one side beam segment between two support posts, under the plank ends"
   },
   {
    "name": "TimberBoardwalkFloorPlank",
@@ -621,11 +258,11 @@
    "subject": "Boardwalk",
    "role": "part",
    "size": [
-    1.7424,
-    0.85,
-    9.5
+    1.3147,
+    0.4,
+    6.0
    ],
-   "tris": 12,
+   "tris": 28,
    "budget": 1000,
    "collision": {
     "CollisionFidelity": "Box",
@@ -638,21 +275,21 @@
     {
      "file": "meshes/TimberBoardwalkFloorPlank.glb",
      "kind": "solid",
-     "tris": 12,
+     "tris": 28,
      "offset": [
       0.0,
-      0.425,
+      0.2,
       0.0
      ],
      "size": [
-      1.7424,
-      0.85,
-      9.5
+      1.3147,
+      0.4,
+      6.0
      ]
     }
    ],
    "vfx": [],
-   "notes": "Floor Plank (reusable): a 1.74 x 0.85 plank, 9.5 long, crisp edges"
+   "notes": "Deck Plank: one 1.31 x 0.40 plank, 6.0 long (across the deck)"
   },
   {
    "name": "TimberBoardwalkRailPlank",
@@ -660,11 +297,11 @@
    "subject": "Boardwalk",
    "role": "part",
    "size": [
-    7.9518,
-    0.9,
-    0.6
+    2.8525,
+    0.43,
+    0.38
    ],
-   "tris": 12,
+   "tris": 28,
    "budget": 1000,
    "collision": {
     "CollisionFidelity": "Box",
@@ -677,21 +314,21 @@
     {
      "file": "meshes/TimberBoardwalkRailPlank.glb",
      "kind": "solid",
-     "tris": 12,
+     "tris": 28,
      "offset": [
       0.0,
-      0.45,
+      0.215,
       0.0
      ],
      "size": [
-      7.9518,
-      0.9,
-      0.6
+      2.8525,
+      0.43,
+      0.38
      ]
     }
    ],
    "vfx": [],
-   "notes": "Rail Plank (reusable): a 0.6 x 0.9 rail plank, 7.95 long, butted into the post faces"
+   "notes": "Rail: one 0.38 x 0.43 rail segment between two rail posts (bay 3.66)"
   },
   {
    "name": "TimberBoardwalkRailPost",
@@ -699,38 +336,38 @@
    "subject": "Boardwalk",
    "role": "part",
    "size": [
-    1.5,
-    9.0,
-    2.32
+    1.09,
+    2.17,
+    0.85
    ],
-   "tris": 102,
+   "tris": 64,
    "budget": 1000,
    "collision": {
-    "CollisionFidelity": "Hull",
+    "CollisionFidelity": "Box",
     "CanCollide": true,
     "CanQuery": true,
     "CanTouch": true,
-    "profile": "hull"
+    "profile": "box"
    },
    "pieces": [
     {
      "file": "meshes/TimberBoardwalkRailPost.glb",
      "kind": "solid",
-     "tris": 102,
+     "tris": 64,
      "offset": [
       0.0,
-      4.5,
+      1.085,
       0.0
      ],
      "size": [
-      1.5,
-      9.0,
-      2.32
+      1.09,
+      2.17,
+      0.85
      ]
     }
    ],
    "vfx": [],
-   "notes": "Rail Post (reusable): a 1.5-square post, ground to a 9.0 chamfered cap with a brass peg dot, a bolt block with a brass hex bolt"
+   "notes": "Back Rail Post: 0.85 square, deck to 5.15, bevelled cap, the rail's end stub block"
   },
   {
    "name": "TimberBoardwalkStairs",
@@ -738,11 +375,11 @@
    "subject": "Boardwalk",
    "role": "part",
    "size": [
-    5.84,
-    4.48,
-    8.0
+    3.02,
+    2.25,
+    5.9
    ],
-   "tris": 176,
+   "tris": 108,
    "budget": 1000,
    "collision": {
     "CollisionFidelity": "Hull",
@@ -755,21 +392,60 @@
     {
      "file": "meshes/TimberBoardwalkStairs.glb",
      "kind": "solid",
-     "tris": 176,
+     "tris": 108,
      "offset": [
       0.0,
-      2.24,
+      1.125,
       0.0
      ],
      "size": [
-      5.84,
-      4.48,
-      8.0
+      3.02,
+      2.25,
+      5.9
      ]
     }
    ],
    "vfx": [],
-   "notes": "Stairs (reusable): four 8.0-wide treads of two boards on two cut stringers, risers 1.12, treads 1.46"
+   "notes": "Stairs: three chunky stacked slabs on two sleepers, four rises of 0.75 to the deck"
+  },
+  {
+   "name": "TimberBoardwalkStraight",
+   "sheet": "M052",
+   "subject": "Boardwalk",
+   "role": "variant",
+   "size": [
+    15.996,
+    5.15,
+    6.9
+   ],
+   "tris": 1464,
+   "budget": 6000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TimberBoardwalkStraight.glb",
+     "kind": "solid",
+     "tris": 1464,
+     "offset": [
+      0.0,
+      2.575,
+      0.0
+     ],
+     "size": [
+      15.996,
+      5.15,
+      6.9
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Tiling continuation: the hero without stairs and without its -X end posts. Place at +16 studs along X after the hero (or another Straight); it shares the previous module's end posts (one post row per joint)."
   },
   {
    "name": "TimberBoardwalkSupportPost",
@@ -777,11 +453,11 @@
    "subject": "Boardwalk",
    "role": "part",
    "size": [
-    1.5,
-    4.77,
-    2.32
+    1.12,
+    2.84,
+    1.45
    ],
-   "tris": 62,
+   "tris": 68,
    "budget": 1000,
    "collision": {
     "CollisionFidelity": "Hull",
@@ -794,34 +470,34 @@
     {
      "file": "meshes/TimberBoardwalkSupportPost.glb",
      "kind": "solid",
-     "tris": 62,
+     "tris": 68,
      "offset": [
       0.0,
-      2.385,
+      1.42,
       0.0
      ],
      "size": [
-      1.5,
-      4.77,
-      2.32
+      1.12,
+      2.84,
+      1.45
      ]
     }
    ],
    "vfx": [],
-   "notes": "Support Post (reusable): a 1.5-square post to 4.77 (under the planks) with a bolt block and hex bolt"
+   "notes": "Support Post: 1.0 square, ground to the plank underside, bolt block and square bolt"
   }
  ],
  "stats": {
-  "assets": 8,
-  "pieces": 8,
-  "solid": 8,
+  "assets": 9,
+  "pieces": 9,
+  "solid": 9,
   "water": 0,
   "glow": 0,
-  "tris": 2884,
+  "tris": 3664,
   "vfxSockets": 0,
-  "paletteColours": 18,
-  "paletteLevels": 349,
-  "meshBytes": 229128
+  "paletteColours": 5,
+  "paletteLevels": 77,
+  "meshBytes": 244544
  },
  "problems": []
 }
