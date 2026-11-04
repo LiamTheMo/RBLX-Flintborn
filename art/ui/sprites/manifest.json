@@ -5171,7 +5171,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_AbyssalShard__hi",
-    "atlas": "atlas_lk_items3_1",
+    "atlas": "atlas_lk_items4_1",
     "rect": [
       0,
       0,
@@ -5193,7 +5193,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_AdamantineAxe__hi",
-    "atlas": "atlas_lk_items3_2",
+    "atlas": "atlas_lk_items4_2",
     "rect": [
       0,
       0,
@@ -5215,7 +5215,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_AdamantineBar__hi",
-    "atlas": "atlas_lk_items3_1",
+    "atlas": "atlas_lk_items4_1",
     "rect": [
       114,
       0,
@@ -5237,7 +5237,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_AdamantineBow__hi",
-    "atlas": "atlas_lk_items3_2",
+    "atlas": "atlas_lk_items4_2",
     "rect": [
       114,
       0,
@@ -5259,7 +5259,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_AdamantineChest__hi",
-    "atlas": "atlas_lk_items3_2",
+    "atlas": "atlas_lk_items4_2",
     "rect": [
       228,
       0,
@@ -5281,7 +5281,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_AdamantineDagger__hi",
-    "atlas": "atlas_lk_items3_2",
+    "atlas": "atlas_lk_items4_2",
     "rect": [
       342,
       0,
@@ -5303,7 +5303,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_AdamantineHead__hi",
-    "atlas": "atlas_lk_items3_2",
+    "atlas": "atlas_lk_items4_2",
     "rect": [
       456,
       0,
@@ -5325,7 +5325,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_AdamantineLegs__hi",
-    "atlas": "atlas_lk_items3_2",
+    "atlas": "atlas_lk_items4_2",
     "rect": [
       570,
       0,
@@ -5347,7 +5347,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_AdamantineOre__hi",
-    "atlas": "atlas_lk_items3_1",
+    "atlas": "atlas_lk_items4_1",
     "rect": [
       228,
       0,
@@ -5369,7 +5369,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_AdamantinePickaxe__hi",
-    "atlas": "atlas_lk_items3_2",
+    "atlas": "atlas_lk_items4_2",
     "rect": [
       684,
       0,
@@ -5391,7 +5391,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_AdamantineSpear__hi",
-    "atlas": "atlas_lk_items3_2",
+    "atlas": "atlas_lk_items4_2",
     "rect": [
       798,
       0,
@@ -5413,7 +5413,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_AdamantineSword__hi",
-    "atlas": "atlas_lk_items3_2",
+    "atlas": "atlas_lk_items4_2",
     "rect": [
       912,
       0,
@@ -5435,7 +5435,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_AdvancedMedicine__hi",
-    "atlas": "atlas_lk_items3_1",
+    "atlas": "atlas_lk_items4_1",
     "rect": [
       342,
       0,
@@ -5457,7 +5457,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_Amethyst__hi",
-    "atlas": "atlas_lk_items3_1",
+    "atlas": "atlas_lk_items4_1",
     "rect": [
       456,
       0,
@@ -5479,7 +5479,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_AncientEmber__hi",
-    "atlas": "atlas_lk_items3_1",
+    "atlas": "atlas_lk_items4_1",
     "rect": [
       570,
       0,
@@ -5501,7 +5501,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_AshenOil__hi",
-    "atlas": "atlas_lk_items3_1",
+    "atlas": "atlas_lk_items4_1",
     "rect": [
       684,
       0,
@@ -5523,7 +5523,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_BasicMedicine__hi",
-    "atlas": "atlas_lk_items3_1",
+    "atlas": "atlas_lk_items4_1",
     "rect": [
       798,
       0,
@@ -5545,7 +5545,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_Bloodroot__hi",
-    "atlas": "atlas_lk_items3_1",
+    "atlas": "atlas_lk_items4_1",
     "rect": [
       912,
       0,
@@ -5567,7 +5567,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_Bone__hi",
-    "atlas": "atlas_lk_items3_1",
+    "atlas": "atlas_lk_items4_1",
     "rect": [
       0,
       114,
@@ -5581,7 +5581,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_BoneChest__hi",
-    "atlas": "atlas_lk_items3_1",
+    "atlas": "atlas_lk_items4_1",
     "rect": [
       114,
       114,
@@ -5603,7 +5603,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_BoneDagger__hi",
-    "atlas": "atlas_lk_items3_1",
+    "atlas": "atlas_lk_items4_1",
     "rect": [
       228,
       114,
@@ -5625,7 +5625,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_BoneHead__hi",
-    "atlas": "atlas_lk_items3_2",
+    "atlas": "atlas_lk_items4_2",
     "rect": [
       0,
       114,
@@ -5647,7 +5647,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_BoneLegs__hi",
-    "atlas": "atlas_lk_items3_2",
+    "atlas": "atlas_lk_items4_2",
     "rect": [
       114,
       114,
@@ -5669,7 +5669,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_BoneSpear__hi",
-    "atlas": "atlas_lk_items3_2",
+    "atlas": "atlas_lk_items4_2",
     "rect": [
       228,
       114,
@@ -5699,7 +5699,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_BreachingCharge__hi",
-    "atlas": "atlas_lk_items3_1",
+    "atlas": "atlas_lk_items4_1",
     "rect": [
       342,
       114,
@@ -5721,7 +5721,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_CaveMushroom__hi",
-    "atlas": "atlas_lk_items3_1",
+    "atlas": "atlas_lk_items4_1",
     "rect": [
       456,
       114,
@@ -5743,7 +5743,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_ChargedCore__hi",
-    "atlas": "atlas_lk_items3_1",
+    "atlas": "atlas_lk_items4_1",
     "rect": [
       570,
       114,
@@ -5765,7 +5765,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_ChestnutMushroom__hi",
-    "atlas": "atlas_lk_items3_1",
+    "atlas": "atlas_lk_items4_1",
     "rect": [
       684,
       114,
@@ -5787,7 +5787,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_Clay__hi",
-    "atlas": "atlas_lk_items3_1",
+    "atlas": "atlas_lk_items4_1",
     "rect": [
       798,
       114,
@@ -5809,7 +5809,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_CobaltAxe__hi",
-    "atlas": "atlas_lk_items3_2",
+    "atlas": "atlas_lk_items4_2",
     "rect": [
       342,
       114,
@@ -5831,7 +5831,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_CobaltBar__hi",
-    "atlas": "atlas_lk_items3_1",
+    "atlas": "atlas_lk_items4_1",
     "rect": [
       912,
       114,
@@ -5853,7 +5853,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_CobaltBow__hi",
-    "atlas": "atlas_lk_items3_2",
+    "atlas": "atlas_lk_items4_2",
     "rect": [
       456,
       114,
@@ -5875,7 +5875,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_CobaltChest__hi",
-    "atlas": "atlas_lk_items3_2",
+    "atlas": "atlas_lk_items4_2",
     "rect": [
       570,
       114,
@@ -5897,7 +5897,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_CobaltDagger__hi",
-    "atlas": "atlas_lk_items3_2",
+    "atlas": "atlas_lk_items4_2",
     "rect": [
       684,
       114,
@@ -5919,7 +5919,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_CobaltHead__hi",
-    "atlas": "atlas_lk_items3_2",
+    "atlas": "atlas_lk_items4_2",
     "rect": [
       798,
       114,
@@ -5941,7 +5941,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_CobaltLegs__hi",
-    "atlas": "atlas_lk_items3_2",
+    "atlas": "atlas_lk_items4_2",
     "rect": [
       912,
       114,
@@ -5963,7 +5963,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_CobaltOre__hi",
-    "atlas": "atlas_lk_items3_1",
+    "atlas": "atlas_lk_items4_1",
     "rect": [
       0,
       228,
@@ -5985,7 +5985,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_CobaltPickaxe__hi",
-    "atlas": "atlas_lk_items3_2",
+    "atlas": "atlas_lk_items4_2",
     "rect": [
       0,
       228,
@@ -6007,7 +6007,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_CobaltSpear__hi",
-    "atlas": "atlas_lk_items3_2",
+    "atlas": "atlas_lk_items4_2",
     "rect": [
       114,
       228,
@@ -6029,7 +6029,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_CobaltSword__hi",
-    "atlas": "atlas_lk_items3_2",
+    "atlas": "atlas_lk_items4_2",
     "rect": [
       228,
       228,
@@ -6051,7 +6051,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_CookedMeat__hi",
-    "atlas": "atlas_lk_items3_1",
+    "atlas": "atlas_lk_items4_1",
     "rect": [
       114,
       228,
@@ -6073,7 +6073,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_CopperAxe__hi",
-    "atlas": "atlas_lk_items3_2",
+    "atlas": "atlas_lk_items4_2",
     "rect": [
       342,
       228,
@@ -6095,7 +6095,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_CopperBar__hi",
-    "atlas": "atlas_lk_items3_1",
+    "atlas": "atlas_lk_items4_1",
     "rect": [
       228,
       228,
@@ -6117,7 +6117,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_CopperBow__hi",
-    "atlas": "atlas_lk_items3_2",
+    "atlas": "atlas_lk_items4_2",
     "rect": [
       456,
       228,
@@ -6139,7 +6139,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_CopperChest__hi",
-    "atlas": "atlas_lk_items3_2",
+    "atlas": "atlas_lk_items4_2",
     "rect": [
       570,
       228,
@@ -6161,7 +6161,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_CopperDagger__hi",
-    "atlas": "atlas_lk_items3_2",
+    "atlas": "atlas_lk_items4_2",
     "rect": [
       684,
       228,
@@ -6183,7 +6183,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_CopperHead__hi",
-    "atlas": "atlas_lk_items3_2",
+    "atlas": "atlas_lk_items4_2",
     "rect": [
       798,
       228,
@@ -6205,7 +6205,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_CopperLegs__hi",
-    "atlas": "atlas_lk_items3_2",
+    "atlas": "atlas_lk_items4_2",
     "rect": [
       912,
       228,
@@ -6227,7 +6227,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_CopperOre__hi",
-    "atlas": "atlas_lk_items3_1",
+    "atlas": "atlas_lk_items4_1",
     "rect": [
       342,
       228,
@@ -6249,7 +6249,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_CopperPickaxe__hi",
-    "atlas": "atlas_lk_items3_2",
+    "atlas": "atlas_lk_items4_2",
     "rect": [
       0,
       342,
@@ -6271,7 +6271,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_CopperSpear__hi",
-    "atlas": "atlas_lk_items3_2",
+    "atlas": "atlas_lk_items4_2",
     "rect": [
       114,
       342,
@@ -6293,7 +6293,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_CopperSword__hi",
-    "atlas": "atlas_lk_items3_2",
+    "atlas": "atlas_lk_items4_2",
     "rect": [
       228,
       342,
@@ -6315,7 +6315,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_DireHide__hi",
-    "atlas": "atlas_lk_items3_1",
+    "atlas": "atlas_lk_items4_1",
     "rect": [
       456,
       228,
@@ -6337,7 +6337,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_Elderberry__hi",
-    "atlas": "atlas_lk_items3_1",
+    "atlas": "atlas_lk_items4_1",
     "rect": [
       570,
       228,
@@ -6359,7 +6359,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_Emberglass__hi",
-    "atlas": "atlas_lk_items3_1",
+    "atlas": "atlas_lk_items4_1",
     "rect": [
       684,
       228,
@@ -6381,7 +6381,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_ExtractionRune__hi",
-    "atlas": "atlas_lk_items3_1",
+    "atlas": "atlas_lk_items4_1",
     "rect": [
       798,
       228,
@@ -6403,7 +6403,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_Fiber__hi",
-    "atlas": "atlas_lk_items3_1",
+    "atlas": "atlas_lk_items4_1",
     "rect": [
       912,
       228,
@@ -6425,7 +6425,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_FireBomb__hi",
-    "atlas": "atlas_lk_items3_1",
+    "atlas": "atlas_lk_items4_1",
     "rect": [
       0,
       342,
@@ -6447,7 +6447,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_Flint__hi",
-    "atlas": "atlas_lk_items3_1",
+    "atlas": "atlas_lk_items4_1",
     "rect": [
       114,
       342,
@@ -6461,7 +6461,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_FlintArrow__hi",
-    "atlas": "atlas_lk_items3_1",
+    "atlas": "atlas_lk_items4_1",
     "rect": [
       228,
       342,
@@ -6483,7 +6483,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_FlintDagger__hi",
-    "atlas": "atlas_lk_items3_2",
+    "atlas": "atlas_lk_items4_2",
     "rect": [
       342,
       342,
@@ -6505,7 +6505,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_FlintSpear__hi",
-    "atlas": "atlas_lk_items3_2",
+    "atlas": "atlas_lk_items4_2",
     "rect": [
       456,
       342,
@@ -6535,7 +6535,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_Frostleaf__hi",
-    "atlas": "atlas_lk_items3_1",
+    "atlas": "atlas_lk_items4_1",
     "rect": [
       342,
       342,
@@ -6557,7 +6557,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_GlimmerDraught__hi",
-    "atlas": "atlas_lk_items3_1",
+    "atlas": "atlas_lk_items4_1",
     "rect": [
       456,
       342,
@@ -6579,7 +6579,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_Glimmerberry__hi",
-    "atlas": "atlas_lk_items3_1",
+    "atlas": "atlas_lk_items4_1",
     "rect": [
       570,
       342,
@@ -6601,7 +6601,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_GlowFur__hi",
-    "atlas": "atlas_lk_items3_1",
+    "atlas": "atlas_lk_items4_1",
     "rect": [
       684,
       342,
@@ -6623,7 +6623,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_GreaterPotion__hi",
-    "atlas": "atlas_lk_items3_1",
+    "atlas": "atlas_lk_items4_1",
     "rect": [
       798,
       342,
@@ -6645,7 +6645,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_GuardianFang__hi",
-    "atlas": "atlas_lk_items3_1",
+    "atlas": "atlas_lk_items4_1",
     "rect": [
       912,
       342,
@@ -6667,7 +6667,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_GuardianHeart__hi",
-    "atlas": "atlas_lk_items3_1",
+    "atlas": "atlas_lk_items4_1",
     "rect": [
       0,
       456,
@@ -6689,7 +6689,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_Hazelnut__hi",
-    "atlas": "atlas_lk_items3_1",
+    "atlas": "atlas_lk_items4_1",
     "rect": [
       114,
       456,
@@ -6711,7 +6711,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_HeartyTonic__hi",
-    "atlas": "atlas_lk_items3_1",
+    "atlas": "atlas_lk_items4_1",
     "rect": [
       228,
       456,
@@ -6733,7 +6733,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_Herbs__hi",
-    "atlas": "atlas_lk_items3_1",
+    "atlas": "atlas_lk_items4_1",
     "rect": [
       342,
       456,
@@ -6755,7 +6755,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_Hide__hi",
-    "atlas": "atlas_lk_items3_1",
+    "atlas": "atlas_lk_items4_1",
     "rect": [
       456,
       456,
@@ -6769,7 +6769,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_HideChest__hi",
-    "atlas": "atlas_lk_items3_1",
+    "atlas": "atlas_lk_items4_1",
     "rect": [
       570,
       456,
@@ -6791,7 +6791,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_HideHead__hi",
-    "atlas": "atlas_lk_items3_1",
+    "atlas": "atlas_lk_items4_1",
     "rect": [
       684,
       456,
@@ -6813,7 +6813,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_HideLegs__hi",
-    "atlas": "atlas_lk_items3_1",
+    "atlas": "atlas_lk_items4_1",
     "rect": [
       798,
       456,
@@ -6843,7 +6843,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_IronAxe__hi",
-    "atlas": "atlas_lk_items3_2",
+    "atlas": "atlas_lk_items4_2",
     "rect": [
       570,
       342,
@@ -6865,7 +6865,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_IronBar__hi",
-    "atlas": "atlas_lk_items3_1",
+    "atlas": "atlas_lk_items4_1",
     "rect": [
       912,
       456,
@@ -6887,7 +6887,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_IronBow__hi",
-    "atlas": "atlas_lk_items3_2",
+    "atlas": "atlas_lk_items4_2",
     "rect": [
       684,
       342,
@@ -6909,7 +6909,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_IronChest__hi",
-    "atlas": "atlas_lk_items3_2",
+    "atlas": "atlas_lk_items4_2",
     "rect": [
       798,
       342,
@@ -6931,7 +6931,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_IronDagger__hi",
-    "atlas": "atlas_lk_items3_2",
+    "atlas": "atlas_lk_items4_2",
     "rect": [
       912,
       342,
@@ -6953,7 +6953,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_IronHead__hi",
-    "atlas": "atlas_lk_items3_2",
+    "atlas": "atlas_lk_items4_2",
     "rect": [
       0,
       456,
@@ -6975,7 +6975,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_IronLegs__hi",
-    "atlas": "atlas_lk_items3_2",
+    "atlas": "atlas_lk_items4_2",
     "rect": [
       114,
       456,
@@ -6997,7 +6997,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_IronOre__hi",
-    "atlas": "atlas_lk_items3_1",
+    "atlas": "atlas_lk_items4_1",
     "rect": [
       0,
       570,
@@ -7019,7 +7019,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_IronPickaxe__hi",
-    "atlas": "atlas_lk_items3_2",
+    "atlas": "atlas_lk_items4_2",
     "rect": [
       228,
       456,
@@ -7041,7 +7041,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_IronSpear__hi",
-    "atlas": "atlas_lk_items3_2",
+    "atlas": "atlas_lk_items4_2",
     "rect": [
       342,
       456,
@@ -7063,7 +7063,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_IronSword__hi",
-    "atlas": "atlas_lk_items3_2",
+    "atlas": "atlas_lk_items4_2",
     "rect": [
       456,
       456,
@@ -7085,7 +7085,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_Jade__hi",
-    "atlas": "atlas_lk_items3_1",
+    "atlas": "atlas_lk_items4_1",
     "rect": [
       114,
       570,
@@ -7099,7 +7099,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_JadeDagger__hi",
-    "atlas": "atlas_lk_items3_2",
+    "atlas": "atlas_lk_items4_2",
     "rect": [
       570,
       456,
@@ -7121,7 +7121,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_JadeSpear__hi",
-    "atlas": "atlas_lk_items3_2",
+    "atlas": "atlas_lk_items4_2",
     "rect": [
       684,
       456,
@@ -7151,7 +7151,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_JuniperBerry__hi",
-    "atlas": "atlas_lk_items3_1",
+    "atlas": "atlas_lk_items4_1",
     "rect": [
       228,
       570,
@@ -7173,7 +7173,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_MithrilAxe__hi",
-    "atlas": "atlas_lk_items3_2",
+    "atlas": "atlas_lk_items4_2",
     "rect": [
       798,
       456,
@@ -7195,7 +7195,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_MithrilBar__hi",
-    "atlas": "atlas_lk_items3_1",
+    "atlas": "atlas_lk_items4_1",
     "rect": [
       342,
       570,
@@ -7217,7 +7217,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_MithrilBow__hi",
-    "atlas": "atlas_lk_items3_2",
+    "atlas": "atlas_lk_items4_2",
     "rect": [
       912,
       456,
@@ -7239,7 +7239,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_MithrilChest__hi",
-    "atlas": "atlas_lk_items3_2",
+    "atlas": "atlas_lk_items4_2",
     "rect": [
       0,
       570,
@@ -7261,7 +7261,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_MithrilDagger__hi",
-    "atlas": "atlas_lk_items3_2",
+    "atlas": "atlas_lk_items4_2",
     "rect": [
       114,
       570,
@@ -7283,7 +7283,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_MithrilHead__hi",
-    "atlas": "atlas_lk_items3_2",
+    "atlas": "atlas_lk_items4_2",
     "rect": [
       228,
       570,
@@ -7305,7 +7305,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_MithrilLegs__hi",
-    "atlas": "atlas_lk_items3_2",
+    "atlas": "atlas_lk_items4_2",
     "rect": [
       342,
       570,
@@ -7327,7 +7327,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_MithrilOre__hi",
-    "atlas": "atlas_lk_items3_1",
+    "atlas": "atlas_lk_items4_1",
     "rect": [
       456,
       570,
@@ -7349,7 +7349,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_MithrilPickaxe__hi",
-    "atlas": "atlas_lk_items3_2",
+    "atlas": "atlas_lk_items4_2",
     "rect": [
       456,
       570,
@@ -7371,7 +7371,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_MithrilSpear__hi",
-    "atlas": "atlas_lk_items3_2",
+    "atlas": "atlas_lk_items4_2",
     "rect": [
       570,
       570,
@@ -7393,7 +7393,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_MithrilSword__hi",
-    "atlas": "atlas_lk_items3_2",
+    "atlas": "atlas_lk_items4_2",
     "rect": [
       684,
       570,
@@ -7415,7 +7415,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_Moonpetal__hi",
-    "atlas": "atlas_lk_items3_1",
+    "atlas": "atlas_lk_items4_1",
     "rect": [
       570,
       570,
@@ -7437,7 +7437,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_Obsidian__hi",
-    "atlas": "atlas_lk_items3_1",
+    "atlas": "atlas_lk_items4_1",
     "rect": [
       684,
       570,
@@ -7451,7 +7451,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_ObsidianDagger__hi",
-    "atlas": "atlas_lk_items3_2",
+    "atlas": "atlas_lk_items4_2",
     "rect": [
       798,
       570,
@@ -7473,7 +7473,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_ObsidianSpear__hi",
-    "atlas": "atlas_lk_items3_2",
+    "atlas": "atlas_lk_items4_2",
     "rect": [
       912,
       570,
@@ -7503,7 +7503,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_Potion__hi",
-    "atlas": "atlas_lk_items3_1",
+    "atlas": "atlas_lk_items4_1",
     "rect": [
       798,
       570,
@@ -7525,7 +7525,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_Raspberry__hi",
-    "atlas": "atlas_lk_items3_1",
+    "atlas": "atlas_lk_items4_1",
     "rect": [
       912,
       570,
@@ -7547,7 +7547,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_RawMeat__hi",
-    "atlas": "atlas_lk_items3_1",
+    "atlas": "atlas_lk_items4_1",
     "rect": [
       0,
       684,
@@ -7569,7 +7569,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_Redberry__hi",
-    "atlas": "atlas_lk_items3_1",
+    "atlas": "atlas_lk_items4_1",
     "rect": [
       114,
       684,
@@ -7591,7 +7591,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_RedcapMushroom__hi",
-    "atlas": "atlas_lk_items3_1",
+    "atlas": "atlas_lk_items4_1",
     "rect": [
       228,
       684,
@@ -7613,7 +7613,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_Resin__hi",
-    "atlas": "atlas_lk_items3_1",
+    "atlas": "atlas_lk_items4_1",
     "rect": [
       342,
       684,
@@ -7635,7 +7635,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_SiegeResin__hi",
-    "atlas": "atlas_lk_items3_1",
+    "atlas": "atlas_lk_items4_1",
     "rect": [
       456,
       684,
@@ -7657,7 +7657,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_SilverAxe__hi",
-    "atlas": "atlas_lk_items3_2",
+    "atlas": "atlas_lk_items4_2",
     "rect": [
       0,
       684,
@@ -7679,7 +7679,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_SilverBar__hi",
-    "atlas": "atlas_lk_items3_1",
+    "atlas": "atlas_lk_items4_1",
     "rect": [
       570,
       684,
@@ -7701,7 +7701,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_SilverBow__hi",
-    "atlas": "atlas_lk_items3_2",
+    "atlas": "atlas_lk_items4_2",
     "rect": [
       114,
       684,
@@ -7723,7 +7723,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_SilverChest__hi",
-    "atlas": "atlas_lk_items3_2",
+    "atlas": "atlas_lk_items4_2",
     "rect": [
       228,
       684,
@@ -7745,7 +7745,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_SilverDagger__hi",
-    "atlas": "atlas_lk_items3_2",
+    "atlas": "atlas_lk_items4_2",
     "rect": [
       342,
       684,
@@ -7767,7 +7767,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_SilverHead__hi",
-    "atlas": "atlas_lk_items3_2",
+    "atlas": "atlas_lk_items4_2",
     "rect": [
       456,
       684,
@@ -7789,7 +7789,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_SilverLegs__hi",
-    "atlas": "atlas_lk_items3_2",
+    "atlas": "atlas_lk_items4_2",
     "rect": [
       570,
       684,
@@ -7811,7 +7811,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_SilverOre__hi",
-    "atlas": "atlas_lk_items3_1",
+    "atlas": "atlas_lk_items4_1",
     "rect": [
       684,
       684,
@@ -7833,7 +7833,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_SilverPickaxe__hi",
-    "atlas": "atlas_lk_items3_2",
+    "atlas": "atlas_lk_items4_2",
     "rect": [
       684,
       684,
@@ -7855,7 +7855,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_SilverSpear__hi",
-    "atlas": "atlas_lk_items3_2",
+    "atlas": "atlas_lk_items4_2",
     "rect": [
       798,
       684,
@@ -7877,7 +7877,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_SilverSword__hi",
-    "atlas": "atlas_lk_items3_2",
+    "atlas": "atlas_lk_items4_2",
     "rect": [
       912,
       684,
@@ -7899,7 +7899,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_Starstone__hi",
-    "atlas": "atlas_lk_items3_1",
+    "atlas": "atlas_lk_items4_1",
     "rect": [
       798,
       684,
@@ -7921,7 +7921,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_Stone__hi",
-    "atlas": "atlas_lk_items3_1",
+    "atlas": "atlas_lk_items4_1",
     "rect": [
       912,
       684,
@@ -7935,7 +7935,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_StoneAxe__hi",
-    "atlas": "atlas_lk_items3_1",
+    "atlas": "atlas_lk_items4_1",
     "rect": [
       0,
       798,
@@ -7957,7 +7957,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_StoneDagger__hi",
-    "atlas": "atlas_lk_items3_1",
+    "atlas": "atlas_lk_items4_1",
     "rect": [
       114,
       798,
@@ -7979,7 +7979,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_StonePickaxe__hi",
-    "atlas": "atlas_lk_items3_1",
+    "atlas": "atlas_lk_items4_1",
     "rect": [
       228,
       798,
@@ -8001,7 +8001,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_StoneSpear__hi",
-    "atlas": "atlas_lk_items3_1",
+    "atlas": "atlas_lk_items4_1",
     "rect": [
       342,
       798,
@@ -8023,7 +8023,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_StoneSword__hi",
-    "atlas": "atlas_lk_items3_1",
+    "atlas": "atlas_lk_items4_1",
     "rect": [
       456,
       798,
@@ -8053,7 +8053,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_Stormglass__hi",
-    "atlas": "atlas_lk_items3_1",
+    "atlas": "atlas_lk_items4_1",
     "rect": [
       570,
       798,
@@ -8075,7 +8075,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_StrongGlimmerDraught__hi",
-    "atlas": "atlas_lk_items3_1",
+    "atlas": "atlas_lk_items4_1",
     "rect": [
       684,
       798,
@@ -8097,7 +8097,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_StrongSunberryDraught__hi",
-    "atlas": "atlas_lk_items3_1",
+    "atlas": "atlas_lk_items4_1",
     "rect": [
       798,
       798,
@@ -8119,7 +8119,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_Sunberry__hi",
-    "atlas": "atlas_lk_items3_1",
+    "atlas": "atlas_lk_items4_1",
     "rect": [
       912,
       798,
@@ -8133,7 +8133,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_SunberryDraught__hi",
-    "atlas": "atlas_lk_items3_1",
+    "atlas": "atlas_lk_items4_1",
     "rect": [
       0,
       912,
@@ -8163,7 +8163,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_Sweetberry__hi",
-    "atlas": "atlas_lk_items3_1",
+    "atlas": "atlas_lk_items4_1",
     "rect": [
       114,
       912,
@@ -8185,7 +8185,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_Thornvine__hi",
-    "atlas": "atlas_lk_items3_1",
+    "atlas": "atlas_lk_items4_1",
     "rect": [
       228,
       912,
@@ -8207,7 +8207,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_Wood__hi",
-    "atlas": "atlas_lk_items3_1",
+    "atlas": "atlas_lk_items4_1",
     "rect": [
       342,
       912,
@@ -8229,7 +8229,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_WoodenAxe__hi",
-    "atlas": "atlas_lk_items3_1",
+    "atlas": "atlas_lk_items4_1",
     "rect": [
       456,
       912,
@@ -8251,7 +8251,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_WoodenBow__hi",
-    "atlas": "atlas_lk_items3_1",
+    "atlas": "atlas_lk_items4_1",
     "rect": [
       570,
       912,
@@ -8273,7 +8273,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_WoodenPickaxe__hi",
-    "atlas": "atlas_lk_items3_1",
+    "atlas": "atlas_lk_items4_1",
     "rect": [
       684,
       912,
@@ -8295,7 +8295,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_WoodenSpear__hi",
-    "atlas": "atlas_lk_items3_1",
+    "atlas": "atlas_lk_items4_1",
     "rect": [
       798,
       912,
@@ -8317,7 +8317,7 @@
     "h": 110,
     "slice": null,
     "hi": "lk_item_Workbench__hi",
-    "atlas": "atlas_lk_items3_1",
+    "atlas": "atlas_lk_items4_1",
     "rect": [
       912,
       912,
@@ -8333,14 +8333,14 @@
     "scale": 3.2364,
     "of": "lk_item_Workbench"
   },
-  "atlas_lk_items3_1": {
-    "file": "atlas_lk_items3_1.png",
+  "atlas_lk_items4_1": {
+    "file": "atlas_lk_items4_1.png",
     "w": 1024,
     "h": 1024,
     "slice": null
   },
-  "atlas_lk_items3_2": {
-    "file": "atlas_lk_items3_2.png",
+  "atlas_lk_items4_2": {
+    "file": "atlas_lk_items4_2.png",
     "w": 1024,
     "h": 1024,
     "slice": null

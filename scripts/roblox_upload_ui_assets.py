@@ -23,7 +23,7 @@ art, UiAssets.Placement) and this script uploads it like any new name.
   python scripts/roblox_upload_ui_assets.py --dry-run --atlases   # atlases only
   python scripts/roblox_upload_ui_assets.py --sprites     # refresh UiSprites.json
   python scripts/roblox_upload_ui_assets.py --upload --only atlas_lk_play
-  python scripts/roblox_upload_ui_assets.py --dry-run --only 'atlas_lk_items3_*,lk_item_*__hi'
+  python scripts/roblox_upload_ui_assets.py --dry-run --only 'atlas_lk_items4_*,lk_item_*__hi'
 
 --only takes names or shell-style patterns (* and ?). A long run (the item
 icons: two atlases and 144 hero images) is safe: every upload is recorded as it
