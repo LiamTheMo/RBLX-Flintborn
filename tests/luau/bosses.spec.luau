@@ -1,8 +1,9 @@
 local Shared = game:GetService("ReplicatedStorage").Shared
-local BossCatalog = require(Shared.Bosses.BossCatalog)
-local BossRules = require(Shared.Bosses.BossRules)
-local BossScaling = require(Shared.Bosses.BossScaling)
-local EventCatalog = require(Shared.Events.EventCatalog)
+local Server = game:GetService("ServerScriptService").Server
+local BossCatalog = require(Server.Rules.Bosses.BossCatalog)
+local BossRules = require(Server.Rules.Bosses.BossRules)
+local BossScaling = require(Server.Rules.Bosses.BossScaling)
+local EventCatalog = require(Server.Rules.Events.EventCatalog)
 local ItemCatalog = require(Shared.Items.ItemCatalog)
 
 test("the Guardian returns 15–20 minutes after its last encounter with a 3 minute horn", function()

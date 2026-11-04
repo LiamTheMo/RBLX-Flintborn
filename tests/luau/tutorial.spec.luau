@@ -1,7 +1,8 @@
 local Shared = game:GetService("ReplicatedStorage").Shared
+local Server = game:GetService("ServerScriptService").Server
 local ItemCatalog = require(Shared.Items.ItemCatalog)
-local ProfileSchema = require(Shared.Data.ProfileSchema)
-local TutorialSteps = require(Shared.Tutorial.TutorialSteps)
+local ProfileSchema = require(Server.Rules.Data.ProfileSchema)
+local TutorialSteps = require(Server.Rules.Tutorial.TutorialSteps)
 
 test("steps follow the learning order with a trigger each; none grants Permanent gear or over 25 Gems", function()
 	for _, step in TutorialSteps.Steps do

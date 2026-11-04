@@ -2320,7 +2320,7 @@ Roblox avatars (accessories, clothing, body colours) are not loaded on top.
 
 **Tribe colours:** players outside a tribe wear **Earth** (the reference's brown). A tribe's members all wear one of nine other colours, picked from the tribe's public id so every server agrees: Ember, Clay, Ochre, Moss, Tide, River, Dusk, Ash and Bone. Joining or leaving a tribe recolours the shorts immediately. Two tribes can share a colour. Letting a tribe choose its own colour is Open.
 
-**Source:** art in `art/blender/scripts/build_09_character.py`; installed by the **Upload and install the player character** workflow (its install modes save the places, so they run only from `main`); colours in `src/shared/Character/CharacterLook.luau`; applied by `OutfitService`.
+**Source:** art in `art/blender/scripts/build_09_character.py`; installed by the **Upload and install the player character** workflow (its install modes save the places, so they run only from `main`); colours in `src/server/Rules/Character/CharacterLook.luau`; applied by `OutfitService`.
 
 **QA:** a new player spawns as the default character in the lobby and the world, with no avatar items; walking, jumping and idle use the R6 animations with the clothing following the limbs; a tribeless player wears brown shorts; creating or joining a tribe changes them to that tribe's colour, and leaving changes them back.
 
@@ -2471,7 +2471,7 @@ The Settings window is rebuilt from the parchment reference (`art/reference/ui/p
 
 1. **Gathering is a swing.** Clicking (or tapping the attack button, or pressing RT) with whatever is held does the natural thing: weapons attack, an **axe chops** trees, a **pickaxe mines** rocks, ores and gems, and **empty hands gather** plants and berries. Resource nodes no longer show an Interact prompt; on desktop, pointing at a node within reach shows its name, the action and any pickaxe gate. Every rule of §53 and §51 is unchanged: the same reach, cadence, tool gates, drops, XP, mastery and regrowth, all decided by the server.
 2. **Target order for one swing:** players, then creatures; then, holding a tool or nothing, a resource node before a structure, and holding a weapon, a structure before a node. Inside a safe zone a swing can only gather.
-3. **Placeholder models.** Until the authored art arrives, every held tool and weapon shows in the hand, worn armor shows on the body, dropped gear shows a small model, and resource nodes, creatures, bosses, event sites, caches, meteors and the generated island's structures and scenery are built from simple primitive shapes coloured by tier and type. They are data recipes (`src/shared/Visuals`), so real models replace them without gameplay changes.
+3. **Placeholder models.** Until the authored art arrives, every held tool and weapon shows in the hand, worn armor shows on the body, dropped gear shows a small model, and resource nodes, creatures, bosses, event sites, caches, meteors and the generated island's structures and scenery are built from simple primitive shapes coloured by tier and type. They are data recipes (`src/server/Rules/Visuals`), so real models replace them without gameplay changes.
 
 
 ## 59. Owner request: hold a consumable and click to use it (2026-11-03)

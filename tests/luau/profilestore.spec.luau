@@ -1,10 +1,9 @@
 local Server = game:GetService("ServerScriptService").Server
-local Shared = game:GetService("ReplicatedStorage").Shared
 local DataStoreGateway = require(Server.Infrastructure.DataStoreGateway)
 local InMemoryDataStore = require(Server.Infrastructure.InMemoryDataStore)
 local OperationJournal = require(Server.Infrastructure.OperationJournal)
 local ProfileStore = require(Server.Infrastructure.ProfileStore)
-local ProfileSchema = require(Shared.Data.ProfileSchema)
+local ProfileSchema = require(Server.Rules.Data.ProfileSchema)
 
 local USER = 4242
 

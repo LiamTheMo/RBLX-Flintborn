@@ -34,8 +34,8 @@ Remotes.Get = function()
 	return { FireClient = function() end }
 end
 
-local ForgeRules = require(Shared.Crafting.ForgeRules)
-local ProfileSchema = require(Shared.Data.ProfileSchema)
+local ForgeRules = require(Server.Rules.Crafting.ForgeRules)
+local ProfileSchema = require(Server.Rules.Data.ProfileSchema)
 local OperationJournal = require(Server.Infrastructure.OperationJournal)
 
 local profiles = {}

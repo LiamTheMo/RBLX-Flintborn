@@ -20,7 +20,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local ServerStorage = game:GetService("ServerStorage")
 
 local BiomeCatalog = require(ReplicatedStorage.Shared.World.BiomeCatalog)
-local IslandLayout = require(ReplicatedStorage.Shared.World.IslandLayout)
+local IslandLayout = require(script.Parent.Parent.Rules.World.IslandLayout)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local PoiCatalog = require(ReplicatedStorage.Shared.World.PoiCatalog)
 local WorldState = require(ReplicatedStorage.Shared.World.WorldState)

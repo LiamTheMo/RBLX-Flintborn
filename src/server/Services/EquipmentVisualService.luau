@@ -25,9 +25,9 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local GearModels = require(ReplicatedStorage.Shared.Visuals.GearModels)
+local GearModels = require(script.Parent.Parent.Rules.Visuals.GearModels)
 local InventoryRules = require(ReplicatedStorage.Shared.Inventory.InventoryRules)
-local ModelBuilder = require(ReplicatedStorage.Shared.Visuals.ModelBuilder)
+local ModelBuilder = require(script.Parent.Parent.Rules.Visuals.ModelBuilder)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local InventoryService = require(script.Parent.InventoryService)
 local WorldAdmissionService = require(script.Parent.WorldAdmissionService)

@@ -3,10 +3,11 @@
 -- swings and shots measured against the server-validated position, the first bow
 -- draw of a run, and a sprint that really stops when stamina runs out.
 local Shared = game:GetService("ReplicatedStorage").Shared
+local Server = game:GetService("ServerScriptService").Server
 local BuildRules = require(Shared.Building.BuildRules)
 local DamageRules = require(Shared.Combat.DamageRules)
-local MovementRules = require(Shared.Security.MovementRules)
-local SurvivalRules = require(Shared.Survival.SurvivalRules)
+local MovementRules = require(Server.Rules.Security.MovementRules)
+local SurvivalRules = require(Server.Rules.Survival.SurvivalRules)
 local WeaponCatalog = require(Shared.Combat.WeaponCatalog)
 
 -- Building ----------------------------------------------------------------------

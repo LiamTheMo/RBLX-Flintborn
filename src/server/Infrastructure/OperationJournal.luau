@@ -4,7 +4,7 @@
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local ProfileSchema = require(ReplicatedStorage.Shared.Data.ProfileSchema)
+local ProfileSchema = require(script.Parent.Parent.Rules.Data.ProfileSchema)
 local Validation = require(ReplicatedStorage.Shared.Data.Validation)
 
 local OperationJournal = {}

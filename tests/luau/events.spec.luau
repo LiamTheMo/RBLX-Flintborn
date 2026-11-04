@@ -1,9 +1,10 @@
 local Shared = game:GetService("ReplicatedStorage").Shared
+local Server = game:GetService("ServerScriptService").Server
 local BiomeCatalog = require(Shared.World.BiomeCatalog)
-local EnemyCatalog = require(Shared.Enemies.EnemyCatalog)
-local EventCatalog = require(Shared.Events.EventCatalog)
-local EventRules = require(Shared.Events.EventRules)
-local IslandLayout = require(Shared.World.IslandLayout)
+local EnemyCatalog = require(Server.Rules.Enemies.EnemyCatalog)
+local EventCatalog = require(Server.Rules.Events.EventCatalog)
+local EventRules = require(Server.Rules.Events.EventRules)
+local IslandLayout = require(Server.Rules.World.IslandLayout)
 local ItemCatalog = require(Shared.Items.ItemCatalog)
 local Rarity = require(Shared.Items.Rarity)
 

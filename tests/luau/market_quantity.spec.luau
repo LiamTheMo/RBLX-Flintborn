@@ -5,10 +5,11 @@
 -- limit the picker offers.
 
 local Shared = game:GetService("ReplicatedStorage").Shared
+local Server = game:GetService("ServerScriptService").Server
 local EconomyRules = require(Shared.Economy.EconomyRules)
 local GameConstants = require(Shared.GameConstants)
 local ItemCatalog = require(Shared.Items.ItemCatalog)
-local ProfileSchema = require(Shared.Data.ProfileSchema)
+local ProfileSchema = require(Server.Rules.Data.ProfileSchema)
 local ShopCatalog = require(Shared.Economy.ShopCatalog)
 
 local function ids()

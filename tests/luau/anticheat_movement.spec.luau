@@ -2,10 +2,10 @@
 -- may be from the validated position, the sustained-pace window that catches a
 -- small steady speed-up, and the air checks that catch fly and hover hacks. Also
 -- the tribe state no longer keeping alliance requests of tribes that are gone.
-local Shared = game:GetService("ReplicatedStorage").Shared
-local MovementRules = require(Shared.Security.MovementRules)
-local SurvivalRules = require(Shared.Survival.SurvivalRules)
-local TribeRules = require(Shared.Admission.TribeRules)
+local Server = game:GetService("ServerScriptService").Server
+local MovementRules = require(Server.Rules.Security.MovementRules)
+local SurvivalRules = require(Server.Rules.Survival.SurvivalRules)
+local TribeRules = require(Server.Rules.Admission.TribeRules)
 
 local WALK = SurvivalRules.WALK_SPEED
 

@@ -3,8 +3,9 @@
 -- offset and the magnetic snap.
 
 local Shared = game:GetService("ReplicatedStorage").Shared
+local Server = game:GetService("ServerScriptService").Server
 local BuildRules = require(Shared.Building.BuildRules)
-local IslandLayout = require(Shared.World.IslandLayout)
+local IslandLayout = require(Server.Rules.World.IslandLayout)
 
 local WALL = Vector3.new(8, 8, 1)
 local FLOOR = Vector3.new(8, 1, 8)

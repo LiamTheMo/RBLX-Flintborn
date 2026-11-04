@@ -1,5 +1,5 @@
-local Shared = game:GetService("ReplicatedStorage").Shared
-local CharacterLook = require(Shared.Character.CharacterLook)
+local Server = game:GetService("ServerScriptService").Server
+local CharacterLook = require(Server.Rules.Character.CharacterLook)
 
 test("players outside a tribe wear the default Earth shorts", function()
 	expectEq(CharacterLook.PantsFor(nil), "Earth", "no tribe")

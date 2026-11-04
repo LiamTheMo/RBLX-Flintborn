@@ -38,7 +38,7 @@ Run every Studio and live check in `docs/release/MANUAL_VALIDATION.md` (v0.01–
 
 ## 7. Platform, store and security
 
-- [ ] Developer product IDs set in `src/shared/Economy/OfferCatalog.luau`; each purchase tested in a test place.
+- [ ] Developer product IDs set in `src/server/Rules/Economy/OfferCatalog.luau`; each purchase tested in a test place.
 - [ ] Roblox paid-random-item and Premium policy reviewed (§38.1); every paid benefit has its earnable route (enforced by spec).
 - [ ] Redemption codes in `src/server/Config/Codes.luau` reviewed (remove any not meant for launch).
 - [ ] Admin allowlist in `src/server/Config/Admins.luau` reviewed.

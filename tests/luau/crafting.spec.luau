@@ -1,9 +1,10 @@
 local Shared = game:GetService("ReplicatedStorage").Shared
+local Server = game:GetService("ServerScriptService").Server
 local InventoryRules = require(Shared.Inventory.InventoryRules)
 local ItemCatalog = require(Shared.Items.ItemCatalog)
 local Rarity = require(Shared.Items.Rarity)
 local Recipes = require(Shared.Crafting.Recipes)
-local QualityRoll = require(Shared.Crafting.QualityRoll)
+local QualityRoll = require(Server.Rules.Crafting.QualityRoll)
 
 local function unique(id, catalogId)
 	return { instanceId = id, catalogId = catalogId, ownerId = 1, location = "Carried", qualityRoll = 0 }

@@ -1,10 +1,10 @@
 -- Placeholder creature, boss and pillar models (CreatureModels): every catalog
 -- entry has a valid, normalized recipe that stands on its hitbox floor.
-local Shared = game:GetService("ReplicatedStorage").Shared
-local BossCatalog = require(Shared.Bosses.BossCatalog)
-local CreatureModels = require(Shared.Visuals.CreatureModels)
-local EnemyCatalog = require(Shared.Enemies.EnemyCatalog)
-local Recipe = require(Shared.Visuals.Recipe)
+local Server = game:GetService("ServerScriptService").Server
+local BossCatalog = require(Server.Rules.Bosses.BossCatalog)
+local CreatureModels = require(Server.Rules.Visuals.CreatureModels)
+local EnemyCatalog = require(Server.Rules.Enemies.EnemyCatalog)
+local Recipe = require(Server.Rules.Visuals.Recipe)
 
 -- Parts stay roughly inside the hitbox (fractions of each axis from its centre).
 local REACH = 0.75

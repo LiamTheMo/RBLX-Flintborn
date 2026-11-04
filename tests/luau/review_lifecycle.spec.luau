@@ -3,7 +3,6 @@
 -- windows right after a Play. Drives the real server services against fake Roblox
 -- services, a DataStore with latency and a fake clock.
 
-local Shared = game:GetService("ReplicatedStorage").Shared
 local Server = game:GetService("ServerScriptService").Server
 
 local world = require(game:GetService("ServerStorage").TestSupport.WorldServer).new({
@@ -20,7 +19,7 @@ local world = require(game:GetService("ServerStorage").TestSupport.WorldServer).
 })
 local advance, play, stored, started = world.advance, world.play, world.stored, world.started
 
-local ProfileSchema = require(Shared.Data.ProfileSchema)
+local ProfileSchema = require(Server.Rules.Data.ProfileSchema)
 local CheckpointStore = require(Server.Infrastructure.CheckpointStore)
 local AdminService = require(Server.Services.AdminService)
 local InventoryService = require(Server.Services.InventoryService)

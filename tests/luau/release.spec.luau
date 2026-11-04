@@ -2,11 +2,12 @@
 -- phase load into the final schema without losing data, and launch catalogs are
 -- complete and consistent.
 local Shared = game:GetService("ReplicatedStorage").Shared
-local EventCatalog = require(Shared.Events.EventCatalog)
+local Server = game:GetService("ServerScriptService").Server
+local EventCatalog = require(Server.Rules.Events.EventCatalog)
 local ForgeRecipes = require(Shared.Crafting.ForgeRecipes)
 local ItemCatalog = require(Shared.Items.ItemCatalog)
 local NodeCatalog = require(Shared.Resources.NodeCatalog)
-local ProfileSchema = require(Shared.Data.ProfileSchema)
+local ProfileSchema = require(Server.Rules.Data.ProfileSchema)
 local QuestCatalog = require(Shared.Economy.QuestCatalog)
 local Recipes = require(Shared.Crafting.Recipes)
 local ShopCatalog = require(Shared.Economy.ShopCatalog)

@@ -13,7 +13,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
-local TribeRules = require(ReplicatedStorage.Shared.Admission.TribeRules)
+local TribeRules = require(script.Parent.Parent.Rules.Admission.TribeRules)
 local Validation = require(ReplicatedStorage.Shared.Data.Validation)
 local Cooldown = require(script.Parent.Parent.Infrastructure.Cooldown)
 local PartyService = require(script.Parent.PartyService)

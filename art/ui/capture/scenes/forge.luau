@@ -18,8 +18,9 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 workspace:SetAttribute("FlintbornPlaceRole", "Lobby")
 
 local Shared = ReplicatedStorage.Shared
+local Rules = game:GetService("ServerScriptService").Server.Rules
 local ForgeRecipes = require(Shared.Crafting.ForgeRecipes)
-local ForgeRules = require(Shared.Crafting.ForgeRules)
+local ForgeRules = require(Rules.Crafting.ForgeRules)
 local ItemCatalog = require(Shared.Items.ItemCatalog)
 
 local W, H = 1672, 941

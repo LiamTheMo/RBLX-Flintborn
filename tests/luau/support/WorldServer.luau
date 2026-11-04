@@ -12,6 +12,7 @@
 --     local player = world.join(101, world.transit(101, world.stacks("item", 2)))
 --     local result = world.play(player, "req-1"); world.advance(5)
 
+local Server = game:GetService("ServerScriptService").Server
 local TestSupport = script.Parent
 local FakeRoblox = require(TestSupport.FakeRoblox)
 local FakeStores = require(TestSupport.FakeStores)
@@ -84,7 +85,7 @@ function WorldServer.new(options)
 		world.started[player] = items
 	end)
 
-	local ProfileSchema = require(game:GetService("ReplicatedStorage").Shared.Data.ProfileSchema)
+	local ProfileSchema = require(Server.Rules.Data.ProfileSchema)
 	local ProfileStore = require(Server.Infrastructure.ProfileStore)
 
 	-- The profile stored for `userId`.

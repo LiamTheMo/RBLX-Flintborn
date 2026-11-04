@@ -1,10 +1,11 @@
 -- Gathering by node health and ground drops (GDD §53).
 local Shared = game:GetService("ReplicatedStorage").Shared
+local Server = game:GetService("ServerScriptService").Server
 local BiomeCatalog = require(Shared.World.BiomeCatalog)
-local BossCatalog = require(Shared.Bosses.BossCatalog)
-local EnemyCatalog = require(Shared.Enemies.EnemyCatalog)
+local BossCatalog = require(Server.Rules.Bosses.BossCatalog)
+local EnemyCatalog = require(Server.Rules.Enemies.EnemyCatalog)
 local GameConstants = require(Shared.GameConstants)
-local GroundDrops = require(Shared.Resources.GroundDrops)
+local GroundDrops = require(Server.Rules.Resources.GroundDrops)
 local ItemCatalog = require(Shared.Items.ItemCatalog)
 local MasteryCatalog = require(Shared.Progression.MasteryCatalog)
 local NodeCatalog = require(Shared.Resources.NodeCatalog)

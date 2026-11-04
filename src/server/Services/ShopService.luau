@@ -9,7 +9,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local EconomyRules = require(ReplicatedStorage.Shared.Economy.EconomyRules)
 local ItemCatalog = require(ReplicatedStorage.Shared.Items.ItemCatalog)
-local OfferCatalog = require(ReplicatedStorage.Shared.Economy.OfferCatalog)
+local OfferCatalog = require(script.Parent.Parent.Rules.Economy.OfferCatalog)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local ShopCatalog = require(ReplicatedStorage.Shared.Economy.ShopCatalog)

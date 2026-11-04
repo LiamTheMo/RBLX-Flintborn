@@ -1,8 +1,9 @@
 -- Player settings (GDD §11, §25): defaults, ranges and what the server accepts.
 
 local Shared = game:GetService("ReplicatedStorage").Shared
+local Server = game:GetService("ServerScriptService").Server
 local SettingsRules = require(Shared.Settings.SettingsRules)
-local ProfileSchema = require(Shared.Data.ProfileSchema)
+local ProfileSchema = require(Server.Rules.Data.ProfileSchema)
 
 test("a fresh profile has every setting at its default", function()
 	local choices = ProfileSchema.Default().choices

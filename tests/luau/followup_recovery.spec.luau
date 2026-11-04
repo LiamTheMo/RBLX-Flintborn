@@ -23,12 +23,12 @@ local world = require(game:GetService("ServerStorage").TestSupport.WorldServer).
 local advance, join, play, stored, stacks = world.advance, world.join, world.play, world.stored, world.stacks
 local started = world.started
 
-local CrashRecoveryRules = require(Shared.Recovery.CrashRecoveryRules)
+local CrashRecoveryRules = require(Server.Rules.Recovery.CrashRecoveryRules)
 local EconomyRules = require(Shared.Economy.EconomyRules)
-local ForgeRules = require(Shared.Crafting.ForgeRules)
-local ProfileSchema = require(Shared.Data.ProfileSchema)
+local ForgeRules = require(Server.Rules.Crafting.ForgeRules)
+local ProfileSchema = require(Server.Rules.Data.ProfileSchema)
 local TradeRules = require(Shared.Economy.TradeRules)
-local TransitRules = require(Shared.Admission.TransitRules)
+local TransitRules = require(Server.Rules.Admission.TransitRules)
 local CheckpointStore = require(Server.Infrastructure.CheckpointStore)
 local CrashRecoveryService = require(Server.Services.CrashRecoveryService)
 local LoadoutService = require(Server.Services.LoadoutService)

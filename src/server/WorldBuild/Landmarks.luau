@@ -4,7 +4,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local BiomeCatalog = require(ReplicatedStorage.Shared.World.BiomeCatalog)
-local IslandLayout = require(ReplicatedStorage.Shared.World.IslandLayout)
+local IslandLayout = require(script.Parent.Parent.Rules.World.IslandLayout)
 local BuildKit = require(script.Parent.BuildKit)
 
 local Landmarks = {}

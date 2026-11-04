@@ -198,7 +198,7 @@ Studio and live checks:
 
 Automated: 12 specs cover the 250 / 1,000 / 3,000 quest bands, zero Coins and Gems from extraction (Center included), +25 vault slots per upgrade at the same Gem price, daily quests paying once, shop purchases into the lobby backpack, fixed merchant prices (crafted gear at 40% of materials, Forge-reagent warning, no Permanent sales), trade eligibility (Coins and raw materials refused; gear, flagged materials, Permanent items and Gems allowed; level 10 and 5% fee for Gems), settlement and crash reconciliation leaving one outcome, Permanent ownership moving with a trade, every Robux offer having an earnable route and no power, purchase receipts fulfilled once, and perk respec refunds. Deployed and verified on both places (2026-10-23).
 
-Placeholders: vault upgrade 500 Gems (max 8 tiers), respec 250 Gems, Gem trades 2,000/day, merchant Wood/Stone 2, Iron 8, Hide 5, Jade 12, Obsidian 10, Ancient Ember 300 Coins; shop Bandage 50, Berries ×5 40, Arrows ×10 60, seeds 25, tools 150, titles 2,000/8,000 Coins. Robux offers show "coming soon" until developer product IDs are set in `src/shared/Economy/OfferCatalog.luau`; codes live in `src/server/Config/Codes.luau`.
+Placeholders: vault upgrade 500 Gems (max 8 tiers), respec 250 Gems, Gem trades 2,000/day, merchant Wood/Stone 2, Iron 8, Hide 5, Jade 12, Obsidian 10, Ancient Ember 300 Coins; shop Bandage 50, Berries ×5 40, Arrows ×10 60, seeds 25, tools 150, titles 2,000/8,000 Coins. Robux offers show "coming soon" until developer product IDs are set in `src/server/Rules/Economy/OfferCatalog.luau`; codes live in `src/server/Config/Codes.luau`.
 
 Studio and live checks (two accounts):
 
@@ -665,7 +665,7 @@ How it's built: every item picture (slots, hotbars, list rows, recipe rows, the 
 
 ## v0.19 — First fully playable build (GDD §58)
 
-How it's built: placeholder models are data recipes in `src/shared/Visuals` (`Recipe` format, `ModelBuilder` turns them into parts): `GearModels` (held items, worn armor, dropped gear), `NodeModels` (resource nodes), `SceneryModels` (decorative island scenery), `CreatureModels` (creatures, bosses, Guardian pillars) and `PropModels` (event structures, caches, meteors, rare nodes, altars, extraction sites). Gameplay keeps its own invisible hitbox parts; models are welded on and never block rays or players. `EquipmentVisualService` dresses characters; `ResourceService.Hit` (through `CombatService.HarvestHit`) and `HarvestRules` make the attack input gather. Automated: `recipe`, `gear_models`, `node_models`, `creature_models`, `event_props` and `harvest_click` specs in `tests/luau/run.py`.
+How it's built: placeholder models are data recipes in `src/server/Rules/Visuals` (`Recipe` format, `ModelBuilder` turns them into parts): `GearModels` (held items, worn armor, dropped gear), `NodeModels` (resource nodes), `SceneryModels` (decorative island scenery), `CreatureModels` (creatures, bosses, Guardian pillars) and `PropModels` (event structures, caches, meteors, rare nodes, altars, extraction sites). Gameplay keeps its own invisible hitbox parts; models are welded on and never block rays or players. `EquipmentVisualService` dresses characters; `ResourceService.Hit` (through `CombatService.HarvestHit`) and `HarvestRules` make the attack input gather. Automated: `recipe`, `gear_models`, `node_models`, `creature_models`, `event_props` and `harvest_click` specs in `tests/luau/run.py`.
 
 Studio and live checks (desktop, touch and controller unless stated):
 

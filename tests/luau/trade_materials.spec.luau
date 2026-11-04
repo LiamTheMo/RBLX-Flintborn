@@ -5,6 +5,7 @@
 -- Roblox services and a fake clock.
 
 local Shared = game:GetService("ReplicatedStorage").Shared
+local Server = game:GetService("ServerScriptService").Server
 
 local lobby = require(game:GetService("ServerStorage").TestSupport.LobbyTrade).new()
 local advance, handlers, pushed, profiles, stored =
@@ -13,7 +14,7 @@ local session, lockAndConfirm = lobby.session, lobby.lockAndConfirm
 
 local GameConstants = require(Shared.GameConstants)
 local ItemCatalog = require(Shared.Items.ItemCatalog)
-local ProfileSchema = require(Shared.Data.ProfileSchema)
+local ProfileSchema = require(Server.Rules.Data.ProfileSchema)
 local TradeRules = require(Shared.Economy.TradeRules)
 local TradeService = require(game:GetService("ServerScriptService").Server.Services.TradeService)
 

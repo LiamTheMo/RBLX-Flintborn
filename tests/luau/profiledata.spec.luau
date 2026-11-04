@@ -1,8 +1,9 @@
 local Shared = game:GetService("ReplicatedStorage").Shared
-local ProfileSchema = require(Shared.Data.ProfileSchema)
+local Server = game:GetService("ServerScriptService").Server
+local ProfileSchema = require(Server.Rules.Data.ProfileSchema)
 local Validation = require(Shared.Data.Validation)
-local ItemInstance = require(Shared.Data.ItemInstance)
-local SessionLease = require(Shared.Data.SessionLease)
+local ItemInstance = require(Server.Rules.Data.ItemInstance)
+local SessionLease = require(Server.Rules.Data.SessionLease)
 
 test("a missing profile becomes a complete default at the current version", function()
 	local profile, problem = ProfileSchema.Migrate(nil, 100)

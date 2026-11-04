@@ -19,9 +19,9 @@ Every document is listed in **[docs/README.md](docs/README.md)**, marked current
 
 | Path | Contents |
 | --- | --- |
-| `src/server` | Server entry point (`init.server.luau`) → `ServerScriptService.Server`. `Services/` (one singleton per responsibility, run by the Loader), `Infrastructure/` (DataStore gateway, profile store, operation journal, checkpoint store, `RequestLedger` and `Cooldown` request guards), `WorldBuild/` (the placeholder island's terrain, landmarks, safe camps and scenery, built by `WorldBuildService`), `Config/` (admins, codes) |
+| `src/server` | Server entry point (`init.server.luau`) → `ServerScriptService.Server`. `Services/` (one singleton per responsibility, run by the Loader), `Infrastructure/` (DataStore gateway, profile store, operation journal, checkpoint store, `RequestLedger` and `Cooldown` request guards), `WorldBuild/` (the placeholder island's terrain, landmarks, safe camps and scenery, built by `WorldBuildService`), `Rules/` (pure rules, catalogs and model recipes only the server uses, one folder per domain like `src/shared`: spawn, death and matchmaking rules, profile schema, enemies, bosses, events, drops, movement limits, `Visuals/` placeholder models, `World/IslandLayout`), `Config/` (admins, codes) |
 | `src/client` | Client entry point (`init.client.luau`) → `StarterPlayer.StarterPlayerScripts.Client`. `Controllers/` (run by the Loader), `Hud/` (HUD pieces, `Kit/` UI components, `Screens/` windows), `Ui/` (binds, reasons, theme) |
-| `src/shared` | Pure rules, catalogs and models shared by server, client and specs → `ReplicatedStorage.Shared`, one folder per domain (`Admission`, `Combat`, `Crafting`, `Data`, `Economy`, `Items`, `Net/Remotes`, `UI`, `Visuals`, `World`, …), plus `Core/Loader`, `Core/Signal`, `GameConstants` and `Config/PlaceConfig`. JSON files here are published as ModuleScripts |
+| `src/shared` | Pure rules, catalogs and models the client needs (and the server shares) → `ReplicatedStorage.Shared`, one folder per domain (`Admission`, `Combat`, `Crafting`, `Data`, `Economy`, `Items`, `Net/Remotes`, `UI`, `World`, …), plus `Core/Loader`, `Core/Signal`, `GameConstants` and `Config/PlaceConfig`. JSON files here are published as ModuleScripts |
 | `tests/luau` | Headless Luau specs (`*.spec.luau`) for shared modules and server modules with injected fakes; `run.py` bundles them with `prelude.luau` stubs |
 | `tests/test_*.py` | Python tests: the spec runner, the UI upload script |
 | `scripts/` | `roblox_cloud_sync.py` (script mapping), `roblox_upload_ui_assets.py` (UI sprite records and uploads) and `studio/` (a command-bar script) |
@@ -31,7 +31,7 @@ Every document is listed in **[docs/README.md](docs/README.md)**, marked current
 ## Code conventions
 
 - One responsibility per Service (`src/server/Services/<Name>Service.luau`) and Controller (`src/client/Controllers/<Name>Controller.luau`). The Loader picks up every module in those folders, so adding one is just adding a file.
-- Pure rules and catalogs live in `src/shared` so the server, client and headless specs share one definition. Tunable values live in shared config modules, never scattered literals.
+- Pure rules and catalogs live in one place so the server, client and headless specs share one definition: `src/shared` when the client requires them, otherwise `src/server/Rules`. Everything in `ReplicatedStorage` is downloaded to every player and readable there, so a module goes in `src/shared` only once client code needs it (anti-cheat limits, drop and spawn tables and the profile schema stay on the server). Tunable values live in config modules, never scattered literals.
 - The server is authoritative (GDD §12.1). Clients send intent only and never decide risk, combat, inventory, crafting, extraction or persistence.
 - Format with StyLua (`stylua src tests/luau`).
 ## Local development

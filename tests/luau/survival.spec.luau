@@ -1,5 +1,6 @@
 local Shared = game:GetService("ReplicatedStorage").Shared
-local SurvivalRules = require(Shared.Survival.SurvivalRules)
+local Server = game:GetService("ServerScriptService").Server
+local SurvivalRules = require(Server.Rules.Survival.SurvivalRules)
 local Consumables = require(Shared.Items.Consumables)
 
 local function run(fn, seconds, dt)

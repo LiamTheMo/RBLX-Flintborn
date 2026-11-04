@@ -10,7 +10,7 @@
 local HttpService = game:GetService("HttpService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local CrashRecoveryRules = require(ReplicatedStorage.Shared.Recovery.CrashRecoveryRules)
+local CrashRecoveryRules = require(script.Parent.Parent.Rules.Recovery.CrashRecoveryRules)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local CheckpointStore = require(script.Parent.Parent.Infrastructure.CheckpointStore)
 local DropService = require(script.Parent.DropService)

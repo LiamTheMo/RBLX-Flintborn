@@ -1,8 +1,9 @@
 -- The play-world island's zones, heights and POIs (GDD §54, owner request 2026-10-28).
 local Shared = game:GetService("ReplicatedStorage").Shared
+local Server = game:GetService("ServerScriptService").Server
 local BiomeCatalog = require(Shared.World.BiomeCatalog)
 local CameraRules = require(Shared.World.CameraRules)
-local IslandLayout = require(Shared.World.IslandLayout)
+local IslandLayout = require(Server.Rules.World.IslandLayout)
 local NodeCatalog = require(Shared.Resources.NodeCatalog)
 local PoiCatalog = require(Shared.World.PoiCatalog)
 

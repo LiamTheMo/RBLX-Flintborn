@@ -7,10 +7,10 @@
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local EventRules = require(ReplicatedStorage.Shared.Events.EventRules)
-local ModelBuilder = require(ReplicatedStorage.Shared.Visuals.ModelBuilder)
+local EventRules = require(script.Parent.Parent.Rules.Events.EventRules)
+local ModelBuilder = require(script.Parent.Parent.Rules.Visuals.ModelBuilder)
 local NodeCatalog = require(ReplicatedStorage.Shared.Resources.NodeCatalog)
-local PropModels = require(ReplicatedStorage.Shared.Visuals.PropModels)
+local PropModels = require(script.Parent.Parent.Rules.Visuals.PropModels)
 local Tiers = require(ReplicatedStorage.Shared.Items.Tiers)
 local Channel = require(script.Parent.Parent.Infrastructure.Channel)
 local DropService = require(script.Parent.DropService)

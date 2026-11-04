@@ -4,6 +4,7 @@
 -- a smelt is shown to take its inputs once, grant once and stop cleanly.
 
 local Shared = game:GetService("ReplicatedStorage").Shared
+local Server = game:GetService("ServerScriptService").Server
 
 local BuildRules = require(Shared.Building.BuildRules)
 local CraftingRules = require(Shared.Crafting.CraftingRules)
@@ -585,7 +586,7 @@ end)
 
 test("smelting carried ore at scale never launders it into doublable bars", function()
 	local ExtractionRules = require(Shared.Extraction.ExtractionRules)
-	local ProfileSchema = require(Shared.Data.ProfileSchema)
+	local ProfileSchema = require(Server.Rules.Data.ProfileSchema)
 	local player = carrying("IronOre", 500, 500)
 	expect(craft(player, "IronBar", CraftingRules.MAX_BATCH), "started")
 	for _ = 1, CraftingRules.MAX_BATCH do

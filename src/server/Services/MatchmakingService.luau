@@ -11,7 +11,7 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local MatchmakingRules = require(ReplicatedStorage.Shared.Admission.MatchmakingRules)
+local MatchmakingRules = require(script.Parent.Parent.Rules.Admission.MatchmakingRules)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local WorldRegistry = require(script.Parent.Parent.Infrastructure.WorldRegistry)
 local TravelService = require(script.Parent.TravelService)

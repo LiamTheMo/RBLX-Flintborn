@@ -6,15 +6,16 @@
 -- through the real TradeService session flow against fake Roblox services.
 
 local Shared = game:GetService("ReplicatedStorage").Shared
+local Server = game:GetService("ServerScriptService").Server
 
 local lobby = require(game:GetService("ServerStorage").TestSupport.LobbyTrade).new()
 local handlers, pushed, profiles = lobby.handlers, lobby.pushed, lobby.profiles
 
 local EconomyRules = require(Shared.Economy.EconomyRules)
 local ForgeRecipes = require(Shared.Crafting.ForgeRecipes)
-local ForgeRules = require(Shared.Crafting.ForgeRules)
+local ForgeRules = require(Server.Rules.Crafting.ForgeRules)
 local ItemCatalog = require(Shared.Items.ItemCatalog)
-local ProfileSchema = require(Shared.Data.ProfileSchema)
+local ProfileSchema = require(Server.Rules.Data.ProfileSchema)
 local Recipes = require(Shared.Crafting.Recipes)
 local ShopCatalog = require(Shared.Economy.ShopCatalog)
 local TradeRules = require(Shared.Economy.TradeRules)

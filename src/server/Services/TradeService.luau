@@ -19,7 +19,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local ItemCatalog = require(ReplicatedStorage.Shared.Items.ItemCatalog)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
-local ProfileSchema = require(ReplicatedStorage.Shared.Data.ProfileSchema)
+local ProfileSchema = require(script.Parent.Parent.Rules.Data.ProfileSchema)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local TradeRules = require(ReplicatedStorage.Shared.Economy.TradeRules)
 local Validation = require(ReplicatedStorage.Shared.Data.Validation)

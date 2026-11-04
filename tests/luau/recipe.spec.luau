@@ -1,6 +1,6 @@
 -- The placeholder model recipe format (v0.19): validation, bounds and colour helpers.
-local Shared = game:GetService("ReplicatedStorage").Shared
-local Recipe = require(Shared.Visuals.Recipe)
+local Server = game:GetService("ServerScriptService").Server
+local Recipe = require(Server.Rules.Visuals.Recipe)
 
 local P = Recipe.Part
 

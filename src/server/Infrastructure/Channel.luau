@@ -6,9 +6,7 @@
 -- interrupts anyone who can no longer use the prompt, briefly disabling the prompt
 -- so the client's hold bar resets too.
 
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-
-local EventRules = require(ReplicatedStorage.Shared.Events.EventRules)
+local EventRules = require(script.Parent.Parent.Rules.Events.EventRules)
 
 local Channel = {}
 

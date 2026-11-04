@@ -13,7 +13,7 @@ local Server = game:GetService("ServerScriptService").Server
 local ConsumeRules = require(Shared.Survival.ConsumeRules)
 local Consumables = require(Shared.Items.Consumables)
 local GameConstants = require(Shared.GameConstants)
-local SurvivalRules = require(Shared.Survival.SurvivalRules)
+local SurvivalRules = require(Server.Rules.Survival.SurvivalRules)
 
 local TestSupport = game:GetService("ServerStorage").TestSupport
 local FakeRoblox = require(TestSupport.FakeRoblox)

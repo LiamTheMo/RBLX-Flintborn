@@ -22,9 +22,9 @@ game.JobId = "job-recovery"
 FakeRoblox.Place("World")
 FakeRoblox.Remotes()
 
-local CrashRecoveryRules = require(Shared.Recovery.CrashRecoveryRules)
+local CrashRecoveryRules = require(Server.Rules.Recovery.CrashRecoveryRules)
 local InventoryRules = require(Shared.Inventory.InventoryRules)
-local ProfileSchema = require(Shared.Data.ProfileSchema)
+local ProfileSchema = require(Server.Rules.Data.ProfileSchema)
 local CheckpointStore = require(Server.Infrastructure.CheckpointStore)
 local ProfileService = require(Server.Services.ProfileService)
 local profiles = {}

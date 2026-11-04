@@ -8,12 +8,12 @@
 local Shared = game:GetService("ReplicatedStorage").Shared
 local Server = game:GetService("ServerScriptService").Server
 
-local CrashRecoveryRules = require(Shared.Recovery.CrashRecoveryRules)
+local CrashRecoveryRules = require(Server.Rules.Recovery.CrashRecoveryRules)
 local ExtractionRules = require(Shared.Extraction.ExtractionRules)
 local InventoryRules = require(Shared.Inventory.InventoryRules)
-local ProfileSchema = require(Shared.Data.ProfileSchema)
+local ProfileSchema = require(Server.Rules.Data.ProfileSchema)
 local Signal = require(Shared.Core.Signal)
-local TransitRules = require(Shared.Admission.TransitRules)
+local TransitRules = require(Server.Rules.Admission.TransitRules)
 
 local function stack(catalogId, quantity, carried)
 	return { catalogId = catalogId, quantity = quantity, carried = carried }

@@ -2,8 +2,9 @@
 -- that can never leave two actions on one key or bind a reserved key.
 
 local Shared = game:GetService("ReplicatedStorage").Shared
+local Server = game:GetService("ServerScriptService").Server
 local Keybinds = require(Shared.Settings.Keybinds)
-local TutorialSteps = require(Shared.Tutorial.TutorialSteps)
+local TutorialSteps = require(Server.Rules.Tutorial.TutorialSteps)
 
 test("the requested defaults: Shift sprint, B backpack, M map, 1-6 hotbar, Q drop, E interact", function()
 	local map = Keybinds.Resolve(nil)

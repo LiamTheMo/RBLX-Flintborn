@@ -1,11 +1,12 @@
 local Shared = game:GetService("ReplicatedStorage").Shared
+local Server = game:GetService("ServerScriptService").Server
 local SessionStates = require(Shared.Admission.SessionStates)
-local TransitRules = require(Shared.Admission.TransitRules)
-local SpawnRules = require(Shared.Admission.SpawnRules)
-local MatchmakingRules = require(Shared.Admission.MatchmakingRules)
+local TransitRules = require(Server.Rules.Admission.TransitRules)
+local SpawnRules = require(Server.Rules.Admission.SpawnRules)
+local MatchmakingRules = require(Server.Rules.Admission.MatchmakingRules)
 local PartyRules = require(Shared.Admission.PartyRules)
 local PlaceConfig = require(Shared.Config.PlaceConfig)
-local ProfileSchema = require(Shared.Data.ProfileSchema)
+local ProfileSchema = require(Server.Rules.Data.ProfileSchema)
 
 test("only the GDD §31.2 transitions are legal", function()
 	local legal = {

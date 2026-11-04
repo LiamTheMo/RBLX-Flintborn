@@ -1,7 +1,7 @@
-local Shared = game:GetService("ReplicatedStorage").Shared
-local DownedRules = require(Shared.Combat.DownedRules)
-local TribeRules = require(Shared.Admission.TribeRules)
-local DeathRules = require(Shared.Admission.DeathRules)
+local Server = game:GetService("ServerScriptService").Server
+local DownedRules = require(Server.Rules.Combat.DownedRules)
+local TribeRules = require(Server.Rules.Admission.TribeRules)
+local DeathRules = require(Server.Rules.Admission.DeathRules)
 
 local function steps(state, seconds, dt)
 	local outcome = nil

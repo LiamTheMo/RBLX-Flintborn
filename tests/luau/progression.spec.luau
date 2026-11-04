@@ -1,10 +1,11 @@
 local Shared = game:GetService("ReplicatedStorage").Shared
-local DeathRules = require(Shared.Admission.DeathRules)
+local Server = game:GetService("ServerScriptService").Server
+local DeathRules = require(Server.Rules.Admission.DeathRules)
 local ExtractionRules = require(Shared.Extraction.ExtractionRules)
 local LevelCurve = require(Shared.Progression.LevelCurve)
 local MasteryCatalog = require(Shared.Progression.MasteryCatalog)
-local ModifierRules = require(Shared.Progression.ModifierRules)
-local ProfileSchema = require(Shared.Data.ProfileSchema)
+local ModifierRules = require(Server.Rules.Progression.ModifierRules)
+local ProfileSchema = require(Server.Rules.Data.ProfileSchema)
 local ProgressionRules = require(Shared.Progression.ProgressionRules)
 
 test("XP saves when earned and persists through death", function()

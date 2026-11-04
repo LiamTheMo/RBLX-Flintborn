@@ -3,9 +3,8 @@
 -- blocks and the stone and wood palette.
 
 local CollectionService = game:GetService("CollectionService")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local IslandLayout = require(ReplicatedStorage.Shared.World.IslandLayout)
+local IslandLayout = require(script.Parent.Parent.Rules.World.IslandLayout)
 
 local BuildKit = {}
 

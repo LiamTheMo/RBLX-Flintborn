@@ -2,8 +2,8 @@
 
 Everything the game needs modelled or given an effect, taken from the game's own data rather than from wish lists:
 
-- the catalogs in `src/shared` (nodes, biomes and POIs, build pieces, items and tiers, creatures, bosses, events);
-- the placeholder model modules in `src/shared/Visuals` (`NodeModels`, `SceneryModels`, `PropModels`, `CreatureModels`, `GearModels`) and the services that spawn things;
+- the catalogs in `src/shared` (nodes, biomes and POIs, build pieces, items and tiers) and `src/server/Rules` (creatures, bosses, events);
+- the placeholder model modules in `src/server/Rules/Visuals` (`NodeModels`, `SceneryModels`, `PropModels`, `CreatureModels`, `GearModels`) and the services that spawn things;
 - the art trackers: [`MODEL_PROGRESS.md`](MODEL_PROGRESS.md), [`art/blender/assets/references/INDEX.md`](../../art/blender/assets/references/INDEX.md), [`art/vfx/`](../../art/vfx/README.md) and the lobby export in `art/roblox/lobby/`.
 
 State as of 2026-11-03 (branch v0.19).
@@ -14,7 +14,7 @@ State as of 2026-11-03 (branch v0.19).
 | --- | --- |
 | ✅ | Final art exists: a passed world-kit model, a lobby-set model or a live effect. It may still need hooking into the play world (see "The big gap" below). |
 | 🔨 | In progress: a world-kit model being built or verified, or an effect whose texture and emitter spec exist but which is not live yet. |
-| 🟨 | Placeholder only: a code-built primitive (`src/shared/Visuals/*Models.luau`, a service's plain part) or a stock Roblox effect. |
+| 🟨 | Placeholder only: a code-built primitive (`src/server/Rules/Visuals/*Models.luau`, a service's plain part) or a stock Roblox effect. |
 | ⬜ | Missing: nothing exists yet. |
 | — | Not applicable (no such item, or no effect wanted). |
 

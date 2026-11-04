@@ -3,10 +3,11 @@
 -- taking worn armour off into a chosen run slot (drag and drop).
 
 local Shared = game:GetService("ReplicatedStorage").Shared
+local Server = game:GetService("ServerScriptService").Server
 local InventoryRules = require(Shared.Inventory.InventoryRules)
-local LobbyLoadoutRules = require(Shared.Inventory.LobbyLoadoutRules)
-local ProfileSchema = require(Shared.Data.ProfileSchema)
-local TransitRules = require(Shared.Admission.TransitRules)
+local LobbyLoadoutRules = require(Server.Rules.Inventory.LobbyLoadoutRules)
+local ProfileSchema = require(Server.Rules.Data.ProfileSchema)
+local TransitRules = require(Server.Rules.Admission.TransitRules)
 
 local function unique(catalogId: string, id: string)
 	return { catalogId = catalogId, instanceId = id, location = "LobbyBackpack" }

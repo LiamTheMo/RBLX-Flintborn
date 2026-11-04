@@ -1,10 +1,11 @@
 -- Creature roster, behaviour and roaming wildlife (GDD §54, owner decisions 2026-10-28).
 local Shared = game:GetService("ReplicatedStorage").Shared
-local AggroRules = require(Shared.Enemies.AggroRules)
+local Server = game:GetService("ServerScriptService").Server
+local AggroRules = require(Server.Rules.Enemies.AggroRules)
 local BiomeCatalog = require(Shared.World.BiomeCatalog)
-local EnemyCatalog = require(Shared.Enemies.EnemyCatalog)
+local EnemyCatalog = require(Server.Rules.Enemies.EnemyCatalog)
 local ItemCatalog = require(Shared.Items.ItemCatalog)
-local WildlifeRules = require(Shared.Enemies.WildlifeRules)
+local WildlifeRules = require(Server.Rules.Enemies.WildlifeRules)
 
 local ZONE_IDS = BiomeCatalog.ZONE_IDS
 

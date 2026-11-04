@@ -5,7 +5,7 @@ Map design documents for Flintborn's two places, the lobby and the play world (G
 | Map | Place | Document | Status |
 | --- | --- | --- | --- |
 | Lobby hub | Lobby (`ROBLOX_LOBBY_PLACE_ID`) | [lobby-hub.md](lobby-hub.md) | Built from the owner's reference (`art/reference/lobby_map.png`, layout in `art/blender/lobby/LAYOUT.md`) and placed by the lobby-map workflow; station prompt parts still to come |
-| Shattered Crater | Play world (`ROBLOX_MAIN_PLACE_ID`) | Not started | Layout and scale set by the owner (GDD §54). A generated placeholder island ships today (`src/shared/World/IslandLayout.luau`, built by `WorldBuildService` and `src/server/WorldBuild/`) |
+| Shattered Crater | Play world (`ROBLOX_MAIN_PLACE_ID`) | Not started | Layout and scale set by the owner (GDD §54). A generated placeholder island ships today (`src/server/Rules/World/IslandLayout.luau`, built by `WorldBuildService` and `src/server/WorldBuild/`) |
 
 ## Shared conventions
 

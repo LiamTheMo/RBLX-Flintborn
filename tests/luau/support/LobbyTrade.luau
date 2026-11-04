@@ -8,6 +8,7 @@
 --     lobby.handlers.TradeOffer(a, id, { "sword-1" }, 0)
 --     lobby.lockAndConfirm(a, b, id)
 
+local Server = game:GetService("ServerScriptService").Server
 local TestSupport = script.Parent
 local FakeRoblox = require(TestSupport.FakeRoblox)
 local Scheduler = require(TestSupport.Scheduler)
@@ -22,7 +23,7 @@ function LobbyTrade.new()
 	FakeRoblox.Place("Lobby")
 	local net = FakeRoblox.Remotes()
 
-	local ProfileSchema = require(game:GetService("ReplicatedStorage").Shared.Data.ProfileSchema)
+	local ProfileSchema = require(Server.Rules.Data.ProfileSchema)
 	local Services = game:GetService("ServerScriptService").Server.Services
 	local profiles, stored = {}, {}
 	local ProfileService = require(Services.ProfileService)

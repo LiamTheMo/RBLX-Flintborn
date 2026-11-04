@@ -1,8 +1,7 @@
 local Server = game:GetService("ServerScriptService").Server
-local Shared = game:GetService("ReplicatedStorage").Shared
-local CrashRecoveryRules = require(Shared.Recovery.CrashRecoveryRules)
+local CrashRecoveryRules = require(Server.Rules.Recovery.CrashRecoveryRules)
 local OperationJournal = require(Server.Infrastructure.OperationJournal)
-local ProfileSchema = require(Shared.Data.ProfileSchema)
+local ProfileSchema = require(Server.Rules.Data.ProfileSchema)
 
 local NOW = 100000
 

@@ -9,7 +9,7 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local CharacterLook = require(ReplicatedStorage.Shared.Character.CharacterLook)
+local CharacterLook = require(script.Parent.Parent.Rules.Character.CharacterLook)
 
 local OutfitService = {}
 

@@ -2,12 +2,13 @@
 -- boost per kind that never weakens (only a stronger one takes over), XP that adds
 -- to Premium and the paid booster, and luck that raises rare-drop chances only.
 local Shared = game:GetService("ReplicatedStorage").Shared
+local Server = game:GetService("ServerScriptService").Server
 local BoostRules = require(Shared.Survival.BoostRules)
 local Consumables = require(Shared.Items.Consumables)
-local EventRules = require(Shared.Events.EventRules)
+local EventRules = require(Server.Rules.Events.EventRules)
 local GameConstants = require(Shared.GameConstants)
 local ItemCatalog = require(Shared.Items.ItemCatalog)
-local ModifierRules = require(Shared.Progression.ModifierRules)
+local ModifierRules = require(Server.Rules.Progression.ModifierRules)
 local PerkCatalog = require(Shared.Progression.PerkCatalog)
 
 local catalog = Consumables.Catalog

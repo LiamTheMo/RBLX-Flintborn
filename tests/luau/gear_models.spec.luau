@@ -2,10 +2,11 @@
 -- gear item has a buildable recipe, held tool heads sit up the handle, and armor
 -- covers the body parts its slot should.
 local Shared = game:GetService("ReplicatedStorage").Shared
-local GearModels = require(Shared.Visuals.GearModels)
+local Server = game:GetService("ServerScriptService").Server
+local GearModels = require(Server.Rules.Visuals.GearModels)
 local InventoryRules = require(Shared.Inventory.InventoryRules)
 local ItemCatalog = require(Shared.Items.ItemCatalog)
-local Recipe = require(Shared.Visuals.Recipe)
+local Recipe = require(Server.Rules.Visuals.Recipe)
 local Tiers = require(Shared.Items.Tiers)
 
 local MAX_PARTS = 8

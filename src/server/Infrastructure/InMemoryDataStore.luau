@@ -3,9 +3,7 @@
 -- when the server stops. `failNext` makes the next N calls error, to exercise
 -- retry and pending-save paths.
 
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-
-local ProfileSchema = require(ReplicatedStorage.Shared.Data.ProfileSchema)
+local ProfileSchema = require(script.Parent.Parent.Rules.Data.ProfileSchema)
 
 local InMemoryDataStore = {}
 InMemoryDataStore.__index = InMemoryDataStore

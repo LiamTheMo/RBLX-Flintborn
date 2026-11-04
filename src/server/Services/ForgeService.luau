@@ -12,7 +12,7 @@ local HttpService = game:GetService("HttpService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local ForgeRecipes = require(ReplicatedStorage.Shared.Crafting.ForgeRecipes)
-local ForgeRules = require(ReplicatedStorage.Shared.Crafting.ForgeRules)
+local ForgeRules = require(script.Parent.Parent.Rules.Crafting.ForgeRules)
 local ItemCatalog = require(ReplicatedStorage.Shared.Items.ItemCatalog)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)

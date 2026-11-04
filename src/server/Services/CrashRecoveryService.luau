@@ -9,8 +9,8 @@
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local CrashRecoveryRules = require(ReplicatedStorage.Shared.Recovery.CrashRecoveryRules)
-local ProfileSchema = require(ReplicatedStorage.Shared.Data.ProfileSchema)
+local CrashRecoveryRules = require(script.Parent.Parent.Rules.Recovery.CrashRecoveryRules)
+local ProfileSchema = require(script.Parent.Parent.Rules.Data.ProfileSchema)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local CheckpointStore = require(script.Parent.Parent.Infrastructure.CheckpointStore)
 local ProfileService = require(script.Parent.ProfileService)

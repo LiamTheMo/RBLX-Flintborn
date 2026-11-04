@@ -1,10 +1,11 @@
 -- Placeholder models for resource nodes and world scenery (GDD §4.1, §54; visuals.md).
 local Shared = game:GetService("ReplicatedStorage").Shared
+local Server = game:GetService("ServerScriptService").Server
 local BiomeCatalog = require(Shared.World.BiomeCatalog)
 local NodeCatalog = require(Shared.Resources.NodeCatalog)
-local NodeModels = require(Shared.Visuals.NodeModels)
-local Recipe = require(Shared.Visuals.Recipe)
-local SceneryModels = require(Shared.Visuals.SceneryModels)
+local NodeModels = require(Server.Rules.Visuals.NodeModels)
+local Recipe = require(Server.Rules.Visuals.Recipe)
+local SceneryModels = require(Server.Rules.Visuals.SceneryModels)
 
 -- The lowest point of a recipe's parts (ignoring rotation, as Recipe.Bounds does).
 local function lowest(recipe): number

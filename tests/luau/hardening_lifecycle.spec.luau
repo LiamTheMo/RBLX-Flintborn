@@ -3,16 +3,16 @@
 -- extraction qualification and release saves that race a change.
 local Server = game:GetService("ServerScriptService").Server
 local Shared = game:GetService("ReplicatedStorage").Shared
-local CrashRecoveryRules = require(Shared.Recovery.CrashRecoveryRules)
+local CrashRecoveryRules = require(Server.Rules.Recovery.CrashRecoveryRules)
 local DataStoreGateway = require(Server.Infrastructure.DataStoreGateway)
-local DeathRules = require(Shared.Admission.DeathRules)
-local DownedRules = require(Shared.Combat.DownedRules)
+local DeathRules = require(Server.Rules.Admission.DeathRules)
+local DownedRules = require(Server.Rules.Combat.DownedRules)
 local ExtractionRules = require(Shared.Extraction.ExtractionRules)
 local GameConstants = require(Shared.GameConstants)
 local InMemoryDataStore = require(Server.Infrastructure.InMemoryDataStore)
 local InventoryRules = require(Shared.Inventory.InventoryRules)
 local OperationJournal = require(Server.Infrastructure.OperationJournal)
-local ProfileSchema = require(Shared.Data.ProfileSchema)
+local ProfileSchema = require(Server.Rules.Data.ProfileSchema)
 local ProfileStore = require(Server.Infrastructure.ProfileStore)
 local Signal = require(Shared.Core.Signal)
 

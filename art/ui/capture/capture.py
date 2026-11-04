@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Capture a code-built screen without Roblox Studio.
 
-Bundles gui_env.luau (a headless GUI runtime), every module under src/shared
-and src/client (JSON files become table modules, as Rojo does) and a scene
+Bundles gui_env.luau (a headless GUI runtime), every module under src/shared,
+src/client and src/server/Rules (JSON files become table modules, as Rojo does) and a scene
 script from scenes/, runs it with the standalone `luau` CLI, and renders the
 instance tree the scene dumps with render.py. The capture is drawn from the
 game's own Luau code, so it shows what that code builds.
@@ -44,6 +44,8 @@ from roblox_cloud_sync import json_to_luau  # noqa: E402
 MOUNTS = {
     ("ReplicatedStorage", "Shared"): ROOT / "src" / "shared",
     ("StarterPlayer", "StarterPlayerScripts", "Client"): ROOT / "src" / "client",
+    # Server-only rules some scenes use to stand in for the server's replies.
+    ("ServerScriptService", "Server", "Rules"): ROOT / "src" / "server" / "Rules",
 }
 OUT = ROOT / "art" / "ui" / "captures"
 SPRITES = ROOT / "art" / "ui" / "sprites"

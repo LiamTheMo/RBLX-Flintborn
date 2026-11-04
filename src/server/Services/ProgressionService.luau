@@ -10,7 +10,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local LevelCurve = require(ReplicatedStorage.Shared.Progression.LevelCurve)
 local MasteryCatalog = require(ReplicatedStorage.Shared.Progression.MasteryCatalog)
-local ModifierRules = require(ReplicatedStorage.Shared.Progression.ModifierRules)
+local ModifierRules = require(script.Parent.Parent.Rules.Progression.ModifierRules)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local ProgressionRules = require(ReplicatedStorage.Shared.Progression.ProgressionRules)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)

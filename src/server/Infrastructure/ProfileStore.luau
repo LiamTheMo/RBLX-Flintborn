@@ -2,10 +2,8 @@
 -- §23.2). Pure apart from the injected gateway and clock, so specs drive it with an
 -- in-memory store. ProfileService adds the Roblox lifecycle around it.
 
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-
-local ProfileSchema = require(ReplicatedStorage.Shared.Data.ProfileSchema)
-local SessionLease = require(ReplicatedStorage.Shared.Data.SessionLease)
+local ProfileSchema = require(script.Parent.Parent.Rules.Data.ProfileSchema)
+local SessionLease = require(script.Parent.Parent.Rules.Data.SessionLease)
 
 local ProfileStore = {}
 ProfileStore.__index = ProfileStore

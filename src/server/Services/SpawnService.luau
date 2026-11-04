@@ -5,7 +5,7 @@
 local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local SpawnRules = require(ReplicatedStorage.Shared.Admission.SpawnRules)
+local SpawnRules = require(script.Parent.Parent.Rules.Admission.SpawnRules)
 local WorldState = require(ReplicatedStorage.Shared.World.WorldState)
 
 local SpawnService = {}
