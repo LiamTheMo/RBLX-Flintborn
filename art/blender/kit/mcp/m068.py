@@ -8,7 +8,8 @@ Build frame (studs): front -Y (the door gable), +X right, ground z 0, the walls'
 along Y. Every object ends with its origin at its bbox bottom centre; o["m068_offset"] is that origin in the build
 frame.
 - One course of big chamfered pale stone blocks (four a side) with a lighter, taller block under each corner post;
-  a plank floor at 2.60 on it (dark underlay under the seams) with a threshold through the doorway.
+  a plank floor at 2.60 on it (dark underlay under the seams) with a threshold through the doorway and a 0.08 sill
+  in the wall plane (door clear 3.60 x 7.00 above it).
 - Walls of five rows of 0.40 planks (V seams from chamfered outer edges, staggered butt joints, rows and joints
   overlapping 0.004 at the back so nothing is see-through) between four chamfered corner posts. A barred window with
   a chunky light board frame and a dark inner shutter in each long wall: -X toward the front (the hero view), +X
@@ -52,24 +53,26 @@ CANVAS, CANVAS_DEEP = "m068_canvas", "m068_canvas_deep"
 STONE, STONE_LIGHT, STONE_DARK, SOOT = "m068_stone", "m068_stone_light", "m068_stone_dark", "m068_soot"
 IRON, GLOW, ROPE, ROPE_DEEP = "m068_iron", "m068_glow", "m068_rope", "m068_rope_deep"
 BANNER, WHITE = "m068_banner", "m068_cloth_white"
+LANT_IRON = "m068_lantern_iron"     # the lanterns' lighter warm grey iron (sheet f34)
 
 # key -> (hex, roughness, metal, emission, low specular). Stage 4: sheet medians (spec "Stage 4"), K.calibrate'd.
 PALETTE = {
-    TIMBER: ("#B05A22", 0.85, 0.0, 0.0, True),
-    TIMBER_END: ("#D88A3A", 0.8, 0.0, 0.0, True),
-    TIMBER_DEEP: ("#7A3A14", 0.9, 0.0, 0.0, True),
-    CANVAS: ("#F2E2BC", 0.95, 0.0, 0.0, True),
-    CANVAS_DEEP: ("#C9AE86", 0.95, 0.0, 0.0, True),
-    STONE: ("#A39698", 0.9, 0.0, 0.0, True),
-    STONE_LIGHT: ("#C2B6B6", 0.9, 0.0, 0.0, True),
-    STONE_DARK: ("#857B7E", 0.9, 0.0, 0.0, True),
+    TIMBER: ("#9C5C26", 0.85, 0.0, 0.0, True),
+    TIMBER_END: ("#BF8241", 0.8, 0.0, 0.0, True),
+    TIMBER_DEEP: ("#754118", 0.9, 0.0, 0.0, True),
+    CANVAS: ("#EADCBC", 0.95, 0.0, 0.0, True),
+    CANVAS_DEEP: ("#B3A488", 0.95, 0.0, 0.0, True),
+    STONE: ("#8F8A91", 0.9, 0.0, 0.0, True),
+    STONE_LIGHT: ("#A29CA3", 0.9, 0.0, 0.0, True),
+    STONE_DARK: ("#7F7B82", 0.9, 0.0, 0.0, True),
     SOOT: ("#1F1E23", 1.0, 0.0, 0.0, True),
-    IRON: ("#55515A", 0.55, 0.4, 0.0, False),
+    IRON: ("#585861", 0.55, 0.4, 0.0, False),
+    LANT_IRON: ("#797175", 0.6, 0.3, 0.0, False),
     GLOW: ("#F8B428", 0.5, 0.0, 1.0, False),
-    ROPE: ("#ECA01C", 0.9, 0.0, 0.0, True),
-    ROPE_DEEP: ("#A8701E", 0.95, 0.0, 0.0, True),
-    BANNER: ("#D41C1E", 0.9, 0.0, 0.0, True),
-    WHITE: ("#F6F0EA", 0.9, 0.0, 0.0, True),
+    ROPE: ("#BB871C", 0.9, 0.0, 0.0, True),
+    ROPE_DEEP: ("#8C641D", 0.95, 0.0, 0.0, True),
+    BANNER: ("#B6191C", 0.9, 0.0, 0.0, True),
+    WHITE: ("#D7D6D3", 0.9, 0.0, 0.0, True),
 }
 TARGETS = {TIMBER: ((0xC4, 0x68, 0x26), "brown"), TIMBER_END: ((0xF0, 0x9A, 0x44), "brown"),
            TIMBER_DEEP: ((0x8E, 0x46, 0x18), "brown"), CANVAS: ((0xFE, 0xF2, 0xCC), "all"),
@@ -96,19 +99,23 @@ EAVE = 7.45                       # canvas eave edge |x|
 CAN_Y = 9.247                     # canvas gable ends |y| (0.003 inside the bargeboards)
 FLOOR_Z = 2.60
 OVL = 0.002                       # closed joints: neighbours sink this far into each other
-PLATE = (6.30, 7.20, 10.40, 11.20, 10.80, 0.12)  # x0, x1, z0, z1, |y| end, chamfer
+# x0, x1, z0, z1, |y| end, chamfer. Round 2: 1.25 x 1.00, the outer face 0.10 proud of the canvas edge (the sheet's
+# visible eave beam under the canvas, the U ties wrapping it); the ends 1.05 past the wider bargeboards.
+PLATE = (6.30, 7.55, 10.20, 11.20, 11.90, 0.12)
 EAVE_BLK = (6.85, 7.08)
 WALL_IN_X, WALL_IN_Y, WALL_T = 6.60, 7.60, 0.40
-ROW_PITCH, ROW_Z0, N_ROWS = 1.62, 2.30, 5
-POST = (6.10, 7.20, 7.10, 8.20)   # corner post |x| and |y| ranges
+ROW_PITCH, ROW_Z0, N_ROWS = 1.58, 2.30, 5          # five rows up to the eave beam (10.20)
+POST = (6.10, 7.35, 7.10, 8.35)   # corner post |x| and |y| ranges (1.25 square: the f34's post)
+POST_LIFT, DPOST_LIFT = 0.20, 0.65  # post faces a step toward timber_end (the sheet's lighter frame members)
 CORNER = (6.11, 7.75, 7.11, 8.75, 2.60)          # corner block |x|, |y| ranges, top
 COURSE_Z = 2.30                   # run blocks' top (floor and wall sills on them)
-DOOR_X, DOOR_TOP = 1.80, 9.60
+DOOR_X, DOOR_TOP = 1.80, 9.68
+SILL_TOP = 2.68                   # door sill in the wall plane: clear 3.60 x 7.00 above it (7.08 above the floor)
 DPOST = (1.80, 2.90, -9.50, -8.405)              # door post |x| range, y range
-BB_Y, BB_D = (9.25, 10.15), 0.92                 # bargeboards |y|, depth
+BB_Y, BB_D = (9.25, 10.85), 1.10                 # bargeboards |y| (1.60 wide), depth (round 2: the sheet's weight)
 RAFTER_Y = (-3.90, 0.0, 3.90)                    # four bays: the sheet's four canvas panels along the ridge
 RAFTER_W, RAFTER_D = 0.50, 0.60
-RIDGE_W, RIDGE_END, RIDGE_Z0 = 1.00, 10.75, 14.536
+RIDGE_W, RIDGE_END, RIDGE_Z0 = 1.00, BB_Y[1] + 0.90, 14.536
 PURLIN_X, PURLIN_W, PURLIN_H = 4.10, 0.50, 0.50
 SINK_TOP = 0.015
 CHIMNEY = (2.20, -1.95)           # chimney centre: +X slope, front half (hero view), between the rafters at -3.9 / 0
@@ -145,6 +152,29 @@ def oct_rect(x0, x1, y0, y1, ch):
             (x0, y0 + ch)]
 
 
+def flatten(a, faces, tol=1e-4):
+    """Split warped quads (P.block's creased and chipped faces) into their two triangles, so each face is planar
+    and the ray-parity normal check probes the real surface. Material and Tint stay with the loops."""
+    import bmesh
+    warped = []
+    for f in faces:
+        if f.is_valid and len(f.verts) == 4:
+            f.normal_update()
+            c = f.calc_center_median()
+            if max(abs((v.co - c).dot(f.normal)) for v in f.verts) > tol:
+                warped.append(f)
+    if warped:
+        bmesh.ops.triangulate(a.bm, faces=warped, quad_method="BEAUTY", ngon_method="BEAUTY")
+    return len(warped)
+
+
+def blk(a, L, D, H, key, **kw):
+    """P.block with its warped faces split (flatten)."""
+    p = P.block(a, L, D, H, key, **kw)
+    flatten(a, p.fs)
+    return p
+
+
 def bx(a, lo, hi, key, name, kind, m=None, amp=0.04):
     """An axis box lo..hi with its corners sorted (mirrored inputs are fine)."""
     lo2 = tuple(min(p, q) for p, q in zip(lo, hi))
@@ -154,9 +184,11 @@ def bx(a, lo, hi, key, name, kind, m=None, amp=0.04):
 
 # ---- foundation ------------------------------------------------------------------------------------------------------------
 RUNS = {"R": (-7.08, 7.08), "L": (-7.08, 7.08), "F": (-6.08, 6.08), "B": (-6.08, 6.08)}
-RUN_CUTS = {"R": (-3.35, 0.20, 3.65), "L": (-3.70, -0.15, 3.40), "F": (-3.10, 0.0, 3.05), "B": (-2.95, 0.10, 3.10)}
+RUN_CUTS = {"R": (-3.35, 0.20, 3.65), "L": (-3.70, -0.15, 3.40), "F": (-3.05, 0.05, 3.10), "B": (-3.10, -0.10, 2.95)}
 CHIPS = {"R": {1: "+x-y"}, "L": {2: "-x-y"}, "F": {0: "+x-y"}, "B": {3: "-x-y"}}
-JOINT = 0.02                      # dark joint between blocks
+# Blocks overlap 0.004 at their ends: the chamfered vertical edges still read as a dark V joint, and no light runs
+# from the deck seams down an open joint to the ground (the escape scan found that path through a 0.02 gap).
+JOINT = -0.004
 BLOCK_D, BLOCK_IN = 1.00, 6.40    # run depth, inner face |x| (long sides; ends: |y| 7.40)
 
 
@@ -171,8 +203,8 @@ def _run_frame(side, t):
 
 
 def foundation_run(a, side):
-    """One side's single course of big chamfered blocks between the corner blocks (the sheet's four a side), dark
-    joints between them, one chipped top corner."""
+    """One side's single course of big chamfered blocks between the corner blocks (the sheet's four a side), ends
+    overlapping 0.004 (the chamfers make the dark V joint), one chipped top corner."""
     t0, t1 = RUNS[side]
     edges = [t0] + list(RUN_CUTS[side]) + [t1]
     for i in range(len(edges) - 1):
@@ -180,7 +212,7 @@ def foundation_run(a, side):
         a1 = edges[i + 1] - (JOINT / 2 if i < len(edges) - 2 else 0.0)
         L = a1 - a0
         ch = CHIPS[side].get(i)
-        P.block(a, L, BLOCK_D, COURSE_Z, STONE, m=_run_frame(side, (a0 + a1) / 2), ch=0.10,
+        blk(a, L, BLOCK_D, COURSE_Z, STONE, m=_run_frame(side, (a0 + a1) / 2), ch=0.10,
                 chips=[(ch, 0.30)] if ch else (), chip_key=STONE_LIGHT, mottle=0.03, name=f"blk_{side}{i}", kind="stone")
 
 
@@ -190,7 +222,7 @@ def corner_block(a, sx, sy):
     c = (sx * (x0 + x1) / 2, sy * (y0 + y1) / 2)
     tag = f"{'L' if sx < 0 else 'R'}{'F' if sy < 0 else 'B'}"
     corner = f"{'+' if sx > 0 else '-'}x{'+' if sy > 0 else '-'}y"
-    P.block(a, x1 - x0, y1 - y0, ztop, STONE_LIGHT, m=Matrix.Translation((c[0], c[1], 0.0)), ch=0.10,
+    blk(a, x1 - x0, y1 - y0, ztop, STONE_LIGHT, m=Matrix.Translation((c[0], c[1], 0.0)), ch=0.10,
             chips=[(corner, 0.34)], chip_key=mix(STONE_LIGHT, STONE, 0.5), mottle=0.03, name=f"corner_{tag}",
             kind="stone")
 
@@ -228,6 +260,11 @@ def floor(a, feet=False):
               kind="thresh", amp=0.05)
     P.box(a, (-DOOR_X + 0.015, -9.48, 1.70 if feet else 1.733), (DOOR_X - 0.015, -8.405, COURSE_Z - 0.003),
           TIMBER_DEEP, name="thresh_beam", kind="beam", tint=0.97)
+    # the sill in the wall plane: the closed leaf stops against it, and it shades the doorway's floor line (grazing
+    # rays from the room floor leave by the door, over the stairs, not through the escape box's floor face)
+    p = P.box(a, (-DOOR_X - OVL, -(WALL_IN_Y + WALL_T), FLOOR_Z - OVL), (DOOR_X + OVL, -WALL_IN_Y + OVL, SILL_TOP),
+              mix(TIMBER, TIMBER_END, 0.30), name="sill", kind="thresh", amp=0.04)
+    P.texture(a, p.vs, 0.03, P.seed("sill"), scale=0.5)
     ux, uy, uz = UNDER
     P.box(a, (-ux, -uy, uz), (ux, uy, COURSE_Z), mix(TIMBER_DEEP, SOOT, 0.4), name="floor_under", kind="board",
           tint=0.97)
@@ -272,7 +309,8 @@ def segs(t0, t1, joints=(), cut=None):
 
 def plank(a, wall, s, t0, t1, z0, z1, name, band=True):
     """One wall plank: a 6-sided section 0.37-0.40 thick with its outer top and bottom edges chamfered 0.10 (the dark
-    V seams between rows); planks over 2.0 long get a darker end band 30 % from a seeded end (by position)."""
+    V seams between rows); some planks over 5.0 long get a slightly darker end band 30 % from a seeded end (by
+    position; the sheet's long boards with weathered ends)."""
     r = P.rng(name)
     uo = WALL_T - r.uniform(0.0, 0.03)
     H = z1 - z0
@@ -283,7 +321,7 @@ def plank(a, wall, s, t0, t1, z0, z1, name, band=True):
     else:
         mp = lambda u, v, t: Vector((t, s * (WALL_IN_Y + u), z0 + v))       # noqa: E731
     ts, bk = [t0, t1], None
-    if band and t1 - t0 > 2.0:
+    if band and t1 - t0 > 5.0 and r.random() < 0.6:
         f = 0.30 * (t1 - t0)
         if r.random() < 0.5:
             ts, bk = [t0, t0 + f, t1], 0
@@ -291,7 +329,7 @@ def plank(a, wall, s, t0, t1, z0, z1, name, band=True):
             ts, bk = [t0, t1 - f, t1], 1
     p = P.prism(a, [[mp(u, v, t) for u, v in sec] for t in ts], TIMBER, name=name, kind="plank", amp=0.05)
     if bk is not None:
-        P.paint(a, p.bands[bk] + p.caps[bk], mix(TIMBER, TIMBER_DEEP, 0.25))
+        P.paint(a, p.bands[bk] + p.caps[bk], mix(TIMBER, TIMBER_DEEP, 0.15))
     P.texture(a, p.vs, 0.025, P.seed(name), scale=0.5)
     return p
 
@@ -326,7 +364,7 @@ def window(a, s):
     yc = WIN_Y[s]
     hw, zb, ztp, bw, pr = WIN
     xo = WALL_IN_X + WALL_T + 0.003
-    key = mix(TIMBER, TIMBER_END, 0.30)
+    key = mix(TIMBER, TIMBER_END, 0.85)        # the brightest wood on its face (sheet side and f34 cells)
 
     def board(y0, y1, z0, z1, out, nm):
         p = bx(a, (s * xo, yc + y0, z0), (s * (xo + out), yc + y1, z1), key, f"win_{tag}_{nm}", "frame")
@@ -365,10 +403,12 @@ def shutter(a, s):
         P.texture(a, p.vs, 0.03, P.seed(f"shutter_{tag}{i}"), scale=0.5)
 
 
-def post(a, x0, x1, y0, y1, z0, z1, name, ch=0.06, foot=0.40):
-    """A chamfered square post: a weathered foot band (toward timber_deep) and a pale golden top."""
-    p = P.post(a, ((x0 + x1) / 2, (y0 + y1) / 2), z0, z1, (x1 - x0) / 2, TIMBER, ch=ch, half_y=(y1 - y0) / 2,
-               zs=(z0 + foot,), band_keys=[mix(TIMBER, TIMBER_DEEP, 0.25), TIMBER], top_key=TIMBER_END, name=name,
+def post(a, x0, x1, y0, y1, z0, z1, name, ch=0.06, foot=0.40, lift=POST_LIFT):
+    """A chamfered square post: faces a step toward timber_end (lift), a weathered foot band (toward timber_deep)
+    and a pale golden top."""
+    key = mix(TIMBER, TIMBER_END, lift)
+    p = P.post(a, ((x0 + x1) / 2, (y0 + y1) / 2), z0, z1, (x1 - x0) / 2, key, ch=ch, half_y=(y1 - y0) / 2,
+               zs=(z0 + foot,), band_keys=[mix(TIMBER, TIMBER_DEEP, 0.25), key], top_key=TIMBER_END, name=name,
                kind="post", amp=0.05)
     P.texture(a, p.vs, 0.03, P.seed(name), scale=0.45)
     return p
@@ -383,25 +423,28 @@ def corner_post(a, sx, sy):
 
 # ---- roof frame -------------------------------------------------------------------------------------------------------------
 def plate(a, s, y_end=None):
-    """An eave beam (0.90 x 0.80, chamfered 0.12: octagonal pale end faces, close-up A) along Y over the long wall,
+    """An eave beam (1.25 x 1.00, chamfered 0.12: octagonal pale end faces, close-up A) along Y over the long wall,
+    its outer face 0.10 proud of the canvas edge (the canvas rests on its top corner; the sheet's visible eave beam),
     projecting past both gables."""
     x0, x1, z0, z1, ye, ch = PLATE
     ye = y_end or ye
     tag = "L" if s < 0 else "R"
-    p = P.ext(a, oct_rect(x0, x1, z0, z1, ch), -ye, ye, TIMBER, to3=xz(s), cap_key=TIMBER_END, name=f"plate_{tag}",
+    key = mix(TIMBER, TIMBER_END, POST_LIFT)      # a frame member: a step lighter than the planks
+    p = P.ext(a, oct_rect(x0, x1, z0, z1, ch), -ye, ye, key, to3=xz(s), cap_key=TIMBER_END, name=f"plate_{tag}",
               kind="beam", amp=0.04)
     P.texture(a, p.vs, 0.03, P.seed(f"plate{tag}"), scale=0.4)
 
 
 def bracket_plate(a, sx, e):
-    """Close-up A: a dark iron plate with two rivets on the eave beam's outer face 0.7 in from its end, a golden peg."""
+    """Close-up A: a dark iron plate with two rivets on the eave beam's outer face 0.62 in from its end (clear of the
+    bargeboard foot), a golden peg."""
     tag = f"{'L' if sx < 0 else 'R'}{'F' if e < 0 else 'B'}"
-    yc = e * (PLATE[4] - 0.70)
+    yc = e * (PLATE[4] - 0.62)
     x0 = PLATE[1] + 0.005
-    bx(a, (sx * x0, yc - 0.42, 10.53), (sx * (x0 + 0.08), yc + 0.42, 11.07), IRON, f"bplate_{tag}", "iron", amp=0.03)
-    bx(a, (sx * (x0 + 0.085), yc - 0.18, 10.62), (sx * (x0 + 0.44), yc + 0.18, 10.98), TIMBER_END, f"bpeg_{tag}", "peg")
+    bx(a, (sx * x0, yc - 0.42, 10.43), (sx * (x0 + 0.08), yc + 0.42, 10.97), IRON, f"bplate_{tag}", "iron", amp=0.03)
+    bx(a, (sx * (x0 + 0.085), yc - 0.18, 10.52), (sx * (x0 + 0.44), yc + 0.18, 10.88), TIMBER_END, f"bpeg_{tag}", "peg")
     for k, dy in enumerate((-0.31, 0.31)):
-        bx(a, (sx * (x0 + 0.085), yc + dy - 0.06, 10.74), (sx * (x0 + 0.19), yc + dy + 0.06, 10.86), IRON,
+        bx(a, (sx * (x0 + 0.085), yc + dy - 0.06, 10.64), (sx * (x0 + 0.19), yc + dy + 0.06, 10.76), IRON,
            f"rivet_{tag}{k}", "iron", amp=0.03)
 
 
@@ -421,8 +464,12 @@ def rafter(a, sx, y):
 
 
 GB_IN, GB_OUT = WALL_IN_Y + 0.01, WALL_IN_Y + WALL_T - 0.01     # gable boards' |y| faces
-PURLIN_SEGS = ((-CAN_Y + 0.006, -GB_OUT - 0.012), (-GB_IN + 0.012, -4.152), (-3.648, -0.252), (0.252, 3.648),
-               (4.152, GB_IN - 0.012), (GB_OUT + 0.012, CAN_Y - 0.006))
+# fly rafters under the canvas's gable overhangs, flush with its ends (round 2: they close the pale sliver of canvas
+# underside the f34 and front cells saw between the gable boards and the bargeboards)
+FLY_Y = CAN_Y - 0.003 - RAFTER_W / 2
+FLY_IN = FLY_Y - RAFTER_W / 2 - 0.002
+PURLIN_SEGS = ((-FLY_IN, -GB_OUT - 0.012), (-GB_IN + 0.012, -4.152), (-3.648, -0.252), (0.252, 3.648),
+               (4.152, GB_IN - 0.012), (GB_OUT + 0.012, FLY_IN))
 
 
 def purlins(a, sx):
@@ -476,12 +523,12 @@ def ridge_section():
             (-h, ztop(h)), (-h, RIDGE_Z0 + ch)]
 
 
-RT_RB, RIDGE_BANDS = 0.10, (10.36, 10.58)
+RT_RB, RIDGE_BANDS = 0.10, (RIDGE_END - 0.55, RIDGE_END - 0.37)    # two touching turns: one golden band
 
 
 def ridge_beam(a):
-    """The ridge beam (1.00 wide) under the canvas apex, its pale ends 0.60 past the bargeboards (the sheet's square
-    block under the crossing), two golden rope turns round each end."""
+    """The ridge beam (1.00 wide) under the canvas apex, its pale ends 0.90 past the bargeboards (the sheet's square
+    block under the crossing), two touching golden rope turns (one band) near each end."""
     sec = ridge_section()
     p = P.ext(a, sec, -RIDGE_END, RIDGE_END, TIMBER, to3=xz(1), cap_key=TIMBER_END, name="ridge", kind="beam",
               amp=0.04)
@@ -497,9 +544,11 @@ def ridge_beam(a):
 
 
 # ---- gable frames --------------------------------------------------------------------------------------------------------------
-BB_FOOT, BB_TIP, BB_HEEL = 8.20, 1.60, (6.40, 7.20)
+# heel on the eave beam's top, stopping short of its chamfer (past 7.455 the board's underside clears the chamfer)
+BB_FOOT, BB_TIP, BB_HEEL = 8.20, 1.60, (6.40, 7.30)
 DV = BB_D / COS
-CLEAT = (0.40, 0.30, 1.40, 0.36)      # along the board, thick, across, position (fraction from the foot)
+CLEAT = (0.50, 0.36, 2.10, 0.36)      # along the board, thick, across, position (fraction from the foot)
+SADDLE = (0.45, 0.57)                 # half width, height over the V between the tips
 
 
 def _bb_bottom(sx, x, lift=0.0):
@@ -512,7 +561,7 @@ def _isect(sa, la, sb, lb):
 
 
 def bargeboards(a, e):
-    """The gable's crossed bargeboards (0.90 x 0.92, 0.80 proud of the canvas) in one plane like a half-lap X: board A
+    """The gable's crossed bargeboards (1.60 x 1.10, 0.98 proud of the canvas) in one plane like a half-lap X: board A
     (foot on -X) whole, board B in two pieces butting A's faces; heels on the eave beams; tips 1.60 out; a golden
     saddle in the V between the tips; one cleat across each board."""
     g = 0.003
@@ -547,7 +596,7 @@ def bargeboards(a, e):
         p = P.ext(a, poly, y0, y1, TIMBER, to3=xz(1), side_keys=sk, name=nm, kind="board", amp=0.05)
         P.texture(a, p.vs, 0.03, P.seed(nm), scale=0.4)
     ztopA = lambda x: _bb_bottom(-1, x) + DV    # noqa: E731
-    sw, stop = 0.35, 17.42
+    sw, stop = SADDLE[0], ztopA(0.0) + SADDLE[1]
     poly = [(0.0, ztopA(0.0) + g), (sw, ztopA(sw) + g), (sw, stop), (-sw, stop), (-sw, ztopA(sw) + g)]
     P.ext(a, poly, y0 + 0.02, y1 - 0.02, ROPE, to3=xz(1), name=f"saddle_{tag}", kind="board", amp=0.03)
     cleats(a, e)
@@ -630,6 +679,7 @@ def gable_infill(a, e):
     for sx in (-1, 1):
         for k in range(6):
             xa, xb = h + k * W - OVL, h + (k + 1) * W + OVL
+            faces = None
             if k < 5:
                 poly = [(xa, zb), (xb, zb), (xb, zu(xb) + OVL), (xa, zu(xa) + OVL)]
             else:
@@ -638,9 +688,14 @@ def gable_infill(a, e):
                 xf = EAVE_BLK[0] + OVL
                 poly = [(xa, zb), (lb - zb, zb), (x0p + OVL, lb - x0p - OVL), (x0p + OVL, lt + x0p + OVL),
                         (z1p - OVL - lt, z1p - OVL), (xf, z1p - OVL), (xf, zu(xf) + OVL), (xa, zu(xa) + OVL)]
+                # its own fan round the eave-beam notch (the ear-clipper left a 0.3 deg sliver with the 1.00 beam)
+                faces = [(0, 1, 2), (0, 2, 3), (0, 3, 7), (3, 4, 7), (4, 6, 7), (4, 5, 6)]
             if sx < 0:
                 poly = [(-u, v) for u, v in reversed(poly)]
-            put(poly, k % 2 == 0, f"gboard_{tag}{'L' if sx < 0 else 'R'}{k}")
+                if faces:
+                    m = len(poly) - 1
+                    faces = [(m - c, m - b, m - a_) for a_, b, c in faces]
+            put(poly, k % 2 == 0, f"gboard_{tag}{'L' if sx < 0 else 'R'}{k}", faces=faces)
 
 
 def gable_frame(a, e, part=False):
@@ -652,12 +707,12 @@ def gable_frame(a, e, part=False):
         for s in (-1, 1):
             x0, x1, z0, z1, ye, ch = PLATE
             ya, yb = sorted((e * 8.40, e * ye))
-            P.ext(a, oct_rect(x0, x1, z0, z1, ch), ya, yb, TIMBER, to3=xz(s), cap_key=TIMBER_END,
-                  name=f"plate_end_{s:+d}", kind="beam", tint=0.98)
+            P.ext(a, oct_rect(x0, x1, z0, z1, ch), ya, yb, mix(TIMBER, TIMBER_END, POST_LIFT), to3=xz(s),
+                  cap_key=TIMBER_END, name=f"plate_end_{s:+d}", kind="beam", tint=0.98)
 
 
 # ---- door frame and leaf --------------------------------------------------------------------------------------------------
-LEAF = (3.56, 2.62, 9.58)
+LEAF = (3.56, 2.62, 9.66)
 HINGE = (-DOOR_X, -WALL_IN_Y + 0.01)
 OPEN_DEG = 95.0
 
@@ -695,7 +750,7 @@ def doorframe(a, theta_deg=OPEN_DEG):
         tag = "L" if sx < 0 else "R"
         xa, xb = sorted((sx * x0, sx * x1))
         bx(a, (xa - 0.03, y0 - 0.03, 0.0), (xb + 0.03, y1 - 0.005, 0.40), ROPE, f"dcap_{tag}", "peg", amp=0.03)
-        post(a, xa, xb, y0, y1, 0.403, DOOR_TOP - 0.003, f"dpost_{tag}")
+        post(a, xa, xb, y0, y1, 0.403, DOOR_TOP - 0.003, f"dpost_{tag}", lift=DPOST_LIFT)
     p = P.box(a, (-3.30, y0, DOOR_TOP), (3.30, -WALL_IN_Y - WALL_T - 0.005, PLATE[2] - 0.003), TIMBER, name="lintel",
               kind="beam", amp=0.04)
     P.paint(a, [p.fs[1], p.fs[3]], TIMBER_END)
@@ -861,7 +916,8 @@ def ties(a, s, short=False):
 
 
 # ---- chimney ------------------------------------------------------------------------------------------------------------------
-MERLON = 0.85                         # cap merlons (the sheet's crenellated cap): corner squares
+MERLON = 0.78                         # cap merlons (the sheet's crenellated cap): corner squares, 0.02 off the flue
+FLUE_D = 0.45                         # flue recess depth (its floor 0.15 above the cap's underside)
 
 
 def chimney(a):
@@ -892,7 +948,7 @@ def chimney(a):
               kind="chimney", amp=0.03)
     P.texture(a, p.vs, 0.04, 6821, scale=0.8)
     cap = mix(STONE_LIGHT, STONE, 0.4)
-    hc, hf, zc0, zf = 1.50, 0.70, CH_Z1 + 0.003, CAP_Z - 0.60
+    hc, hf, zc0, zf = 1.50, 0.70, CH_Z1 + 0.003, CAP_Z - FLUE_D
     o0 = [Vector((cx + x * hc, cy + y * hc, zc0)) for x, y in sq]
     o1 = [q + Vector((0, 0, CAP_Z - zc0)) for q in o0]
     i1 = [Vector((cx + x * hf, cy + y * hf, CAP_Z)) for x, y in sq]
@@ -912,7 +968,7 @@ def chimney(a):
     P.GEO["flue"] = [cx, cy, zf + 0.05]
 
 
-FLUE = (CHIMNEY[0], CHIMNEY[1], CAP_Z - 0.55)
+FLUE = (CHIMNEY[0], CHIMNEY[1], CAP_Z - FLUE_D + 0.05)
 SMOKE = {"emitters": [{"name": "Smoke", "texture": "smoke_puff", "color": ["#BDB8B4", "#E4E0DC"], "size": [1.0, 3.5],
                        "transparency": [0.6, 1.0], "lifetime": [3, 5], "rate": 2, "speed": [1.5, 2.5], "spread": 6,
                        "light_emission": 0.0, "acceleration": [0.4, 0.3, 0], "drag": 0.3, "rotation": [0, 360],
@@ -920,29 +976,29 @@ SMOKE = {"emitters": [{"name": "Smoke", "texture": "smoke_puff", "color": ["#BDB
 
 
 # ---- stairs ------------------------------------------------------------------------------------------------------------------
-STAIR_X = 2.40
-TREADS = ((-11.10, -9.503, 1.73), (-12.70, -11.10, 0.87))       # y0, y1, top
+# y0, y1, top, half width: the upper tread spans the door posts (|x| 1.80-2.90; the sheet's 5.8-6.4)
+TREADS = ((-11.10, -9.503, 1.73, 3.00), (-12.70, -11.10, 0.87, 2.40))
 
 
 def stairs(a):
-    """Two treads of two planks (0.30 thick, 0.04 gap) on two blocks each (the exploded's steps); rises 0.87 / 0.86
-    / 0.87 to the threshold."""
-    for ti, (y0, y1, ztop) in enumerate(TREADS):
+    """Two treads of two planks (0.30 thick, 0.04 gap) on two blocks each (the exploded's steps), the upper one as
+    wide as the door posts; rises 0.87 / 0.86 / 0.87 to the threshold."""
+    for ti, (y0, y1, ztop, hw) in enumerate(TREADS):
         w = (y1 - y0 - 0.04) / 2
         for k in range(2):
             ya = y0 + k * (w + 0.04)
             nm = f"tread{ti}_{k}"
-            p = P.plank(a, (-STAIR_X, ya + w / 2, ztop - 0.15), (STAIR_X, ya + w / 2, ztop - 0.15), w, 0.30,
+            p = P.plank(a, (-hw, ya + w / 2, ztop - 0.15), (hw, ya + w / 2, ztop - 0.15), w, 0.30,
                         mix(TIMBER, TIMBER_END, 0.30), ch=0.04, name=nm, kind="tread", amp=0.05)
             P.texture(a, p.vs, 0.03, P.seed(nm), scale=0.5)
         for k, sx in enumerate((-1, 1)):
-            bx(a, (sx * 1.50, y0 + 0.10, 0.0), (sx * 2.10, y1 - 0.10, ztop - 0.303), mix(TIMBER, TIMBER_DEEP, 0.4),
-               f"tblock{ti}_{k}", "tblock", amp=0.05)
+            bx(a, (sx * (hw - 0.90), y0 + 0.10, 0.0), (sx * (hw - 0.30), y1 - 0.10, ztop - 0.303),
+               mix(TIMBER, TIMBER_DEEP, 0.4), f"tblock{ti}_{k}", "tblock", amp=0.05)
     P.GEO["risers"] = [TREADS[1][2], round(TREADS[0][2] - TREADS[1][2], 3), round(FLOOR_Z - TREADS[0][2], 3)]
 
 
 # ---- lanterns ----------------------------------------------------------------------------------------------------------------
-L1 = (-8.30, -6.60, 7.00)                                   # eave lantern base (on a bracket off the -X eave beam)
+L1 = (-8.65, -5.40, 6.50)       # eave lantern base (on a bracket off the -X eave beam), over the window's front jamb
 L23 = ((-4.70, -9.10, 6.20), (4.70, -9.10, 6.20))           # door lanterns
 GLASS_DZ = 0.20 + 1.60 / 2                                  # glass centre above the lantern base
 HALO = {"emitters": [{"name": "Halo", "texture": "glow_soft", "color": ["#FFC23A", "#FF9A1E"], "size": [1.4, 1.7],
@@ -954,15 +1010,15 @@ HALO = {"emitters": [{"name": "Halo", "texture": "glow_soft", "color": ["#FFC23A
 def lantern_set(a, kind, base, tag):
     """A lantern on its iron bracket. kind "eave": hung from an L bracket on the -X eave beam's outer face (the
     sheet's hanging lantern); "door": on a wall bracket on the front wall."""
-    lt = P.lantern(a, base, IRON, GLOW, ring_axis=(0, 1, 0) if kind == "eave" else (1, 0, 0), name=tag)
+    lt = P.lantern(a, base, LANT_IRON, GLOW, ring_axis=(0, 1, 0) if kind == "eave" else (1, 0, 0), name=tag)
     rtop = lt["ring_top"].z
     if kind == "eave":
-        P.bracket(a, (base[0], base[1]), (-(PLATE[1] + 0.003), base[1]), (-1, 0), 10.75, rtop, IRON, strap=0.30,
-                  name=f"{tag}_br")
+        P.bracket(a, (base[0], base[1]), (-(PLATE[1] + 0.003), base[1], 0.0), (-1, 0), 10.75, rtop, LANT_IRON,
+                  strap=0.30, name=f"{tag}_br")
     else:
         z_arm = 9.75
-        P.bracket(a, (base[0], base[1]), (base[0], -(WALL_IN_Y + WALL_T + 0.003)), (0, -1), z_arm, rtop, IRON,
-                  strap=PLATE[2] - 0.003 - (z_arm - 0.10), name=f"{tag}_br")
+        P.bracket(a, (base[0], base[1]), (base[0], -(WALL_IN_Y + WALL_T + 0.003), 0.0), (0, -1), z_arm, rtop,
+                  LANT_IRON, strap=PLATE[2] - 0.003 - (z_arm - 0.10), name=f"{tag}_br")
     P.GEO.setdefault("lanterns", {})[tag] = {"bottom": round(base[2], 3), "glass": [round(x, 3) for x in lt["glass"]],
                                               "ring_top": round(rtop, 3)}
     return lt
@@ -970,12 +1026,13 @@ def lantern_set(a, kind, base, tag):
 
 # ---- banner ------------------------------------------------------------------------------------------------------------------
 POLE = (-8.60, 8.40, 115.0)           # pole x, y and the turn of its crossarm (local +X; 115 deg: toward +Y and -X)
-POLE_R, POLE_TOP = 0.42, 12.90
+POLE_R, POLE_TOP = 0.42, 14.40       # round 2: 2.0 of pole over the arm, then the block (f34 and front cells)
 ARM_Z, ARM_R = 12.40, 0.18
 ARM_PROF = ((-0.85, 0.26), (-0.60, 0.26), (-0.60, ARM_R), (0.55, ARM_R), (0.55, 0.23), (0.75, 0.23), (0.75, ARM_R),
-            (2.95, ARM_R), (2.95, 0.23), (3.15, 0.23), (3.15, ARM_R), (3.30, ARM_R), (3.30, 0.26), (3.55, 0.26))
-SLEEVE = (0.78, 2.92, 0.30, ARM_R + 0.003)      # x0, x1, outer and inner flat radius
-BAN_T, BAN_DROP, RT_X = 0.08, 6.40, 0.10
+            (3.31, ARM_R), (3.31, 0.23), (3.51, 0.23), (3.51, ARM_R), (3.66, ARM_R), (3.66, 0.26), (3.91, 0.26))
+SLEEVE = (0.78, 3.28, 0.30, ARM_R + 0.003)      # x0, x1, outer and inner flat radius (2.50 span)
+BAN_T, BAN_DROP, RT_X = 0.08, 7.60, 0.10
+EMBLEM = (1.40, 2.25)                 # white diamond w, h (scaled with the cloth)
 
 
 def banner_set(a):
@@ -1001,7 +1058,7 @@ def banner_set(a):
         rings = [P.ngon(Vector((x, 0, ARM_Z)), ey, ez, r, 6, math.pi / 6) for x, r in arm]
         p = P.prism(a, rings, TIMBER, cap_keys=(None, TIMBER_END), name="arm", kind="pole", amp=0.04)
         for k in range(1, len(arm) - 2):        # the two iron bands: the raised rings between the knob ends
-            if arm[k][1] > ARM_R + 1e-6 and arm[k + 1][1] > ARM_R + 1e-6 and arm[k][0] < 3.2:
+            if arm[k][1] > ARM_R + 1e-6 and arm[k + 1][1] > ARM_R + 1e-6 and arm[k][0] < ARM_PROF[-3][0]:
                 P.paint(a, p.bands[k - 1] + p.bands[k] + p.bands[k + 1], IRON)
         c = Vector((0, 0, ARM_Z))
         pole_lines = P.ngon(Vector((0, 0, 0)), ex, ey, POLE_R, 8, math.pi / 8)
@@ -1020,7 +1077,8 @@ def banner_set(a):
                        hem_key=mix(BANNER, IRON, 0.10), t=BAN_T, points=3, name="cloth")
         xc, cz = (x0 + x1) / 2, zt_ - BAN_DROP * 0.42
         for side in (-1, 1):
-            P.emblem(a, xc, cz, side * BAN_T / 2, side, WHITE, w=1.20, h=1.90, dots=(0.12, 0.80), name="emblem")
+            P.emblem(a, xc, cz, side * BAN_T / 2, side, WHITE, w=EMBLEM[0], h=EMBLEM[1], dots=(0.12, 0.80),
+                     name="emblem")
         P.GEO["banner_top"] = list(P.here((0, 0, POLE_TOP + 0.60)))
     return out
 
@@ -1071,7 +1129,7 @@ def hero_all(a):
         plate(a, s)
         for e in (-1, 1):
             bracket_plate(a, s, e)
-        for y in RAFTER_Y:
+        for y in RAFTER_Y + (-FLY_Y, FLY_Y):
             rafter(a, s, y)
         purlins(a, s)
         eave_block(a, s)
@@ -1140,8 +1198,8 @@ PARTS = ((ROOF_P, roof_part), (RIDGE_P, ridge_beam), (CHIMNEY_P, chimney_part), 
          (GABLE_P, lambda a: gable_frame(a, -1, part=True)), (FLOOR_P, lambda a: floor(a, feet=True)),
          (STAIRS_P, stairs), (FOUND_P, foundation_part))
 NOTES = {
-    HERO: "Walk-in gable-roofed timber cabin (remade sheet; door 3.60 x 7.00 clear on a 2.60 floor, rises 0.87 / "
-          "0.86 / 0.87): one course of big pale stone blocks with lighter corner blocks, plank floor, five rows of "
+    HERO: "Walk-in gable-roofed timber cabin (remade sheet; door 3.60 x 7.00 clear over a 0.08 sill on a 2.60 "
+          "floor, rises 0.87 / 0.86 / 0.87): one course of big pale stone blocks with lighter corner blocks, plank floor, five rows of "
           "planks between chamfered corner posts, a barred window with a dark inner shutter in each long wall, the "
           "door between tall posts on golden caps under a lintel and collar (leaf open inward 95 deg), octagonal-ended "
           "eave beams with iron brackets, rafters, purlins and a ridge beam under two closed cream canvas slabs with "
@@ -1173,7 +1231,7 @@ COLLISION = {HERO: "precise", ROOF_P: "box", RIDGE_P: "box", CHIMNEY_P: "box", B
              WALL_P: "box", WINDOW_P: "precise", DOOR_P: "precise", GABLE_P: "hull", FLOOR_P: "box",
              STAIRS_P: "precise", FOUND_P: "box"}
 BUDGETS = {HERO: 8000}
-TARGET_SIZE = ((20.6, 0.3), (24.4, 0.3), (CH_TOP, 0.05))
+TARGET_SIZE = ((20.8, 0.3), (24.7, 0.3), (CH_TOP, 0.05))
 
 # points (build frame) and sockets; the parts' frames are the hero's build frame (each recentred by its own offset)
 POINTS = {HERO: {"m068_centre": (0.0, 0.0, FLOOR_Z), "m068_threshold": ((0.0, -(WALL_IN_Y + WALL_T), FLOOR_Z),
@@ -1187,12 +1245,14 @@ FX = {HERO: [("heat_glow", (L1[0], L1[1], L1[2] + GLASS_DZ), HALO)] +
       LANTERN_P: [("heat_glow", (0.0, -9.10, 6.20 + GLASS_DZ), HALO)],
       CHIMNEY_P: [("chimney_smoke", FLUE, SMOKE)]}
 
-VIEWS = {"f34_sheet": (-36, 18), "r34_sheet": (35, 18, "mirror"), "front_sheet": (-30, 10), "side_sheet": (90, 3),
+VIEWS = {"f34_sheet": (-46, 22), "r34_sheet": (35, 18, "mirror"), "front_sheet": (-42, 8), "side_sheet": (90, 3),
          "rear_sheet": (-90, 3, "mirror"), "top_sheet": (0, 89.9)}
-EXPLODED = {ROOF_P: (6.0, 0.0, 14.0), RIDGE_P: (0.0, 0.0, 20.0), CHIMNEY_P: (-6.0, 0.0, 16.0),
-            BANNER_P: (-20.0, 0.0, 0.0), LANTERN_P: (-26.0, 0.0, 0.0), WALL_P: (-12.0, 0.0, 0.0),
-            WINDOW_P: (0.0, 0.0, 0.0), DOOR_P: (12.0, 0.0, 0.0), GABLE_P: (24.0, 0.0, 0.0), FLOOR_P: (36.0, 0.0, 0.0),
-            STAIRS_P: (50.0, 0.0, 0.0), FOUND_P: (58.0, 0.0, 0.0)}
+# exploded view, laid out like the sheet's panel 4: roof pieces up and behind, walls in the middle, floor, stairs and
+# foundation in front
+EXPLODED = {ROOF_P: (-4.0, 14.0, 10.0), RIDGE_P: (8.0, 14.0, 16.0), CHIMNEY_P: (-16.0, 12.0, 9.0),
+            BANNER_P: (-24.0, 2.0, 0.0), LANTERN_P: (-29.0, -2.0, 3.0), WALL_P: (-10.0, 4.0, 2.0),
+            WINDOW_P: (4.0, 2.0, 2.0), DOOR_P: (14.0, -4.0, 0.0), GABLE_P: (28.0, 0.0, 2.0), FLOOR_P: (-4.0, -15.0, 0.0),
+            STAIRS_P: (16.0, -18.0, 0.0), FOUND_P: (-18.0, -12.0, 0.0)}
 CLOSE = {"junction_cu": dict(at=(-7.0, -10.0, 11.0), r=1.6, az=-40, el=12),
          "apex_cu": dict(at=(0.0, -9.7, 16.6), r=2.2, az=-25, el=10),
          "chimney_cu": dict(at=(2.2, -1.95, 17.0), r=3.0, az=-35, el=20),
@@ -1201,21 +1261,24 @@ CLOSE = {"junction_cu": dict(at=(-7.0, -10.0, 11.0), r=1.6, az=-40, el=12),
          "underside_cu": dict(cam=(0.0, 4.0, 4.5), look=(1.5, -2.0, 14.0), lens=14.0),
          "base_cu": dict(at=(-7.0, -8.0, 1.6), r=2.2, az=-40, el=15)}
 
-ESCAPE = {"box": ((-6.55, -7.55, 2.65), (6.55, 7.55, 15.6)),
-          "allow": {"door": ((-DOOR_X, -7.65, FLOOR_Z), (DOOR_X, -7.45, DOOR_TOP))}}
-WALK = {"paths": [[(0.0, -14.5), (0.0, -9.0), (0.0, -3.0), (0.0, 4.0)], [(0.0, -2.0), (-3.5, 3.0)],
-                  [(0.0, -2.0), (3.5, 3.0)]],
-        "feet_z": 0.0, "ride": True, "skip": ("tread", "deck", "thresh", "floor_under", "tblock"),
+# Interior box: up to 14.4 (under the ridge beam, 14.54): a higher top puts grid points above the canvas under the
+# chimney cap's overhang, which count as enclosed. The door allow box reaches 0.10 over the lintel line: rays that
+# cross the box face (0.05 inside the wall) just above the door top drop out under the header.
+ESCAPE = {"box": ((-6.55, -7.55, 2.65), (6.55, 7.55, 14.4)),
+          "allow": {"door": ((-DOOR_X, -7.65, FLOOR_Z), (DOOR_X, -7.45, DOOR_TOP + 0.10))}}
+WALK = {"paths": [[(0.0, -14.5), (0.0, -9.0), (0.0, -3.0), (-3.5, 3.0), (0.0, 5.0), (3.5, 3.0), (0.0, -3.0),
+                   (0.0, -14.5)]],
+        "feet_z": 0.0, "ride": True, "skip": ("tread", "deck", "thresh", "floor_under", "tblock", "sleeper"),
         "turn": [(0.0, 0.0, FLOOR_Z), (-2.5, 3.5, FLOOR_Z), (2.5, 3.5, FLOOR_Z)]}
 VERIFY = dict(cls="building", escape=ESCAPE, walk=WALK,
               sockets={HERO: ["chimney_smoke", "heat_glow", "heat_glow", "heat_glow"], LANTERN_P: ["heat_glow"],
                        CHIMNEY_P: ["chimney_smoke"]})
 COMPARE = {"f34": {"box": (16, 104, 508, 466), "view": VIEWS["f34_sheet"][:2]},
            "r34": {"box": (516, 104, 1010, 466), "view": (35, 18), "mirror": True},
-           "front": {"box": (16, 532, 272, 738), "view": (-30, 10)},
+           "front": {"box": (16, 532, 272, 738), "view": VIEWS["front_sheet"][:2]},
            "side": {"box": (276, 532, 478, 738), "view": (90, 3)},
            "rear": {"box": (516, 532, 762, 738), "view": (-90, 3), "mirror": True},
-           "top": {"box": (765, 532, 1010, 738), "view": (0, 89.9)}}
+           "top": {"box": (765, 532, 1010, 738), "view": (0, 89.9), "rot90": 1}}
 
 
 def after(objs):
@@ -1242,7 +1305,7 @@ def house_check(objs):
     def up(x, y, z):
         hit = tree.ray_cast(MODEL.at(h, (x, y, z)), Vector((0, 0, 1)))[0]
         return round(hit.z - oz, 3) if hit else None
-    floor_z = [down(x, y) for x in (-4.0, -1.3, 1.3, 4.0) for y in (-5.0, 0.0, 5.0)]
+    floor_z = [down(x, y) for x in (-4.6, -2.0, 2.0, 4.6) for y in (-5.0, 0.0, 5.0)]      # off the deck seams
     head = [up(x, y, FLOOR_Z + 0.1) for x in (-5.0, -2.5, 0.0, 2.5, 5.0) for y in (-6.5, -3.0, 0.0, 3.0, 6.5)]
     head_min = round(min(z for z in head if z is not None) - FLOOR_Z, 3)
     door_top = up(0.0, -7.8, FLOOR_Z + 0.1)
@@ -1250,7 +1313,7 @@ def house_check(objs):
     for sx in (-1, 1):
         hit = tree.ray_cast(MODEL.at(h, (0.0, -7.8, 5.0)), Vector((sx, 0, 0)))[0]
         xs.append(round(hit.x - h.matrix_world.translation.x + h[MODEL.OFF][0], 3) if hit else None)
-    stairs_z = [down(0.0, -10.3, 5.0), down(0.0, -11.9, 5.0)]
+    stairs_z = [down(0.0, -10.0, 5.0), down(0.0, -11.5, 5.0)]                              # off the tread gaps
     rep = {"floor_z": sorted(set(floor_z)), "headroom_min": head_min, "door_top": door_top, "door_x": xs,
            "stair_tops": stairs_z}
     pr = []
@@ -1258,8 +1321,11 @@ def house_check(objs):
         pr.append(f"{HERO}: floor tops {rep['floor_z']}")
     if head_min < 7.8:
         pr.append(f"{HERO}: headroom {head_min} under 7.8")
-    if door_top is None or door_top - FLOOR_Z < 6.99 or None in xs or xs[1] - xs[0] < 3.59:
+    rep["door_clear_h"] = round(door_top - SILL_TOP, 3) if door_top else None
+    if door_top is None or door_top - SILL_TOP < 6.99 or None in xs or xs[1] - xs[0] < 3.59:
         pr.append(f"{HERO}: door clear {xs} to {door_top}")
+    if stairs_z != [TREADS[0][2], TREADS[1][2]]:
+        pr.append(f"{HERO}: stair tops {stairs_z}")
     return rep, pr
 
 

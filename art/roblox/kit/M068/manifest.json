@@ -1,0 +1,1759 @@
+{
+ "version": 1,
+ "source": "art/blender/assets/kit/FlintbornWorldKit.blend",
+ "sheet": "M068",
+ "module": null,
+ "units": "1 stud = 1 Blender unit. Sizes and offsets are in studs; set each MeshPart's Size from 'size'.",
+ "axes": "Roblox axes (Y up). Blender (x, y, z) -> Roblox (x, z, -y); an asset's front (Blender -Y) faces Roblox +Z. The asset origin is the bottom centre of its footprint: a piece's MeshPart sits at origin CFrame * CFrame.new(offset); VFX positions are relative to the same origin.",
+ "palette": {
+  "file": "palette.png",
+  "width": 512,
+  "height": 1024,
+  "cell": 16,
+  "columns": 32,
+  "uv": "row i, level j: u = (j + 0.5) / columns, v = 1 - (i + 0.5) * cell / height (v up from the bottom of the image); a row's spare cells repeat its last level",
+  "rows": [
+   {
+    "key": "m068_banner",
+    "hex": "#B6191C",
+    "levels": [
+     1.00879,
+     1.012,
+     1.01448,
+     1.01867,
+     1.02649,
+     1.02914,
+     1.03106,
+     1.03426
+    ],
+    "used": true
+   },
+   {
+    "key": "m068_banner_x_iron_10",
+    "hex": "#AD1F23",
+    "levels": [
+     1.0221,
+     1.02489
+    ],
+    "used": true
+   },
+   {
+    "key": "m068_banner_x_iron_15",
+    "hex": "#A82226",
+    "levels": [
+     1.00337
+    ],
+    "used": true
+   },
+   {
+    "key": "m068_canvas",
+    "hex": "#EADCBC",
+    "levels": [
+     0.98292,
+     0.98458,
+     0.987,
+     0.98903,
+     0.99231,
+     0.99454,
+     0.99657,
+     0.99878,
+     1.00092,
+     1.00277,
+     1.00528,
+     1.00719,
+     1.00928,
+     1.01113,
+     1.01351,
+     1.01551,
+     1.01796,
+     1.02055,
+     1.02256,
+     1.02518,
+     1.02741,
+     1.02984,
+     1.03188,
+     1.03365,
+     1.03571,
+     1.04159,
+     1.04336,
+     1.04602
+    ],
+    "used": true
+   },
+   {
+    "key": "m068_canvas_x_deep_25",
+    "hex": "#DCCEAF",
+    "levels": [
+     0.96982,
+     0.97201,
+     0.98223,
+     0.98421,
+     0.99287,
+     0.99706,
+     0.99919,
+     1.00159,
+     1.00332,
+     1.00559,
+     1.00836,
+     1.01028,
+     1.01239,
+     1.01454,
+     1.01801,
+     1.02059,
+     1.02708,
+     1.0289,
+     1.03225
+    ],
+    "used": true
+   },
+   {
+    "key": "m068_canvas_x_deep_50",
+    "hex": "#CEC0A2",
+    "levels": [
+     0.96458,
+     0.96891,
+     0.97689,
+     0.98468,
+     0.98931,
+     0.99075,
+     0.99475,
+     0.99836,
+     1.00005,
+     1.00345,
+     1.0057,
+     1.00748,
+     1.01017,
+     1.01236,
+     1.0146,
+     1.01735,
+     1.01896,
+     1.02157,
+     1.02371,
+     1.02722,
+     1.02928,
+     1.0322,
+     1.03676
+    ],
+    "used": true
+   },
+   {
+    "key": "m068_canvas_x_deep_70",
+    "hex": "#C4B598",
+    "levels": [
+     0.98388,
+     0.98616,
+     0.98817,
+     0.99588,
+     1.00077,
+     1.00643,
+     1.0101,
+     1.0141,
+     1.0185
+    ],
+    "used": true
+   },
+   {
+    "key": "m068_canvas_x_deep_75",
+    "hex": "#C1B295",
+    "levels": [
+     0.96554,
+     0.97458,
+     0.98552,
+     0.9879,
+     0.99459,
+     0.99786,
+     1.0008,
+     1.00503,
+     1.00854,
+     1.01385,
+     1.0154,
+     1.01893,
+     1.02151,
+     1.02895,
+     1.03908
+    ],
+    "used": true
+   },
+   {
+    "key": "m068_cloth_white",
+    "hex": "#D7D6D3",
+    "levels": [
+     0.98319,
+     0.98554,
+     0.98812,
+     0.9963,
+     1.00058,
+     1.00322,
+     1.00724
+    ],
+    "used": true
+   },
+   {
+    "key": "m068_glow",
+    "hex": "#F8B428",
+    "levels": [
+     1.0
+    ],
+    "used": true
+   },
+   {
+    "key": "m068_iron",
+    "hex": "#585861",
+    "levels": [
+     0.92,
+     0.95,
+     0.96422,
+     0.96644,
+     0.97262,
+     0.97937,
+     0.9819,
+     0.98599,
+     0.99031,
+     1.0,
+     1.00916,
+     1.01149,
+     1.01608,
+     1.0211,
+     1.02437,
+     1.02845,
+     1.03598
+    ],
+    "used": true
+   },
+   {
+    "key": "m068_iron_x_cloth_white_55",
+    "hex": "#9E9DA0",
+    "levels": [
+     1.0
+    ],
+    "used": true
+   },
+   {
+    "key": "m068_lantern_iron",
+    "hex": "#797175",
+    "levels": [
+     0.9,
+     0.97093,
+     0.97355,
+     0.97602,
+     0.97988,
+     0.9829,
+     0.9842,
+     0.99046,
+     0.99297,
+     0.99492,
+     0.99781,
+     1.00096,
+     1.00361,
+     1.00602,
+     1.0094,
+     1.01402,
+     1.01638,
+     1.02227,
+     1.02592
+    ],
+    "used": true
+   },
+   {
+    "key": "m068_rope",
+    "hex": "#BB871C",
+    "levels": [
+     0.96745,
+     0.97444,
+     0.97791,
+     0.98256,
+     0.99114,
+     0.99323,
+     0.99559,
+     1.00083,
+     1.00562,
+     1.00892,
+     1.00987,
+     1.01371,
+     1.01614,
+     1.01906,
+     1.03422
+    ],
+    "used": true
+   },
+   {
+    "key": "m068_rope_deep",
+    "hex": "#8C641D",
+    "levels": [
+     0.98218,
+     0.99114,
+     0.99323,
+     0.99559,
+     1.00909
+    ],
+    "used": true
+   },
+   {
+    "key": "m068_rope_x_deep_50",
+    "hex": "#A4761C",
+    "levels": [
+     0.96745,
+     0.97444,
+     0.983,
+     1.00058,
+     1.00561,
+     1.0162,
+     1.03422
+    ],
+    "used": true
+   },
+   {
+    "key": "m068_soot",
+    "hex": "#1F1E23",
+    "levels": [
+     1.02673
+    ],
+    "used": true
+   },
+   {
+    "key": "m068_stone",
+    "hex": "#8F8A91",
+    "levels": [
+     0.93555,
+     0.94704,
+     0.95755,
+     0.96496,
+     0.97164,
+     0.97373,
+     0.97519,
+     0.97699,
+     0.97837,
+     0.98235,
+     0.98436,
+     0.98866,
+     0.98988,
+     0.9919,
+     0.99294,
+     0.99507,
+     0.99739,
+     1.00328,
+     1.00552,
+     1.00627,
+     1.00847,
+     1.01215,
+     1.01418,
+     1.01617,
+     1.01812,
+     1.02028,
+     1.02495,
+     1.02978,
+     1.03306,
+     1.03548,
+     1.04868,
+     1.07189
+    ],
+    "used": true
+   },
+   {
+    "key": "m068_stone_dark",
+    "hex": "#7F7B82",
+    "levels": [
+     0.98176,
+     0.99992,
+     1.00426
+    ],
+    "used": true
+   },
+   {
+    "key": "m068_stone_dark_x_soot_25",
+    "hex": "#67646A",
+    "levels": [
+     1.00735
+    ],
+    "used": true
+   },
+   {
+    "key": "m068_stone_dark_x_stone_25",
+    "hex": "#837F86",
+    "levels": [
+     1.01862,
+     1.03057,
+     1.03969,
+     1.04708,
+     1.0502
+    ],
+    "used": true
+   },
+   {
+    "key": "m068_stone_light",
+    "hex": "#A29CA3",
+    "levels": [
+     0.93346,
+     0.93849,
+     0.94267,
+     0.94582,
+     0.94807,
+     0.95016,
+     0.952,
+     0.95585,
+     0.95927,
+     0.96685,
+     0.97115,
+     0.97771,
+     0.98086,
+     0.98578,
+     0.98675,
+     0.99037,
+     0.99212,
+     0.99449,
+     1.00228,
+     1.00481,
+     1.00642,
+     1.0138,
+     1.01589,
+     1.019,
+     1.02151,
+     1.02354,
+     1.02875,
+     1.03205,
+     1.03531
+    ],
+    "used": true
+   },
+   {
+    "key": "m068_stone_light_x_stone_40",
+    "hex": "#9A959C",
+    "levels": [
+     0.96191,
+     0.97496,
+     1.00802,
+     1.01051,
+     1.02673
+    ],
+    "used": true
+   },
+   {
+    "key": "m068_stone_light_x_stone_50",
+    "hex": "#98939A",
+    "levels": [
+     0.93877,
+     0.94609,
+     0.95039,
+     0.95397,
+     0.95628,
+     0.96121,
+     0.96461,
+     0.9728,
+     0.97556,
+     0.98002,
+     0.98444,
+     0.99174,
+     0.99582,
+     0.99902,
+     1.00176,
+     1.00453,
+     1.00661,
+     1.01014,
+     1.01308
+    ],
+    "used": true
+   },
+   {
+    "key": "m068_timber",
+    "hex": "#9C5C26",
+    "levels": [
+     0.92573,
+     0.9462,
+     0.95209,
+     0.95957,
+     0.96347,
+     0.96739,
+     0.97036,
+     0.97443,
+     0.97625,
+     0.98064,
+     0.9832,
+     0.98618,
+     0.98941,
+     0.99031,
+     0.99151,
+     0.99704,
+     1.00096,
+     1.00529,
+     1.0091,
+     1.012,
+     1.01537,
+     1.01942,
+     1.02331,
+     1.02705,
+     1.03089,
+     1.0314,
+     1.03511,
+     1.03805,
+     1.04137,
+     1.04634,
+     1.05617,
+     1.07483
+    ],
+    "used": true
+   },
+   {
+    "key": "m068_timber_deep",
+    "hex": "#754118",
+    "levels": [
+     0.95056,
+     0.95812,
+     0.96638,
+     0.97,
+     0.97534,
+     0.98068,
+     0.98522,
+     0.98889,
+     1.0,
+     1.0027,
+     1.01436,
+     1.0175,
+     1.02154,
+     1.02401,
+     1.02778,
+     1.03308,
+     1.03558,
+     1.04319,
+     1.04896
+    ],
+    "used": true
+   },
+   {
+    "key": "m068_timber_deep_x_soot_40",
+    "hex": "#53331C",
+    "levels": [
+     0.97
+    ],
+    "used": true
+   },
+   {
+    "key": "m068_timber_deep_x_soot_55",
+    "hex": "#462E1E",
+    "levels": [
+     0.92635,
+     0.9386,
+     0.94975,
+     0.95361,
+     0.96605,
+     0.98594,
+     0.98848,
+     0.99128,
+     0.99852,
+     1.00423,
+     1.00987,
+     1.01404,
+     1.01926
+    ],
+    "used": true
+   },
+   {
+    "key": "m068_timber_end",
+    "hex": "#BF8241",
+    "levels": [
+     0.94531,
+     0.95705,
+     0.95967,
+     0.96432,
+     0.96892,
+     0.97649,
+     0.97983,
+     0.98049,
+     0.98431,
+     0.98735,
+     0.9898,
+     0.99159,
+     0.99413,
+     0.99717,
+     0.99995,
+     1.00207,
+     1.00711,
+     1.01088,
+     1.01383,
+     1.01614,
+     1.02805,
+     1.03137,
+     1.03566,
+     1.03952,
+     1.04161,
+     1.04736,
+     1.05865,
+     1.06158
+    ],
+    "used": true
+   },
+   {
+    "key": "m068_timber_x_deep_15",
+    "hex": "#965824",
+    "levels": [
+     0.94277,
+     0.94524,
+     0.9507,
+     0.95204,
+     0.95725,
+     0.96345,
+     0.96725,
+     0.96957,
+     0.97143,
+     0.97437,
+     0.97636,
+     0.97802,
+     0.98749,
+     0.99342,
+     0.99649,
+     1.00571,
+     1.00774,
+     1.0298,
+     1.03273,
+     1.03554,
+     1.03709,
+     1.04441,
+     1.05036,
+     1.05243,
+     1.05446,
+     1.0611
+    ],
+    "used": true
+   },
+   {
+    "key": "m068_timber_x_deep_25",
+    "hex": "#925522",
+    "levels": [
+     0.94552,
+     0.95159,
+     0.96002,
+     0.96755,
+     0.97392,
+     0.98127,
+     0.98773,
+     0.992,
+     0.99345,
+     0.99484,
+     0.99542,
+     0.99584,
+     0.99679,
+     0.99957,
+     1.00176,
+     1.00434,
+     1.00597,
+     1.00953,
+     1.01004,
+     1.01361,
+     1.01679,
+     1.01979,
+     1.02551,
+     1.02598,
+     1.02628,
+     1.0301,
+     1.03259,
+     1.0346,
+     1.03579,
+     1.03772,
+     1.04752,
+     1.05449
+    ],
+    "used": true
+   },
+   {
+    "key": "m068_timber_x_deep_35",
+    "hex": "#8E5321",
+    "levels": [
+     0.94953,
+     0.95326,
+     0.95505,
+     0.95914,
+     0.96289,
+     0.96799,
+     0.97096,
+     0.97643,
+     0.98481,
+     0.98779,
+     0.99251,
+     0.99522,
+     0.99981,
+     1.00762,
+     1.00983,
+     1.01292,
+     1.01629,
+     1.01839,
+     1.02202,
+     1.02424,
+     1.02629,
+     1.02931,
+     1.03106,
+     1.0345,
+     1.04221
+    ],
+    "used": true
+   },
+   {
+    "key": "m068_timber_x_deep_40",
+    "hex": "#8C5120",
+    "levels": [
+     0.9696,
+     0.9929,
+     1.03948,
+     1.04446
+    ],
+    "used": true
+   },
+   {
+    "key": "m068_timber_x_deep_45",
+    "hex": "#8A5020",
+    "levels": [
+     0.97341,
+     0.97628,
+     0.98312,
+     0.988,
+     0.99324,
+     0.99896,
+     1.00423,
+     1.01187,
+     1.01637,
+     1.0286,
+     1.03324,
+     1.03871
+    ],
+    "used": true
+   },
+   {
+    "key": "m068_timber_x_deep_50",
+    "hex": "#884E1F",
+    "levels": [
+     1.0
+    ],
+    "used": true
+   },
+   {
+    "key": "m068_timber_x_end_20",
+    "hex": "#A3642B",
+    "levels": [
+     0.93858,
+     0.94172,
+     0.94398,
+     0.94863,
+     0.95154,
+     0.95651,
+     0.97065,
+     0.97338,
+     0.97608,
+     0.97993,
+     0.98302,
+     0.98613,
+     0.99069,
+     0.99625,
+     0.9994,
+     1.00335,
+     1.00739,
+     1.01067,
+     1.01372,
+     1.01703,
+     1.02251,
+     1.0274,
+     1.02873,
+     1.03264,
+     1.03633,
+     1.03883,
+     1.04654,
+     1.05307,
+     1.05753,
+     1.06452
+    ],
+    "used": true
+   },
+   {
+    "key": "m068_timber_x_end_25",
+    "hex": "#A5662D",
+    "levels": [
+     0.94418,
+     0.95256,
+     0.9592,
+     0.97476,
+     0.98303,
+     0.98529,
+     0.98804,
+     0.99195,
+     0.99539,
+     1.0009
+    ],
+    "used": true
+   },
+   {
+    "key": "m068_timber_x_end_30",
+    "hex": "#A6672E",
+    "levels": [
+     0.94106,
+     0.94419,
+     0.94841,
+     0.95375,
+     0.95544,
+     0.96991,
+     0.98476,
+     1.00025,
+     1.01383,
+     1.01674,
+     1.0187,
+     1.02132,
+     1.02332,
+     1.02442,
+     1.02795,
+     1.03059,
+     1.03401,
+     1.03767,
+     1.04024,
+     1.04235,
+     1.0471,
+     1.05166,
+     1.0551,
+     1.05727,
+     1.05977,
+     1.06287,
+     1.0648,
+     1.0677
+    ],
+    "used": true
+   },
+   {
+    "key": "m068_timber_x_end_65",
+    "hex": "#B37538",
+    "levels": [
+     0.96634,
+     0.97069,
+     0.97759,
+     0.98073,
+     0.98819,
+     0.99579,
+     1.00504,
+     1.00728,
+     1.01171,
+     1.01684,
+     1.0189,
+     1.02431,
+     1.026,
+     1.03087,
+     1.03943,
+     1.04472
+    ],
+    "used": true
+   },
+   {
+    "key": "m068_timber_x_end_85",
+    "hex": "#BA7C3D",
+    "levels": [
+     0.94872,
+     0.95545,
+     0.95725,
+     0.9661,
+     0.97049,
+     0.9723,
+     0.97678,
+     0.97881,
+     0.98277,
+     0.98446,
+     0.98759,
+     0.99516,
+     0.99676,
+     1.00097,
+     1.00643,
+     1.01665,
+     1.03023,
+     1.0335,
+     1.03706,
+     1.03896,
+     1.04208,
+     1.04641,
+     1.05826,
+     1.06294
+    ],
+    "used": true
+   }
+  ]
+ },
+ "water": {
+  "keys": {},
+  "material": "SmoothPlastic",
+  "tile_studs": 16.0,
+  "uv": "Water pieces carry their own UVs (not palette cells): a box projection in studs from the asset origin, one texture tile per tile_studs. Up-facing faces: u = X / tile, v = Z / tile (mod 1, Roblox axes); faces toward +-Z use (X, -Y), toward +-X use (-Z, -Y). Set MeshPart.TextureID to the uploaded texture (it wraps), Transparency from the piece, Material SmoothPlastic, CastShadow false. Assets placed on a tile_studs grid continue the pattern seamlessly.",
+  "flow": "Pieces of an asset with a water_flow socket carry flow = {direction (unit, Roblox X/Z), speed (studs/s), socket}. To animate, use a Texture (Face Top, StudsPerTileU/V = tile_studs) on the piece instead of TextureID and move OffsetStudsU/V along direction * speed each frame."
+ },
+ "assets": [
+  {
+   "name": "TimberCabin",
+   "sheet": "M068",
+   "subject": "Timber Hut",
+   "role": "hero",
+   "size": [
+    20.7604,
+    19.4,
+    24.7388
+   ],
+   "tris": 7596,
+   "budget": 8000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TimberCabin.glb",
+     "kind": "solid",
+     "tris": 7560,
+     "offset": [
+      0.0,
+      9.7,
+      0.0
+     ],
+     "size": [
+      20.7604,
+      19.4,
+      24.7388
+     ]
+    },
+    {
+     "file": "meshes/TimberCabin_glow_m068_glow.glb",
+     "kind": "glow",
+     "tris": 36,
+     "offset": [
+      -1.8987,
+      7.35,
+      6.9194
+     ],
+     "size": [
+      14.35,
+      1.91,
+      4.7
+     ],
+     "key": "m068_glow",
+     "color": "#F8B428",
+     "material": "Neon",
+     "collision": {
+      "CollisionFidelity": "Box",
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CastShadow": false
+     }
+    }
+   ],
+   "vfx": [
+    {
+     "name": "VFX_TimberCabin_chimney_smoke_1.001",
+     "kind": "chimney_smoke",
+     "position": [
+      2.2763,
+      18.6,
+      1.6194
+     ],
+     "vfx_scale": 1.0,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Smoke",
+        "texture": "smoke_puff",
+        "color": [
+         "#BDB8B4",
+         "#E4E0DC"
+        ],
+        "size": [
+         1.0,
+         3.5
+        ],
+        "transparency": [
+         0.6,
+         1.0
+        ],
+        "lifetime": [
+         3,
+         5
+        ],
+        "rate": 2,
+        "speed": [
+         1.5,
+         2.5
+        ],
+        "spread": 6,
+        "light_emission": 0.0,
+        "acceleration": [
+         0.4,
+         0.3,
+         0
+        ],
+        "drag": 0.3,
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -15,
+         15
+        ]
+       }
+      ],
+      "light": null
+     }
+    },
+    {
+     "name": "VFX_TimberCabin_heat_glow_1.001",
+     "kind": "heat_glow",
+     "position": [
+      -8.5737,
+      7.5,
+      5.0694
+     ],
+     "vfx_scale": 1.0,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Halo",
+        "texture": "glow_soft",
+        "color": [
+         "#FFC23A",
+         "#FF9A1E"
+        ],
+        "size": [
+         1.4,
+         1.7
+        ],
+        "transparency": [
+         0.65,
+         1.0
+        ],
+        "lifetime": [
+         1.0,
+         1.5
+        ],
+        "rate": 2,
+        "speed": [
+         0,
+         0.05
+        ],
+        "spread": 0,
+        "light_emission": 1.0
+       }
+      ],
+      "light": {
+       "color": "#FFB347",
+       "brightness": 1.0,
+       "range": 12,
+       "flicker": true
+      }
+     }
+    },
+    {
+     "name": "VFX_TimberCabin_heat_glow_2.001",
+     "kind": "heat_glow",
+     "position": [
+      -4.6237,
+      7.2,
+      8.7694
+     ],
+     "vfx_scale": 1.0,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Halo",
+        "texture": "glow_soft",
+        "color": [
+         "#FFC23A",
+         "#FF9A1E"
+        ],
+        "size": [
+         1.4,
+         1.7
+        ],
+        "transparency": [
+         0.65,
+         1.0
+        ],
+        "lifetime": [
+         1.0,
+         1.5
+        ],
+        "rate": 2,
+        "speed": [
+         0,
+         0.05
+        ],
+        "spread": 0,
+        "light_emission": 1.0
+       }
+      ],
+      "light": {
+       "color": "#FFB347",
+       "brightness": 1.0,
+       "range": 12,
+       "flicker": true
+      }
+     }
+    },
+    {
+     "name": "VFX_TimberCabin_heat_glow_3.001",
+     "kind": "heat_glow",
+     "position": [
+      4.7763,
+      7.2,
+      8.7694
+     ],
+     "vfx_scale": 1.0,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Halo",
+        "texture": "glow_soft",
+        "color": [
+         "#FFC23A",
+         "#FF9A1E"
+        ],
+        "size": [
+         1.4,
+         1.7
+        ],
+        "transparency": [
+         0.65,
+         1.0
+        ],
+        "lifetime": [
+         1.0,
+         1.5
+        ],
+        "rate": 2,
+        "speed": [
+         0,
+         0.05
+        ],
+        "spread": 0,
+        "light_emission": 1.0
+       }
+      ],
+      "light": {
+       "color": "#FFB347",
+       "brightness": 1.0,
+       "range": 12,
+       "flicker": true
+      }
+     }
+    }
+   ],
+   "notes": "Walk-in gable-roofed timber cabin (remade sheet; door 3.60 x 7.00 clear over a 0.08 sill on a 2.60 floor, rises 0.87 / 0.86 / 0.87): one course of big pale stone blocks with lighter corner blocks, plank floor, five rows of planks between chamfered corner posts, a barred window with a dark inner shutter in each long wall, the door between tall posts on golden caps under a lintel and collar (leaf open inward 95 deg), octagonal-ended eave beams with iron brackets, rafters, purlins and a ridge beam under two closed cream canvas slabs with a seam grid and golden U ties, crossed bargeboards with golden saddles and cleats, a stone chimney with a crenellated cap (thin pale chimney_smoke), two-tread stairs, three Neon lanterns (heat_glow), a red banner on an X-lashed pole, two barrels and a crate. Collision precise: Requires Manual Validation in Studio (walk in, turn round, walk out)."
+  },
+  {
+   "name": "TimberCabinBanner",
+   "sheet": "M068",
+   "subject": "Timber Hut",
+   "role": "part",
+   "size": [
+    2.6084,
+    15.0,
+    4.5043
+   ],
+   "tris": 632,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TimberCabinBanner.glb",
+     "kind": "solid",
+     "tris": 632,
+     "offset": [
+      0.0,
+      7.5,
+      0.0
+     ],
+     "size": [
+      2.6084,
+      15.0,
+      4.5043
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Banner Pole + Banner: 8-sided pole with a golden foot band and block top, crossarm through it with an X lashing and iron bands, red three-point banner with the white diamond emblem on both faces"
+  },
+  {
+   "name": "TimberCabinChimney",
+   "sheet": "M068",
+   "subject": "Timber Hut",
+   "role": "part",
+   "size": [
+    3.0,
+    5.7405,
+    3.0
+   ],
+   "tris": 132,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TimberCabinChimney.glb",
+     "kind": "solid",
+     "tris": 132,
+     "offset": [
+      0.0,
+      2.8703,
+      0.0
+     ],
+     "size": [
+      3.0,
+      5.7405,
+      3.0
+     ]
+    }
+   ],
+   "vfx": [
+    {
+     "name": "VFX_TimberCabinChimney_chimney_smoke_1.001",
+     "kind": "chimney_smoke",
+     "position": [
+      0.0,
+      4.9405,
+      0.0
+     ],
+     "vfx_scale": 1.0,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Smoke",
+        "texture": "smoke_puff",
+        "color": [
+         "#BDB8B4",
+         "#E4E0DC"
+        ],
+        "size": [
+         1.0,
+         3.5
+        ],
+        "transparency": [
+         0.6,
+         1.0
+        ],
+        "lifetime": [
+         3,
+         5
+        ],
+        "rate": 2,
+        "speed": [
+         1.5,
+         2.5
+        ],
+        "spread": 6,
+        "light_emission": 0.0,
+        "acceleration": [
+         0.4,
+         0.3,
+         0
+        ],
+        "drag": 0.3,
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -15,
+         15
+        ]
+       }
+      ],
+      "light": null
+     }
+    }
+   ],
+   "notes": "Chimney: square stone stack in two blocks with a notched joint, a flashing collar and a crenellated flued cap (chimney_smoke socket); its foot is cut to the 32 deg roof pitch"
+  },
+  {
+   "name": "TimberCabinDoorFrame",
+   "sheet": "M068",
+   "subject": "Timber Hut",
+   "role": "part",
+   "size": [
+    6.6,
+    10.202,
+    2.246
+   ],
+   "tris": 288,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TimberCabinDoorFrame.glb",
+     "kind": "solid",
+     "tris": 288,
+     "offset": [
+      0.0,
+      5.101,
+      0.0
+     ],
+     "size": [
+      6.6,
+      10.202,
+      2.246
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Doorframe: two chamfered door posts on golden caps, lintel, header plank and the plank door (closed; hinge stored as m068_hinge for a scripted door)"
+  },
+  {
+   "name": "TimberCabinFloor",
+   "sheet": "M068",
+   "subject": "Timber Hut",
+   "role": "part",
+   "size": [
+    13.204,
+    0.98,
+    17.102
+   ],
+   "tris": 464,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TimberCabinFloor.glb",
+     "kind": "solid",
+     "tris": 464,
+     "offset": [
+      0.0,
+      0.49,
+      0.0
+     ],
+     "size": [
+      13.204,
+      0.98,
+      17.102
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Floor: ten deck planks, the dark underlay and the threshold on short dark feet (top 2.60)"
+  },
+  {
+   "name": "TimberCabinFoundation",
+   "sheet": "M068",
+   "subject": "Timber Hut",
+   "role": "part",
+   "size": [
+    1.64,
+    2.6,
+    15.83
+   ],
+   "tris": 180,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TimberCabinFoundation.glb",
+     "kind": "solid",
+     "tris": 180,
+     "offset": [
+      0.0,
+      1.3,
+      0.0
+     ],
+     "size": [
+      1.64,
+      2.6,
+      15.83
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Stone Foundation (x4): one side's run of four big chamfered blocks with its lighter corner block"
+  },
+  {
+   "name": "TimberCabinGableFrame",
+   "sheet": "M068",
+   "subject": "Timber Hut",
+   "role": "part",
+   "size": [
+    17.5658,
+    7.5911,
+    3.5
+   ],
+   "tris": 176,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TimberCabinGableFrame.glb",
+     "kind": "solid",
+     "tris": 176,
+     "offset": [
+      0.0,
+      3.7956,
+      0.0
+     ],
+     "size": [
+      17.5658,
+      7.5911,
+      3.5
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Front Gable Frame: collar, crossed bargeboards (half-lap X) with a golden saddle and cleats, on the two eave-beam ends"
+  },
+  {
+   "name": "TimberCabinLantern",
+   "sheet": "M068",
+   "subject": "Timber Hut",
+   "role": "part",
+   "size": [
+    1.498,
+    3.997,
+    1.846
+   ],
+   "tris": 180,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TimberCabinLantern.glb",
+     "kind": "solid",
+     "tris": 168,
+     "offset": [
+      0.0,
+      1.9985,
+      0.0
+     ],
+     "size": [
+      1.498,
+      3.997,
+      1.846
+     ]
+    },
+    {
+     "file": "meshes/TimberCabinLantern_glow_m068_glow.glb",
+     "kind": "glow",
+     "tris": 12,
+     "offset": [
+      0.0,
+      1.0,
+      0.174
+     ],
+     "size": [
+      1.0,
+      1.61,
+      1.0
+     ],
+     "key": "m068_glow",
+     "color": "#F8B428",
+     "material": "Neon",
+     "collision": {
+      "CollisionFidelity": "Box",
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CastShadow": false
+     }
+    }
+   ],
+   "vfx": [
+    {
+     "name": "VFX_TimberCabinLantern_heat_glow_1.001",
+     "kind": "heat_glow",
+     "position": [
+      0.0,
+      1.0,
+      0.174
+     ],
+     "vfx_scale": 1.0,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Halo",
+        "texture": "glow_soft",
+        "color": [
+         "#FFC23A",
+         "#FF9A1E"
+        ],
+        "size": [
+         1.4,
+         1.7
+        ],
+        "transparency": [
+         0.65,
+         1.0
+        ],
+        "lifetime": [
+         1.0,
+         1.5
+        ],
+        "rate": 2,
+        "speed": [
+         0,
+         0.05
+        ],
+        "spread": 0,
+        "light_emission": 1.0
+       }
+      ],
+      "light": {
+       "color": "#FFB347",
+       "brightness": 1.0,
+       "range": 12,
+       "flicker": true
+      }
+     }
+    }
+   ],
+   "notes": "Lantern: square dark-iron lantern with Neon amber glass (heat_glow halo) on its iron wall bracket"
+  },
+  {
+   "name": "TimberCabinRidgeBeam",
+   "sheet": "M068",
+   "subject": "Timber Hut",
+   "role": "part",
+   "size": [
+    1.36,
+    1.6734,
+    23.5
+   ],
+   "tris": 280,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TimberCabinRidgeBeam.glb",
+     "kind": "solid",
+     "tris": 280,
+     "offset": [
+      0.0,
+      0.8367,
+      0.0
+     ],
+     "size": [
+      1.36,
+      1.6734,
+      23.5
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Ridge Beam: 1.00 beam with a pitched top, pale ends and two golden rope turns at each end"
+  },
+  {
+   "name": "TimberCabinRoofPanel",
+   "sheet": "M068",
+   "subject": "Timber Hut",
+   "role": "part",
+   "size": [
+    7.534,
+    4.9726,
+    18.494
+   ],
+   "tris": 456,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TimberCabinRoofPanel.glb",
+     "kind": "solid",
+     "tris": 456,
+     "offset": [
+      0.0,
+      2.4863,
+      0.0
+     ],
+     "size": [
+      7.534,
+      4.9726,
+      18.494
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Roof Panel (Left / Right): one closed 0.12 canvas slab, 4 x 2 panels with raised seams, four golden U clips (mirror for the other slope)"
+  },
+  {
+   "name": "TimberCabinStairs",
+   "sheet": "M068",
+   "subject": "Timber Hut",
+   "role": "part",
+   "size": [
+    6.0,
+    1.73,
+    3.197
+   ],
+   "tris": 160,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TimberCabinStairs.glb",
+     "kind": "solid",
+     "tris": 160,
+     "offset": [
+      0.0,
+      0.865,
+      0.0
+     ],
+     "size": [
+      6.0,
+      1.73,
+      3.197
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Steps: two two-plank treads on blocks (rises 0.87 / 0.86 / 0.87 to a 2.60 floor)"
+  },
+  {
+   "name": "TimberCabinWallPanel",
+   "sheet": "M068",
+   "subject": "Timber Hut",
+   "role": "part",
+   "size": [
+    14.7,
+    7.899,
+    1.25
+   ],
+   "tris": 336,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TimberCabinWallPanel.glb",
+     "kind": "solid",
+     "tris": 336,
+     "offset": [
+      0.0,
+      3.9495,
+      0.0
+     ],
+     "size": [
+      14.7,
+      7.899,
+      1.25
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Wall Panel (Left / Rear): five rows of 0.40 V-seamed planks with staggered joints between two corner posts"
+  },
+  {
+   "name": "TimberCabinWindowWall",
+   "sheet": "M068",
+   "subject": "Timber Hut",
+   "role": "part",
+   "size": [
+    1.25,
+    7.899,
+    16.7
+   ],
+   "tris": 488,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TimberCabinWindowWall.glb",
+     "kind": "solid",
+     "tris": 488,
+     "offset": [
+      0.0,
+      3.9495,
+      0.0
+     ],
+     "size": [
+      1.25,
+      7.899,
+      16.7
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Wall Panel (Right): a long plank wall with the centred barred window, its chunky frame and dark inner shutter, and its corner posts"
+  }
+ ],
+ "stats": {
+  "assets": 13,
+  "pieces": 15,
+  "solid": 13,
+  "water": 0,
+  "glow": 2,
+  "tris": 11368,
+  "vfxSockets": 6,
+  "paletteColours": 40,
+  "paletteLevels": 573,
+  "meshBytes": 857944
+ },
+ "problems": []
+}
