@@ -38,6 +38,7 @@ local Recipes = require(ReplicatedStorage.Shared.Crafting.Recipes)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local Validation = require(ReplicatedStorage.Shared.Data.Validation)
 local RequestLedger = require(script.Parent.Parent.Infrastructure.RequestLedger)
+local AntiExploitService = require(script.Parent.AntiExploitService)
 local BuildingService = require(script.Parent.BuildingService)
 local DownedService = require(script.Parent.DownedService)
 local DropService = require(script.Parent.DropService)
@@ -80,15 +81,17 @@ local function now(): number
 end
 
 -- The closest standing tagged station part in range, or nil.
+-- Measured from where the server knows the player is, so nobody works another
+-- tribe's Anvil from outside its walls.
 local function nearestStation(player: Player, tag: string)
-	local root = Characters.RootOf(player)
-	if root == nil then
+	local at = AntiExploitService.TrustedPosition(player)
+	if at == nil then
 		return nil
 	end
 	local best, bestDistance = nil, CraftingRules.STATION_RANGE
 	for _, part in CollectionService:GetTagged(tag) do
 		if part:IsA("BasePart") and part.Parent ~= nil then
-			local distance = (part.Position - root.Position).Magnitude
+			local distance = (part.Position - at).Magnitude
 			if distance <= bestDistance then
 				best, bestDistance = part, distance
 			end
@@ -215,6 +218,7 @@ local function interruption(player: Player, job): string?
 	local character = player.Character
 	local humanoid = character and character:FindFirstChildOfClass("Humanoid")
 	local root = Characters.RootOf(player)
+	local at = root and (AntiExploitService.TrustedPosition(player) or root.Position)
 	local station = job.station
 	return CraftingRules.Interruption({
 		atRisk = player.Parent ~= nil and WorldAdmissionService.IsAtRisk(player),
@@ -222,7 +226,7 @@ local function interruption(player: Player, job): string?
 		alive = humanoid ~= nil and humanoid.Health > 0,
 		downed = DownedService.IsDowned(player),
 		stationStanding = station.Parent ~= nil,
-		distance = root and (station.Position - root.Position).Magnitude,
+		distance = at and (station.Position - at).Magnitude,
 	})
 end
 

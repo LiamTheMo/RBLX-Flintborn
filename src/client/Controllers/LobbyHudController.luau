@@ -145,6 +145,18 @@ local function build()
 		end,
 	})
 	ProgressionController.MountPopups(hud.popups)
+	-- The hotbar is the lobby loadout's: its items drag to other hotbar slots, and
+	-- to and from the Inventory window (the same "hotbar:i" cells).
+	for index, slot in hud.slots do
+		Kit.Drag.Attach(slot, {
+			group = "lobby",
+			id = function()
+				return "hotbar:" .. index
+			end,
+			canDrop = VaultController.CanDrop,
+			onDrop = VaultController.Drop,
+		})
+	end
 	gui.Parent = player:WaitForChild("PlayerGui")
 end
 

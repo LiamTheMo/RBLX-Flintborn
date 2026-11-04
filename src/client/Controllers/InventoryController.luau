@@ -208,9 +208,24 @@ local function takeOff(index: number)
 	end
 end
 
+-- Takes worn piece `index` off into (area, toIndex): an empty slot, or a piece
+-- for the same armour slot, which is worn in its place.
+local function takeOffTo(index: number, area: string, toIndex: number)
+	local ok, reason = Remotes.Invoke("UnequipArmorTo", ARMOR_SLOTS[index], area, toIndex)
+	if not ok then
+		toast("Can't take that off there (" .. Reasons.Text(reason) .. ")", "warn")
+	end
+end
+
 local function isArmor(slot): boolean
 	local def = slot and ItemCatalog.Get(slot.catalogId)
 	return def ~= nil and def.family == ItemCatalog.Families.Armor
+end
+
+-- The armour slot ("Head", "Chest", "Legs") an item is worn in, or nil.
+local function armorSlotOf(slot): string?
+	local def = slot and ItemCatalog.Get(slot.catalogId)
+	return def and def.armor and def.armor.slot or nil
 end
 
 local function itemOf(slot)
@@ -253,23 +268,68 @@ local function run(fn)
 	end)
 end
 
+-- Whether the item in `from` can go onto `target` ({area, index} each): any item
+-- between hotbar and backpack slots (swapping with what is there); armour onto
+-- its own armour slot only; a worn piece onto an empty slot, or one holding a
+-- piece for the same armour slot.
+local function canPlace(from, target): boolean
+	if from == nil or target == nil or sameSlot(from, target) then
+		return false
+	end
+	local item = slotAt(from.area, from.index)
+	if item == nil then
+		return false
+	end
+	if target.area == "armor" then
+		return from.area ~= "armor" and armorSlotOf(item) == ARMOR_SLOTS[target.index]
+	end
+	if from.area == "armor" then
+		local there = slotAt(target.area, target.index)
+		return there == nil or armorSlotOf(there) == ARMOR_SLOTS[from.index]
+	end
+	return true
+end
+
 -- Moves (or swaps) the picked-up slot `from` onto `target`: onto an armour slot
--- it is worn, a worn piece put elsewhere comes off.
+-- it is worn, a worn piece put elsewhere comes off into that slot.
 local function place(from, target)
 	if sameSlot(from, target) then
 		return
 	end
+	if not canPlace(from, target) then
+		toast("That can't go there.", "warn")
+		return
+	end
 	run(function()
 		if target.area == "armor" then
-			if from.area ~= "armor" then
-				wear(from)
-			end
+			wear(from)
 		elseif from.area == "armor" then
-			takeOff(from.index)
+			takeOffTo(from.index, target.area, target.index)
 		else
 			move(from, target.area, target.index)
 		end
 	end)
+end
+
+local function cellOf(id: string)
+	local area, index = parseCell(id)
+	return if area and index then { area = area, index = index } else nil
+end
+
+-- Drag and drop between cells (the window's, and the HUD hotbar's "hotbar:i").
+function InventoryController.CanDrop(fromId: string, toId: string): boolean
+	return canPlace(cellOf(fromId), cellOf(toId))
+end
+
+function InventoryController.Drop(fromId: string, toId: string)
+	local from, target = cellOf(fromId), cellOf(toId)
+	if from == nil or target == nil or busy then
+		return
+	end
+	moving = nil
+	selected = target
+	place(from, target)
+	InventoryController.Render()
 end
 
 -- A slot pressed in the window: while MOVE holds an item it goes there;
@@ -344,8 +404,8 @@ local function showDetail()
 	if slot == nil then
 		window:SetDetail({
 			hint = if tab == "Backpack"
-				then "Everything you carry. Choose an item to equip, move or drop it."
-				else "Your hotbar (keys 1–6) and worn armour. Choose a slot to use, move or take it off.",
+				then "Everything you carry. Drag items between slots, or choose one to equip, move or drop it."
+				else "Your hotbar (keys 1–6) and worn armour. Drag items, or choose one to use or take it off.",
 		})
 		return
 	end
@@ -461,6 +521,7 @@ local function build()
 		end,
 		onSlot = onWindowSlot,
 		onAction = onAction,
+		drag = { group = "run", canDrop = InventoryController.CanDrop, onDrop = InventoryController.Drop },
 		onClose = function()
 			selected, moving = nil, nil
 			InventoryController.BackpackToggled:Fire(false)

@@ -12,6 +12,12 @@ local Characters = require(ReplicatedStorage.Shared.World.Characters)
 local SafeZoneService = {}
 
 SafeZoneService.TAG = "SafeZone"
+-- Where a player counts as standing. AntiExploitService sets it to the
+-- server-validated position, so a client cannot flick into a zone to dodge a hit.
+SafeZoneService.PositionOf = function(player: Player): Vector3?
+	local root = Characters.RootOf(player)
+	return root and root.Position or nil
+end
 
 local function inside(zone: BasePart, position: Vector3): boolean
 	local localPoint = zone.CFrame:PointToObjectSpace(position)
@@ -31,8 +37,8 @@ end
 
 -- True when `player`'s character stands inside a zone, where nobody deals damage.
 function SafeZoneService.ContainsPlayer(player: Player): boolean
-	local root = Characters.RootOf(player)
-	return root ~= nil and SafeZoneService.Contains(root.Position)
+	local position = SafeZoneService.PositionOf(player)
+	return position ~= nil and SafeZoneService.Contains(position)
 end
 
 -- True when any part of an axis-aligned box (centre, half-size) touches a zone:

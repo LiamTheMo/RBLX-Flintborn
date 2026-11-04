@@ -181,7 +181,8 @@
     "dialog": 30,
     "toasts": 40,
     "tooltip": 45,
-    "subtitles": 50
+    "subtitles": 50,
+    "drag": 60
   },
   "blur": { "size": 8, "minQuality": 4 },
   "phoneFloor": { "hud": 0.5, "overlay": 0.6 },

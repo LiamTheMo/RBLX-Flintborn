@@ -1,8 +1,14 @@
 # Numbered-model stage procedure
 
-**Agent grouping (user decision, 2026-10-28, revised the same day to speed things up):**
-- **Two new-model modellers at a time** (user decision, 2026-10-28, down from three). Fix modellers and verifiers come on top of that, but never more than **4 Blender agents in all**. Each agent runs on the high-effort model and starts with a fresh context. A modeller does stages 1–6 (modelling, optimisation and cleanup, UV, materials/colour/texture, lighting, VFX) for one model in its own background Blender (see "Parallel sessions").
-- **A separate verifier per model, with a fresh context, does stage 7.** It didn't do any other stage. The user wants clean context, because context bloat hurts the modelling. It works read-only in its own background Blender, on a copy of the kit file taken after the model has been put into it.
+**Agent grouping (user decisions of 2026-10-28, revised 2026-11-04 for speed):**
+- **Two new-model modellers at a time** (user decision, 2026-11-04). Fix modellers and verifiers come on top of that, but never more than **5 Blender agents in all** (the machine has 32 GB and 16 cores). Each agent runs on the high-effort model and starts with a fresh context. A modeller does stages 1–6 (modelling, optimisation and cleanup, UV, materials/colour/texture, lighting, VFX) for one model in its own background Blender (see "Parallel sessions").
+- **No separate study stage** (2026-11-04). The modeller writes a one-page brief (`BRIEF_TEMPLATE.md`) as its first step, answering everything the sheet doesn't decide from `HOUSE_RULES.md`. It doesn't wait for rulings; it notes departures and carries on.
+- **Family builders.** Sheets that are variants of one design (ore deposits, picked/depleted states, building sets, gear tiers, armor sets) get one parametric builder for the family. Each sheet's `mNNN.py` calls it with that sheet's parameters.
+- **A separate verifier, with a fresh context, does stage 7.** It didn't do any other stage. The user wants clean context, because context bloat hurts the modelling. It works read-only in its own background Blender, on a copy of the kit file taken after the model has been put into it.
+- **Verification is sized to the model** (2026-11-04):
+  - **Small models** (prop and asset classes, nothing to walk into): one verifier checks 3–4 of them in one session, in one round. On a fail, a fix modeller fixes it, and the main session confirms the fix with `kit_verify` and the compare image instead of a second verifier, unless the blocker was visual.
+  - **Large models** (structures, buildings, landmarks, anything enterable): one model per verifier, up to two rounds, as before.
+  - The pass bar is the same for both.
 - **The main session is the hub.** It:
   - starts every agent;
   - owns the open GUI Blender (`FlintbornWorldKit.blend`);
@@ -12,8 +18,32 @@
 - **Every agent starts with a fresh context** (a new agent, never a fork or a continuation of a finished one). It loads exactly what its job needs: the `roblox-blender-model` skill (Skill tool), this file, the model's spec, and the reference. Modellers also read the builder. Fixes after a failed verification go to a fresh modeller.
 - Each modeller still runs every check listed for its stages below and records each stage in the spec under its own heading.
 - Verification findings go back to a modeller (a fresh one if the first has finished). A model gets at most 2 verification rounds; after that the main session commits it with the leftovers noted, unless something is actually broken or the model's defining feature still reads clearly unlike the sheet. In those cases a targeted third round fixes only the named blockers (018's leaf rosette was the first).
-- A non-Blender study agent writes the next models' 2a studies ahead of time.
-- Passed models are batched into one PR into the version branch every 3–5 models; each model still gets its own commit.
+- Each passed model gets its own commit, straight on the active version branch (no feature branch or PR; owner's decision, 2026-11-04). Commits stay local: the owner pushes.
+
+## Shared library (2026-11-04)
+
+Build every new model on the shared library, in the light work file. A builder is then a few hundred lines of
+model-specific shapes and data (`demo_m067.py`, 396 lines, rebuilds 067 exactly: m067.py is 1,582).
+- **`kit_parts.py` (P): the pieces.** Closed, outward-wound, flat-shaded shells with defaults from the best passed
+  model: `plank` (chamfered, V-seam option), `plank_wall` (board rows and butt joints that close), `post` (pyramid tip,
+  foot bands), `log`, `leg`, `bolt`, `stairs`, `rope` / `rope_turn` / `rope_band` / `x_lashing` / `strap`, `canvas`
+  (sag, hem, thickness, holes), `banner` / `emblem` / `banner_set`, `crate`, `barrel`, `lantern` (glass key) /
+  `bracket`, `block` (chamfers, chips), `rock`, `stone`, `moss`, `leaf` (m070's tent leaf that passes the 5° sweep),
+  `ivy`; and the core `shell` / `prism` / `box` / `ext` / `beam` / `hull`, `frame()` placement, `earclip`. Every named
+  piece goes into the register kit_verify reads. The file's docstring lists the API.
+- **`kit_build.py` (B): the scaffold.** `MODEL = B.Model(NNN, title, palette=PALETTE, targets=TARGETS)`, then
+  `MODEL.run(hero=(name, fn), parts=..., notes=..., collision=..., budgets=..., target_size=..., points=..., fx=...,
+  views=...)` builds the parts and hero, cleans them (normals, bowties, ear-clipped n-gons, UVs, origin), stores points
+  and sockets, puts them on display, calls `kit_verify.run` and renders. Default renders: the sheet views you list, an
+  exploded view and a scale view, all on `MNNN_views.png`; close-ups, part shots and the spin only when asked. Add
+  model-specific checks with `checks=[fn]`; pass kit_verify's optional checks with `verify={...}`.
+- **The light work file.** `art/blender/assets/kit/wip/LIGHT.blend` (3.3 MB against the kit's 36 MB): the studio,
+  the Kit collection and every palette material, no models. Copy it to `wip/MNNN.blend` and start bgmcp on that copy.
+  Make or refresh it with `make_workfile.py` (its docstring says how; `--keep M067` keeps a model to build next to).
+  In a background session it opens about 3x faster, renders about 3x faster and saves about 5x faster than a kit copy,
+  and a build there gives the same tris, sizes, offsets and materials as in the kit file.
+- **New reusable pieces go into `kit_parts.py` only through the main session.** A modeller who needs one writes it in
+  its own `mNNN.py` and reports it; the main session moves it into the library. The same holds for `kit_build.py`.
 
 ## Parallel sessions
 
@@ -39,6 +69,9 @@ $PY art/blender/kit/mcp/bgmcp.py stop <port>                # when your stages a
 - **Crashes.** A crash takes down only that session, and the log is `art/blender/logs/bgmcp-<port>.log`. Restart with `start` on the saved work file.
 - **Shared helpers are frozen while sessions run in parallel.** Don't edit `kit_models.py`, `kit_mcp.py`, `build_kit.py` or `lib/vfx.py`. Put new helpers in your own `mNNN.py`. If a shared change is truly needed, report it and the main session makes it.
 - **Into the kit file.** When a model passes, the main session runs `mNNN.build()` in the GUI kit file (the builder is the source of truth), saves it, checks that the renders match, then exports and commits.
+  A rebuild that drops parts leaves the old objects in the kit file, where the export picks them up again (051's Brace
+  and PegBlock). Modellers list any dropped part names in their report. Before shipping, the main session deletes
+  those objects from the kit file and their meshes from `art/roblox/kit/MNNN/meshes/`.
 
 How every numbered model (`art/blender/assets/references/NNN.png`, builders `mNNN.py`) is built. It follows the
 `roblox-blender-model` skill (`art/blender/skills/roblox-blender-model/SKILL.md`) and `docs/art/WorldModeling.md` (read §1, §2,
@@ -78,6 +111,49 @@ session (the GUI or a background one) is driven by only one agent at a time.
 - **Scope.** Don't touch other models' collections or objects, and don't save over another sheet's names (`M.mk` guards this).
 - **Record.** Write what the stage did and why into `art/blender/renders/models/MNNN/MNNN_spec.md`, under a heading for the stage.
 - **Report.** Your final message lists what changed, the measured numbers and anything left for later stages.
+
+## Verify suite (2026-11-04)
+
+The technical checks every modeller reports and every verifier re-measures are shared code now. Don't rewrite bmesh,
+BVH or raster checks in a builder or a scratch file.
+- **`kit_verify.run(objs, cls=..., **opts)`** runs every technical check in one call and returns the numbers plus a
+  `problems` list (empty means clean) and the run time per check. It takes about 10 s for an 8000-tri building and
+  its 12 parts, including the inside escape scan. It is read-only. `kit_verify.summary(r)` gives one line per object.
+  - **Always:**
+    - tris against the class budget (`cls`: `part` / `prop` < 1000, `asset` < 4000, `structure` ≤ 6000, `building`
+      ≤ 8000; the hero and variants get `cls`, parts get `part`; `classes=` / `budgets=` override);
+    - sizes (`size=`), origin at the bottom centre, transforms applied, no modifiers or custom normals;
+    - non-manifold edges, bowties, boundary / wire / loose, zero-area faces, n-gons, duplicate verts;
+    - per shell: winding errors, ray-parity inward faces, self-intersections, signed volume;
+    - the thinnest face corner (floor 0.3°);
+    - floating and unchained shells (contact ≤ 0.03, chained to the ground or another shell);
+    - buried shells (> 0.05 inside another; `bury_pairs` for ruled exceptions such as rope in rope 0.08). Edge
+      midpoints are sampled too, so it finds sinks that the builders' vertex and face-centre sampling misses: 070's
+      ivy pads sit 0.07–0.08 inside their stems. `bury_edges=False` gives the builders' numbers;
+    - pierces through thin sheets (`thin=`: canvas, banner, emblem, cloth, ...);
+    - UV overlaps, flips, island gap and border;
+    - Tint against the face normal per material (shading painted inside pieces);
+    - sockets (`sockets=`) and stored points (`stored=`), and `K.check`.
+  - Shells are named from the builder's piece register (`o["mNNN_pieces"]`) when there is one, else by material.
+    Options and reports use the build frame when the object stores `mNNN_offset`.
+  - **Optional checks, switched on by options:**
+    - `foliage=`: the 5° azimuth sweep with the whole-leaf rule above;
+    - `escape=`: the inside light-escape scan of an interior box, with `allow` boxes for doorways;
+    - `walk=`: a 5.5-stud character proxy along paths, with clearance, intersections, rises, headroom and turning
+      room;
+    - `seams=`: tiling, a copy at the pitch, with no crossing, identical end sections and nothing past the seams.
+  - The module docstring lists every option. Modellers pass the same options in `build()` and record the result in
+    the spec.
+- **`compare.compare(num, cells)`** crops each named cell from `references/NNN.png` (pixel boxes from the spec's §1),
+  renders the model at the matching camera, and writes one side-by-side PNG per cell and one `MNNN_compare.png`, each
+  pair labelled with its camera and the content W : H of both. A cell can be mirrored or turned. Output goes to
+  `<temp>/RBLX-Flintborn/compare/MNNN/` unless `out_dir` is given.
+- **Verifiers call both first**, quote their numbers, and then spend their time on the visual comparison: the
+  compare sheet view by view, colours sampled from both images, close-ups. A verifier re-derives a number with its
+  own code only when a result looks wrong; it reports that as a suite bug.
+- **Shipping.** The main session ships a passed model with `art/blender/kit/ship.sh MNNN "message"`. It builds in the
+  GUI, saves, exports, requires 0 export problems, checks the spec and builder for temp paths and assistant names,
+  stages exactly the model's files and commits. It never pushes. `--dry-run` prints the steps.
 
 ## Stages
 

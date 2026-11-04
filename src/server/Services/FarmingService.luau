@@ -25,6 +25,9 @@ local ProgressionService = require(script.Parent.ProgressionService)
 
 local FarmingService = {}
 
+-- How far a planter can be planted or harvested from, in sight (its prompts show at 8).
+FarmingService.REACH = 10
+
 -- One plant prompt per crop in CROP_ORDER, each on its own key. Every other
 -- gamepad button already has a job (hotbar step, placement, drop, panels), so the
 -- crops after the last key share its prompt: a tap shows the next of them and a
@@ -101,7 +104,10 @@ end
 
 local function plant(player: Player, planter, cropId: string)
 	local crop = StructureCatalog.Crops[cropId]
-	if crop == nil or planter.cropId or not InteractionService.CanAct(player) then
+	if crop == nil or planter.cropId then
+		return
+	end
+	if not InteractionService.CanReach(player, planter.record.part, FarmingService.REACH) then
 		return
 	end
 	local paid, carried = InventoryService.RemoveAll(player, crop.seed)
@@ -127,7 +133,7 @@ local function harvest(player: Player, planter)
 	local crop = planter.cropId and StructureCatalog.Crops[planter.cropId]
 	if
 		crop == nil
-		or not InteractionService.CanAct(player)
+		or not InteractionService.CanReach(player, planter.record.part, FarmingService.REACH)
 		or BuildRules.CropRemaining(crop, planter.plantedAt, now()) > 0
 	then
 		return

@@ -512,7 +512,7 @@ place their regions on **one grid**, defined once in
 | `grid.gap` (**G**) | 12 (6 on a phone) | between stacked or neighbouring HUD pieces |
 | `grid.column` | 315 | the width of the right-hand column's pieces in both HUDs |
 | `grid.topBand` / `bottomBand` | 0.30 / 0.25 | the corner bands of the edge rule (§5.7) |
-| `gear` | 52 × 46, ring gap 12, pad 44 | the ⚙ both HUDs draw |
+| `gear` | 52 × 52 (square: the tile frame with the ink gears glyph), ring gap 12, pad 44 | the ⚙ both HUDs draw |
 
 A region names its column (`"column": "right"`, `"left"` or `"bottom"`)
 instead of carrying offsets; `Hud/Layout.ForScreen` resolves it, and
@@ -902,6 +902,7 @@ for new glyphs.
 | `atlas_lk_icons` | Menu, section and status icons; ink and white glyphs | uploaded |
 | `atlas_lk_items` | Kit icons cut from the kit sheets' item drawings (heart, star, warning, tusk, build, campfire, hatchet, …). Items no longer draw them; menus, stat rows, events, notices and the Journal use them as icons, so the uploaded atlas stays as it is | uploaded |
 | `atlas_lk_play` | The sheet-21 Play art (D26), 1024 × 256 | new: uploaded by the owner |
+| `atlas_lk_build` | `lk_icon_build2`, the build icon lifted whole (the Build tile, Field Crafting's header; `lk_icon_build`'s planks are cut off), 1024 × 128 (KitModel `icon.build`, `lk_icon_build` as its fallback) | uploaded |
 | `atlas_island` | The island painting | uploaded |
 | `atlas_lk_lobby_hi` | High-resolution copies: frames, bars, slots, paper buttons, pills, tile frame, round frame, toast, panel | new: uploaded by the owner |
 | `atlas_lk_window_hi` | High-resolution copies: dialog, leather buttons, tabs, plaques, inset panel, steppers, clasps, play glyph | new: uploaded by the owner |

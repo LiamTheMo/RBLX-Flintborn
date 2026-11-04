@@ -64,5 +64,5 @@ rojo build default.project.json --output build/validation.rbxlx
 
 ## Branches and releasing
 
-- `main` is the released state. Version branches (`v0.01`, `v0.02`, …) are permanent phase checkpoints. All work happens on short-lived branches merged into the active version branch, then into `main`.
+- `main` is the released state. Version branches (`v0.01`, `v0.02`, …) are permanent phase checkpoints. All work is committed straight to the active (most recent) version branch in small, frequent commits, with no feature branches (owner's decision, 2026-11-04). The version branch is merged into `main` to release.
 - Nothing publishes from GitHub. A release is `main` synced with Rojo into each place in Studio (the lobby and the play world) and published from Studio. Steps, the place IDs and how art is imported are in [DEPLOYMENT.md](docs/ops/DEPLOYMENT.md).

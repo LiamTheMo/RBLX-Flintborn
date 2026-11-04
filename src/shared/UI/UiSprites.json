@@ -24,6 +24,11 @@
     "slice": null,
     "w": 1024
   },
+  "atlas_lk_build": {
+    "h": 128,
+    "slice": null,
+    "w": 1024
+  },
   "atlas_lk_icons": {
     "h": 1024,
     "slice": null,
@@ -2358,6 +2363,18 @@
     ],
     "slice": null,
     "w": 108
+  },
+  "lk_icon_build2": {
+    "atlas": "atlas_lk_build",
+    "h": 97,
+    "rect": [
+      0,
+      0,
+      110,
+      97
+    ],
+    "slice": null,
+    "w": 110
   },
   "lk_icon_campfire": {
     "atlas": "atlas_lk_items",

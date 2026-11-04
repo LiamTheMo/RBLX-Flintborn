@@ -230,6 +230,15 @@ local function requestPlay(player: Player, requestId: any)
 	humanoid.Died:Connect(function()
 		onDied(player)
 	end)
+	-- A client can delete its own Humanoid or root, and that replicates: with no
+	-- Humanoid nothing can hurt it and Died never fires. Losing either during the
+	-- run counts as dying.
+	local root = character:FindFirstChild("HumanoidRootPart")
+	character.ChildRemoved:Connect(function(child)
+		if (child == humanoid or child == root) and player.Parent and character.Parent then
+			onDied(player)
+		end
+	end)
 	WorldAdmissionService.RunStarted:Fire(player, character, items, runId)
 	return true, nil
 end

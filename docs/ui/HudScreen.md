@@ -69,10 +69,10 @@ builds every region), `Hud/Vitals`, `BottomBar`, `PartyFrames`, `Compass`,
 | Level and XP | bottom centre, M up (D30; D27–D29: 49), 572 × 124 (the lobby's group, HudLayout `bottom`); the XP bar (356) centred over the hotbar at x 108, the level text ending 7 px left of it, the XP text from 11 px right of it, the XP pop-ups over it | "LV. n" `Text`, `Bar` xp on the track (356 × 16), "450/750 XP" `Text`; at the cap a full bar, the real level and "Max level" | progression snapshots (`ProgressionController.Changed`) |
 | Hotbar | under the XP bar, 6 × `Slot` hotbar 89 × 89 (square) at the lobby's x, y 35 in the bottom group | `Slot` with `ItemIcon` art via itemId, count, Permanent star, leather number badge (keyboard and mouse only), gold glow when selected | run inventory `area == "hotbar"`; badges read `Binds.Label("HotbarN")` and follow `Kit.Input.Watch`; the selection follows the equipped slot |
 | Interaction prompt | BillboardGui over the prompt's part, 230–420 × 64 (touch: × 70, object line 15), at the HUD scale | `Panel` plaque, `KeyCap` (live key: Interact bind, gamepad button or TAP), action `Text` (`rowTitle`), object `Text` (`small`), `Bar` xp hold bar; the plaque widens for the longer line (with `Kit.Core.FIT_SLACK`), so on touch only a text past 420 ends in "…" | ProximityPrompt texts; redrawn on rebinds and text changes |
-| Overhead health bars | a BillboardGui over each other player's head while they are below full health, 96 × 14 bar (+ an 18 px "Downed" line), at the HUD scale clamped to 0.75–1.35; see [Overhead health bars](#overhead-health-bars) | `Bar` health fill on the track; downed: `food` (orange) fill under a `Text` "Downed" (`hudSmall` 15, cream, ink outline) | Humanoid `Health`/`MaxHealth`; `Downed`, `DownedHealth` player attributes; Show Health Bars setting |
+| Overhead health bars | a BillboardGui over each other player's head while they are below full health, 72 × 12 bar (+ an 18 px "Downed" line), at the HUD scale clamped to 0.75–1.15; see [Overhead health bars](#overhead-health-bars) | `Bar` health fill on the track; downed: `food` (orange) fill under a `Text` "Downed" (`hudSmall` 15, cream, ink outline) | Humanoid `Health`/`MaxHealth`; `Downed`, `DownedHealth` player attributes; Show Health Bars setting |
 | Damage numbers | world billboards | display font (`fonts.display`), `gold` with an `ink` outline | `CombatFeedback` hits, when Show Damage is on |
 | Touch attack | touch only, bottom right (right 300, bottom 60; phones right 220, bottom 30: right of the hotbar, left of the Roblox jump button), 130 × 124 | `IconButton` round with the spear icon (axe or pickaxe while one is held; drumstick, heart or lightning while food, medicine or a draught is, GDD §59); the Kit pads its hit area | press = swing or start the bow draw, release fires; holding a consumable, press = eat or drink it (one item per press) |
-| Settings | the bottom-left corner (D30): M from the left and M from the bottom (desktop x 24–76, y 871–917), 52 × 46 (HudLayout `gear`, the lobby's too); on touch screens the same unless Roblox's thumbstick ring reaches the corner (a phone without a side inset), then above the ring (`HudModel.GearCorner`; see Phones) | `IconButton` settings (`SettingsController`'s own HUD-scaled gui `FlintbornSettingsButton`, `SettingsController.GearSize` / `GearPosition`); gamepad: left of the first hotbar slot, under the bottom-left tile (Map; `SettingsController.LinkGear`) | opens Settings (also the Settings key, O by default) |
+| Settings | the bottom-left corner (D30): M from the left and M from the bottom (desktop x 24–76, y 865–917), 52 × 52, square (HudLayout `gear`, the lobby's too; the menu tiles' 9-sliced frame with the ink gears glyph, 2026-11-04); on touch screens the same unless Roblox's thumbstick ring reaches the corner (a phone without a side inset), then above the ring (`HudModel.GearCorner`; see Phones) | `IconButton` settings (`SettingsController`'s own HUD-scaled gui `FlintbornSettingsButton`, `SettingsController.GearSize` / `GearPosition`); gamepad: left of the first hotbar slot, under the bottom-left tile (Map; `SettingsController.LinkGear`) | opens Settings (also the Settings key, O by default) |
 | Hit marker, bow draw | screen centre (−70 / +48) | `Panel` plaque with `Text` ("Hit 12" in ink, "Hurt -8" in `short`); `Bar` well with "Range 60%" | `CombatFeedback`; draw time |
 
 ## Phones (touch, viewport under 500 px high)
@@ -152,14 +152,16 @@ the rules are pure in `src/shared/UI/OverheadHealthModel.luau`
   Everyone's bar is red: a green tint for tribe-mates was left out because green
   is the stamina fill, and the tribe frames already list tribe-mates' health.
 - **Names:** the name tag stays Roblox's (Show Names). Roblox's own overhead
-  health bar (shown when damaged) is turned off on every character on this
-  client (`HealthDisplayType` AlwaysOff), so there is one bar. The bar's foot sits
+  health bar (shown when damaged) never shows: `CoreGuiController` sets the local
+  player's `HealthDisplayDistance` to 0 at start in both places, and each watched
+  character's `HealthDisplayType` is AlwaysOff as well, so there is one bar. The bar's foot sits
   `STUDS_ABOVE_HEAD` (1.5) studs over the head's top plus a 14 px lift, above the
   name tag.
 - **Size and range:** drawn in screen px (`Content` at the billboard's UIScale),
   so it reads at range and is never huge up close; the scale is the HUD's,
-  clamped to `MIN_SCALE` 0.75 (phones, whose HUD scale is about 0.4: a 72 × 10.5
-  px bar, the "Downed" line at 11 px) and `MAX_SCALE` 1.35. `AlwaysOnTop` is off
+  clamped to `MIN_SCALE` 0.75 (phones, whose HUD scale is about 0.4: a 54 × 9
+  px bar, the "Downed" line at 11 px) and `MAX_SCALE` 1.15 (at most an 83 × 14 px
+  bar). `AlwaysOnTop` is off
   so walls and terrain hide it; `MaxDistance` 100 studs; `LightInfluence` 0 so
   night does not darken it.
 - **Cost:** per player only signal connections (`HealthChanged`, `MaxHealth`,

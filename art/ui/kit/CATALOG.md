@@ -200,6 +200,7 @@ Alpha after clean-up: 2,033,526 visible px, 129,510 semi-transparent (6.4 %), 14
 | `lk_icon_bone` | 02_hollow_frames_hud_buttons.png (1522, 824, 1646, 914) | 87x79 | | | atlas_lk_items | | Item icon (inventory grid) | Lifted off its item tile. |
 | `lk_icon_bridge` | 17_icons_world.png (559, 879, 852, 1059) | 100x63 | | | | | World / map icon | |
 | `lk_icon_build` | 19_progress_bars_badges.png (1019, 767, 1218, 949) | 108x97 | | | atlas_lk_items | | Status icon | Lifted off its framed tile. |
+| `lk_icon_build2` | 19_progress_bars_badges.png (1019, 767, 1218, 949) | 110x97 | | | atlas_lk_build | | Status icon | Lifted off its framed tile. |
 | `lk_icon_campfire` | 17_icons_world.png (852, 70, 1071, 303) | 95x100 | | | atlas_lk_items | | World / map icon | |
 | `lk_icon_cave` | 17_icons_world.png (557, 101, 825, 296) | 100x74 | | | | | World / map icon | |
 | `lk_icon_check` | 16_icons_status_items.png (597, 365, 837, 557) | 116x93 | | | atlas_lk_icons | | Status / stat / item icon | |

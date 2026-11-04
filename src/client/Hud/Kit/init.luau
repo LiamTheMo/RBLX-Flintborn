@@ -32,6 +32,7 @@ Kit.IconButton = require(script.IconButton)
 Kit.Tab = require(script.Tab)
 Kit.TabGroup = Kit.Tab.Group
 Kit.Slot = require(script.Slot)
+Kit.Drag = require(script.Drag)
 Kit.Bar = require(script.Bar)
 Kit.Ring = require(script.Ring)
 Kit.Checkbox = require(script.Checkbox)

@@ -70,7 +70,8 @@ local function startRun(player: Player, character: Model)
 	if humanoid == nil then
 		return
 	end
-	-- Flintborn has no passive regeneration: remove Roblox's default Health script.
+	-- Remove Roblox's default Health script: natural regeneration is the server's
+	-- own (SurvivalRules.StepRegen), so it stops while downed.
 	local regen = character:FindFirstChild("Health")
 	if regen and regen:IsA("Script") then
 		regen:Destroy()
@@ -160,6 +161,7 @@ local function step(dt: number)
 			SurvivalRules.StepStamina(rules, dt, moving, entry.observedSprint)
 			SurvivalRules.StepFood(rules, dt)
 			local healed = SurvivalRules.StepFoodHeals(rules, time, dt)
+			healed += SurvivalRules.StepRegen(rules, dt, humanoid.Health + healed, humanoid.MaxHealth)
 			if healed > 0 then
 				SurvivalService.SetHealth(player, humanoid.Health + healed)
 			end

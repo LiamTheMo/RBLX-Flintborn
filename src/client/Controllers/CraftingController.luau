@@ -197,7 +197,7 @@ local function build()
 		name = "FlintbornCrafting",
 		title = "Field Crafting",
 		subtitle = "Make tools and supplies from what you carry.",
-		icon = "build",
+		icon = "icon.build",
 		categories = categories,
 		parent = player:WaitForChild("PlayerGui"),
 		onForge = function(entry, count)

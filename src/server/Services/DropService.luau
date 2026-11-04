@@ -35,6 +35,8 @@ local DropService = {}
 DropService.Released = Signal.new()
 
 DropService.ORDINARY_SECONDS = GameConstants.CORPSE_SECONDS
+-- How far an ordinary drop may be picked up from (its prompt shows at 8).
+DropService.PICKUP_REACH = 10
 
 local drops = {}
 
@@ -171,7 +173,13 @@ function pickUp(player: Player, id: string, walked: boolean)
 	if drop == nil or not InteractionService.CanAct(player) then
 		return
 	end
-	if drop.rules then
+	if drop.rules == nil then
+		-- In reach and in sight from where the server knows the player is: loot
+		-- behind a wall stays there.
+		if not InteractionService.CanReach(player, drop.part, DropService.PICKUP_REACH) then
+			return
+		end
+	else
 		-- Reach counts from the last server-validated position, not wherever the
 		-- client put its own character.
 		local root = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
@@ -227,8 +235,10 @@ local function dropItem(player: Player, area: any, index: any)
 		return false, "Empty"
 	end
 	DropService.Release(player, item, "WorldDropped")
-	local ground = workspace:Raycast(root.Position + root.CFrame.LookVector * 3, Vector3.new(0, -12, 0))
-	DropService.Spawn(item, ground and ground.Position or (root.Position - Vector3.new(0, 2.5, 0)))
+	-- In front of where the server knows they are, not where the client says.
+	local at = AntiExploitService.TrustedPosition(player) or root.Position
+	local ground = workspace:Raycast(at + root.CFrame.LookVector * 3, Vector3.new(0, -12, 0))
+	DropService.Spawn(item, ground and ground.Position or (at - Vector3.new(0, 2.5, 0)))
 	return true, nil
 end
 

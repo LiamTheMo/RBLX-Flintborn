@@ -10,6 +10,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local CrashRecoveryRules = require(ReplicatedStorage.Shared.Recovery.CrashRecoveryRules)
 local InventoryRules = require(ReplicatedStorage.Shared.Inventory.InventoryRules)
+local LobbyLoadoutRules = require(ReplicatedStorage.Shared.Inventory.LobbyLoadoutRules)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local ProfileSchema = require(ReplicatedStorage.Shared.Data.ProfileSchema)
 local TransitRules = require(ReplicatedStorage.Shared.Admission.TransitRules)
@@ -67,7 +68,7 @@ local function unconsume(player: Player)
 					profile.transit = ProfileSchema.DeepCopy(taken.transit)
 				else
 					for _, item in ProfileSchema.DeepCopy(taken.transit.items) do
-						table.insert(profile.lobbyBackpack.slots, item)
+						LobbyLoadoutRules.Return(profile, item)
 					end
 				end
 			end
@@ -134,7 +135,7 @@ end
 -- What the run inventory will hold of `items`: the same packing InventoryService
 -- applies at run start, whose leftovers it saves back to the lobby backpack.
 local function carriedPart(items)
-	local inventory = InventoryRules.FromItems(ProfileSchema.DeepCopy(items))
+	local inventory = InventoryRules.FromLoadout(ProfileSchema.DeepCopy(items))
 	return InventoryRules.Items(inventory)
 end
 
@@ -208,10 +209,11 @@ function LoadoutService.Confirm(player: Player)
 	unconfirmed[player] = nil
 end
 
--- Items that will enter the run on the next Deploy (lobby preview).
+-- Items that will enter the run on the next Deploy (lobby preview): the backpack,
+-- then the hotbar and worn armour tagged with their places (`loadoutSlot`).
 function LoadoutService.Preview(player: Player)
 	local profile = ProfileService.GetProfile(player)
-	return profile and profile.lobbyBackpack.slots or {}
+	return profile and LobbyLoadoutRules.Items(profile) or {}
 end
 
 local function reservationFromTeleport(player: Player)

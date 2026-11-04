@@ -38,6 +38,10 @@ export type State = {
 	regenDelay: number?,
 	medicineLockUntil: number,
 	foodHeals: { FoodHeal },
+	-- Seconds since the last natural regeneration step (StepRegen).
+	regenElapsed: number?,
+	-- Seconds left before natural regeneration resumes after damage (OnDamaged).
+	healthRegenDelay: number?,
 }
 
 function SurvivalRules.NewState(): State
@@ -219,9 +223,36 @@ function SurvivalRules.StepFoodHeals(state: State, now: number, dt: number): num
 	return healed
 end
 
+-- Natural regeneration (owner decision 2026-11-03): HEALTH_REGEN_PER_STEP of
+-- max HP every HEALTH_REGEN_STEP_SECONDS, never past max. Whole steps, so health
+-- changes once a second rather than every frame. Damage pauses it for
+-- HEALTH_REGEN_DELAY_SECONDS (OnDamaged), and the first step comes a full step
+-- after the pause ends; at full health the clock waits too. Returns the HP to
+-- add this frame (0 between steps).
+function SurvivalRules.StepRegen(state: State, dt: number, health: number, maxHealth: number): number
+	local delay = state.healthRegenDelay or 0
+	if delay > 0 then
+		state.healthRegenDelay = math.max(0, delay - dt)
+		dt = math.max(0, dt - delay)
+	end
+	local missing = maxHealth - health
+	if missing <= 0 then
+		state.regenElapsed = 0
+		return 0
+	end
+	local step = GameConstants.HEALTH_REGEN_STEP_SECONDS
+	local elapsed = (state.regenElapsed or 0) + dt
+	local steps = math.floor(elapsed / step)
+	state.regenElapsed = elapsed - steps * step
+	return math.min(missing, steps * GameConstants.HEALTH_REGEN_PER_STEP * maxHealth)
+end
+
 -- A damaging hit halves every pending food heal and cancels any left at ≤10 HP (Q65).
--- Already-applied healing is never taken back.
+-- Already-applied healing is never taken back. It also pauses natural
+-- regeneration (StepRegen) and restarts its step clock.
 function SurvivalRules.OnDamaged(state: State)
+	state.healthRegenDelay = GameConstants.HEALTH_REGEN_DELAY_SECONDS
+	state.regenElapsed = 0
 	for index = #state.foodHeals, 1, -1 do
 		local heal = state.foodHeals[index]
 		heal.remaining = GameConstants.FoodHealAfterHit(heal.remaining)

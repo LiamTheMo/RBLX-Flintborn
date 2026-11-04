@@ -134,6 +134,11 @@ GROUPS = {
     "atlas_lk_play": [
         "lk_icon_play_rune", "lk_icon_play_rune_small", "lk_pillar_rune_left", "lk_pillar_rune_right",
     ],
+    # The build icon lifted whole (slice_lobby_kit.py build2; lk_icon_build in
+    # atlas_lk_items has its planks cut off). Its own atlas, so atlas_lk_items
+    # keeps its bytes; until it is uploaded the Kit draws lk_icon_build
+    # (KitModel.ROLES "icon.build" `fallback`).
+    "atlas_lk_build": ["lk_icon_build2"],
     # High-resolution copies (slice_lobby_kit.py HIRES, `<name>__hi`): the same
     # parts at up to 2x, drawn where the 1x art would be magnified. New atlases,
     # so every uploaded atlas keeps its bytes and rects; until one is uploaded

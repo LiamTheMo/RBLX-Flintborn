@@ -24,9 +24,11 @@ OverheadHealthModel.SHOW_OWN = false
 OverheadHealthModel.LINGER_SECONDS = 1.2
 -- Studs from the camera beyond which a bar is not drawn (BillboardGui.MaxDistance).
 OverheadHealthModel.MAX_DISTANCE = 100
--- The bar in design px (Kit.Bar, health fill on the track) and the "Downed" line
--- over it; LIFT is clear space under the bar (px, so it holds at any range).
-OverheadHealthModel.BAR = { 96, 14 }
+-- The bar in design px (Kit.Bar, health fill on the track; just the bar, kept
+-- small so it takes little of the screen: owner, 2026-11-03) and the "Downed"
+-- line over it; LIFT is clear space under the bar (px, so it holds at any range).
+-- 12 px tall is the thinnest that stays 9 px on a phone (MIN_SCALE).
+OverheadHealthModel.BAR = { 72, 12 }
 OverheadHealthModel.LABEL_H = 18
 OverheadHealthModel.LABEL_SIZE = 15
 OverheadHealthModel.LABEL_GAP = 1
@@ -37,7 +39,7 @@ OverheadHealthModel.STUDS_ABOVE_HEAD = 1.5
 -- Design px to screen px: the HUD's scale, kept between these so the bar stays
 -- readable on phones (HUD scale about 0.4) and never grows huge on big screens.
 OverheadHealthModel.MIN_SCALE = 0.75
-OverheadHealthModel.MAX_SCALE = 1.35
+OverheadHealthModel.MAX_SCALE = 1.15
 -- Kit.Bar fills for each look.
 OverheadHealthModel.FILLS = { hurt = "health", downed = "food" }
 

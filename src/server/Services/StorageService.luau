@@ -11,45 +11,20 @@ local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local StructureCatalog = require(ReplicatedStorage.Shared.Building.StructureCatalog)
 local BuildingService = require(script.Parent.BuildingService)
-local DownedService = require(script.Parent.DownedService)
 local DropService = require(script.Parent.DropService)
+local InteractionService = require(script.Parent.InteractionService)
 local InventoryService = require(script.Parent.InventoryService)
-local WorldAdmissionService = require(script.Parent.WorldAdmissionService)
 
 local StorageService = {}
 
 StorageService.REACH = 10
--- How far the Head may be from the HumanoidRootPart on a real character.
-StorageService.HEAD_OFFSET = 3.5
 
 local chests = {}
 
--- In reach and in sight: reach is measured from the HumanoidRootPart, the head
--- must sit on the body (a client can move its own Head through a wall), and the
--- first thing between the head and the chest must be the chest itself.
+-- In reach and in sight, from where the server knows the player is
+-- (InteractionService.CanReach): walls block a chest until they are breached.
 local function canReach(player: Player, chest): boolean
-	local character = player.Character
-	local head = character and character:FindFirstChild("Head")
-	local root = character and character:FindFirstChild("HumanoidRootPart")
-	local humanoid = character and character:FindFirstChildOfClass("Humanoid")
-	if head == nil or root == nil or humanoid == nil or humanoid.Health <= 0 or DownedService.IsDowned(player) then
-		return false
-	end
-	if not WorldAdmissionService.IsAtRisk(player) then
-		return false
-	end
-	if (head.Position - root.Position).Magnitude > StorageService.HEAD_OFFSET then
-		return false
-	end
-	local part = chest.record.part
-	if (part.Position - root.Position).Magnitude > StorageService.REACH then
-		return false
-	end
-	local params = RaycastParams.new()
-	params.FilterType = Enum.RaycastFilterType.Exclude
-	params.FilterDescendantsInstances = { character }
-	local hit = workspace:Raycast(head.Position, part.Position - head.Position, params)
-	return hit == nil or hit.Instance == part
+	return InteractionService.CanReach(player, chest.record.part, StorageService.REACH)
 end
 
 local function send(player: Player, id: string, chest)

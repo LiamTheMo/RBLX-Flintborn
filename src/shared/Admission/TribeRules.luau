@@ -98,6 +98,13 @@ local function remove(state, tribe, userId: number)
 			end
 		end
 		state.tribes[tribe.id] = nil
+		-- Its alliance requests, sent and received, go with it.
+		for key in state.allianceRequests do
+			local from, to = string.match(key, "^(.*)>(.*)$")
+			if from == tribe.id or to == tribe.id then
+				state.allianceRequests[key] = nil
+			end
+		end
 	elseif tribe.leader == userId then
 		tribe.leader = tribe.members[1]
 	end

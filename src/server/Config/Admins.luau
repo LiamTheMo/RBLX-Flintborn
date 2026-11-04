@@ -4,6 +4,8 @@
 -- here.
 
 return {
-	UserIds = {},
+	UserIds = {
+		855002824,
+	},
 	MIN_GROUP_RANK = 254,
 }

@@ -99,11 +99,47 @@ local function identity(cells)
 	return cells
 end
 
+-- The lobby hotbar and worn-armour sections of a VaultSnapshot view ("hotbar:i",
+-- "armor:i" cells, as in a run; the snapshot's slots are `false` when empty).
+-- `hotkey(i)` names hotbar slot i's key.
+function InventoryModel.LobbyEquipped(view, hotkey: ((index: number) -> string?)?): { Section }
+	local hotbar = {}
+	for index = 1, GameConstants.HOTBAR_SLOTS do
+		local entry = view.hotbar and view.hotbar[index]
+		table.insert(hotbar, {
+			id = InventoryModel.RunCellId("hotbar", index),
+			name = if entry then nameOf(entry) else nil,
+			item = if entry then itemOf(entry) else nil,
+			hotkey = if hotkey then hotkey(index) else nil,
+		})
+	end
+	local armor = {}
+	for index, name in InventoryModel.ARMOR_SLOTS do
+		local entry = view.armor and view.armor[index]
+		table.insert(armor, {
+			id = InventoryModel.RunCellId("armor", index),
+			name = if entry then nameOf(entry) else nil,
+			item = if entry then itemOf(entry) else nil,
+			caption = name,
+		})
+	end
+	return {
+		{ id = "hotbar", title = "Hotbar", cells = hotbar },
+		{ id = "armor", title = "Armour", cells = armor },
+	}
+end
+
 -- The sections of the lobby window's tab `tab` ("Backpack" or "Vault") for a
 -- VaultSnapshot view. `sort(cells)` orders each list (the Sort button). The
--- Backpack tab shows the lobby backpack and then the whole vault: everything
--- the player owns.
-function InventoryModel.LobbySections(view, tab: string, sort: ((cells: { Cell }) -> { Cell })?): { Section }
+-- Backpack tab shows the lobby backpack, the lobby hotbar and worn armour (which
+-- go into the run as they are and take no backpack slots), and then the whole
+-- vault: everything the player owns.
+function InventoryModel.LobbySections(
+	view,
+	tab: string,
+	sort: ((cells: { Cell }) -> { Cell })?,
+	hotkey: ((index: number) -> string?)?
+): { Section }
 	local order = sort or identity
 	local backpack = order(InventoryModel.LobbyCells(view.backpack, "b"))
 	local items = order(InventoryModel.LobbyCells(view.items, "i"))
@@ -119,12 +155,15 @@ function InventoryModel.LobbySections(view, tab: string, sort: ((cells: { Cell }
 			{ id = "materials", title = "Materials", cells = materials, emptyText = "No materials stored yet." },
 		}
 	end
+	local equipped = InventoryModel.LobbyEquipped(view, hotkey)
 	return {
 		{
 			id = "backpack",
 			title = ("Backpack %d/%d"):format(#view.backpack, view.backpackCapacity),
 			cells = InventoryModel.Padded(backpack, view.backpackCapacity, "be"),
 		},
+		equipped[1],
+		equipped[2],
 		{
 			id = "vaultItems",
 			title = "Vault Items " .. itemCount,

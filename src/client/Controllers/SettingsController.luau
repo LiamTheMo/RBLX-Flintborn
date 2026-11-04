@@ -282,7 +282,9 @@ local function build()
 	local margin = SettingsController.MARGIN
 	local gear = Kit.IconButton.new(root, {
 		name = "Open",
-		variant = "settings",
+		-- The menu tiles' frame (9-sliced, so square at any size) with the gear.
+		variant = "tile",
+		icon = "ink:gears",
 		size = { size[1], size[2] },
 		position = UDim2.new(0, margin, 1, -margin),
 		anchorPoint = Vector2.new(0, 1),
@@ -326,7 +328,7 @@ SettingsController.MARGIN = 24
 -- The ⚙'s size in design px (HudLayout "gear").
 function SettingsController.GearSize(): { number }
 	local gear = Layout.Gear()
-	return if gear then gear.size else { 52, 46 }
+	return if gear then gear.size else { 52, 52 }
 end
 
 -- The world ⚙'s position on its HUD root (anchored at its bottom-left corner)

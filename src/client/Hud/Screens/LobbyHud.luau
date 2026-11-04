@@ -350,7 +350,9 @@ function LobbyHud.new(parent: Instance, actions)
 	self.settings = Kit.IconButton.new(self.settingsRegion, {
 		name = "Settings",
 		rect = { 0, 0, g[1], g[2] },
-		variant = "settings",
+		-- The menu tiles' frame (9-sliced, so square at any size) with the gear.
+		variant = "tile",
+		icon = "ink:gears",
 		onPress = function()
 			fire("onSettings")
 		end,

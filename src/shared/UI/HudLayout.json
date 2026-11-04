@@ -1,7 +1,7 @@
 {
   "reference": { "width": 1672, "height": 941 },
   "grid": { "margin": 24, "gap": 12, "column": 315, "topBand": 0.3, "bottomBand": 0.25 },
-  "gear": { "size": [52, 46], "ringGap": 12, "pad": 44 },
+  "gear": { "size": [52, 52], "ringGap": 12, "pad": 44 },
   "party": {
     "column": "left",
     "width": 294,

@@ -20,7 +20,6 @@ local TweenService = game:GetService("TweenService")
 local BuildRules = require(ReplicatedStorage.Shared.Building.BuildRules)
 local Characters = require(ReplicatedStorage.Shared.World.Characters)
 local InventoryRules = require(ReplicatedStorage.Shared.Inventory.InventoryRules)
-local MovementRules = require(ReplicatedStorage.Shared.Security.MovementRules)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local SiegeRules = require(ReplicatedStorage.Shared.Combat.SiegeRules)
@@ -191,14 +190,15 @@ local function throw(player: Player, aim: Vector3): (boolean, string?)
 	if held == nil or held.catalogId ~= SiegeRules.FIRE_BOMB then
 		return false, "NotHeld"
 	end
-	if SafeZoneService.Contains(root.Position) then
+	if SafeZoneService.ContainsPlayer(player) then
 		return false, "SafeZone"
 	end
-	-- Launched from the client-owned head, so it must be near the validated spot.
-	local validated = AntiExploitService.ValidatedPosition(player)
-	if not MovementRules.NearValidated(head.Position, validated, SiegeRules.VALIDATED_SLACK) then
+	-- Launched from the client-owned head, so it must be one the player could
+	-- really have, on this side of any wall.
+	if AntiExploitService.Body(player) == nil then
 		return false, "TooFar"
 	end
+	local validated = AntiExploitService.ValidatedPosition(player)
 	local now = os.clock()
 	if not SiegeRules.ThrowReady(lastThrow[player], now) then
 		return false, "TooSoon"
@@ -314,10 +314,11 @@ local function placeCharge(player: Player, aim: Vector3): (boolean, string?)
 	if head == nil or root == nil or not InteractionService.CanAct(player) then
 		return false, "NotInRun"
 	end
-	local validated = AntiExploitService.ValidatedPosition(player)
-	if not MovementRules.NearValidated(head.Position, validated, SiegeRules.VALIDATED_SLACK) then
+	-- Set from the client-owned head: it must be on this side of the wall.
+	if AntiExploitService.Body(player) == nil then
 		return false, "TooFar"
 	end
+	local validated = AntiExploitService.ValidatedPosition(player)
 	local now = os.clock()
 	if not SiegeRules.ChargeReady(lastCharge[player], now) then
 		return false, "TooSoon"
@@ -339,7 +340,7 @@ local function placeCharge(player: Player, aim: Vector3): (boolean, string?)
 			ownedByPlacer = BuildingService.IsOwnedBy(player, record),
 			distance = (hit.Position - head.Position).Magnitude,
 			validatedDistance = validated and (hit.Position - validated).Magnitude,
-			inSafeZone = SafeZoneService.Contains(root.Position)
+			inSafeZone = SafeZoneService.ContainsPlayer(player)
 				or SafeZoneService.OverlapsBox(record.position, record.half),
 			inNoBuildAura = BuildRules.OverlapsAura(record.position, record.half, noBuildAuras()),
 		}

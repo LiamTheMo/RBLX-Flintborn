@@ -8,338 +8,126 @@
  "palette": {
   "file": "palette.png",
   "width": 512,
-  "height": 256,
+  "height": 128,
   "cell": 16,
   "columns": 32,
   "uv": "row i, level j: u = (j + 0.5) / columns, v = 1 - (i + 0.5) * cell / height (v up from the bottom of the image); a row's spare cells repeat its last level",
   "rows": [
    {
     "key": "m048_brass",
-    "hex": "#EBC772",
+    "hex": "#EBA949",
     "levels": [
-     1.0
+     0.98626,
+     0.98979,
+     0.99294,
+     0.99547,
+     1.00118,
+     1.01255
     ],
     "used": true
    },
    {
     "key": "m048_rope",
-    "hex": "#F4CF80",
+    "hex": "#EEC77A",
     "levels": [
-     0.98066,
-     0.98358,
-     0.98643,
-     0.9965,
-     0.99958,
-     1.0014,
-     1.00558,
-     1.01383,
-     1.01841
+     0.9714,
+     0.97622,
+     0.97853,
+     0.98512,
+     0.99197,
+     0.99754,
+     1.00367,
+     1.01223,
+     1.01588,
+     1.01773,
+     1.02814
     ],
     "used": true
    },
    {
     "key": "m048_rope_dark",
-    "hex": "#99601A",
+    "hex": "#D89A50",
     "levels": [
-     0.98217,
-     0.98523,
-     0.98705,
-     0.9965,
-     0.99959,
-     1.0014,
-     1.00558,
-     1.01383,
-     1.01841
-    ],
-    "used": true
-   },
-   {
-    "key": "m048_rope_x_dark_45",
-    "hex": "#CB9D52",
-    "levels": [
-     0.98233,
-     0.98504,
-     0.98715,
-     0.9965,
-     1.0014,
-     1.01383,
-     1.01841
-    ],
-    "used": true
-   },
-   {
-    "key": "m048_rope_x_dark_90",
-    "hex": "#A26B24",
-    "levels": [
-     0.98085,
-     0.98641,
-     0.99959,
-     1.00558
+     0.9714,
+     0.97621,
+     0.97853,
+     0.98512,
+     0.99197,
+     0.99754,
+     1.00367,
+     1.01223,
+     1.01589,
+     1.01773,
+     1.02814
     ],
     "used": true
    },
    {
     "key": "m048_wood",
-    "hex": "#BB722E",
+    "hex": "#914A16",
     "levels": [
-     0.97411,
-     0.9781,
-     0.98349,
-     0.98644,
-     0.98896,
-     0.99394,
-     0.99599,
-     1.00346,
-     1.00643,
-     1.00878,
-     1.01202,
-     1.01399,
-     1.0168,
-     1.01919,
-     1.02133,
-     1.02359,
-     1.02586,
-     1.02777,
-     1.03016,
-     1.03219,
-     1.03506,
-     1.03674
-    ],
-    "used": true
-   },
-   {
-    "key": "m048_wood_dark",
-    "hex": "#633D20",
-    "levels": [
-     0.98743,
-     0.99094,
-     0.99357,
-     0.99948,
-     1.00618,
-     1.00942,
-     1.01549,
-     1.01782,
-     1.02047,
-     1.02328,
-     1.03802,
-     1.04146,
-     1.04479
+     0.95603,
+     0.95893,
+     0.96436,
+     0.96679,
+     0.97645,
+     0.99035,
+     0.99447,
+     0.99807,
+     1.01091,
+     1.01616,
+     1.02187,
+     1.03391,
+     1.03948,
+     1.04466,
+     1.04863
     ],
     "used": true
    },
    {
     "key": "m048_wood_deep",
-    "hex": "#88491A",
+    "hex": "#673514",
     "levels": [
-     0.95507,
-     0.96142,
-     0.96379,
-     0.96664,
-     0.97544,
-     0.99024,
-     0.99448,
-     0.99714,
-     0.99859,
-     1.00063,
-     1.00273,
-     1.0041,
-     1.00491,
-     1.0071,
-     1.00862,
-     1.00876,
-     1.00915,
-     1.01017,
-     1.01114,
-     1.0116,
-     1.01404,
-     1.01897,
-     1.02,
-     1.02086,
-     1.02435,
-     1.02769,
-     1.0285,
-     1.03175,
-     1.03549,
-     1.03674,
-     1.04105,
-     1.04904
-    ],
-    "used": true
-   },
-   {
-    "key": "m048_wood_deep_x_wood_dark_35",
-    "hex": "#7B451C",
-    "levels": [
-     0.98369,
-     0.98562,
-     0.99206,
-     0.99824,
-     1.0003,
-     1.00878,
-     1.01493,
-     1.02458,
-     1.02691,
-     1.02864,
-     1.03265,
-     1.04111,
-     1.04317,
-     1.052
-    ],
-    "used": true
-   },
-   {
-    "key": "m048_wood_deep_x_wood_dark_60",
-    "hex": "#72421E",
-    "levels": [
-     0.95567,
-     0.95893,
-     0.96186,
-     0.96521,
-     0.96743,
-     0.97091,
-     0.97647,
-     0.98069,
-     0.9831,
-     0.98802,
-     0.98928,
-     0.99525,
-     0.99783,
-     1.00211,
-     1.00493,
-     1.00753,
-     1.01045,
-     1.0161,
-     1.02836,
-     1.03044,
-     1.03306,
-     1.05102,
-     1.05483,
-     1.0572
-    ],
-    "used": true
-   },
-   {
-    "key": "m048_wood_deep_x_wood_dark_65",
-    "hex": "#70411E",
-    "levels": [
-     0.98219,
-     0.98516,
-     0.9879,
-     0.99403,
-     0.99938,
-     1.00171,
-     1.00885,
-     1.01426,
-     1.02388,
-     1.02759,
-     1.03027,
-     1.04258,
-     1.045,
-     1.05382
-    ],
-    "used": true
-   },
-   {
-    "key": "m048_wood_deep_x_wood_light_20",
-    "hex": "#955420",
-    "levels": [
-     0.96697,
-     0.97269,
-     0.97851,
-     0.98665,
-     0.9899,
-     0.99756,
-     0.99899,
-     1.00125,
-     1.00543,
-     1.00693,
-     1.01065,
-     1.01362,
-     1.01681,
-     1.01982,
-     1.02543,
-     1.028
-    ],
-    "used": true
-   },
-   {
-    "key": "m048_wood_deep_x_wood_light_40",
-    "hex": "#A25E26",
-    "levels": [
-     0.97493,
-     0.97789,
-     0.98057,
-     0.98485,
-     0.9884,
-     0.99257,
-     0.99893,
-     1.00296,
-     1.00516,
-     1.00802,
+     0.95242,
+     0.96054,
+     0.96811,
+     0.97687,
+     0.99724,
+     1.00244,
+     1.00497,
      1.01278,
-     1.01578,
-     1.02117,
-     1.02419
+     1.01566,
+     1.01899,
+     1.0314,
+     1.03597,
+     1.03896,
+     1.04948
     ],
     "used": true
    },
    {
-    "key": "m048_wood_deep_x_wood_light_60",
-    "hex": "#AF692B",
+    "key": "m048_wood_x_deep_25",
+    "hex": "#864516",
     "levels": [
-     0.97006,
-     0.9722,
-     0.97475,
-     0.97744,
-     0.98357,
-     0.99003,
-     0.99294,
-     0.99568,
-     0.99813,
-     1.00041,
-     1.00548,
-     1.00929,
-     1.01164,
-     1.01747,
-     1.02223,
-     1.02554
+     0.95893,
+     0.97645,
+     1.01662,
+     1.02258,
+     1.03979,
+     1.04882
     ],
     "used": true
    },
    {
-    "key": "m048_wood_x_deep_15",
-    "hex": "#B36C2B",
+    "key": "m048_wood_x_deep_50",
+    "hex": "#7C4015",
     "levels": [
-     0.99729,
-     1.00108,
-     1.01177,
-     1.01501,
-     1.01806,
-     1.02082,
-     1.02852,
-     1.03023,
-     1.03374
-    ],
-    "used": true
-   },
-   {
-    "key": "m048_wood_x_light_15",
-    "hex": "#BD742F",
-    "levels": [
-     1.00519,
-     1.00798,
-     1.01032,
-     1.01263,
-     1.01547,
-     1.01813,
-     1.02096,
-     1.02286,
-     1.02526,
-     1.02767,
-     1.03049,
-     1.03189,
-     1.0346,
-     1.0387
+     0.95893,
+     0.97645,
+     1.01662,
+     1.02258,
+     1.03979,
+     1.04882
     ],
     "used": true
    }
@@ -359,12 +147,12 @@
    "subject": "Dock",
    "role": "hero",
    "size": [
-    10.56,
-    8.3,
-    19.2
+    16.0,
+    7.2,
+    9.69
    ],
-   "tris": 3860,
-   "budget": 4000,
+   "tris": 3890,
+   "budget": 6000,
    "collision": {
     "CollisionFidelity": "PreciseConvexDecomposition",
     "CanCollide": true,
@@ -376,21 +164,21 @@
     {
      "file": "meshes/TimberDock.glb",
      "kind": "solid",
-     "tris": 3860,
+     "tris": 3890,
      "offset": [
       0.0,
-      4.15,
+      3.6,
       0.0
      ],
      "size": [
-      10.56,
-      8.3,
-      19.2
+      16.0,
+      7.2,
+      9.69
      ]
     }
    ],
    "vfx": [],
-   "notes": "Timber dock (post centres 8 x 16, deck top 5.6, posts to 8.3; about 10.6 x 19.2 x 8.3): a raised pier on six tall square legs, ten chunky orange boards across the width (notched round the posts), side beams and crossbeams under the deck, bolt blocks with brass bolt heads, knee braces on the long sides and the +Y end, an X brace on the open -Y end, two fat rope coils on every post and five low twisted rope swags (none across the open -Y end). Seams: feet z 0, deck top 5.6 (M043 lower lawn), open end y -9.6. No VFX"
+   "notes": "Dock module (remade sheet): six 1.25-stud square posts (2 x 3, centres 7.4 x 6.4) to 7.2, 15 transverse planks 0.9 thick, deck top 4.4, side beams, an end header and an X brace at each end, four knee braces, a bolt block with a hex brass bolt on each post, two rope turns per post and five twisted swags (the -X end open). Tiles along X at a 16-stud pitch (end planks at +-8.0)."
   },
   {
    "name": "TimberDockBeam",
@@ -398,38 +186,38 @@
    "subject": "Dock",
    "role": "part",
    "size": [
-    0.92,
-    1.3,
-    18.3
+    5.19,
+    0.76,
+    0.725
    ],
-   "tris": 12,
+   "tris": 28,
    "budget": 1000,
    "collision": {
-    "CollisionFidelity": "Hull",
+    "CollisionFidelity": "Box",
     "CanCollide": true,
     "CanQuery": true,
     "CanTouch": true,
-    "profile": "hull"
+    "profile": "box"
    },
    "pieces": [
     {
      "file": "meshes/TimberDockBeam.glb",
      "kind": "solid",
-     "tris": 12,
+     "tris": 28,
      "offset": [
       0.0,
-      0.65,
+      0.38,
       0.0
      ],
      "size": [
-      0.92,
-      1.3,
-      18.3
+      5.19,
+      0.76,
+      0.725
      ]
     }
    ],
    "vfx": [],
-   "notes": "Beam (reusable): a 0.9 x 1.3 side beam, 18.3 long"
+   "notes": "Longitudinal Beam: one side beam segment between two posts"
   },
   {
    "name": "TimberDockBrace",
@@ -437,9 +225,9 @@
    "subject": "Dock",
    "role": "part",
    "size": [
-    0.45,
-    2.7817,
-    3.2552
+    2.77,
+    2.07,
+    0.55
    ],
    "tris": 12,
    "budget": 1000,
@@ -457,18 +245,18 @@
      "tris": 12,
      "offset": [
       0.0,
-      1.3909,
+      1.035,
       0.0
      ],
      "size": [
-      0.45,
-      2.7817,
-      3.2552
+      2.77,
+      2.07,
+      0.55
      ]
     }
    ],
    "vfx": [],
-   "notes": "Brace (reusable): a knee brace, ends cut to the leg face and the beam underside"
+   "notes": "Diagonal Brace: a knee brace from a post face to the beam's underside"
   },
   {
    "name": "TimberDockCrossbeam",
@@ -476,38 +264,38 @@
    "subject": "Dock",
    "role": "part",
    "size": [
-    4.94,
-    1.3,
-    0.9
+    0.595,
+    0.76,
+    7.7
    ],
-   "tris": 12,
+   "tris": 28,
    "budget": 1000,
    "collision": {
-    "CollisionFidelity": "Hull",
+    "CollisionFidelity": "Box",
     "CanCollide": true,
     "CanQuery": true,
     "CanTouch": true,
-    "profile": "hull"
+    "profile": "box"
    },
    "pieces": [
     {
      "file": "meshes/TimberDockCrossbeam.glb",
      "kind": "solid",
-     "tris": 12,
+     "tris": 28,
      "offset": [
       0.0,
-      0.65,
+      0.38,
       0.0
      ],
      "size": [
-      4.94,
-      1.3,
-      0.9
+      0.595,
+      0.76,
+      7.7
      ]
     }
    ],
    "vfx": [],
-   "notes": "Crossbeam (reusable): a 0.9 x 1.3 crossbeam between the side beams"
+   "notes": "Crossbeam: the end header across the deck under the end planks"
   },
   {
    "name": "TimberDockDeck",
@@ -515,11 +303,11 @@
    "subject": "Dock",
    "role": "part",
    "size": [
-    10.2088,
-    0.8837,
-    19.2
+    16.0,
+    0.9,
+    8.65
    ],
-   "tris": 416,
+   "tris": 420,
    "budget": 1000,
    "collision": {
     "CollisionFidelity": "Box",
@@ -532,21 +320,21 @@
     {
      "file": "meshes/TimberDockDeck.glb",
      "kind": "solid",
-     "tris": 416,
+     "tris": 420,
      "offset": [
       0.0,
-      0.4419,
+      0.45,
       0.0
      ],
      "size": [
-      10.2088,
-      0.8837,
-      19.2
+      16.0,
+      0.9,
+      8.65
      ]
     }
    ],
    "vfx": [],
-   "notes": "Deck (reusable): ten chunky 1.83 x 0.85 boards across the width with chamfered tops, notched round the posts, a seam at the middle posts"
+   "notes": "Deck Plank set: the 15 deck planks (0.9 thick, seams on the post faces)"
   },
   {
    "name": "TimberDockPost",
@@ -554,11 +342,11 @@
    "subject": "Dock",
    "role": "part",
    "size": [
-    2.2955,
-    8.3,
-    2.2955
+    1.8343,
+    7.2,
+    2.0622
    ],
-   "tris": 432,
+   "tris": 368,
    "budget": 1000,
    "collision": {
     "CollisionFidelity": "Hull",
@@ -571,21 +359,21 @@
     {
      "file": "meshes/TimberDockPost.glb",
      "kind": "solid",
-     "tris": 432,
+     "tris": 368,
      "offset": [
       0.0,
-      4.15,
+      3.6,
       0.0
      ],
      "size": [
-      2.2955,
-      8.3,
-      2.2955
+      1.8343,
+      7.2,
+      2.0622
      ]
     }
    ],
    "vfx": [],
-   "notes": "Mooring Post (reusable): a 1.3-square post, ground to an 8.3 chamfered cap, with two bolt blocks and brass bolts and two twisted rope coils; legs darker below the beams"
+   "notes": "Mooring Post: ground to bevelled cap, bolt block and hex brass bolt, two rope turns (lashing)"
   },
   {
    "name": "TimberDockRope",
@@ -593,11 +381,11 @@
    "subject": "Dock",
    "role": "part",
    "size": [
-    0.6,
-    1.0901,
-    6.95
+    4.8059,
+    1.2151,
+    0.3
    ],
-   "tris": 222,
+   "tris": 186,
    "budget": 1000,
    "collision": {
     "CollisionFidelity": "Box",
@@ -610,21 +398,21 @@
     {
      "file": "meshes/TimberDockRope.glb",
      "kind": "solid",
-     "tris": 222,
+     "tris": 186,
      "offset": [
       0.0,
-      0.545,
+      0.6076,
       0.0
      ],
      "size": [
-      0.6,
-      1.0901,
-      6.95
+      4.8059,
+      1.2151,
+      0.3
      ]
     }
    ],
    "vfx": [],
-   "notes": "Rope Segment (reusable): one sagging twisted rope swag with round knob ends"
+   "notes": "Rope Segment: one twisted sagging swag"
   }
  ],
  "stats": {
@@ -633,11 +421,11 @@
   "solid": 7,
   "water": 0,
   "glow": 0,
-  "tris": 4966,
+  "tris": 4932,
   "vfxSockets": 0,
-  "paletteColours": 16,
-  "paletteLevels": 218,
-  "meshBytes": 425916
+  "paletteColours": 7,
+  "paletteLevels": 69,
+  "meshBytes": 430452
  },
  "problems": []
 }

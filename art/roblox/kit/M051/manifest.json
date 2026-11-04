@@ -15,423 +15,340 @@
   "rows": [
    {
     "key": "m051_cloth",
-    "hex": "#8F2210",
+    "hex": "#B82418",
     "levels": [
-     0.935,
-     0.94485,
-     0.95468,
-     0.96538,
-     0.98463,
-     0.98629,
-     0.99458,
-     1.01631
+     0.95355,
+     0.96018,
+     0.96393,
+     0.969,
+     0.97258,
+     0.97643,
+     0.98039,
+     0.98197,
+     0.98598,
+     0.98991,
+     0.99835,
+     1.0047,
+     1.01389,
+     1.02149,
+     1.02518,
+     1.03351,
+     1.03965,
+     1.0493
+    ],
+    "used": true
+   },
+   {
+    "key": "m051_cloth_dark",
+    "hex": "#951B11",
+    "levels": [
+     0.97031,
+     0.98141,
+     0.99243,
+     1.00334,
+     1.01047,
+     1.02049,
+     1.02809,
+     1.03427,
+     1.04626
     ],
     "used": true
    },
    {
     "key": "m051_peg",
-    "hex": "#C0A870",
+    "hex": "#EDB641",
     "levels": [
-     0.96553,
-     0.96802,
-     0.9746,
-     0.9784,
-     0.98121,
-     0.9857,
-     1.00005,
-     1.0035,
-     1.00876,
-     1.01266,
-     1.01668,
-     1.02001,
-     1.02436,
-     1.02823
+     0.98166,
+     0.99263,
+     0.99556,
+     0.99769,
+     1.00127,
+     1.00625,
+     1.00852,
+     1.01731,
+     1.01984
     ],
     "used": true
    },
    {
     "key": "m051_rope",
-    "hex": "#CEA261",
+    "hex": "#E09A36",
     "levels": [
-     0.98132,
-     0.98433,
-     0.98715,
-     0.98959,
-     0.99198,
-     0.99468,
-     0.99588,
-     0.99973,
-     1.00156,
-     1.00439,
-     1.00723,
-     1.00996,
-     1.0133,
-     1.01765,
-     1.01941
+     0.97324,
+     0.97598,
+     0.97777,
+     0.97988,
+     0.98327,
+     0.9859,
+     0.98783,
+     0.99111,
+     0.99372,
+     0.99643,
+     0.99876,
+     1.00414,
+     1.00636,
+     1.01027,
+     1.0139,
+     1.02056,
+     1.02319,
+     1.02418,
+     1.0283
     ],
     "used": true
    },
    {
     "key": "m051_rope_dark",
-    "hex": "#A16720",
+    "hex": "#C78328",
     "levels": [
-     0.98128,
-     0.98433,
-     0.98715,
-     0.98959,
-     0.99212,
-     0.99457,
-     0.99586,
-     0.99981,
-     1.00135,
-     1.00439,
-     1.00723,
-     1.00996,
-     1.01303,
-     1.0176,
-     1.01941
-    ],
-    "used": true
-   },
-   {
-    "key": "m051_rope_x_dark_50",
-    "hex": "#B88440",
-    "levels": [
-     0.98
-    ],
-    "used": true
-   },
-   {
-    "key": "m051_rope_x_dark_60",
-    "hex": "#B37F3A",
-    "levels": [
-     0.98123,
-     0.98433,
-     0.98714,
-     0.98959,
-     0.99178,
-     0.99425,
-     0.99583,
-     0.99967,
-     1.00121,
-     1.00439,
-     1.00723,
-     1.01001,
-     1.01233,
-     1.01754,
-     1.0194
+     0.97326,
+     0.97606,
+     0.97777,
+     0.97988,
+     0.98326,
+     0.98573,
+     0.98783,
+     0.99095,
+     0.9936,
+     0.99643,
+     0.99876,
+     1.0042,
+     1.00642,
+     1.01027,
+     1.01382,
+     1.02056,
+     1.02308,
+     1.02418,
+     1.0283
     ],
     "used": true
    },
    {
     "key": "m051_stone",
-    "hex": "#ABA5A2",
+    "hex": "#ADAEB1",
     "levels": [
-     0.94894,
-     0.95172,
-     0.95449,
-     0.95721,
-     0.9601,
-     0.96311,
-     0.96447,
-     0.96748,
-     0.96988,
-     0.97195,
-     0.9743,
-     0.97669,
-     0.97881,
-     0.98099,
-     0.98384,
-     0.98586,
-     0.99878,
-     1.00127,
-     1.00446,
-     1.00677,
-     1.00912,
-     1.01227,
-     1.01517
+     0.93821,
+     0.94054,
+     0.94251,
+     0.94455,
+     0.94699,
+     0.94926,
+     0.95157,
+     0.9544,
+     0.95669,
+     0.95918,
+     0.9623,
+     0.96467,
+     0.96639,
+     0.96947,
+     0.98738,
+     0.9894,
+     0.99164,
+     0.99457,
+     0.99745,
+     1.0003,
+     1.00213,
+     1.00405,
+     1.00649,
+     1.00851,
+     1.01138,
+     1.01398,
+     1.01828,
+     1.02278,
+     1.02589,
+     1.0283,
+     1.03452
     ],
     "used": true
    },
    {
     "key": "m051_stone_x_mid_15",
-    "hex": "#A39F9E",
+    "hex": "#A7A8AC",
     "levels": [
-     0.95569,
-     0.96142,
-     0.96707,
-     0.9707,
-     0.97675,
-     0.97945,
-     0.98138,
-     0.98432,
-     0.98926,
-     0.9913,
-     0.99659,
-     0.9991,
-     1.00202,
-     1.00463,
-     1.01256,
-     1.01532,
-     1.02269,
-     1.02531
+     0.95142,
+     0.95362,
+     0.95665,
+     0.95827,
+     0.96222,
+     0.96478,
+     0.96661,
+     0.96884,
+     0.97813,
+     0.98677,
+     0.9904,
+     0.99334,
+     0.99571,
+     0.99928,
+     1.00192,
+     1.00428,
+     1.00747,
+     1.0093,
+     1.01373,
+     1.02265,
+     1.02998,
+     1.03273
     ],
     "used": true
    },
    {
-    "key": "m051_stone_x_mid_30",
-    "hex": "#9B9899",
+    "key": "m051_stone_x_mid_35",
+    "hex": "#9FA0A5",
     "levels": [
-     0.95219,
-     0.9555,
-     0.95765,
-     0.96964,
-     0.97454,
-     0.97832,
-     0.98157,
-     0.98385,
-     1.01847,
-     1.02429
+     0.936,
+     0.93809,
+     0.94175,
+     0.9478,
+     0.95279,
+     0.95601,
+     0.96116,
+     0.96465,
+     0.96695,
+     0.96901,
+     0.97277,
+     0.98359,
+     0.98645,
+     0.98947,
+     0.99288,
+     0.99556,
+     0.9993,
+     1.00204,
+     1.00494
     ],
     "used": true
    },
    {
-    "key": "m051_stone_x_mid_40",
-    "hex": "#969496",
+    "key": "m051_stone_x_mid_45",
+    "hex": "#9B9CA2",
     "levels": [
-     0.96039,
-     0.96254,
-     0.96471,
-     0.96774,
-     0.97294,
-     0.9767,
-     0.97834,
-     0.98086,
-     0.98257,
-     0.98548,
-     0.98723,
-     0.99034,
-     0.9942,
-     0.9961,
-     0.99851,
-     1.00096,
-     1.00534,
-     1.00732,
-     1.0096,
-     1.01186,
-     1.01422,
-     1.01693,
-     1.02296,
-     1.03029,
-     1.03168
-    ],
-    "used": true
-   },
-   {
-    "key": "m051_stone_x_mid_50",
-    "hex": "#909094",
-    "levels": [
-     0.95356,
-     0.95536,
-     0.95699,
-     0.98502,
-     0.98653,
-     0.98799,
-     0.99281,
-     0.99487,
-     0.9967,
-     0.99992,
-     1.00176,
-     1.00314,
-     1.00722,
-     1.00936,
-     1.01155,
-     1.01351,
-     1.01538
+     0.94895,
+     0.95472,
+     0.96452,
+     0.96761,
+     0.9716,
+     0.97478,
+     0.97651,
+     0.97883,
+     0.98183,
+     0.98576,
+     0.98822,
+     0.99091,
+     0.99244,
+     0.99417,
+     0.99519,
+     0.9956,
+     0.99712,
+     0.99787,
+     0.99919,
+     1.0008,
+     1.00182,
+     1.00256,
+     1.00483,
+     1.00602,
+     1.00699,
+     1.01001,
+     1.01315,
+     1.01615,
+     1.01855,
+     1.02924,
+     1.03269,
+     1.03662
     ],
     "used": true
    },
    {
     "key": "m051_wood",
-    "hex": "#B66D2A",
+    "hex": "#B06825",
     "levels": [
-     0.9704,
-     0.97308,
-     0.97528,
-     0.97723,
-     0.98694,
-     0.99461,
-     1.00335,
-     1.00495,
-     1.00803,
-     1.01194,
-     1.0152,
-     1.01793,
-     1.02058,
-     1.028
+     0.94553,
+     0.94885,
+     0.96589,
+     0.99255,
+     1.01299,
+     1.04588,
+     1.0489,
+     1.05743
     ],
     "used": true
    },
    {
     "key": "m051_wood_dark",
-    "hex": "#5C3014",
+    "hex": "#5E2909",
     "levels": [
-     1.00575,
-     1.00846,
-     1.01486,
-     1.02394
+     0.95182,
+     0.95819,
+     1.01662,
+     1.02164
     ],
     "used": true
    },
    {
     "key": "m051_wood_deep",
-    "hex": "#894315",
+    "hex": "#9C4C15",
     "levels": [
-     0.97042,
-     0.97238,
-     0.97588,
-     0.98001,
-     0.98232,
-     0.98519,
-     0.98734,
-     0.98937,
-     0.99241,
-     0.99657,
-     0.9991,
-     1.00114,
-     1.00335,
-     1.00533,
-     1.00767,
-     1.00971,
-     1.01206,
-     1.0144,
-     1.01594,
-     1.01843,
-     1.02095,
-     1.02467,
-     1.02653,
-     1.03098,
-     1.03263,
-     1.03567,
-     1.04118
+     0.95182,
+     0.95819,
+     1.01662,
+     1.02164
     ],
     "used": true
    },
    {
-    "key": "m051_wood_deep_x_wood_dark_10",
-    "hex": "#844115",
+    "key": "m051_wood_deep_x_wood_dark_25",
+    "hex": "#8C4312",
     "levels": [
-     0.97788,
-     0.9804,
-     0.98438,
-     0.9902,
-     1.0047,
-     1.01145,
-     1.02787,
-     1.03218,
-     1.03533,
-     1.04062,
-     1.04427,
-     1.0502,
-     1.05868
+     0.96894,
+     0.99817,
+     1.0204,
+     1.02388,
+     1.02902
     ],
     "used": true
    },
    {
-    "key": "m051_wood_deep_x_wood_dark_15",
-    "hex": "#824015",
+    "key": "m051_wood_deep_x_wood_light_30",
+    "hex": "#B15B1C",
     "levels": [
-     0.95613,
-     0.96063,
-     0.96637,
-     0.97589,
-     0.97943,
-     0.98388,
-     0.98747,
-     0.99111,
-     0.99446,
-     0.99705,
-     0.99852,
-     1.00284,
-     1.0091,
-     1.01263,
-     1.01921,
-     1.03457
+     0.96894,
+     0.99817,
+     1.0204,
+     1.02388,
+     1.02902
     ],
     "used": true
    },
    {
-    "key": "m051_wood_x_dark_50",
-    "hex": "#894E1F",
+    "key": "m051_wood_deep_x_wood_light_50",
+    "hex": "#C06420",
     "levels": [
-     0.96232,
-     0.96436,
-     0.9666,
-     0.9686,
-     0.97069,
-     0.9731,
-     0.97602,
-     0.97786,
-     0.97989,
-     0.98255,
-     0.98456,
-     0.98662,
-     0.98885,
-     0.99076,
-     0.99957,
-     1.00266,
-     1.00479,
-     1.00725,
-     1.00909,
-     1.01107,
-     1.01314,
-     1.01549,
-     1.01742,
-     1.02026,
-     1.02195,
-     1.0243,
-     1.02675,
-     1.02866,
-     1.03155,
-     1.03365
+     0.95182,
+     0.95819,
+     1.01662,
+     1.02164
     ],
     "used": true
    },
    {
-    "key": "m051_wood_x_deep_15",
-    "hex": "#AF6727",
+    "key": "m051_wood_light",
+    "hex": "#E37D2C",
     "levels": [
-     0.94811,
-     0.95381,
-     0.95484,
-     0.96631,
-     0.96887,
-     0.97128,
-     0.98069,
-     0.98394
+     0.95182,
+     0.95819,
+     1.01662,
+     1.02164
     ],
     "used": true
    },
    {
-    "key": "m051_wood_x_peg_10",
-    "hex": "#B77331",
+    "key": "m051_wood_x_deep_30",
+    "hex": "#AA6020",
     "levels": [
-     0.96842,
-     0.9729,
-     0.97576,
-     0.97824,
-     0.98098,
-     0.98422,
-     0.99149,
-     0.99661,
-     1.00657,
-     1.0117,
-     1.01506,
-     1.01634,
-     1.01895,
-     1.02484,
-     1.02691,
-     1.03244
+     0.94553,
+     0.94885,
+     0.96589,
+     0.99255,
+     1.01299,
+     1.04588,
+     1.0489,
+     1.05743
     ],
     "used": true
    }
@@ -451,12 +368,12 @@
    "subject": "Rope Crossing",
    "role": "hero",
    "size": [
-    27.4106,
-    11.0,
-    12.331
+    17.6188,
+    7.2,
+    9.2402
    ],
-   "tris": 3896,
-   "budget": 4000,
+   "tris": 5698,
+   "budget": 6000,
    "collision": {
     "CollisionFidelity": "PreciseConvexDecomposition",
     "CanCollide": true,
@@ -468,21 +385,21 @@
     {
      "file": "meshes/RopeBridge.glb",
      "kind": "solid",
-     "tris": 3896,
+     "tris": 5698,
      "offset": [
       0.0,
-      5.5,
+      3.6,
       0.0
      ],
      "size": [
-      27.4106,
-      11.0,
-      12.331
+      17.6188,
+      7.2,
+      9.2402
      ]
     }
    ],
    "vfx": [],
-   "notes": "Rope crossing (post centres 18 x 6, stone tops 5.6, posts to 11.0, deck sagging from 5.6 to 4.5; about 26 x 11.2 x 11): a sagging plank footbridge between two pairs of square timber posts on four faceted anchor stones; twisted rope coils and red cloth wraps on the posts, two main ropes with knot collars, hangers to ten tilted planks with lugs, diagonals, backstays to the stones, rope links between the lugs, low brace sills and peg blocks at the ends. Seams: stone tops and deck ends 5.6, ground 0, both ends open. No VFX"
+   "notes": "Rope crossing (sheet 051, remade): 8 tilted planks across the width hung by hangers from two sagging upper rope rails and tied by lower rope rails, between two pairs of square end posts (rope turns, red cloth) on faceted anchor stones; stone tops 3.47 (walk surface at both ends, open ends), deck sagging to 2.67."
   },
   {
    "name": "RopeBridgeAnchorStone",
@@ -490,11 +407,11 @@
    "subject": "Rope Crossing",
    "role": "part",
    "size": [
-    6.8004,
-    5.6,
-    6.1104
+    4.6785,
+    3.47,
+    4.9112
    ],
-   "tris": 130,
+   "tris": 170,
    "budget": 1000,
    "collision": {
     "CollisionFidelity": "Hull",
@@ -507,60 +424,21 @@
     {
      "file": "meshes/RopeBridgeAnchorStone.glb",
      "kind": "solid",
-     "tris": 130,
+     "tris": 170,
      "offset": [
       0.0,
-      2.8,
+      1.735,
       0.0
      ],
      "size": [
-      6.8004,
-      5.6,
-      6.1104
+      4.6785,
+      3.47,
+      4.9112
      ]
     }
    ],
    "vfx": [],
-   "notes": "Anchor Stone (reusable): a tapered faceted anchor stone with a flat 5.6 top and loose chunks at its foot"
-  },
-  {
-   "name": "RopeBridgeBrace",
-   "sheet": "M051",
-   "subject": "Rope Crossing",
-   "role": "part",
-   "size": [
-    1.0,
-    0.37,
-    4.04
-   ],
-   "tris": 12,
-   "budget": 1000,
-   "collision": {
-    "CollisionFidelity": "Box",
-    "CanCollide": true,
-    "CanQuery": true,
-    "CanTouch": true,
-    "profile": "box"
-   },
-   "pieces": [
-    {
-     "file": "meshes/RopeBridgeBrace.glb",
-     "kind": "solid",
-     "tris": 12,
-     "offset": [
-      0.0,
-      0.185,
-      0.0
-     ],
-     "size": [
-      1.0,
-      0.37,
-      4.04
-     ]
-    }
-   ],
-   "vfx": [],
-   "notes": "Brace (reusable): the 1.0 x 4.0 x 0.37 end sill between the base blocks"
+   "notes": "Anchor Stone: one faceted anchor stone with its chunks"
   },
   {
    "name": "RopeBridgeEndPost",
@@ -568,11 +446,11 @@
    "subject": "Rope Crossing",
    "role": "part",
    "size": [
-    2.0,
-    5.42,
-    2.0
+    1.6771,
+    3.75,
+    1.7047
    ],
-   "tris": 68,
+   "tris": 618,
    "budget": 1000,
    "collision": {
     "CollisionFidelity": "Hull",
@@ -585,21 +463,21 @@
     {
      "file": "meshes/RopeBridgeEndPost.glb",
      "kind": "solid",
-     "tris": 68,
+     "tris": 618,
      "offset": [
       0.0,
-      2.71,
+      1.875,
       0.0
      ],
      "size": [
-      2.0,
-      5.42,
-      2.0
+      1.6771,
+      3.75,
+      1.7047
      ]
     }
    ],
    "vfx": [],
-   "notes": "End Post (reusable): a 1.6-square timber post on a 2.0 base block, a 1.7 chamfered cap with a peg hole and a side peg"
+   "notes": "End Post: base block, 1.10 shaft and 1.26 cap with a peg hole, two rope turns and the red cloth lashing"
   },
   {
    "name": "RopeBridgeHangerRope",
@@ -607,11 +485,11 @@
    "subject": "Rope Crossing",
    "role": "part",
    "size": [
-    0.41,
-    3.0,
-    0.3984
+    0.2697,
+    1.6063,
+    0.27
    ],
-   "tris": 68,
+   "tris": 60,
    "budget": 1000,
    "collision": {
     "CollisionFidelity": "Box",
@@ -624,21 +502,60 @@
     {
      "file": "meshes/RopeBridgeHangerRope.glb",
      "kind": "solid",
-     "tris": 68,
+     "tris": 60,
      "offset": [
       0.0,
-      1.5,
+      0.8032,
       0.0
      ],
      "size": [
-      0.41,
-      3.0,
-      0.3984
+      0.2697,
+      1.6063,
+      0.27
      ]
     }
    ],
    "vfx": [],
-   "notes": "Hanger Rope (reusable): a 3.0 twisted hanger rope with three knots"
+   "notes": "Hanger Rope: one hanger with its middle and foot knots"
+  },
+  {
+   "name": "RopeBridgeLowerRope",
+   "sheet": "M051",
+   "subject": "Rope Crossing",
+   "role": "part",
+   "size": [
+    7.7549,
+    0.7006,
+    0.18
+   ],
+   "tris": 108,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/RopeBridgeLowerRope.glb",
+     "kind": "solid",
+     "tris": 108,
+     "offset": [
+      0.0,
+      0.3503,
+      0.0
+     ],
+     "size": [
+      7.7549,
+      0.7006,
+      0.18
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Lower Rope Rail: the hero's seven links between the plank ends, joined end to end into one rope"
   },
   {
    "name": "RopeBridgeMainRope",
@@ -646,11 +563,11 @@
    "subject": "Rope Crossing",
    "role": "part",
    "size": [
-    8.5196,
-    1.1153,
-    0.636
+    10.7422,
+    2.0433,
+    0.36
    ],
-   "tris": 154,
+   "tris": 464,
    "budget": 1000,
    "collision": {
     "CollisionFidelity": "Box",
@@ -663,60 +580,21 @@
     {
      "file": "meshes/RopeBridgeMainRope.glb",
      "kind": "solid",
-     "tris": 154,
+     "tris": 464,
      "offset": [
       0.0,
-      0.5577,
+      1.0216,
       0.0
      ],
      "size": [
-      8.5196,
-      1.1153,
-      0.636
+      10.7422,
+      2.0433,
+      0.36
      ]
     }
    ],
    "vfx": [],
-   "notes": "Main Rope (reusable): a sagging twisted rope with knot collars and round knob ends"
-  },
-  {
-   "name": "RopeBridgePegBlock",
-   "sheet": "M051",
-   "subject": "Rope Crossing",
-   "role": "part",
-   "size": [
-    0.81,
-    0.8,
-    0.9
-   ],
-   "tris": 24,
-   "budget": 1000,
-   "collision": {
-    "CollisionFidelity": "Box",
-    "CanCollide": true,
-    "CanQuery": true,
-    "CanTouch": true,
-    "profile": "box"
-   },
-   "pieces": [
-    {
-     "file": "meshes/RopeBridgePegBlock.glb",
-     "kind": "solid",
-     "tris": 24,
-     "offset": [
-      0.0,
-      0.4,
-      0.0
-     ],
-     "size": [
-      0.81,
-      0.8,
-      0.9
-     ]
-    }
-   ],
-   "vfx": [],
-   "notes": "Peg Block (reusable): a timber block with a square peg that anchors a rope"
+   "notes": "Upper Rope Rail (Main Rope): one sagging twisted rope coil to coil with six knots"
   },
   {
    "name": "RopeBridgePlank",
@@ -724,11 +602,11 @@
    "subject": "Rope Crossing",
    "role": "part",
    "size": [
-    1.15,
-    1.15,
-    6.2
+    1.0,
+    0.62,
+    4.87
    ],
-   "tris": 44,
+   "tris": 56,
    "budget": 1000,
    "collision": {
     "CollisionFidelity": "Box",
@@ -741,34 +619,34 @@
     {
      "file": "meshes/RopeBridgePlank.glb",
      "kind": "solid",
-     "tris": 44,
+     "tris": 56,
      "offset": [
       0.0,
-      0.575,
+      0.31,
       0.0
      ],
      "size": [
-      1.15,
-      1.15,
-      6.2
+      1.0,
+      0.62,
+      4.87
      ]
     }
    ],
    "vfx": [],
-   "notes": "Plank (reusable): a 1.15 x 0.80 x 6.2 plank with a deeper lug at each end and pale peg dots"
+   "notes": "Plank: one 1.00 x 0.62 x 4.70 plank with a square peg on each end face"
   }
  ],
  "stats": {
-  "assets": 8,
-  "pieces": 8,
-  "solid": 8,
+  "assets": 7,
+  "pieces": 7,
+  "solid": 7,
   "water": 0,
   "glow": 0,
-  "tris": 4396,
+  "tris": 7174,
   "vfxSockets": 0,
-  "paletteColours": 19,
-  "paletteLevels": 289,
-  "meshBytes": 413740
+  "paletteColours": 17,
+  "paletteLevels": 220,
+  "meshBytes": 660316
  },
  "problems": []
 }

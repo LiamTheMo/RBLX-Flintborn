@@ -372,3 +372,38 @@ Each has the default that will be used if unanswered.
   chosen, 3 Consumables on the smaller phone; prints the scale and smallest
   text and checks square slots and whole category labels. `inventory_world`
   page 1 is now the Backpack tab with the hotbar and armour under the backpack.
+
+## Owner request: drag and drop, and a lobby hotbar and armour (2026-11-04)
+
+- **Drag and drop** (`Kit.Drag`): an item drags from any slot to another of
+  the same place's group. A mouse drags once the pointer moves 6 px with the
+  button held; a finger holds the slot 0.3 s first (moving sooner scrolls the
+  grid). The item's picture follows the pointer, the slot under it lights up
+  (hover state) when it would take the item, and letting go there moves it;
+  anywhere else, or Escape, cancels. While carrying, the mouse wheel still
+  scrolls the grid (to reach the armour rows or the vault); a finger's drag
+  locks it. Gamepads keep MOVE / EQUIP / WEAR.
+- **Run** (group `run`): the window's backpack, hotbar and armour cells and the
+  HUD hotbar's six slots. Any item swaps between backpack and hotbar slots
+  (`MoveItem`; the held item stays held where it goes); armour drops only on its
+  own armour slot (`EquipArmor`); a worn piece drops on an empty slot or swaps
+  with a piece for the same slot (`UnequipArmorTo`).
+- **Lobby** (group `lobby`): the lobby now has its own 6-slot hotbar and three
+  worn-armour slots (`LobbyLoadoutRules`, `profile.lobbyBackpack.hotbar` /
+  `.armor`), which **take no backpack slots** (the backpack stays 50). The
+  Backpack tab shows Backpack, Hotbar, Armour, then the vault. Drags: anything
+  between backpack, hotbar and armour (`LobbyMove`, same armour rules); a
+  backpack slot onto the vault stores it whole (`VaultDeposit`); a vault item or
+  material onto the backpack takes it (all of a material). Hotbar and armour do
+  not drag to or from the vault directly. The lobby HUD hotbar is the lobby
+  hotbar and drags too. The card adds EQUIP / WEAR (first free hotbar slot, or
+  the piece's armour slot; not for stacks, whose card shows the amount
+  stepper) and UNEQUIP (back to the backpack).
+- **Into the run**: Deploy carries the hotbar and worn armour tagged with their
+  place (`loadoutSlot`); the run starts with the same hotbar and worn armour
+  (`InventoryRules.FromLoadout`) and the backpack's items in the run backpack
+  (no longer auto-placed on free hotbar slots). A profile from before this gets
+  one arrangement on its first lobby load (`LobbyLoadoutRules.Arrange`: the
+  tools a run used to put on the hotbar go to the lobby hotbar).
+- Not yet: items on the lobby hotbar or armour are not offered for selling or
+  trading (move them to the backpack first).

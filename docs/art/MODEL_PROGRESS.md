@@ -2,7 +2,7 @@
 
 Tracks the rebuild of every world-kit model in `art/blender/assets/kit/FlintbornWorldKit.blend` against its master reference sheet in `art/reference/kit/`. Update this file after every model. It is the hand-over point between sessions.
 
-- **Branch:** `feat/world-kit-rebuild` (from `v0.18`).
+- **Branch:** committed straight to the active version branch (`v0.19`), no feature branch (from 2026-11-04; the earlier work was on `feat/world-kit-rebuild`, now merged and deleted locally).
 - **Sheets:** 34 (W01–W16, R01–R08, V01–V10). Each sheet has 4 rows; each row is one **model** (136 in total).
 - **A model** is the whole row: the assembled hero, every exploded part, every variation and, for resources, the depleted state and drops. Each is its own mesh asset tagged with `kit_role`.
 - **Builders:** durable per-sheet MCP modules in `art/blender/kit/mcp/<sheet>.py` (shared tools in `kit_mcp.py`). Load with `sys.path.insert(0, ".../art/blender/kit/mcp"); import kit_mcp; kit_mcp.install()`.
@@ -244,11 +244,11 @@ Skill vs design doc / repo (design doc wins, reported):
 | 045 | Flintborn pine sapling model study | World & resources | ✅ | 3012; parts 470 / 576 / 576 / 348 / 162 / 44 / 44 | modeller + fresh verifiers; R1 FAIL 6 (tiers merged, long plates, rosettes like 042's), R2 PASS 8 | minors: f34 middle hem narrow; crown waist wide; side-on plates read as sticks; lime tip band reads as scales; sand share high; two edge-on GroundFoliage leaves |
 | 046 | Flintborn Natural Arch Model Study | World & resources | ✅ | 3960; parts 986 / 872 / 808 / 184 | modeller + fresh verifiers; R1 FAIL 6.5 (foot bushes buried in rock), R2 PASS 7.5 | minors: foot greenery sparse; flowers invisible; no emerald in bushes; crown leaves edge-on from the front; ledge pads read as shelves; rim-bush row widens the top; lawn edge sawtooth |
 | 047 | Old Pine Flintborn model study | World & resources | ✅ | 3590; parts 960 / 410 / 280 / 328 / 992 | modeller + fresh verifiers; R1 FAIL 6.5 (skeleton, ball pads), R2 FAIL 7.5 (buried plants), targeted R3 fix | minors: few twigs under L/R in f34; bark share high in front/rear; plants lean yellow; top W:D 1.354; knot a slot; straight trunk column |
-| 048 | Flintborn dock model study | World & resources | ✅ | 3860; parts 432 / 416 / 12 / 12 / 12 / 222 | modeller + fresh verifier; R1 PASS 8 | minors: coils read as faceted collars (twist only in colour); 5-sided swags (accepted); f34 gold +2.7 (rope); legs dark in side light; knot boxy; bolt blocks faint from the front |
+| 048 | Dock (remade sheet, 2026-11-04) | World & resources | ✅ | 3890; parts 368 / 420 / 28 / 28 / 12 / 186 | rebuilt on the shared library; R1 PASS 8 | 16-stud tiling module, deck top 4.40 (ruled), roped +X end; reads about 20 % short along its length in the f34 (forced by the pitch); rope turns flare into collars; braces a little dark; 0.975 end overhang leaves a gap between butted modules |
 | 049 | Classic Pine construction study | World & resources | ✅ | 3532; parts 254 / 484 / 546 / 626 / 704 / 918 | modeller + fresh verifiers; R1 FAIL 6 (merged tiers, shield blades, round top), R2 PASS 7.5 | minors: hems spikier than the sheet's fans, crown a tuft; parts read as steep bells; crown light; f34 sub-step a shoulder; T2 hem high; sand share 7.1 % |
-| 050 | Flintborn timber bridge model study | World & resources | ✅ | 3860; parts 286 / 12 / 12 / 12 / 12 / 224 | modeller + fresh verifier; R1 PASS 8 | minors: rope wraps read faceted close up; deck reads as one slab in f34 (hairline gaps); pegs close to rope colour; light deck field invisible; Plank part keeps yaw/jitter |
-| 051 | Flintborn rope crossing model study | World & resources | ✅ | 3896; parts 68 / 12 / 24 / 44 / 154 / 68 / 130 | modeller + fresh verifier; R1 PASS 8 | minors: coils read as jagged faceted bands; coils and diagonal feet sink slightly deep; foot rocks small shards; stone cool band hard-edged; PegBlock part simplified; no rope across the ends (decided) |
-| 052 | Flintborn Boardwalk model study | World & resources | ✅ | 2484; parts 102 / 62 / 12 / 12 / 176 / 12 / 24 | modeller + fresh verifier; R1 PASS 8 | Studio check: 1.12 stair risers walkable; minors: deck smoother than the sheet (edge bands); gold share low; post middle band dark; caps blow out; Brace part stubby |
+| 050 | Timber bridge (remade sheet, 2026-11-04) | World & resources | ✅ | 4416; parts 338 / 28 / 28 / 28 / 12 / 152 | rebuilt on the shared library; R1 FAIL 6 (frame inside the long sides), R2 PASS 8 | 16-stud tiling module, deck 2.60 (legs 0.4 shorter than drawn); rope turns faceted with pointed ends close up; stringer thinner than the f34 draws it; end blocks can't stand proud past the seam; no end swag or end-plane braces |
+| 051 | Rope crossing (remade sheet, 2026-11-04) | World & resources | ✅ | 5698; parts 618 / 56 / 464 / 108 / 60 / 170 | rebuilt on the shared library; R1 FAIL 7 (cloth read as a flat label), R2 PASS 8 | stone tops 3.47 (ruled), no entrance rope (ruled); rope about 1.3× the sheet's share; side view shows red the sheet doesn't; front chunks stand out past the stones; lower rail reads as broken links; no timber between the post pairs; Brace and PegBlock parts retired |
+| 052 | Boardwalk (remade sheet, 2026-11-04) | World & resources | ✅ | 1864 (+TimberBoardwalkStraight 1464); parts 64 / 68 / 28 / 28 / 108 / 28 / 12 | rebuilt on the shared library; R1 PASS 8 | 16-stud tiling module, deck 3.00 (ruled), three 0.75 risers; rail a little thin; bottom tread thicker than the other two; no post-top collars or long underside diagonal; rail stub knob at module joints; RailPlank part is one bay |
 | 053 | Flintborn dead tree asset study | World & resources | ✅ | 3562; parts 880 / 216 / 172 / 152 / 120 / 104 / 120 | modeller + fresh verifier; R1 PASS 7 | minors: knot hidden at the f34; crown chunkier and less branched (taper, Y-fork tips); lit wood low; moss olive in shade; hero 17 deep; top view tangled |
 | 054 | Flintborn broadleaf tree study | World & resources | ✅ | 3948 (+4 parts) | V1 FAIL, V2 FAIL 6/10, V3 PASS 7/10 | leaves larger/fewer than the sheet (smooth outline); upper trunk hidden from the sides; low dark tones; moss stripes and pit rows |
 | 055 | Fallen Log Model Study | World & resources | ✅ | 3558; parts 956 / 410 / 112 / 260 / 30 / 72 | modeller + fresh verifier; R1 PASS 8 | minors: f34 fill low (dressing past the log ends); f34 bore reads brown; branch fork barely reads; +X flank dark (studio light); cap grain ring missing (main session fixed the rock_dark key, B ≤ G + 4) |
@@ -370,6 +370,59 @@ Skill vs design doc / repo (design doc wins, reported):
 | 171 | Resin drip and amber glint | Event & VFX | ⬜ | | | |
 | 172 | Harvest Leaves and Pollen VFX Study | Event & VFX | ⬜ | | | |
 
+## Queue and tracks (from 2026-11-04)
+
+The owner added remade and new sheets (2026-11-03). Every reference is now a plain `NNN.png`; the owner's master folder
+is the source, and the list of titles and remakes is in `art/blender/assets/references/INDEX.md`. Sheets after 172 are
+copied into the repo when their batch starts.
+
+**Order of work** (owner's choice):
+1. **Rebuild the remade sheets that were already built:** 048, 050, 051, 052, 064, 066, 068, 069, 070. Their earlier
+   builds stay in the kit file until each rebuild passes.
+2. **Compare pass on 001–035,** whose sheets were restyled in place with the same designs. One agent compares each built
+   model with its new sheet and lists only real design changes; only those models are rebuilt.
+   **Result (2026-11-04):** no silhouette, proportion or part count changed on any of 001–035. The restyled sheets drop
+   baked detail and glow. Touch-ups, batched several per agent; the new sheet governs, so glow and VFX the sheet no
+   longer shows are removed (house rule):
+   - **Colour and material only:**
+     - 012 Amber: drop the bright facet seams and glints.
+     - 014 Starstone: solid flat cyan core, no halo or sparkles.
+     - 015 Ember Meteor: no glow or particles.
+     - 019 Resin Node: plain cream cut ends, no sparkle sockets, darker inner wood `#926246`.
+     - 025 Emberbloom: plain faceted orange-yellow seedpod, no glow or sparks.
+     - 028 Frost Shrub: deeper blues `#31528A` / `#527ABE`.
+     - 032 Shoreline Corner: plain cyan water.
+     - 034 Streambed: plain cyan water with white foam outlines; the flow strips become painted bands.
+   - **Small mesh fixes:**
+     - 026 Softwood Log: trunk without the bark slits and plate steps.
+     - 015 Ember Meteor: chunky separate shell slabs over a large exposed core, as both sheets draw it.
+     - 002 Flint: flatter shards set in shallow recesses, not pyramid spikes.
+     - 032 Shoreline Corner: square, edge-matched grass top with white daisies.
+   - **Keep as built:** everything else in 001–035. 017's optional trim to 6 berries is left as is.
+3. **Continue from 071 in order** through 172. These remakes come up in turn: 072, 073, 075, 076, 077, 080–084, 088–091,
+   093, 095, 100, 102, 143, 145, 147, 150, 153, 154, 157.
+4. **New sheets 173–212, 337, 338** (resources, picked states, building sets, placeables, landmarks), with family
+   builders for the ore deposits, the picked/depleted states and the three building sets.
+5. **Gear 247–270** with family builders per weapon type (12 tiers from one builder) and per armor set. Sheets 246, 249,
+   252 and 262 don't exist yet.
+
+**Separate tracks, not in the modelling queue:**
+- **VFX concepts 271–301:** each sheet says "rebuild as separate textures". These become Studio ParticleEmitter, Beam
+  and Trail setups with small textures, done a few sheets per agent, not Blender models.
+- **Creatures, bosses and NPCs 213–245:** these need a rig and animation decision (R6-style parts or a skinned rig)
+  before modelling starts. They wait for the owner.
+
+**Pipeline changes (2026-11-04):**
+- two modellers at a time;
+- the brief replaces the study (`art/blender/kit/mcp/HOUSE_RULES.md`, `BRIEF_TEMPLATE.md`);
+- shared parts library and builder scaffold;
+- the verify suite and compare image;
+- light work files;
+- verification sized to the model;
+- the ship script.
+
+STAGES.md has the details. The repository no longer runs GitHub checks: run README → Checks locally before a PR.
+
 ## Log
 
 - 2026-10-27: inventory written from four independent audit agents (one per sheet group). No model is marked done; every model needs work.
@@ -477,3 +530,10 @@ Skill vs design doc / repo (design doc wins, reported):
   - 068 Timber Hut: built (`TimberCabin`, 7976 tris, 12 parts). R1 FAIL 7: light leaked through every wall, gable and floor joint. The fix round closed them (escape scan: 0 rays out except through the doorway), added dark inner window shutters, bargeboard cleats, plate ends to |y| 10.80, eave blocking and a chimney collar; the main session accepted the extra pieces. Next: round 2 with a fresh verifier on a copy of the kit file (`wip/M068v.blend` is current).
   - 070 Ruined Lean-To: built (`RuinedLeanTo`, 5926 tris, 10 parts), `build()` reports no problems; not yet verified. Recorded misses: front and side W : H out of tolerance, ivy thinner than the sheet. Next: round 1 with a fresh verifier (`wip/M070v.blend` is current).
   - Both are already built into `FlintbornWorldKit.blend`. Not yet in a PR: 069.
+- 2026-11-04: the speed-up landed (house rules and briefs, shared parts library and builder scaffold, light work files, verify suite and compare sheets, ship script; work committed straight to v0.19). Remakes rebuilt on the library and passed: 048 Dock (R1 8), 050 Timber Bridge (R1 FAIL 6, R2 8), 051 Rope Crossing (R1 FAIL 7, R2 8), 052 Boardwalk (R1 8). Compare pass on 001–035: no rebuilds, ten touch-ups queued (see "Queue and tracks").
+- 2026-11-04 (later): PAUSED at the owner's request. All agents and background sessions stopped. In progress, committed as work in progress:
+  - 064 A-Frame Tent: rebuilt from the remade sheet (`CanvasTent`, 4068 tris, kit_verify clean, walk and escape scan clean); main-session rulings written. Next: round-1 verifier on a copy of `wip/M064.blend` (`wip/M064v.blend` is current).
+  - 066 Canvas Shelter: rebuilt (4056 tris); R1 FAIL 6 (thin posts and footings, plain crate, timber 20 % dark). The fix list is in its spec; the fix modeller was stopped before finishing, so `m066.py` may be partly edited. Next: a fresh fix modeller from `wip/M066.blend`, then round 2.
+  - 068 Timber Hut: the modeller rewrote `m068.py` on the library (not yet built; the spec and renders are still the old design's). Next: a fresh modeller continues from that builder.
+  - 069 Palisade Wall and 070 Ruined Lean-To: not started on their remade sheets.
+  - Then the 001–035 touch-ups, then 071 onward.

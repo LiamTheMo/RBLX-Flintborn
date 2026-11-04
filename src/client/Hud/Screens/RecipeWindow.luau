@@ -653,6 +653,8 @@ function RecipeWindow:_renderList()
 		row:SetSubtitle(entry.subtitle or "")
 		self:_fitSubtitle(row, layout)
 		row:SetState(if entry.locked then "locked" else "normal")
+		-- Short of materials: greyed, still chosen to see what is missing.
+		row:SetGreyed(not entry.locked and not RecipeModel.Affordable(entry))
 		height += layout.h + (if index > 1 then L.recipeGap else 0)
 	end
 	for id, row in self.rows do

@@ -24,6 +24,7 @@ local PropModels = require(ReplicatedStorage.Shared.Visuals.PropModels)
 local Rarity = require(ReplicatedStorage.Shared.Items.Rarity)
 local Recipe = require(ReplicatedStorage.Shared.Visuals.Recipe)
 local WorldState = require(ReplicatedStorage.Shared.World.WorldState)
+local Channel = require(script.Parent.Parent.Infrastructure.Channel)
 local AnnouncementService = require(script.Parent.AnnouncementService)
 local BossService = require(script.Parent.BossService)
 local BuildingService = require(script.Parent.BuildingService)
@@ -197,7 +198,6 @@ local function spawnNode(event, loot, position: Vector3, minRank: number?, onCla
 	prompt.ObjectText = if isOre
 		then ("%s · %s · %s+"):format(event.entry.name, event.entry.rarity, NodeCatalog.PickaxeName(minRank))
 		else ("%s · %s"):format(event.entry.name, event.entry.rarity)
-	prompt.HoldDuration = EventDirectorService.NODE_HARVEST_SECONDS
 	prompt.MaxActivationDistance = 8
 	prompt.RequiresLineOfSight = false
 	prompt.Parent = part
@@ -212,10 +212,11 @@ local function spawnNode(event, loot, position: Vector3, minRank: number?, onCla
 		end
 	end)
 	local site = {}
-	prompt.Triggered:Connect(function(player)
-		if not InteractionService.CanInteract(player, part, 10) or notice(player) then
-			return
-		end
+	-- The hold is timed by the server (Channel), not by the client's prompt.
+	local function canUse(player: Player): boolean
+		return InteractionService.CanInteract(player, part, 10) and notice(player) == nil
+	end
+	Channel.Attach(prompt, EventDirectorService.NODE_HARVEST_SECONDS, canUse, function(player)
 		if EventRules.Claim(site) then
 			part:Destroy()
 			DropService.Scatter(EventRules.RollLoot(loot, rng, ModifierService.Sum(player, "Luck")), position, rng)

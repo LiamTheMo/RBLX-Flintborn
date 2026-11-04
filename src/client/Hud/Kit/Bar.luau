@@ -39,12 +39,16 @@ Bar.FILLS = {
 }
 
 -- Frame art and its well (the fill's area) in the sprite's own px:
--- {role, left, top, right, bottom}.
+-- {role, left, top, right, bottom, channel}. `channel` is the dark channel's
+-- rows {first, past the last} when the fill must sit centred on it: the track's
+-- channel has 6 rows above it and 7 below, and its 9-slice corners round to
+-- whole px, so centring the fill on the art left it about a third of a px low
+-- (a pixel on a big screen). See centreOn.
 Bar.FRAMES = {
-	track = { "bar.track", 3, 3, 3, 3 },
+	track = { "bar.track", 3, 3, 3, 4, { 6, 21 } },
 	well = { "bar.frame", 24, 15, 23, 16 },
 	thin = { "bar.frameThin", 10, 9, 10, 8 },
-	stat = { "bar.track", 3, 3, 3, 3 },
+	stat = { "bar.track", 3, 3, 3, 4, { 6, 21 } },
 }
 -- The stat frame, as shares of the bar's height: the icon's size and its left
 -- inset, the gap after it, the track's inset from the plate's top, bottom and
@@ -54,6 +58,62 @@ Bar.STAT_ICON_X = 0.2
 Bar.STAT_GAP = 0.1
 Bar.STAT_INSET = 0.22
 Bar.STAT_TEXT = 0.72
+
+-- The well {x, y, w, h} in an x, y, w × h box from its insets in px (left, top,
+-- right, bottom), each rounded on its own so equal insets stay equal and the fill
+-- stays centred. (Rounding the sum instead turned the XP track's 0.57 + 0.57 px
+-- into 1 + 0, so the fill sat a pixel low over the bottom rim.)
+local function wellIn(x: number, y: number, w: number, h: number, l: number, t: number, r: number, b: number)
+	local left, top = math.floor(l + 0.5), math.floor(t + 0.5)
+	local right, bottom = math.floor(r + 0.5), math.floor(b + 0.5)
+	return { x + left, y + top, w - left - right, h - top - bottom }
+end
+
+-- Where the middle of sprite rows `channel` {first, past the last} is drawn, in
+-- px from the top of a w × h plate of `roleName`: the plate is outset
+-- (Art.Outset) and 9-sliced with whole-px corners (Widgets' nine-slice), so a
+-- row's place depends on which band it falls in. Inside the scaled HUD Roblox
+-- drops the fraction of a design px from offsets, so the outset art starts at
+-- a whole px and is a whole number of px tall. Nil without slice data.
+local function channelMiddle(roleName: string, sprite: string, w: number, h: number, channel): number?
+	local entry = UiAssets.sprite(sprite)
+	if entry == nil or type(entry.slice) ~= "table" then
+		return nil
+	end
+	local out = Art.Outset(roleName, sprite, w, h)
+	local scale = Art.SliceScale(sprite, w + out[1] + out[3], h + out[2] + out[4]) or 1
+	local artTop, artH = -math.floor(out[2]), math.floor(h + out[2] + out[4])
+	local top, bottom = entry.slice[2], entry.slice[4]
+	local T, B = math.round(top * scale), math.round(bottom * scale)
+	local function rowY(row: number): number
+		if row <= top then
+			return row / top * T
+		elseif row >= entry.h - bottom then
+			return artH - (entry.h - row) / bottom * B
+		end
+		return T + (row - top) / (entry.h - top - bottom) * (artH - T - B)
+	end
+	return artTop + (rowY(channel[1]) + rowY(channel[2])) / 2
+end
+
+-- Moves `well` (in a box starting at `y`) so its middle sits as near `middle`
+-- as whole px allow (offsets drop their fractions), at its height or one px
+-- shorter, whichever centres it better (its height on a tie).
+local function centreOn(well, y: number, middle: number)
+	local best, bestError = nil, math.huge
+	for _, height in { well[4], well[4] - 1 } do
+		local top = math.floor(middle - height / 2)
+		for _, candidate in { top, top + 1 } do
+			local miss = math.abs(candidate + height / 2 - middle)
+			if height > 0 and miss < bestError - 1e-6 then
+				best, bestError = { candidate, height }, miss
+			end
+		end
+	end
+	if best then
+		well[2], well[4] = y + best[1], best[2]
+	end
+end
 
 -- props: rect | size, fill, frame ("track"), icon (stat frame), text (value
 -- text over the bar: the stat frame's in cream with an ink outline, else in
@@ -96,12 +156,11 @@ function Bar.new(parent: Instance, props)
 		local out = Art.Outset(frame[1], sprite, track[3], track[4])
 		local l, t = frame[2] * k - out[1], frame[3] * k - out[2]
 		local r, b = frame[4] * k - out[3], frame[5] * k - out[4]
-		well = {
-			track[1] + math.floor(l + 0.5),
-			track[2] + math.floor(t + 0.5),
-			track[3] - math.floor(l + r + 0.5),
-			track[4] - math.floor(t + b + 0.5),
-		}
+		well = wellIn(track[1], track[2], track[3], track[4], l, t, r, b)
+		local middle = frame[6] and channelMiddle(frame[1], sprite, track[3], track[4], frame[6])
+		if middle then
+			centreOn(well, track[2], middle)
+		end
 		-- The value sits in the track, over the fill and the empty part.
 		self.label = Core.Label(base.visual, {
 			name = "Value",
@@ -126,12 +185,11 @@ function Bar.new(parent: Instance, props)
 		local out = Art.Outset(frame[1], sprite, w, h)
 		local l, t = frame[2] * k - out[1], frame[3] * k - out[2]
 		local r, b = frame[4] * k - out[3], frame[5] * k - out[4]
-		well = {
-			math.floor(l + 0.5),
-			math.floor(t + 0.5),
-			w - math.floor(l + r + 0.5),
-			h - math.floor(t + b + 0.5),
-		}
+		well = wellIn(0, 0, w, h, l, t, r, b)
+		local middle = frame[6] and channelMiddle(frame[1], sprite, w, h, frame[6])
+		if middle then
+			centreOn(well, 0, middle)
+		end
 	end
 	self.well = well
 	local fillSprite = Art.ROLES[fillRole].sprite

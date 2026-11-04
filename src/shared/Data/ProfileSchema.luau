@@ -177,11 +177,29 @@ local function pruneMap(map: any): number
 	return removed
 end
 
+-- Removes the items of retired catalog ids from a {[place] = item} map (the lobby
+-- hotbar and worn armour) in place.
+local function pruneItemMap(map: any): number
+	if type(map) ~= "table" then
+		return 0
+	end
+	local removed = 0
+	for place, item in table.clone(map) do
+		if type(item) ~= "table" or not known(item.catalogId) then
+			map[place] = nil
+			removed += 1
+		end
+	end
+	return removed
+end
+
 -- Deletes every reference to a retired item, and the Forge conversions of retired
 -- items. Returns how many entries were removed (0 when the profile is clean).
 function ProfileSchema.PruneRetiredItems(profile): number
 	local removed = 0
 	removed += pruneList(profile.lobbyBackpack.slots)
+	removed += pruneItemMap(profile.lobbyBackpack.hotbar)
+	removed += pruneItemMap(profile.lobbyBackpack.armor)
 	removed += pruneList(profile.vault.items)
 	removed += pruneMap(profile.vault.materials)
 	local overflow = profile.vault.lastOverflow

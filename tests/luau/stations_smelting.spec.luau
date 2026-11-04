@@ -635,13 +635,17 @@ end)
 -- FarmingService against the same fakes --------------------------------------------
 
 local created = FakeRoblox.Instances()
+-- Planters are reached in sight: nothing stands between player and planter here.
+workspace.Raycast = function()
+	return nil
+end
 local FarmingService = require(game:GetService("ServerScriptService").Server.Services.FarmingService)
 FarmingService.Start()
 
 -- A placed planter's prompts, in the order they were made.
 local function planter(id: string)
 	local first = #created + 1
-	local part = { Position = Vector3.new(0, 0, 0), CFrame = CFrame.new() }
+	local part = { Position = Vector3.new(0, 0, 0), CFrame = CFrame.new(), Parent = "PlayerStructures" }
 	stubs.BuildingService.Placed:Fire({ id = id, pieceId = "Planter", part = part, position = part.Position })
 	local made = {}
 	for index = first, #created do

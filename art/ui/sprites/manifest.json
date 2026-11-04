@@ -1,4 +1,23 @@
 {
+  "atlas_lk_build": {
+    "file": "atlas_lk_build.png",
+    "w": 1024,
+    "h": 128,
+    "slice": null
+  },
+  "lk_icon_build2": {
+    "file": "lk_icon_build2.png",
+    "w": 110,
+    "h": 97,
+    "slice": null,
+    "atlas": "atlas_lk_build",
+    "rect": [
+      0,
+      0,
+      110,
+      97
+    ]
+  },
   "pm_map_island": {
     "file": "pm_map_island.png",
     "w": 1000,

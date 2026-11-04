@@ -107,10 +107,13 @@ function DeployService.Start()
 		local items = {}
 		for _, item in LoadoutService.Preview(player) do
 			if TransitRules.Deployable(item) then
-				table.insert(
-					items,
-					{ catalogId = item.catalogId, quantity = item.quantity, permanent = item.permanent }
-				)
+				table.insert(items, {
+					catalogId = item.catalogId,
+					quantity = item.quantity,
+					permanent = item.permanent,
+					-- The hotbar slot or armour slot it starts the run in.
+					loadoutSlot = item.loadoutSlot,
+				})
 			end
 		end
 		return items

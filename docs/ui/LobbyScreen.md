@@ -119,9 +119,9 @@ and width as the run's vitals. The HUD draws on the whole screen
 (`Kit.Scale.FullScreen`) and `LobbyHud:_place` (SetTopInset, SetScreen)
 places every region with the run's placement (`Hud/Layout.PlaceColumns`, the
 edge rule applied to the whole column, STYLE_GUIDE §5.7). The Settings button
-sits in the bottom-left corner, the run's ⚙ (HudLayout `gear`, 52 × 46,
+sits in the bottom-left corner, the run's ⚙ (HudLayout `gear`, 52 × 52 since 2026-11-04,
 `HudModel.GearCorner`): M from the left and the bottom (desktop x 24–76,
-y 871–917; a notched 844 × 390 iPhone x 12–38, y 355–378, the thumbstick ring
+y 865–917; a notched 844 × 390 iPhone x 12–38, y 355–378, the thumbstick ring
 from x 72); only where Roblox's thumbstick ring reaches the corner (a phone
 without a side inset) its foot stands 12 screen px above the ring (667 × 375:
 x 12–38, y 250–273). Gamepad: Settings is under the tiles' bottom-left tile

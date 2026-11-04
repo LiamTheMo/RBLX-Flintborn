@@ -5,6 +5,7 @@
 -- functions run inside ProfileService operations.
 
 local InventoryRules = require(script.Parent.Parent.Inventory.InventoryRules)
+local LobbyLoadoutRules = require(script.Parent.Parent.Inventory.LobbyLoadoutRules)
 local TradeRules = require(script.Parent.Parent.Economy.TradeRules)
 
 local TransitRules = {}
@@ -18,7 +19,9 @@ function TransitRules.Deployable(item): boolean
 end
 
 -- Moves every deployable lobby backpack slot into a new reservation (malformed
--- entries stay behind). Errors (changing nothing, since operations run on a copy)
+-- entries stay behind), and the lobby hotbar and worn armour too, each tagged with
+-- its place (LobbyLoadoutRules.TakePlaced) so the run starts with them where they
+-- were. Errors (changing nothing, since operations run on a copy)
 -- if a reservation already exists, or while a trade settles (a rollback cannot
 -- reclaim items carried into a run).
 function TransitRules.Reserve(profile, reservationId: string, now: number)
@@ -31,6 +34,9 @@ function TransitRules.Reserve(profile, reservationId: string, now: number)
 	local deploying, staying = {}, {}
 	for _, item in profile.lobbyBackpack.slots do
 		table.insert(if TransitRules.Deployable(item) then deploying else staying, item)
+	end
+	for _, item in LobbyLoadoutRules.TakePlaced(profile) do
+		table.insert(deploying, item)
 	end
 	profile.transit = {
 		reservationId = reservationId,
@@ -54,16 +60,17 @@ function TransitRules.Consume(profile, reservationId: string)
 	return InventoryRules.MarkCarried(transit.items)
 end
 
--- Returns reserved items to the lobby backpack. A missing reservation is a no-op.
+-- Returns reserved items to the lobby: hotbar and worn armour to their places,
+-- the rest to the lobby backpack (LobbyLoadoutRules.Return). A missing
+-- reservation is a no-op.
 function TransitRules.Rollback(profile)
 	local transit = profile.transit
 	if transit == nil then
 		return 0
 	end
-	local slots = profile.lobbyBackpack.slots
 	local returned = 0
 	for _, item in transit.items do
-		table.insert(slots, item)
+		LobbyLoadoutRules.Return(profile, item)
 		returned += 1
 	end
 	profile.transit = nil

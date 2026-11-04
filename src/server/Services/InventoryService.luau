@@ -206,7 +206,8 @@ local function keepInLobby(player: Player, leftovers)
 end
 
 local function startRun(player: Player, _character, items)
-	local inventory, leftovers = InventoryRules.FromItems(items or {})
+	-- The lobby's hotbar and worn armour come back as they were (loadoutSlot tags).
+	local inventory, leftovers = InventoryRules.FromLoadout(items or {})
 	entries[player] = { inventory = inventory, equipped = nil }
 	if #leftovers > 0 then
 		keepInLobby(player, leftovers)
@@ -228,7 +229,16 @@ local function move(player: Player, fromArea: any, fromIndex: any, toArea: any, 
 	if not InventoryRules.Move(entry.inventory, fromArea, fromIndex, toArea, toIndex) then
 		return false, "InvalidMove"
 	end
-	-- Keep the equipped slot pointing at whatever is now there.
+	-- The held item stays held wherever it moves; a held slot that swapped its item
+	-- out for one from the backpack puts it away.
+	local hotbar = InventoryRules.Hotbar
+	if entry.equipped then
+		if fromArea == hotbar and fromIndex == entry.equipped then
+			entry.equipped = if toArea == hotbar then toIndex else nil
+		elseif toArea == hotbar and toIndex == entry.equipped then
+			entry.equipped = if fromArea == hotbar then fromIndex else nil
+		end
+	end
 	InventoryService.Publish(player)
 	return true, nil
 end
@@ -281,6 +291,21 @@ function InventoryService.Start()
 		end
 		if not InventoryRules.UnequipArmor(entry.inventory, slot) then
 			return false, "NoRoom"
+		end
+		InventoryService.Publish(player)
+		return true, nil
+	end)
+	-- Takes a worn piece off into a chosen hotbar or backpack slot (drag and drop).
+	Remotes.Handle("UnequipArmorTo", function(player, slot, area, index)
+		local entry = entries[player]
+		if entry == nil or type(slot) ~= "string" or type(area) ~= "string" or type(index) ~= "number" then
+			return false, "BadRequest"
+		end
+		if not InventoryRules.UnequipArmorTo(entry.inventory, slot, area, index) then
+			return false, "SlotTaken"
+		end
+		if area == InventoryRules.Hotbar and entry.equipped == index then
+			entry.equipped = nil
 		end
 		InventoryService.Publish(player)
 		return true, nil

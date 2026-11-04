@@ -1,11 +1,16 @@
 -- Server movement sanity (GDD §24, §21.4). Horizontal travel between two server
 -- samples may not exceed the speed the server currently allows the player (walk,
 -- sprint or a downed crawl, as set on their Humanoid) with a generous
--- allowance for latency; vertical motion (falls, jumps) is ignored. The latency
--- allowance is a budget: overruns spend it and slower samples refill it, so it
--- cannot be claimed every sample for a sustained speed-up. A move far beyond the
--- limit is a teleport and is pulled back at once; smaller overruns get STRIKES
--- chances first.
+-- allowance for latency. The latency allowance is a budget: overruns spend it
+-- and slower samples refill it, so it cannot be claimed every sample for a
+-- sustained speed-up. A move far beyond the limit is a teleport and is pulled
+-- back at once; smaller overruns get STRIKES chances first. Over a longer window
+-- (WINDOW_SECONDS) the distance must also stay near the allowed pace, so a small
+-- steady speed-up inside the per-sample tolerance is caught too.
+--
+-- Vertically (JudgeAir): nobody swims or climbs, so a player off the ground may
+-- rise no higher than a jump above where they last stood, and may not stay up
+-- for long without falling (fly and hover hacks). Falls are free.
 
 local Geometry = require(script.Parent.Parent.Core.Geometry)
 local SurvivalRules = require(script.Parent.Parent.Survival.SurvivalRules)
@@ -53,6 +58,76 @@ end
 -- that teleports, acts and teleports back between two samples fails this.
 function MovementRules.NearValidated(live: Vector3, validated: Vector3?, slack: number): boolean
 	return validated == nil or Geometry.FlatDistance(validated, live) <= slack
+end
+
+-- Studs a client-owned point may be from the last validated position: what the
+-- allowed speed covers in `elapsed` seconds since that position was taken, plus
+-- a little latency, capped at `cap`. The longer since the last good sample, the
+-- more slack (an overrun sample leaves the validated position behind).
+MovementRules.SLACK_PAD = 2
+function MovementRules.Slack(allowedSpeed: number, elapsed: number, cap: number): number
+	return math.min(cap, allowedSpeed * elapsed * MovementRules.TOLERANCE + MovementRules.SLACK_PAD)
+end
+
+-- Sustained pace: the flat distance over the last WINDOW_SECONDS may exceed what
+-- the allowed speed covered by WINDOW_TOLERANCE plus WINDOW_PAD studs (latency
+-- when sprint starts or stops, and a lag spike's backlog arriving at once:
+-- about a second and a half of walking). A steady speed-up of about 18% or more
+-- is over. `window` is a list of {dt, distance, allowed} samples, oldest first.
+MovementRules.WINDOW_SECONDS = 8
+MovementRules.WINDOW_TOLERANCE = 1.08
+MovementRules.WINDOW_PAD = 12
+function MovementRules.PushWindow(window, dt: number, distance: number, allowed: number)
+	table.insert(window, { dt = dt, distance = distance, allowed = allowed })
+	local total = 0
+	for index = #window, 1, -1 do
+		total += window[index].dt
+		if total > MovementRules.WINDOW_SECONDS then
+			for _ = 1, index - 1 do
+				table.remove(window, 1)
+			end
+			break
+		end
+	end
+end
+
+function MovementRules.WindowOver(window): boolean
+	local seconds, travelled, budget = 0, 0, 0
+	for _, entry in window do
+		seconds += entry.dt
+		travelled += entry.distance
+		budget += entry.allowed * entry.dt
+	end
+	-- Only a (nearly) full window judges: a short one is the per-sample check's job.
+	if seconds < MovementRules.WINDOW_SECONDS * 0.9 then
+		return false
+	end
+	return travelled > budget * MovementRules.WINDOW_TOLERANCE + MovementRules.WINDOW_PAD
+end
+
+-- Air time. `air` is {groundY, since?, startY?}: the height the player last stood
+-- at, and when and at what height they left the ground. Off the ground they may
+-- rise at most `jumpHeight` + RISE_MARGIN above groundY, and after HOVER_SECONDS
+-- they must have dropped HOVER_DROP studs below where they left it.
+-- Returns "Ok" | "Fly" (and updates `air`).
+MovementRules.RISE_MARGIN = 3
+MovementRules.HOVER_SECONDS = 1.5
+MovementRules.HOVER_DROP = 4
+function MovementRules.JudgeAir(air, supported: boolean, y: number, jumpHeight: number, now: number): string
+	if supported then
+		air.groundY, air.since, air.startY = y, nil, nil
+		return "Ok"
+	end
+	if air.since == nil then
+		air.since, air.startY = now, y
+	end
+	if y - air.groundY > math.max(jumpHeight, 0) + MovementRules.RISE_MARGIN then
+		return "Fly"
+	end
+	if now - air.since >= MovementRules.HOVER_SECONDS and air.startY - y < MovementRules.HOVER_DROP then
+		return "Fly"
+	end
+	return "Ok"
 end
 
 -- True for a move so far over the limit that it can only be a teleport ("blink").

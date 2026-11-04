@@ -57,10 +57,26 @@ local function nameOf(entry): string
 	return entry.name or (def and def.name) or entry.catalogId
 end
 
--- The entry behind a cell id: {kind, index?, entry}, or nil.
+-- The armour slot ("Head", "Chest", "Legs") an entry is worn in, or nil.
+local function armorSlotOf(entry): string?
+	local def = entry and ItemCatalog.Get(entry.catalogId)
+	return def and def.armor and def.armor.slot or nil
+end
+
+local ARMOR_SLOTS = InventoryModel.ARMOR_SLOTS
+
+-- The entry behind a cell id: {kind, index?, entry}, or nil. Kinds: "backpack",
+-- "item" (vault), "material" (vault), "hotbar" and "armor" (the lobby loadout).
 local function entryFor(id: string?)
 	if id == nil or view == nil then
 		return nil
+	end
+	local area, number = string.match(id, "^(%a+):(%d+)$")
+	if area == "hotbar" or area == "armor" then
+		local index = tonumber(number) :: number
+		local list = if area == "hotbar" then view.hotbar else view.armor
+		local entry = list and list[index]
+		return if entry then { kind = area, index = index, entry = entry } else nil
 	end
 	local kind, key = string.sub(id, 1, 1), string.sub(id, 2)
 	if kind == "b" then
@@ -128,7 +144,7 @@ local function showDetail()
 	if choice == nil then
 		window:SetDetail({
 			hint = if tab == "Backpack"
-				then "Everything you own. Choose an item to store it in your vault or take it out."
+				then "Everything you own. Drag items to your hotbar, armour or vault, or choose one."
 				else "Your vault keeps items safe. Choose one to take it into your backpack.",
 		})
 		return
@@ -149,7 +165,19 @@ local function showDetail()
 		if quantity > 1 then
 			detail.amount = { min = 1, max = quantity, value = math.clamp(amount, 1, quantity), allLabel = "All" }
 		end
-		detail.actions = { { id = "store", label = "Store", enabled = not busy } }
+		detail.actions = {
+			{ id = "store", label = "Store", enabled = not busy },
+			{
+				id = "equip",
+				label = if armorSlotOf(entry) then "Wear" else "Equip",
+				variant = "secondary",
+				enabled = not busy,
+			},
+		}
+	elseif choice.kind == "hotbar" or choice.kind == "armor" then
+		detail.text = (detail.text or "")
+			.. (if choice.kind == "hotbar" then "\nOn your hotbar for the next run." else "\nWorn on the next run.")
+		detail.actions = { { id = "unequip", label = "Unequip", enabled = not busy } }
 	elseif choice.kind == "item" then
 		detail.actions = { { id = "take", label = "Take", enabled = not busy } }
 	else
@@ -167,7 +195,9 @@ function render()
 	window:SelectTab(tab)
 	window:SetTabLabel("Vault", ("Vault %d/%d"):format(#view.items, view.itemCapacity))
 	if tab == "Backpack" then
-		window:SetSections(InventoryModel.LobbySections(view, tab, sorted))
+		window:SetSections(InventoryModel.LobbySections(view, tab, sorted, function(index)
+			return Binds.Label("Hotbar" .. index)
+		end))
 		window:SetToolbar({
 			{ id = "sort", label = "Sort: " .. VaultController.SORTS[sortIndex] },
 			{ id = "storeAll", label = "Store All", enabled = #view.backpack > 0 },
@@ -188,11 +218,14 @@ function render()
 end
 
 -- Fetches the backpack and vault and draws them. `opening`: also tells of
--- material deliveries the vault had no room for (once per opening).
-local function refresh(opening: boolean?)
+-- material deliveries the vault had no room for (once per opening). `quiet`:
+-- says nothing when the data is not loaded yet (the background read at start).
+local function refresh(opening: boolean?, quiet: boolean?)
 	local latest = Remotes.Invoke("VaultSnapshot")
 	if type(latest) ~= "table" then
-		notify("warn", "Still loading", "Your data is still loading. Try again in a moment.")
+		if not quiet then
+			notify("warn", "Still loading", "Your data is still loading. Try again in a moment.")
+		end
 		return
 	end
 	view = latest
@@ -224,18 +257,18 @@ local function hold(fn)
 	end
 end
 
--- Deposits backpack slot `index` (the amount picked with the stepper when it
--- holds a stack). A material the vault cannot hold in full asks first how much
--- would be deleted (GDD §53); "deposit anyway" goes through only while that slot
--- still holds the same stack.
-local function deposit(index: number)
+-- Deposits backpack slot `index` (`quantity`, else the amount picked with the
+-- stepper when it holds a stack). A material the vault cannot hold in full asks
+-- first how much would be deleted (GDD §53); "deposit anyway" goes through only
+-- while that slot still holds the same stack.
+local function deposit(index: number, quantity: number?)
 	local item = view and view.backpack[index]
 	if item == nil then
 		return
 	end
 	local name = nameOf(item)
 	local owned = if item.instanceId then 1 else (item.quantity or 1)
-	local store = math.clamp(amount, 1, owned)
+	local store = math.clamp(quantity or amount, 1, owned)
 	local overflow = nil
 	hold(function()
 		local ok, reason, lost = Remotes.Invoke("VaultDeposit", index, nil, nil, store)
@@ -274,14 +307,14 @@ local function deposit(index: number)
 	})
 end
 
-local function withdraw(choice)
+local function withdraw(choice, quantity: number?)
 	local name = nameOf(choice.entry)
 	hold(function()
 		local ok, reason
 		if choice.kind == "item" then
 			ok, reason = Remotes.Invoke("VaultWithdrawItem", choice.index)
 		else
-			local take = math.clamp(amount, 1, choice.entry.quantity or 1)
+			local take = math.clamp(quantity or amount, 1, choice.entry.quantity or 1)
 			ok, reason = Remotes.Invoke("VaultWithdrawMaterial", choice.entry.catalogId, take)
 		end
 		if ok then
@@ -328,6 +361,137 @@ local function storeAll()
 	end)
 end
 
+-- The lobby loadout (backpack, hotbar, worn armour) -------------------------------
+
+-- A cell as a place: {area, key?, index?, entry?}. Areas "backpack" (key: list
+-- index, nil for the end), "hotbar", "armor" (index: slot number), "vault"
+-- (index, nil for an empty cell) and "material" (entry).
+local function placeOf(id: string)
+	if view == nil then
+		return nil
+	end
+	local choice = entryFor(id)
+	if choice then
+		if choice.kind == "backpack" then
+			return { area = "backpack", key = choice.index, entry = choice.entry }
+		elseif choice.kind == "item" then
+			return { area = "vault", index = choice.index, entry = choice.entry }
+		elseif choice.kind == "material" then
+			return { area = "material", entry = choice.entry }
+		end
+		return { area = choice.kind, index = choice.index, entry = choice.entry }
+	end
+	local area, number = string.match(id, "^(%a+):(%d+)$")
+	if area == "hotbar" or area == "armor" then
+		return { area = area, index = tonumber(number) }
+	elseif string.sub(id, 1, 2) == "be" then
+		return { area = "backpack" }
+	elseif string.sub(id, 1, 2) == "ie" then
+		return { area = "vault" }
+	end
+	return nil
+end
+
+local LOADOUT = { backpack = true, hotbar = true, armor = true }
+
+-- The key LobbyMove takes for a place: a backpack index (nil: the end), a hotbar
+-- slot number or an armour slot name.
+local function keyOf(place)
+	if place.area == "armor" then
+		return ARMOR_SLOTS[place.index]
+	elseif place.area == "hotbar" then
+		return place.index
+	end
+	return place.key
+end
+
+local function backpackFull(): boolean
+	return view ~= nil and #view.backpack >= (view.backpackCapacity or 50)
+end
+
+-- Whether the item in cell `fromId` can be dropped on cell `toId`: anything between
+-- the backpack, hotbar and worn armour (armour on its own slot only; a worn piece
+-- swaps only with a piece for the same slot); backpack items into the vault, and
+-- vault items and materials into the backpack.
+function VaultController.CanDrop(fromId: string, toId: string): boolean
+	if fromId == toId then
+		return false
+	end
+	local from, to = placeOf(fromId), placeOf(toId)
+	if from == nil or to == nil or from.entry == nil then
+		return false
+	end
+	if LOADOUT[from.area] and LOADOUT[to.area] then
+		if to.area == "armor" then
+			return armorSlotOf(from.entry) == ARMOR_SLOTS[to.index]
+		end
+		if from.area == "armor" and to.entry and armorSlotOf(to.entry) ~= ARMOR_SLOTS[from.index] then
+			return false
+		end
+		-- The hotbar and armour take no backpack slots: the end of the backpack needs a free one.
+		if to.area == "backpack" and to.key == nil and from.area ~= "backpack" and backpackFull() then
+			return false
+		end
+		return true
+	end
+	if from.area == "backpack" and (to.area == "vault" or to.area == "material") then
+		return ItemCatalog.IsMaterial(from.entry.catalogId) or not vaultFull()
+	end
+	return (from.area == "vault" or from.area == "material") and to.area == "backpack"
+end
+
+-- Moves between the backpack, hotbar and worn armour (LobbyMove).
+local function relocate(from, to)
+	hold(function()
+		local ok, reason = Remotes.Invoke("LobbyMove", from.area, keyOf(from), to.area, keyOf(to))
+		if not ok then
+			refused(reason)
+		end
+	end)
+end
+
+function VaultController.Drop(fromId: string, toId: string)
+	if busy or not VaultController.CanDrop(fromId, toId) then
+		return
+	end
+	local from, to = placeOf(fromId), placeOf(toId)
+	if from == nil or to == nil then
+		return
+	end
+	selected = nil
+	if LOADOUT[from.area] and LOADOUT[to.area] then
+		relocate(from, to)
+	elseif from.area == "backpack" then
+		-- The whole slot goes in.
+		deposit(from.key, if from.entry.instanceId then 1 else from.entry.quantity)
+	elseif from.area == "vault" then
+		withdraw({ kind = "item", index = from.index, entry = from.entry })
+	else
+		withdraw({ kind = "material", entry = from.entry }, from.entry.quantity)
+	end
+end
+
+-- EQUIP / WEAR on a backpack item: onto the first free hotbar slot, or worn.
+local function equip(choice)
+	local slot = armorSlotOf(choice.entry)
+	local to
+	if slot then
+		to = { area = "armor", index = table.find(ARMOR_SLOTS, slot) }
+	else
+		for index = 1, #(view.hotbar or {}) do
+			if not view.hotbar[index] then
+				to = { area = "hotbar", index = index }
+				break
+			end
+		end
+		if to == nil then
+			notify("warn", "Hotbar full", "Drag the item onto a hotbar slot to swap it.")
+			return
+		end
+	end
+	relocate({ area = "backpack", key = choice.index }, to)
+end
+
 local function onAction(id: string)
 	local choice = entryFor(selected)
 	if choice == nil or busy then
@@ -335,7 +499,15 @@ local function onAction(id: string)
 	end
 	if id == "store" and choice.kind == "backpack" then
 		deposit(choice.index)
-	elseif id == "take" and choice.kind ~= "backpack" then
+	elseif id == "equip" and choice.kind == "backpack" then
+		equip(choice)
+	elseif id == "unequip" and (choice.kind == "hotbar" or choice.kind == "armor") then
+		if backpackFull() then
+			refused("BackpackFull")
+			return
+		end
+		relocate({ area = choice.kind, index = choice.index }, { area = "backpack" })
+	elseif id == "take" and (choice.kind == "item" or choice.kind == "material") then
 		withdraw(choice)
 	end
 end
@@ -379,6 +551,7 @@ local function build()
 			amount = value
 		end,
 		onToolbar = onToolbar,
+		drag = { group = "lobby", canDrop = VaultController.CanDrop, onDrop = VaultController.Drop },
 	})
 	VaultController.window = window
 end
@@ -498,6 +671,17 @@ function VaultController.Start()
 		return
 	end
 	build()
+	-- Read once in the background, so the HUD hotbar can drag before the window
+	-- is first opened; a few tries while the profile loads.
+	task.spawn(function()
+		for _ = 1, 5 do
+			refresh(false, true)
+			if view then
+				return
+			end
+			task.wait(3)
+		end
+	end)
 	Remotes.Get("ExtractionReceipt").OnClientEvent:Connect(showReceipt)
 	Binds.Bind("Backpack", function(_, state, input)
 		if state == Enum.UserInputState.Begin then
