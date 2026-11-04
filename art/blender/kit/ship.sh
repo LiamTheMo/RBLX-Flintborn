@@ -90,7 +90,8 @@ if not getattr(kit['render_group'], 'ship_retry', False):
         return render_group
     kit['render_group'] = _retry(kit['render_group'])
 # drop the sheet's old objects first, so parts a rebuild retires don't survive in the kit file and the export
-for o in [o for o in bpy.data.objects if o.get('kit_sheet') == '$CODE']:
+old = [o for o in bpy.data.objects if o.get('kit_sheet') == '$CODE']
+for o in {c for o in old for c in o.children_recursive} | set(old):   # VFX socket empties carry no kit_sheet
     bpy.data.objects.remove(o, do_unlink=True)
 t0 = time.time()
 out = $MOD.build() or {}

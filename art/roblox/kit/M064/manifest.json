@@ -482,7 +482,7 @@
    ],
    "vfx": [
     {
-     "name": "VFX_CanvasTent_heat_glow_1.001",
+     "name": "VFX_CanvasTent_heat_glow_1",
      "kind": "heat_glow",
      "position": [
       1.2461,
@@ -530,7 +530,7 @@
      }
     },
     {
-     "name": "VFX_CanvasTent_heat_glow_2.001",
+     "name": "VFX_CanvasTent_heat_glow_2",
      "kind": "heat_glow",
      "position": [
       -6.5539,
@@ -760,7 +760,7 @@
    ],
    "vfx": [
     {
-     "name": "VFX_CanvasTentLantern_heat_glow_1.001",
+     "name": "VFX_CanvasTentLantern_heat_glow_1",
      "kind": "heat_glow",
      "position": [
       0.0,

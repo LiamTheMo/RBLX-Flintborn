@@ -939,7 +939,7 @@
    ],
    "vfx": [
     {
-     "name": "VFX_TimberCabin_chimney_smoke_1.001",
+     "name": "VFX_TimberCabin_chimney_smoke_1",
      "kind": "chimney_smoke",
      "position": [
       2.2763,
@@ -996,7 +996,7 @@
      }
     },
     {
-     "name": "VFX_TimberCabin_heat_glow_1.001",
+     "name": "VFX_TimberCabin_heat_glow_1",
      "kind": "heat_glow",
      "position": [
       -8.5737,
@@ -1044,7 +1044,7 @@
      }
     },
     {
-     "name": "VFX_TimberCabin_heat_glow_2.001",
+     "name": "VFX_TimberCabin_heat_glow_2",
      "kind": "heat_glow",
      "position": [
       -4.6237,
@@ -1092,7 +1092,7 @@
      }
     },
     {
-     "name": "VFX_TimberCabin_heat_glow_3.001",
+     "name": "VFX_TimberCabin_heat_glow_3",
      "kind": "heat_glow",
      "position": [
       4.7763,
@@ -1219,7 +1219,7 @@
    ],
    "vfx": [
     {
-     "name": "VFX_TimberCabinChimney_chimney_smoke_1.001",
+     "name": "VFX_TimberCabinChimney_chimney_smoke_1",
      "kind": "chimney_smoke",
      "position": [
       0.0,
@@ -1497,7 +1497,7 @@
    ],
    "vfx": [
     {
-     "name": "VFX_TimberCabinLantern_heat_glow_1.001",
+     "name": "VFX_TimberCabinLantern_heat_glow_1",
      "kind": "heat_glow",
      "position": [
       0.0,
