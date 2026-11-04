@@ -1412,3 +1412,63 @@ Fresh verifier, read-only. Background session on port 9880 using `wip/M034_verif
   - RockLarge facets are plain (60–70 tris);
   - Studio checks on the bed's deep tone and the water and foam transparency.
 - **Export:** 7 assets, 9 pieces (6 solid, 3 water), 5146 tris, 20 VFX sockets (17 on the hero, 3 on WaterPlane), palette 18 colours, 0 problems.
+
+## Touch-up for the restyled sheet (2026-11-04)
+
+The owner restyled `references/034.png` (same design: plain cyan water, clean white foam outlines, no caustic net, no "Flow Strips" overlay; its Water Plane part shows long white wave bands instead). The compare pass found only colour and effect changes, so the land, rocks and water shells are unchanged. Land 2250 tris and water 376, as before. Foam 1156 → 1324 tris and 16 → 18 shells, from the wave bands. Hero 3782 → 3950 / 3999 tris (only 49 under the asset ceiling), 32.0 × 32.0 × 7.4.
+
+- **Plain water.** `BED_PLAIN = True`: the bed top is plain `m034_bed`, with no `bed_light` patches showing through the water. `m034_water` `#00ACDC` → `#00ADAE`, so the water renders the sheet's cyan; the old key clipped b at 255.
+- **Clean white foam.** `m034_water_foam` `#AAD0E6` → `#F2F8FA`, and its transparency 0.22 → 0.05, so the outlines read solid white instead of pale blue.
+- **Wave bands, not flow strips.** `WAVES` / `wave_bands()`: three tapered sine bands in the old flow-strip lanes, part of the foam shell (`foam_regions()` pos): the centre lane in two dashes (y 14.4 → 1.4 and −1.2 → −14.4, 0.34 wide) and the right lane (x 2.6, y 12.2 → −8.2, 0.32 wide). The right band has 10 stations; with 8 stations 2.9 apart its triangles were needles, and `_tidy2d` collapsed the whole band. The narrow left lane (x −3.8) stays plain: the hero budget has no room for a fourth band. The `StreambedSectionWaterPlane` part stays the plain water slab (96 tris), because a band there would make it two shells.
+- **Sockets removed:** the 3 `water_flow` beams (`FLOW`, `flow_clearance()`) on the hero and on the WaterPlane part, and the 14 `water_foam` sockets (`FOAM_FX`) on the hero. The sheet shows neither now; the foam is the painted outlines. `report()` now expects no sockets. Without a `water_flow` socket, the exported water pieces carry no `flow`.
+- **Material dropped:** `m034_bed_light` (unused while `BED_PLAIN` is set).
+- **Not done here: the caustic net.** The net is the kit's shared water texture (`lib/kitwater.py`). `export_kit_roblox.py` writes it for every key containing "water", and `flintkit` uses it as the preview, so it can't be removed from this builder without diverging from the export. It needs a shared change: a kit-wide opt-out per water key, or a plain texture style. The other way, a non-water key for the stream, would make it opaque and colliding. Left for the main session; the renders still show the net.
+
+Colour measures (water: b > r + 90, g > r + 60, sat > 0.55; foam: lum > 215, sat < 0.2), as median / lit quartile / shade quartile and pixel count:
+
+| Region | Sheet | Ours now | Before |
+| --- | --- | --- | --- |
+| Water, front three-quarter | `#01CEED` / `#02D0EE` / `#02CAE8` | `#07CFED` / `#4BDFF9` / `#01C5E5` | `#13D2FF` / `#4DE4FF` / `#03C8FF` |
+| Water, top | `#01CCEB` / `#03CEED` / `#01CAEA` | `#01CFEE` / `#47DFFA` / `#01C4E5` | `#13D5FF` / `#4DE8FF` / `#03C9FF` |
+| Foam, front three-quarter | `#F8FCFD`, 4200 px (0.17 of water) | `#FFFFFF`, 2492 px (0.19) | `#E0FFFF`, 541 px; most foam rendered pale blue `#A2DDFA` (2827 px) |
+| Foam, top | `#F8FCFD`, 2753 px (0.20) | `#FFFFFF`, 10470 px (0.20) | `#E4FFFF`, 3592 px; pale blue `#B0F2FF` (11540 px) |
+| Swatches | Water (Plane) `#28DFF0`, Water (Stream Bed) `#01B6E0` | keys `#00ADAE` (water), `#0090E8` (bed) | |
+
+The water median now matches within 7 levels. Our lit quartile is lighter (`#4BDFF9`) because of the caustic net's lines.
+
+Checks: `build()` problems `[]` (one land, one water and 18 foam shells, all closed; 0 self-hits, 0 inverted faces). `kit_verify.run(cls="asset")` on the hero and six parts reports one problem: the hero's water and foam shells are "unchained". That is this model's design (decision 9): the water and foam stand 0.06 off the land so they never touch it. The 17 earlier water and foam shells were the same before this touch-up; the two new band shells follow the same rule. The hero is at 3950 of 3999 tris; the next change to this model needs tris taken elsewhere. Renders in this folder were all re-made by `build()`; `front34.png` would not overwrite, so the old PNGs were deleted first.
+
+## Touch-up verification (2026-11-04)
+
+**Result: PASS, 8/10.** Fresh verifier, read-only, in a background session on a copy of the work file with the touch-up built (`TOUCH_Av2.blend`); nothing rebuilt or saved. The water is the sheet's plain cyan, the foam is clean white outlines, the flow and foam sockets are gone, and the wave bands are painted. No blockers.
+
+Technical:
+- `kit_verify.run(cls="asset", sockets=[])` on the hero and six parts: hero **3950 / 3999** (49 to spare, in budget), bank slab 676, bed slab 430, water plane 96, rocks 46 / 88 / 28; hero 32.0 × 32.0 × 7.4; 20 shells (1 land, 1 water, 18 foam); 0 buried; min corner 5.02°. One problem: hero "unchained" `water#1` and `water_foam#2`–`#19`.
+- **The unchained report is pre-existing, by design (decision 9).** Against the committed kit file's build, the land shell (2250 tris) and the water shell (376) are vertex-for-vertex identical, and 13 of the 16 old foam shells are unchanged. The water and foam stand 0.06 off the land so they never touch it, as before, and nothing shows: the water lies over the bed. The new band foam follows the same rule.
+- Mesh changes are confined to the foam: 3 old foam shells replaced and 5 new (16 → 18), +168 tris. The bands are clear of every rock hole (centre dashes 1.66 and 1.47 from S1 / s3; right band 1.09 from s8), and their shortest edge is 0.11. Parts are vertex-identical to the kit file's.
+- Land keys: the bed top is plain `m034_bed` (260 faces). `bed_light` and its three blends are on no object now.
+- Sockets: none on the hero or the WaterPlane part (were 14 `water_foam` + 3 `water_flow`). No emission on any key.
+
+Colours against the sheet (`compare.compare` cells f34 (35, 28), r34 (225, 32), front (0, 5), side (270, 5), rear (180, 5), top (0, 89); water: b > r + 90, g > r + 60, sat > 0.55; foam: lum > 215, sat < 0.2, b ≥ r; median / lit quartile / shade quartile):
+
+| Region | Sheet | Ours |
+| --- | --- | --- |
+| Water, front three-quarter | `#01CEED` / `#03D1EE` / `#02CAE8` | `#03CFED` / `#4ADEF9` / `#01C3E3` |
+| Water, rear three-quarter | `#01CEED` / `#03D0EE` / `#02CAE9` | `#03CFED` / `#4AE0FA` / `#01C2E3` |
+| Water, top | `#01CCEB` / `#03CEEC` / `#01CAEA` | `#02CFEE` / `#49DFFA` / `#01C3E5` |
+| Foam, front three-quarter (foam : water px) | `#F8FDFD` (0.164) | `#FFFFFF` (0.184) |
+| Foam, rear three-quarter | `#F8FCFD` (0.161) | `#FFFFFF` (0.152) |
+| Foam, top | `#F8FDFD` (0.191) | `#FFFFFF` (0.196) |
+
+The water medians match within 3 levels; the foam is white and its share matches within 0.02. Our lit water quartile (`#4ADEF9`) is the caustic net's lines.
+
+Blockers: none.
+
+Minors:
+1. **Caustic net (known).** The water still shows the shared kit water texture's net; the sheet's water is flat cyan. This needs the shared change (a per-key opt-out or a plain style in `lib/kitwater.py`), which the main session will make.
+2. **Blue rings round the in-water rocks are now more visible.** The pre-existing gap between each rock and its foam collar (round-2 minor, median 0.15–0.38) now reads as a sharp deeper-blue line between grey rock and white foam (top and close-up views). Before, it was softened by pale-blue foam. The sheet's junction close-up has the foam against the rock. Fix later: grow each `FOAM_RING` collar's inner edge to within 0.08 of its rock hole.
+3. **Where the bands sit.** The sheet draws wave bands only on the exploded and isolated Water Plane part; its assembled, orthographic and top cells show plain water with foam only round rocks and banks. The touch-up paints the bands on the hero, as the queue asked, and leaves `StreambedSectionWaterPlane` plain. The bands are thin (0.32–0.34) and read as light streaks, so this is not a blocker, but it is the reverse of the sheet. The main session should rule whether the hero keeps them. If the part should match the sheet, it can carry the bands as extra shells: a part may have several shells, and it has 900 tris spare.
+4. Budget: 49 tris of headroom. Any later change (the collar fix in 2, a fourth band) must take tris from elsewhere, for example by thinning bank pebbles.
+5. The foam renders clipped pure white (`#FFFFFF` against the sheet's `#F8FDFD`), with no visible shading on it. Negligible.
+
+Silhouette, layout and the round-2 minors (B1 upright, f34 rock share, basin-like top view, plain RockLarge facets) are unchanged and not re-scored. Scratch renders: `<temp>/.../cmp/M034/`.

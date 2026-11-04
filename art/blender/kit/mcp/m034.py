@@ -21,7 +21,7 @@ into the slab they stand on and united one shell at a time (merge-0 exact unions
 Parts (the sheet's Parts Breakdown, decision 5), each from its own function:
 - StreambedSectionBankSlab (bank_slab_part): the left bank slab with its small rocks and pebbles.
 - StreambedSectionBedSlab (bed_slab_part): the channel slab (top 0.7, earth sides) with its in-stream small rocks.
-- StreambedSectionWaterPlane (water_plane_part): the water shell alone (no rock holes), carrying the flow sockets.
+- StreambedSectionWaterPlane (water_plane_part): the water shell alone (no rock holes).
 - StreambedSectionRockLarge / RockMedium / RockSmall (rock_*_part): the reusable rock pieces (B4, M2 with a small
   rock at its foot, S1), flat-bottomed at z 0.
 
@@ -71,10 +71,12 @@ PALETTE = {SAND: ("#DCB874", 0.95, False),          # #FBCE81 exploded bank top 
            PEBBLE: ("#715735", 0.9, False),         # #8E6B45
            BED: ("#0090E8", 0.9, False),            # the deep water tone #01C2FC (s >= .97)
            BED_LIGHT: ("#38C8EE", 0.9, False),      # the light water tone #3FE1FD
-           WATER: ("#00ACDC", 0.3, False),         # rendered water median #08D1FD
-           FOAM: ("#AAD0E6", 0.6, False)}           # rendered foam median #C2F2FC
-TRANSPARENCY = {WATER: 0.3, FOAM: 0.22}
+           WATER: ("#00ADAE", 0.3, False),         # touch-up 2026-11-04: renders #07CFED (sheet #01CEED); was #00ACDC
+           FOAM: ("#F2F8FA", 0.6, False)}           # touch-up 2026-11-04: clean white (sheet foam #F8FCFD); was #AAD0E6
+# (touch-up 2026-11-04: the foam is near opaque, so it reads as clean white outlines; was 0.22)
+TRANSPARENCY = {WATER: 0.3, FOAM: 0.05}
 BED_PATCH_SCALE, BED_PATCH_LEVEL = 0.12, 0.0       # the bed's broad light patches (about 8 studs across)
+BED_PLAIN = True       # touch-up 2026-11-04: the restyled sheet's water is plain cyan, so the bed has no light patches
 WATER_SPEC = 0.0
 
 TARGETS = {SAND: ((0xFB, 0xCE, 0x81), "all"), SAND_LIGHT: ((0xFE, 0xE5, 0xA0), "all"),
@@ -726,7 +728,8 @@ def _paint_terrace(a, T, seed):
         tval = nxt
     for tag, faces in T["top"].items():
         for f in faces:
-            key = _mix(BED, BED_LIGHT, tval[f]) if tag == "chan" else _mix(SAND, SAND_LIGHT, tval[f])
+            key = ((BED if BED_PLAIN else _mix(BED, BED_LIGHT, tval[f])) if tag == "chan" else
+                   _mix(SAND, SAND_LIGHT, tval[f]))
             f.material_index = a._mi(key)
     for f, tag, nb in T["wall"]:
         z = f.calc_center_median().z
@@ -956,6 +959,37 @@ def _bank_neg(edge_way, side, grow):
     return [Vector((side * T, T))] + line + [Vector((side * T, -T))]
 
 
+# touch-up 2026-11-04: the sheet's "Flow Strips" VFX are gone; its Water Plane part draws long white wave bands
+# instead, so the old flow-strip lanes (clear of every rock hole by >= 0.5) carry painted bands, part of the foam
+# shell: (centre x, y from, y to, width, sine amplitude, periods, phase, stations). Ends taper to WAVE_TIP of the
+# width. The left lane (x -3.8, 1.2 wide) is left plain: the hero budget (4000) has room for three bands only.
+WAVES = ((-0.4, 14.4, 1.4, 0.34, 0.45, 1.0, 0.0, 7),
+         (-0.4, -1.2, -14.4, 0.34, 0.45, 1.0, 3.1, 7),
+         (2.6, 12.2, -8.2, 0.32, 0.3, 1.5, 1.2, 10))     # (8 stations 2.9 apart made needles that _tidy2d collapsed)
+WAVE_TIP = 0.35
+
+
+def wave_bands():
+    """The wave bands (WAVES) as 2D polygons (CCW)."""
+    out = []
+    for x0, y0, y1, w, amp, per, ph, n in WAVES:
+        ctr = [Vector((x0 + amp * math.sin(2 * math.pi * per * k / (n - 1) + ph), y0 + (y1 - y0) * k / (n - 1)))
+               for k in range(n)]
+        left, right = [], []
+        for k, c in enumerate(ctr):
+            t = (ctr[min(n - 1, k + 1)] - ctr[max(0, k - 1)]).normalized()
+            nrm = Vector((-t.y, t.x))
+            hw = w / 2 * (WAVE_TIP if k in (0, n - 1) else 1.0)
+            left.append(c + nrm * hw)
+            right.append(c - nrm * hw)
+        poly = left + list(reversed(right))
+        if sum(poly[i].x * poly[(i + 1) % len(poly)].y - poly[(i + 1) % len(poly)].x * poly[i].y
+               for i in range(len(poly))) < 0:
+            poly = list(reversed(poly))
+        out.append(poly)
+    return out
+
+
 def foam_regions():
     """(pos, neg) 2D polygons of the foam (fix round 1: soft, lobed and broken, hugging the rocks and the sand):
     each bank's shore ribbon in 4-5 segments with lobed widths and rounded ends, a lobed collar round each rock in the
@@ -994,6 +1028,7 @@ def foam_regions():
     for name, w in FOAM_RING.items():
         n = 11 if ROCKS[name][6] == "big" else 10
         pos.append(_collar(hs[name], w, n, rng))
+    pos += wave_bands()      # touch-up 2026-11-04: the flow strips as painted white wave bands
     for c, r in FOAM_BLOBS:
         a0 = rng.uniform(0, 6.3)
         pos.append([Vector(c) + Vector((math.cos(a_), math.sin(a_) * 0.8)) * r * rng.uniform(0.75, 1.25)
@@ -1087,11 +1122,11 @@ NOTES = {
           "slabs with jogged plank edges, a broad recessed bed slab under a thin see-through water plane, soft lobed "
           "foam ribbons and rock collars, four chunky flat-crowned boulders on the waterlines, two mid rocks in the "
           "water, one mid-stream rock, bank "
-          "rocks and pebbles; one closed land shell plus closed water and foam shells (two water pieces). Flow "
-          "+Y -> -Y. 14 water_foam + 3 water_flow sockets",
+          "rocks and pebbles; one closed land shell plus closed water and foam shells (two water pieces), white "
+          "wave bands painted on the water (part of the foam). No VFX",
     BANK_P: "Sand / Bank Slab (reusable): the left bank plank slab (top 1.6) with its small rocks and pebbles",
     BED_P: "Stream Bed Slab (reusable): the channel slab (top 0.7, earth sides) with its in-stream small rocks",
-    WATER_P: "Water Plane (reusable): the thin see-through water slab (top 1.0) with the 3 flow-strip sockets",
+    WATER_P: "Water Plane (reusable): the thin see-through water slab (top 1.0)",
     ROCK_LP: "Rock Piece Large (reusable): a big flat-faceted boulder with a flat crown (B4)",
     ROCK_MP: "Rock Piece Medium (reusable): a squat chunky rock with a small rock at its foot (M2)",
     ROCK_SP: "Rock Piece Small (reusable): a small flat-topped rock (S1)",
@@ -1099,42 +1134,11 @@ NOTES = {
 
 # ---- stages 5 + 6 (spec section 7) -------------------------------------------------------------------------------------
 # Stage 5: nothing glows (decision 8): no emissive key, no light. The water and foam are see-through water pieces.
-# Stage 6 (decision 6): 3 water_flow beams (the sheet's "Flow Strips" overlay, +Y -> -Y) and 14 water_foam sockets
-# (one per rock standing in or straddling the water, scaled by size, plus 4 along the bank edges).
-# fix round 1: the strips run in the clear lanes of the widened stream, every strip edge >= 0.5 off every rock in
-# the water (flow_clearance()): the centre lane between S1 / M2 and s3, a back-left lane between B1 and S1, a
-# right lane between s8 / B2 / B3 / M1 and s3
-FLOW = [((-0.4, 15.5, 1.03), (-0.4, -15.5, 1.03), 2.6), ((-3.8, 15.5, 1.03), (-3.8, 4.6, 1.03), 1.2),
-        ((2.6, 15.5, 1.03), (2.6, -9.6, 1.03), 1.4)]
-FOAM_FX_ROCKS = (("B1", 1.0), ("B2", 1.0), ("B3", 1.0), ("B4", 1.0), ("M1", 0.8), ("M2", 0.8),
-                 ("S1", 0.6), ("s3", 0.4), ("s8", 0.4), ("s2", 0.4))
-FOAM_FX = [(ROCKS[n][0], sc) for n, sc in FOAM_FX_ROCKS] + [
-    ((-9.9, 0.8), 0.7), ((-9.9, -4.8), 0.7), ((9.4, 12.0), 0.7), ((7.3, -13.4), 0.7)]
-
-
-def flow_clearance():
-    """Per flow strip: the smallest distance from its edge (centre line +- width / 2) to any rock hole."""
-    out = []
-    for p, e, w in FLOW:
-        a_, b_ = _v2(p), _v2(e)
-        best = 1e9
-        n = int((b_ - a_).length / 0.2) + 1
-        for name, hp in holes().items():
-            for k in range(n + 1):
-                q = a_.lerp(b_, k / n)
-                d = -1.0 if _inside(q, hp) else _dist_line(q, hp, True)
-                best = min(best, d - w / 2)
-        out.append(round(best, 2))
-    return out
-
-
+# Stage 6: nothing since the 2026-11-04 touch-up. The restyled sheet drops the "Flow Strips" overlay (now painted wave
+# bands, WAVES) and shows no foam particles (the foam is the painted outlines), so under the house rule the 3
+# water_flow beams (FLOW) and the 14 water_foam sockets (FOAM_FX) are gone, from the hero and the WaterPlane part.
 def _sockets(o, hero=True):
-    off = Vector(o[OFF])
-    for p, e, w in FLOW:
-        K.socket(o, "water_flow", Vector(p) - off, end=tuple(Vector(e) - off), width=w)
-    if hero:
-        for (x, y), sc in FOAM_FX:
-            K.socket(o, "water_foam", Vector((x, y, 1.05)) - off, scale=sc)
+    return []
 
 
 # ---- union, cleanup (m033 / m031) ------------------------------------------------------------------------------------
@@ -1474,9 +1478,8 @@ def report(order):
         if abs(got - tgt) > tol:
             problems.append(f"{HERO}: {ax} {got:.2f} outside {tgt} +- {tol}")
     socks = [c.get("vfx_kind") for c in h.children if c.get("vfx_kind")]
-    if socks.count("water_foam") != 14 or socks.count("water_flow") != 3:
-        problems.append(f"{HERO}: sockets {socks.count('water_foam')} foam / {socks.count('water_flow')} flow, "
-                        f"expected 14 / 3")
+    if socks:          # touch-up 2026-11-04: no sockets (the flow strips are painted wave bands now)
+        problems.append(f"{HERO}: sockets {socks}, expected none")
     uv = {o.name: {k: v for k, v in M.uv_stats(o).items() if k in ("islands", "overlap_pairs", "flipped", "min_gap",
                                                                     "border", "density", "stretch_conformal_p95")}
           for o in order}

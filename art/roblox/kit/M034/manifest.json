@@ -8,7 +8,7 @@
  "palette": {
   "file": "palette.png",
   "width": 512,
-  "height": 512,
+  "height": 256,
   "cell": 16,
   "columns": 32,
   "uv": "row i, level j: u = (j + 0.5) / columns, v = 1 - (i + 0.5) * cell / height (v up from the bottom of the image); a row's spare cells repeat its last level",
@@ -19,120 +19,32 @@
     "levels": [
      0.96669,
      0.96977,
-     0.9752,
-     0.97871,
-     0.98216,
-     0.98512,
-     0.98796,
-     0.98993,
-     0.99245,
-     0.99447,
-     0.99748,
-     0.99952,
-     1.00128,
-     1.00426,
-     1.00641,
-     1.00849,
-     1.01114,
-     1.01399,
-     1.01672,
-     1.01997,
-     1.02261,
-     1.02369,
-     1.02691
-    ],
-    "used": true
-   },
-   {
-    "key": "m034_bed_light",
-    "hex": "#38C8EE",
-    "levels": [
-     0.97609,
-     0.97962,
-     0.98448,
-     0.98665,
-     0.9892,
-     0.99077,
-     0.99338,
-     0.99589,
-     0.99815,
-     1.00093,
-     1.00658,
-     1.00921,
-     1.0131,
-     1.01491,
-     1.01781,
-     1.02456
-    ],
-    "used": true
-   },
-   {
-    "key": "m034_bed_x_light_25",
-    "hex": "#0E9EEA",
-    "levels": [
-     0.98189,
-     0.98678,
-     0.99112,
-     0.99361,
-     0.99588,
-     0.99844,
-     1.00098,
-     1.00311,
-     1.00483,
-     1.00777,
-     1.01118,
-     1.013,
-     1.01536,
-     1.019,
-     1.02106
-    ],
-    "used": true
-   },
-   {
-    "key": "m034_bed_x_light_50",
-    "hex": "#1CACEB",
-    "levels": [
-     0.98057,
-     0.98261,
-     0.9864,
-     0.9897,
-     0.99257,
-     0.99412,
-     0.99832,
-     1.00085,
-     1.00309,
-     1.00527,
-     1.00691,
-     1.00913,
-     1.01137,
-     1.01358,
-     1.01825,
+     0.97542,
+     0.97944,
+     0.98212,
+     0.98454,
+     0.98686,
+     0.98888,
+     0.99097,
+     0.9933,
+     0.99522,
+     0.99753,
+     0.99925,
+     1.00147,
+     1.00354,
+     1.00581,
+     1.00786,
+     1.00973,
+     1.01183,
+     1.01391,
+     1.0157,
+     1.01827,
+     1.02045,
+     1.02312,
+     1.02534,
+     1.02691,
+     1.03078,
      1.03307
-    ],
-    "used": true
-   },
-   {
-    "key": "m034_bed_x_light_75",
-    "hex": "#2ABAEC",
-    "levels": [
-     0.9795,
-     0.98181,
-     0.98446,
-     0.98668,
-     0.98914,
-     0.99176,
-     0.99421,
-     0.99746,
-     1.00031,
-     1.00309,
-     1.00512,
-     1.00832,
-     1.01113,
-     1.01315,
-     1.01509,
-     1.02277,
-     1.02573,
-     1.03078
     ],
     "used": true
    },
@@ -457,7 +369,7 @@
    },
    {
     "key": "m034_water",
-    "hex": "#00ACDC",
+    "hex": "#00ADAE",
     "levels": [
      1.0
     ],
@@ -465,7 +377,7 @@
    },
    {
     "key": "m034_water_foam",
-    "hex": "#AAD0E6",
+    "hex": "#F2F8FA",
     "levels": [
      1.0
     ],
@@ -476,14 +388,14 @@
  "water": {
   "keys": {
    "m034_water": {
-    "hex": "#00ACDC",
+    "hex": "#00ADAE",
     "texture": "water/m034_water.png",
     "transparency": 0.3
    },
    "m034_water_foam": {
-    "hex": "#AAD0E6",
+    "hex": "#F2F8FA",
     "texture": "water/m034_water_foam.png",
-    "transparency": 0.22
+    "transparency": 0.05
    }
   },
   "material": "SmoothPlastic",
@@ -502,7 +414,7 @@
     7.4,
     32.0
    ],
-   "tris": 3782,
+   "tris": 3950,
    "budget": 4000,
    "collision": {
     "CollisionFidelity": "PreciseConvexDecomposition",
@@ -542,7 +454,7 @@
       31.88
      ],
      "key": "m034_water",
-     "color": "#00ACDC",
+     "color": "#00ADAE",
      "texture": "water/m034_water.png",
      "tile_studs": 16.0,
      "transparency": 0.3,
@@ -554,21 +466,12 @@
       "CanQuery": false,
       "CanTouch": false,
       "CastShadow": false
-     },
-     "flow": {
-      "direction": [
-       0.0,
-       0.0,
-       1.0
-      ],
-      "speed": 4.0,
-      "socket": "VFX_StreambedSection_water_flow_1"
      }
     },
     {
      "file": "meshes/StreambedSection_water_m034_water_foam.glb",
      "kind": "water",
-     "tris": 1156,
+     "tris": 1324,
      "offset": [
       0.0009,
       1.045,
@@ -580,10 +483,10 @@
       30.3656
      ],
      "key": "m034_water_foam",
-     "color": "#AAD0E6",
+     "color": "#F2F8FA",
      "texture": "water/m034_water_foam.png",
      "tile_studs": 16.0,
-     "transparency": 0.22,
+     "transparency": 0.05,
      "material": "SmoothPlastic",
      "cast_shadow": false,
      "collision": {
@@ -592,1029 +495,11 @@
       "CanQuery": false,
       "CanTouch": false,
       "CastShadow": false
-     },
-     "flow": {
-      "direction": [
-       0.0,
-       0.0,
-       1.0
-      ],
-      "speed": 4.0,
-      "socket": "VFX_StreambedSection_water_flow_1"
      }
     }
    ],
-   "vfx": [
-    {
-     "name": "VFX_StreambedSection_water_flow_1",
-     "kind": "water_flow",
-     "position": [
-      -0.4,
-      1.03,
-      -15.5
-     ],
-     "vfx_scale": 1.0,
-     "trigger": null,
-     "spec": {
-      "emitters": [],
-      "beams": [
-       {
-        "name": "Streaks",
-        "texture": "water_streaks",
-        "color": [
-         "#FFFFFF",
-         "#E6F7FC"
-        ],
-        "transparency": [
-         0.92,
-         0.72,
-         0.72,
-         0.92
-        ],
-        "width0": 2.6,
-        "width1": 2.6,
-        "texture_speed": 4.0,
-        "texture_length": 8.0,
-        "texture_mode": "Wrap",
-        "light_emission": 0.1,
-        "light_influence": 0.8,
-        "segments": 4,
-        "face_camera": false
-       }
-      ],
-      "light": null,
-      "end": [
-       0.0,
-       0.0,
-       31.0
-      ],
-      "axis": [
-       0.0,
-       0.0,
-       1.0
-      ],
-      "normal": [
-       0.0,
-       1.0,
-       0.0
-      ]
-     },
-     "end": [
-      0.0,
-      0.0,
-      31.0
-     ],
-     "axis": [
-      0.0,
-      0.0,
-      1.0
-     ],
-     "normal": [
-      0.0,
-      1.0,
-      0.0
-     ]
-    },
-    {
-     "name": "VFX_StreambedSection_water_flow_2",
-     "kind": "water_flow",
-     "position": [
-      -3.8,
-      1.03,
-      -15.5
-     ],
-     "vfx_scale": 1.0,
-     "trigger": null,
-     "spec": {
-      "emitters": [],
-      "beams": [
-       {
-        "name": "Streaks",
-        "texture": "water_streaks",
-        "color": [
-         "#FFFFFF",
-         "#E6F7FC"
-        ],
-        "transparency": [
-         0.92,
-         0.72,
-         0.72,
-         0.92
-        ],
-        "width0": 1.2,
-        "width1": 1.2,
-        "texture_speed": 4.0,
-        "texture_length": 8.0,
-        "texture_mode": "Wrap",
-        "light_emission": 0.1,
-        "light_influence": 0.8,
-        "segments": 4,
-        "face_camera": false
-       }
-      ],
-      "light": null,
-      "end": [
-       0.0,
-       0.0,
-       10.9
-      ],
-      "axis": [
-       0.0,
-       0.0,
-       1.0
-      ],
-      "normal": [
-       0.0,
-       1.0,
-       0.0
-      ]
-     },
-     "end": [
-      0.0,
-      0.0,
-      10.9
-     ],
-     "axis": [
-      0.0,
-      0.0,
-      1.0
-     ],
-     "normal": [
-      0.0,
-      1.0,
-      0.0
-     ]
-    },
-    {
-     "name": "VFX_StreambedSection_water_flow_3",
-     "kind": "water_flow",
-     "position": [
-      2.6,
-      1.03,
-      -15.5
-     ],
-     "vfx_scale": 1.0,
-     "trigger": null,
-     "spec": {
-      "emitters": [],
-      "beams": [
-       {
-        "name": "Streaks",
-        "texture": "water_streaks",
-        "color": [
-         "#FFFFFF",
-         "#E6F7FC"
-        ],
-        "transparency": [
-         0.92,
-         0.72,
-         0.72,
-         0.92
-        ],
-        "width0": 1.4,
-        "width1": 1.4,
-        "texture_speed": 4.0,
-        "texture_length": 8.0,
-        "texture_mode": "Wrap",
-        "light_emission": 0.1,
-        "light_influence": 0.8,
-        "segments": 4,
-        "face_camera": false
-       }
-      ],
-      "light": null,
-      "end": [
-       0.0,
-       0.0,
-       25.1
-      ],
-      "axis": [
-       0.0,
-       0.0,
-       1.0
-      ],
-      "normal": [
-       0.0,
-       1.0,
-       0.0
-      ]
-     },
-     "end": [
-      0.0,
-      0.0,
-      25.1
-     ],
-     "axis": [
-      0.0,
-      0.0,
-      1.0
-     ],
-     "normal": [
-      0.0,
-      1.0,
-      0.0
-     ]
-    },
-    {
-     "name": "VFX_StreambedSection_water_foam_1",
-     "kind": "water_foam",
-     "position": [
-      -9.4,
-      1.05,
-      -11.0
-     ],
-     "vfx_scale": 1.0,
-     "trigger": null,
-     "spec": {
-      "emitters": [
-       {
-        "name": "Foam",
-        "texture": "foam_patch",
-        "color": [
-         "#FFFFFF",
-         "#E3F4FA"
-        ],
-        "size": [
-         2.0,
-         3.0
-        ],
-        "transparency": [
-         0.2,
-         1.0
-        ],
-        "lifetime": [
-         2.0,
-         3.0
-        ],
-        "rate": 4,
-        "speed": [
-         0.05,
-         0.12
-        ],
-        "spread": 0,
-        "light_emission": 0.0,
-        "orientation": "flat",
-        "rotation": [
-         0,
-         360
-        ],
-        "rot_speed": [
-         -12,
-         12
-        ],
-        "shape": [
-         6.0,
-         0.1,
-         1.5
-        ]
-       }
-      ],
-      "light": null
-     }
-    },
-    {
-     "name": "VFX_StreambedSection_water_foam_10",
-     "kind": "water_foam",
-     "position": [
-      11.3,
-      1.05,
-      -0.6
-     ],
-     "vfx_scale": 0.4,
-     "trigger": null,
-     "spec": {
-      "emitters": [
-       {
-        "name": "Foam",
-        "texture": "foam_patch",
-        "color": [
-         "#FFFFFF",
-         "#E3F4FA"
-        ],
-        "size": [
-         2.0,
-         3.0
-        ],
-        "transparency": [
-         0.2,
-         1.0
-        ],
-        "lifetime": [
-         2.0,
-         3.0
-        ],
-        "rate": 4,
-        "speed": [
-         0.05,
-         0.12
-        ],
-        "spread": 0,
-        "light_emission": 0.0,
-        "orientation": "flat",
-        "rotation": [
-         0,
-         360
-        ],
-        "rot_speed": [
-         -12,
-         12
-        ],
-        "shape": [
-         6.0,
-         0.1,
-         1.5
-        ]
-       }
-      ],
-      "light": null
-     }
-    },
-    {
-     "name": "VFX_StreambedSection_water_foam_11",
-     "kind": "water_foam",
-     "position": [
-      -9.9,
-      1.05,
-      -0.8
-     ],
-     "vfx_scale": 0.7,
-     "trigger": null,
-     "spec": {
-      "emitters": [
-       {
-        "name": "Foam",
-        "texture": "foam_patch",
-        "color": [
-         "#FFFFFF",
-         "#E3F4FA"
-        ],
-        "size": [
-         2.0,
-         3.0
-        ],
-        "transparency": [
-         0.2,
-         1.0
-        ],
-        "lifetime": [
-         2.0,
-         3.0
-        ],
-        "rate": 4,
-        "speed": [
-         0.05,
-         0.12
-        ],
-        "spread": 0,
-        "light_emission": 0.0,
-        "orientation": "flat",
-        "rotation": [
-         0,
-         360
-        ],
-        "rot_speed": [
-         -12,
-         12
-        ],
-        "shape": [
-         6.0,
-         0.1,
-         1.5
-        ]
-       }
-      ],
-      "light": null
-     }
-    },
-    {
-     "name": "VFX_StreambedSection_water_foam_12",
-     "kind": "water_foam",
-     "position": [
-      -9.9,
-      1.05,
-      4.8
-     ],
-     "vfx_scale": 0.7,
-     "trigger": null,
-     "spec": {
-      "emitters": [
-       {
-        "name": "Foam",
-        "texture": "foam_patch",
-        "color": [
-         "#FFFFFF",
-         "#E3F4FA"
-        ],
-        "size": [
-         2.0,
-         3.0
-        ],
-        "transparency": [
-         0.2,
-         1.0
-        ],
-        "lifetime": [
-         2.0,
-         3.0
-        ],
-        "rate": 4,
-        "speed": [
-         0.05,
-         0.12
-        ],
-        "spread": 0,
-        "light_emission": 0.0,
-        "orientation": "flat",
-        "rotation": [
-         0,
-         360
-        ],
-        "rot_speed": [
-         -12,
-         12
-        ],
-        "shape": [
-         6.0,
-         0.1,
-         1.5
-        ]
-       }
-      ],
-      "light": null
-     }
-    },
-    {
-     "name": "VFX_StreambedSection_water_foam_13",
-     "kind": "water_foam",
-     "position": [
-      9.4,
-      1.05,
-      -12.0
-     ],
-     "vfx_scale": 0.7,
-     "trigger": null,
-     "spec": {
-      "emitters": [
-       {
-        "name": "Foam",
-        "texture": "foam_patch",
-        "color": [
-         "#FFFFFF",
-         "#E3F4FA"
-        ],
-        "size": [
-         2.0,
-         3.0
-        ],
-        "transparency": [
-         0.2,
-         1.0
-        ],
-        "lifetime": [
-         2.0,
-         3.0
-        ],
-        "rate": 4,
-        "speed": [
-         0.05,
-         0.12
-        ],
-        "spread": 0,
-        "light_emission": 0.0,
-        "orientation": "flat",
-        "rotation": [
-         0,
-         360
-        ],
-        "rot_speed": [
-         -12,
-         12
-        ],
-        "shape": [
-         6.0,
-         0.1,
-         1.5
-        ]
-       }
-      ],
-      "light": null
-     }
-    },
-    {
-     "name": "VFX_StreambedSection_water_foam_14",
-     "kind": "water_foam",
-     "position": [
-      7.3,
-      1.05,
-      13.4
-     ],
-     "vfx_scale": 0.7,
-     "trigger": null,
-     "spec": {
-      "emitters": [
-       {
-        "name": "Foam",
-        "texture": "foam_patch",
-        "color": [
-         "#FFFFFF",
-         "#E3F4FA"
-        ],
-        "size": [
-         2.0,
-         3.0
-        ],
-        "transparency": [
-         0.2,
-         1.0
-        ],
-        "lifetime": [
-         2.0,
-         3.0
-        ],
-        "rate": 4,
-        "speed": [
-         0.05,
-         0.12
-        ],
-        "spread": 0,
-        "light_emission": 0.0,
-        "orientation": "flat",
-        "rotation": [
-         0,
-         360
-        ],
-        "rot_speed": [
-         -12,
-         12
-        ],
-        "shape": [
-         6.0,
-         0.1,
-         1.5
-        ]
-       }
-      ],
-      "light": null
-     }
-    },
-    {
-     "name": "VFX_StreambedSection_water_foam_2",
-     "kind": "water_foam",
-     "position": [
-      9.9,
-      1.05,
-      -7.0
-     ],
-     "vfx_scale": 1.0,
-     "trigger": null,
-     "spec": {
-      "emitters": [
-       {
-        "name": "Foam",
-        "texture": "foam_patch",
-        "color": [
-         "#FFFFFF",
-         "#E3F4FA"
-        ],
-        "size": [
-         2.0,
-         3.0
-        ],
-        "transparency": [
-         0.2,
-         1.0
-        ],
-        "lifetime": [
-         2.0,
-         3.0
-        ],
-        "rate": 4,
-        "speed": [
-         0.05,
-         0.12
-        ],
-        "spread": 0,
-        "light_emission": 0.0,
-        "orientation": "flat",
-        "rotation": [
-         0,
-         360
-        ],
-        "rot_speed": [
-         -12,
-         12
-        ],
-        "shape": [
-         6.0,
-         0.1,
-         1.5
-        ]
-       }
-      ],
-      "light": null
-     }
-    },
-    {
-     "name": "VFX_StreambedSection_water_foam_3",
-     "kind": "water_foam",
-     "position": [
-      11.3,
-      1.05,
-      5.2
-     ],
-     "vfx_scale": 1.0,
-     "trigger": null,
-     "spec": {
-      "emitters": [
-       {
-        "name": "Foam",
-        "texture": "foam_patch",
-        "color": [
-         "#FFFFFF",
-         "#E3F4FA"
-        ],
-        "size": [
-         2.0,
-         3.0
-        ],
-        "transparency": [
-         0.2,
-         1.0
-        ],
-        "lifetime": [
-         2.0,
-         3.0
-        ],
-        "rate": 4,
-        "speed": [
-         0.05,
-         0.12
-        ],
-        "spread": 0,
-        "light_emission": 0.0,
-        "orientation": "flat",
-        "rotation": [
-         0,
-         360
-        ],
-        "rot_speed": [
-         -12,
-         12
-        ],
-        "shape": [
-         6.0,
-         0.1,
-         1.5
-        ]
-       }
-      ],
-      "light": null
-     }
-    },
-    {
-     "name": "VFX_StreambedSection_water_foam_4",
-     "kind": "water_foam",
-     "position": [
-      -11.2,
-      1.05,
-      9.4
-     ],
-     "vfx_scale": 1.0,
-     "trigger": null,
-     "spec": {
-      "emitters": [
-       {
-        "name": "Foam",
-        "texture": "foam_patch",
-        "color": [
-         "#FFFFFF",
-         "#E3F4FA"
-        ],
-        "size": [
-         2.0,
-         3.0
-        ],
-        "transparency": [
-         0.2,
-         1.0
-        ],
-        "lifetime": [
-         2.0,
-         3.0
-        ],
-        "rate": 4,
-        "speed": [
-         0.05,
-         0.12
-        ],
-        "spread": 0,
-        "light_emission": 0.0,
-        "orientation": "flat",
-        "rotation": [
-         0,
-         360
-        ],
-        "rot_speed": [
-         -12,
-         12
-        ],
-        "shape": [
-         6.0,
-         0.1,
-         1.5
-        ]
-       }
-      ],
-      "light": null
-     }
-    },
-    {
-     "name": "VFX_StreambedSection_water_foam_5",
-     "kind": "water_foam",
-     "position": [
-      7.0,
-      1.05,
-      10.6
-     ],
-     "vfx_scale": 0.8,
-     "trigger": null,
-     "spec": {
-      "emitters": [
-       {
-        "name": "Foam",
-        "texture": "foam_patch",
-        "color": [
-         "#FFFFFF",
-         "#E3F4FA"
-        ],
-        "size": [
-         2.0,
-         3.0
-        ],
-        "transparency": [
-         0.2,
-         1.0
-        ],
-        "lifetime": [
-         2.0,
-         3.0
-        ],
-        "rate": 4,
-        "speed": [
-         0.05,
-         0.12
-        ],
-        "spread": 0,
-        "light_emission": 0.0,
-        "orientation": "flat",
-        "rotation": [
-         0,
-         360
-        ],
-        "rot_speed": [
-         -12,
-         12
-        ],
-        "shape": [
-         6.0,
-         0.1,
-         1.5
-        ]
-       }
-      ],
-      "light": null
-     }
-    },
-    {
-     "name": "VFX_StreambedSection_water_foam_6",
-     "kind": "water_foam",
-     "position": [
-      -6.8,
-      1.05,
-      2.6
-     ],
-     "vfx_scale": 0.8,
-     "trigger": null,
-     "spec": {
-      "emitters": [
-       {
-        "name": "Foam",
-        "texture": "foam_patch",
-        "color": [
-         "#FFFFFF",
-         "#E3F4FA"
-        ],
-        "size": [
-         2.0,
-         3.0
-        ],
-        "transparency": [
-         0.2,
-         1.0
-        ],
-        "lifetime": [
-         2.0,
-         3.0
-        ],
-        "rate": 4,
-        "speed": [
-         0.05,
-         0.12
-        ],
-        "spread": 0,
-        "light_emission": 0.0,
-        "orientation": "flat",
-        "rotation": [
-         0,
-         360
-        ],
-        "rot_speed": [
-         -12,
-         12
-        ],
-        "shape": [
-         6.0,
-         0.1,
-         1.5
-        ]
-       }
-      ],
-      "light": null
-     }
-    },
-    {
-     "name": "VFX_StreambedSection_water_foam_7",
-     "kind": "water_foam",
-     "position": [
-      -3.8,
-      1.05,
-      -2.1
-     ],
-     "vfx_scale": 0.6,
-     "trigger": null,
-     "spec": {
-      "emitters": [
-       {
-        "name": "Foam",
-        "texture": "foam_patch",
-        "color": [
-         "#FFFFFF",
-         "#E3F4FA"
-        ],
-        "size": [
-         2.0,
-         3.0
-        ],
-        "transparency": [
-         0.2,
-         1.0
-        ],
-        "lifetime": [
-         2.0,
-         3.0
-        ],
-        "rate": 4,
-        "speed": [
-         0.05,
-         0.12
-        ],
-        "spread": 0,
-        "light_emission": 0.0,
-        "orientation": "flat",
-        "rotation": [
-         0,
-         360
-        ],
-        "rot_speed": [
-         -12,
-         12
-        ],
-        "shape": [
-         6.0,
-         0.1,
-         1.5
-        ]
-       }
-      ],
-      "light": null
-     }
-    },
-    {
-     "name": "VFX_StreambedSection_water_foam_8",
-     "kind": "water_foam",
-     "position": [
-      2.6,
-      1.05,
-      12.2
-     ],
-     "vfx_scale": 0.4,
-     "trigger": null,
-     "spec": {
-      "emitters": [
-       {
-        "name": "Foam",
-        "texture": "foam_patch",
-        "color": [
-         "#FFFFFF",
-         "#E3F4FA"
-        ],
-        "size": [
-         2.0,
-         3.0
-        ],
-        "transparency": [
-         0.2,
-         1.0
-        ],
-        "lifetime": [
-         2.0,
-         3.0
-        ],
-        "rate": 4,
-        "speed": [
-         0.05,
-         0.12
-        ],
-        "spread": 0,
-        "light_emission": 0.0,
-        "orientation": "flat",
-        "rotation": [
-         0,
-         360
-        ],
-        "rot_speed": [
-         -12,
-         12
-        ],
-        "shape": [
-         6.0,
-         0.1,
-         1.5
-        ]
-       }
-      ],
-      "light": null
-     }
-    },
-    {
-     "name": "VFX_StreambedSection_water_foam_9",
-     "kind": "water_foam",
-     "position": [
-      4.6,
-      1.05,
-      -12.4
-     ],
-     "vfx_scale": 0.4,
-     "trigger": null,
-     "spec": {
-      "emitters": [
-       {
-        "name": "Foam",
-        "texture": "foam_patch",
-        "color": [
-         "#FFFFFF",
-         "#E3F4FA"
-        ],
-        "size": [
-         2.0,
-         3.0
-        ],
-        "transparency": [
-         0.2,
-         1.0
-        ],
-        "lifetime": [
-         2.0,
-         3.0
-        ],
-        "rate": 4,
-        "speed": [
-         0.05,
-         0.12
-        ],
-        "spread": 0,
-        "light_emission": 0.0,
-        "orientation": "flat",
-        "rotation": [
-         0,
-         360
-        ],
-        "rot_speed": [
-         -12,
-         12
-        ],
-        "shape": [
-         6.0,
-         0.1,
-         1.5
-        ]
-       }
-      ],
-      "light": null
-     }
-    }
-   ],
-   "notes": "streambed section terrain tile (32 x 32; ground 0, bed 0.7, water 1.0, banks 1.6): two flat sand bank slabs with jogged plank edges, a broad recessed bed slab under a thin see-through water plane, soft lobed foam ribbons and rock collars, four chunky flat-crowned boulders on the waterlines, two mid rocks in the water, one mid-stream rock, bank rocks and pebbles; one closed land shell plus closed water and foam shells (two water pieces). Flow +Y -> -Y. 14 water_foam + 3 water_flow sockets"
+   "vfx": [],
+   "notes": "streambed section terrain tile (32 x 32; ground 0, bed 0.7, water 1.0, banks 1.6): two flat sand bank slabs with jogged plank edges, a broad recessed bed slab under a thin see-through water plane, soft lobed foam ribbons and rock collars, four chunky flat-crowned boulders on the waterlines, two mid rocks in the water, one mid-stream rock, bank rocks and pebbles; one closed land shell plus closed water and foam shells (two water pieces), white wave bands painted on the water (part of the foam). No VFX"
   },
   {
    "name": "StreambedSectionBankSlab",
@@ -1846,7 +731,7 @@
       31.88
      ],
      "key": "m034_water",
-     "color": "#00ACDC",
+     "color": "#00ADAE",
      "texture": "water/m034_water.png",
      "tile_studs": 16.0,
      "transparency": 0.3,
@@ -1858,231 +743,11 @@
       "CanQuery": false,
       "CanTouch": false,
       "CastShadow": false
-     },
-     "flow": {
-      "direction": [
-       0.0,
-       0.0,
-       1.0
-      ],
-      "speed": 4.0,
-      "socket": "VFX_StreambedSectionWaterPlane_water_flow_1"
      }
     }
    ],
-   "vfx": [
-    {
-     "name": "VFX_StreambedSectionWaterPlane_water_flow_1",
-     "kind": "water_flow",
-     "position": [
-      -0.4,
-      0.27,
-      -15.5
-     ],
-     "vfx_scale": 1.0,
-     "trigger": null,
-     "spec": {
-      "emitters": [],
-      "beams": [
-       {
-        "name": "Streaks",
-        "texture": "water_streaks",
-        "color": [
-         "#FFFFFF",
-         "#E6F7FC"
-        ],
-        "transparency": [
-         0.92,
-         0.72,
-         0.72,
-         0.92
-        ],
-        "width0": 2.6,
-        "width1": 2.6,
-        "texture_speed": 4.0,
-        "texture_length": 8.0,
-        "texture_mode": "Wrap",
-        "light_emission": 0.1,
-        "light_influence": 0.8,
-        "segments": 4,
-        "face_camera": false
-       }
-      ],
-      "light": null,
-      "end": [
-       0.0,
-       0.0,
-       31.0
-      ],
-      "axis": [
-       0.0,
-       0.0,
-       1.0
-      ],
-      "normal": [
-       0.0,
-       1.0,
-       0.0
-      ]
-     },
-     "end": [
-      0.0,
-      0.0,
-      31.0
-     ],
-     "axis": [
-      0.0,
-      0.0,
-      1.0
-     ],
-     "normal": [
-      0.0,
-      1.0,
-      0.0
-     ]
-    },
-    {
-     "name": "VFX_StreambedSectionWaterPlane_water_flow_2",
-     "kind": "water_flow",
-     "position": [
-      -3.8,
-      0.27,
-      -15.5
-     ],
-     "vfx_scale": 1.0,
-     "trigger": null,
-     "spec": {
-      "emitters": [],
-      "beams": [
-       {
-        "name": "Streaks",
-        "texture": "water_streaks",
-        "color": [
-         "#FFFFFF",
-         "#E6F7FC"
-        ],
-        "transparency": [
-         0.92,
-         0.72,
-         0.72,
-         0.92
-        ],
-        "width0": 1.2,
-        "width1": 1.2,
-        "texture_speed": 4.0,
-        "texture_length": 8.0,
-        "texture_mode": "Wrap",
-        "light_emission": 0.1,
-        "light_influence": 0.8,
-        "segments": 4,
-        "face_camera": false
-       }
-      ],
-      "light": null,
-      "end": [
-       0.0,
-       0.0,
-       10.9
-      ],
-      "axis": [
-       0.0,
-       0.0,
-       1.0
-      ],
-      "normal": [
-       0.0,
-       1.0,
-       0.0
-      ]
-     },
-     "end": [
-      0.0,
-      0.0,
-      10.9
-     ],
-     "axis": [
-      0.0,
-      0.0,
-      1.0
-     ],
-     "normal": [
-      0.0,
-      1.0,
-      0.0
-     ]
-    },
-    {
-     "name": "VFX_StreambedSectionWaterPlane_water_flow_3",
-     "kind": "water_flow",
-     "position": [
-      2.6,
-      0.27,
-      -15.5
-     ],
-     "vfx_scale": 1.0,
-     "trigger": null,
-     "spec": {
-      "emitters": [],
-      "beams": [
-       {
-        "name": "Streaks",
-        "texture": "water_streaks",
-        "color": [
-         "#FFFFFF",
-         "#E6F7FC"
-        ],
-        "transparency": [
-         0.92,
-         0.72,
-         0.72,
-         0.92
-        ],
-        "width0": 1.4,
-        "width1": 1.4,
-        "texture_speed": 4.0,
-        "texture_length": 8.0,
-        "texture_mode": "Wrap",
-        "light_emission": 0.1,
-        "light_influence": 0.8,
-        "segments": 4,
-        "face_camera": false
-       }
-      ],
-      "light": null,
-      "end": [
-       0.0,
-       0.0,
-       25.1
-      ],
-      "axis": [
-       0.0,
-       0.0,
-       1.0
-      ],
-      "normal": [
-       0.0,
-       1.0,
-       0.0
-      ]
-     },
-     "end": [
-      0.0,
-      0.0,
-      25.1
-     ],
-     "axis": [
-      0.0,
-      0.0,
-      1.0
-     ],
-     "normal": [
-      0.0,
-      1.0,
-      0.0
-     ]
-    }
-   ],
-   "notes": "Water Plane (reusable): the thin see-through water slab (top 1.0) with the 3 flow-strip sockets"
+   "vfx": [],
+   "notes": "Water Plane (reusable): the thin see-through water slab (top 1.0)"
   }
  ],
  "stats": {
@@ -2091,11 +756,11 @@
   "solid": 6,
   "water": 3,
   "glow": 0,
-  "tris": 5146,
-  "vfxSockets": 20,
-  "paletteColours": 18,
-  "paletteLevels": 332,
-  "meshBytes": 390672
+  "tris": 5314,
+  "vfxSockets": 0,
+  "paletteColours": 14,
+  "paletteLevels": 272,
+  "meshBytes": 398528
  },
  "problems": []
 }
