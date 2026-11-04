@@ -1,1293 +1,446 @@
 # 050 Timber Bridge — spec
 
-Reference: `art/blender/assets/references/050.png` (1024 × 1536 px). The sheet's title is "49/132 | TIMBER BRIDGE" (the
-printed 49 is the generator's number; INDEX.md row 50 calls it "Flintborn timber bridge model study"). The footer reads
-"FLINTBORN — INDIVIDUAL MODEL STUDY".
-Builder: `art/blender/kit/mcp/m050.py` → `build()` (not written yet). Procedure: `art/blender/kit/mcp/STAGES.md`. One
-modeller does stages 1–6 in a background Blender, then a fresh verifier does stage 7; the main session then puts the
-model into the kit file, exports and commits.
-
-User direction for every model: shapes must match the sheet; colours "need to match the master reference and blend
-into the colors nearby. please ensure all color and textures are being made and applied." Effects ship wherever the
-sheet shows them. **This sheet shows no water, glow or effect** (§7).
-
-Sheet text:
-- **Cells:** "1 ASSEMBLED VIEWS": "FRONT THREE QUARTER", "REAR THREE QUARTER"; "2 ORTHOGRAPHIC VIEWS": "FRONT VIEW",
-  "SIDE VIEW", "REAR VIEW", "TOP VIEW". The front, side and rear cells are level (e ≈ 0: no plank tops show); the top
-  view is a plan.
-- **Exploded:** "3 EXPLODED CONSTRUCTION": labels "Rope Segment", "Post", "Stringer", "Brace", "Crossbeam". Also drawn,
-  unlabelled: 7 posts with two rope coils each, one long rope strung over five of them, two deck groups (about 5 + 9
-  boards), three stringers, two crossbeams, two corner "L" pieces (a leg with a beam end), two loose leg stubs, about
-  eight small blocks with round peg heads, dashed drop arrows.
-- **Key parts:** "PARTS (ISOLATED)": "Post" (square post, two coils near the top, peg dot on the cap, two dark slots
-  near the foot), "Plank" (a long board with a faint line along its top), "Stringer", "Crossbeam", "Brace", "Rope
-  Segment" (a short sagging twisted rope with round knob ends).
-- **Close-ups:** "4 CONSTRUCTION CLOSE-UPS": "UNDERSIDE VIEW" — "Crossbeams and diagonal braces support the deck from
-  below."; "POST JUNCTION" — "Rope tied around post. Planks sit on stringers and are fastened with wooden pegs.";
-  "PLANK DETAIL (SECTION)" — "Plank thickness and joining surface. Simple blocky forms and clean edges for consistent
-  low-poly style."
-- **Material palette:** six unlabelled swatches, twice (header and §5): orange wood, tan, cream, grey, green, blue (§5.1).
-- **Modeling notes:** "Modular construction using reusable parts." "Keep forms chunky and readable." "Broad
-  flat-shaded faces, no small bevels." "Simple, clean geometry with straight cuts and consistent proportions."
-  "Maintain the same silhouette and style as the Flintborn reference." "No additional details, props or text."
-- **Game context:**
-  - **W08 owns the old kit's footbridge** (`art/blender/scripts/kit/W08/footbridge.py`, goals
-    `art/blender/renders/kit/W08/footbridge_goals.md`, manifest `art/roblox/kit/W08/manifest.json`): `Footbridge`,
-    `FootbridgePost`, `FootbridgePlank`, `FootbridgeStringer`, `FootbridgeCrossbeam`, `FootbridgeBrace`,
-    `FootbridgeRopeSegment`, `FootbridgeShortSpan`, `FootbridgeArched`, `FootbridgeBroken`; keys `w08_*`. It was built
-    to an older drawing as a **low stream crossing** (deck top 2.0, posts 0.6, 10 × 5.3, 3 posts a side; its goals ask
-    for "deck z ~1.6, walkable width ≥ 4"). `MODEL_PROGRESS.md` row 72 flags it "plank orientation; no X brace; flat
-    orange; arched variant flat"; its goals record a rope that rendered "more golden-yellow than the reference's tan".
-    Reuse its lessons, not its names or sizes (§8).
-  - **M048 Dock** (being modelled now, `m048.py` untracked): the kit's first timber piece. W 8 post centres, posts 1.3,
-    boards 1.82 × 0.85 (0.06 top chamfer), beams 3.45 → 4.75, **deck top 5.6**, posts to 8.3, rope coils + swags Ø
-    0.42, brass bolt heads. Its colour family (§5) and rope look are this bridge's.
-  - **Kit levels:** ground 0; water top 1.0 (M032 / M034 / M037 / M041; water 0.25/0.6 → 1.0 over a plate at z 0);
-    M034 banks 1.6 with a 14-wide channel at its seams (X −7 … +7); M043 lower lawn 5.6, M040 / M043 upper lawn 10.4;
-    M048's dock deck 5.6.
-  - WorldModeling §13.1–13.2 (timber vocabulary): squared timbers with restrained bevels, posts stronger than rails,
-    load-bearing parts first (posts, stringers, crossbeams, boards, then braces and rope), "Rope rails are thick
-    low-resolution curves/tubes with restrained sag. Do not model individual rope fibers".
-
-**Pixel boxes and masks.** All boxes are sheet pixels `(x0, y0, x1, y1)`, origin top left. Cell paper `#FEFDF9`
-(the masks use M048's `#FEFCF7`, tolerance 10). Cell borders from the grey rule lines (`lines.py`): rows 63 / 393 /
-401 / 651 / 659 / 1182 / 1190 / 1410 / 1492; columns 11 / 319 / 511 / 795 / 743 / 1012. Labels and callouts are painted
-out (`TITLES` in `m.py`, found with `navy.py`). Masks are M048's `cls()` (HSV, h in degrees, in this order):
-- **T** outlines / text: v < 0.16, or s < 0.25 and v < 0.35.
-- **B** ground shadow: s < 0.12, v ≥ 0.70. Excluded from shares.
-- **Y** rope and pegs: h 36–62, s ≥ 0.18, v ≥ 0.60; or h 33–36, s < 0.62, v ≥ 0.75.
-- **W** lit wood: h < 40 (or > 345), s ≥ 0.35, v ≥ 0.62 (board tops, caps, lit ends).
-- **K** dark wood: the rest of the wood hues, s ≥ 0.25, v ≥ 0.16 (post faces, stringers, legs, braces, shade).
-- **O** other.
-- W / K is a **lit / dark** split, not a material split (one orange timber family, §5).
-- Cells: f34 (12,64,511,393); r34 (513,64,1011,393); front (12,402,318,651); side (320,402,510,651); rear
-  (512,402,794,651); top (796,402,1011,651); exploded (12,660,742,1181); key parts (744,660,1011,1181); underside
-  close-up (22,1236,290,1412); post junction (301,1236,500,1412); plank detail (512,1236,720,1412). Header swatches:
-  inner boxes (736,19,762,43), (783,…), (830,…), (877,…), (924,…), (970,19,996,43) (`m.SW`); the §5 copies at x 752 /
-  796 / 840 / 884 / 927 / 970, y 1250–1275.
-
-**Scratch study material** (no Blender), in
-`<temp>/m050_study/`.
-Run with the scratch venv `..\venv22\Scripts\python.exe` (Python 3.14, Pillow, numpy; no scipy).
-- **Helpers:** `m.py` (masks, boxes `V` / `X` / `SW` / `TITLES`, `label`), `zoom.py` (crop with an optional sheet
-  grid), `px.py`, `lines.py` (cell borders), `navy.py` (label boxes), `sampcore.py` (`reg()`: region median / lit /
-  shade quartiles).
-- **Measurements:** `measure.py` → `bb.json` and `cls_*.png` (bbox, W : H, shares, top profile, width per height,
-  fifths); `ortho.py` (row runs across the ortho cells: posts, deck band, legs, the top view's rows); `colp.py <cell>
-  <x,x,…> <y0> <y1>` (class runs down columns: levels); `persp.py` / `persp_r34.py` (a pinhole camera fitted to the
-  eight cap centres of each three-quarter: azimuth, elevation, bay / width); `proj050.py` (orthographic block model of
-  the adopted layout at any camera, §2.7).
-- **Colour:** `samp050.py` (swatches and every region in §5.2).
-- **Zooms:** `n_f34.png`, `n_r34.png`, `n_fs.png` (front + side), `n_rt.png` (rear + top), `z_expl.png`,
-  `z_expl_deck.png`, `z_keys.png`, `z_cu.png`, `z_cu2.png`; gridded details `g_front.png`, `g_side.png`, `z_f34a.png`,
-  `z_f34b.png`, `z_f34under.png`, `z_f34under2.png`, `z_r34a.png`, `z_r34b.png`.
-- **On our renders:** `measure_render.py <render.png> [paper_hex]` prints bbox, W : H, W / K / Y shares, profile,
-  width per height, fifths and class medians with these masks. Self-test on the sheet's own f34 cell
-  (`selftest_f34.png`) reproduces §1.2 exactly (W : H 1.670, W 41.7 / K 52.4 / Y 5.9).
-
-## 1. Study (2a)
-
-### 1.1 Classification, what it is, size
-
-- **Classification:** full asset, a modular timber structure. Hero budget 4000 tris, each part under 1000. The plan in
-  §4.3 lands at about 3450 (the rope is about 60 % of it).
-- **Overall read (check this first).** A **long, level, straight timber trestle footbridge on eight square posts**
-  (four a side, three equal bays), about three times as long as it is wide, **open at both ends**:
-  - a **deck of chunky orange boards laid across the width**, four per bay, their ends forming a row of blocks along
-    both long edges, the deck running on past the end posts at each end (front cell 11 px ≈ 1.3 studs past their
-    outer faces; adopted 1.54, the end board);
-  - **eight square posts** running from the ground up through the deck edge and standing a good third of their height
-    above it, each with a softened square cap and a small dark peg dot;
-  - **two tan rope wraps round each post** a little above the deck, and **thick twisted rope swags sagging low
-    between the posts along both long sides** (three per side). **No rope across either end**;
-  - under the deck, a **dark stringer** along each side (running a little past the end posts), a **crossbeam** at
-    every post pair, and a **block with a round pale-gold peg head** on each post's outer face at stringer height
-    (and on the end faces of the corner posts);
-  - **legs** (the posts below the stringers), **knee braces** from each end leg inward to the stringer (end bays only)
-    and an **X brace** between the two legs at each end, with a peg at the crossing.
-  - Hero shares (f34): W 41.7 % (lit board tops, caps, plank ends), K 52.4 % (post faces, stringers, legs, braces),
-    Y 5.9 % (rope and pegs).
-- **Focal silhouettes, in order:**
-  1. The long deck slab with its row of plank-end blocks, rising from the lower left (near −X end) to the upper right
-     of the f34.
-  2. The eight posts standing above it, each with its rope wraps, and the six low swags between them.
-  3. The legs, the knee braces and the end X braces under the deck; the blocks and pegs on the post faces at the
-     stringer line.
-- **Target (post centres): W 8.0 across × 3 bays of 9.143 along (27.43 end post to end post), deck 32.0 long, deck top
-  5.6, post top 8.85.** Overall about **32.0 L × 11.0 W (pegs) × 8.85 H**. Tolerances: post spacing exact; deck top
-  5.6 ± 0.02 (a seam level, §2.1); H ± 0.3; W ± 0.4; L ± 0.4. Decision §8.1.
-  - **How it was derived.**
-    - **Height to width.** The side cell (level, the only cell drawn at one scale) gives post spacing 105 px across
-      (posts 353–373 / 458–478) against post top → ground 471 → 591 = 121 px: **H / W 1.15**; the f34 fit (below),
-      corrected for the near post's larger scale, gives 1.13. Adopted H / W 1.106 (W 8, H 8.85: the deck top lands on
-      5.6, see levels).
-    - **Bay to width.** Fitting a pinhole camera to the eight cap centres (`persp.py`, rms 5 px): **f34 bay / W 1.38,
-      e 23°, the long axis 39° off the screen plane; r34 bay / W 1.35, rms 7 px.** Forced to a ratio, the fit error is
-      8.8 px at 1.0, 5.9 at 1.2, 5.2 at 1.3–1.4. The **front and rear cells give 0.93** (bays 75.5 / 82.5 / 76 px
-      against W ≈ 84 px at their height scale: the cells are drawn horizontally compressed, §3.1) and the **top cell
-      1.0** (a two-bay drawing, §3.2). Adopted **1.143** (bay 9.143 = 4 boards of 2.286): between the three-quarters
-      and the orthos, and it makes the deck exactly one 32-stud tile. The block model then gives the f34 W : H
-      **1.677** at (−40, 23) against the sheet's **1.670**, and **1.587** at (140, 26) against the r34's 1.577
-      (`proj050.py`).
-    - **Levels** (front cell, H = 97 px from the post top y 486 to the ground y 582; side cell, H = 121 px, 471 → 591):
-
-      | Item | Front (frac. of H) | Side | Adopted (z) |
-      | --- | --- | --- | --- |
-      | Post top | 1.000 | 1.000 | **8.85** |
-      | Upper / lower rope wrap centre | .836 / .794 | .847 / .810 | **7.46 / 7.06** |
-      | Swag at mid-bay (centre) | .699 (rope 512–516.5) | .715 | **6.20** |
-      | Deck top | .634 (520.5) | .632 (514.5) | **5.60** (.633) |
-      | Plank bottom | .551 (528.5) | .541 (525.5) | **4.75** |
-      | Stringer / crossbeam bottom | .397 (543.5) | .393 (543.5) | **3.45** |
-      | Peg centre on the block | .474 (536) | .479 | **4.12** |
-      | Knee brace foot on the leg | .124 (570) | — | **1.10** |
-      | X brace feet / tops | — | ≈ .05 / .37 | **0.45 / 3.30** |
-    - **Sections:** post 17.5 px (front, 0.180 H), 20.5 px (side, 0.169 H), 17 px of 85 (top, 0.20 W) → **1.5**;
-      board ends 8 px (front) and 11 px (side) thick → **0.85** (M048's); stringer 14.5 px → **1.30**; swag 5–7 px →
-      **Ø 0.45**; the two wraps make a 0.66–0.73 band standing 0.27 proud of the post faces → **wrap tube Ø 0.40**.
-  - **Why this size.**
-    - **Against the character (5.5):** posts stand **3.25 above the deck** (hip height, 0.59 of the character); the
-      wraps sit 1.5–1.9 above the deck (knee to thigh); the swags sag to **0.38 above the deck** (ankle height: a low
-      rope edge, not a handrail, as on the dock); the walkway is **6.5 clear between the post lines** (9.5 of deck),
-      room for three characters abreast; posts 1.5 square (chunky, as the notes ask); boards 2.19 wide, 0.85 thick.
-    - **Against the kit:** the deck top **5.6 equals M048's dock deck and M043's lower lawn**; post centres 8 across
-      equal the dock's, so a bridge end meets the dock's open end post line for post line (§2.1). The deck is **4.6
-      above the water top 1.0** (legs on a water tile's plate at z 0, like the dock's).
-- **Build frame (decision §8.2):** long axis **X** (the sheet's "FRONT VIEW" is a long side, and the kit's default
-  `front` camera then shows it), +Y back, ground z 0, centred on x 0 / y 0. **Both ends open; the model is symmetric
-  about x 0 and y 0.** Stage 2 puts the origin at the bbox bottom centre (it stays at 0, 0, 0; record any offset).
-  This differs from M048 (long axis Y); placement rotates either as needed.
-
-### 1.2 Measured views (`measure.py`)
-
-| View (box) | Silhouette bbox (px) | W : H | W (lit) | K (dark) | Y (rope + pegs) | O |
-| --- | --- | --- | --- | --- | --- | --- |
-| Front three-quarter (12,64,511,393) | 39–499 × 99–374 (461 × 276) | **1.670** | 41.7 % | 52.4 | 5.9 | 2.0 |
-| Rear three-quarter (513,64,1011,393) | 519–988 × 81–378 (470 × 298) | 1.577 | 45.1 | 48.8 | 6.0 | 2.0 |
-| Front (12,402,318,651) | 30–303 × 486–582 (274 × 97) | 2.825 | 44.4 | 49.1 | 6.4 | 2.3 |
-| Side (320,402,510,651) | 341–489 × 471–592 (149 × 122) | **1.221** | 28.8 | 67.1 | 4.2 | 2.8 |
-| Rear (512,402,794,651) | 522–786 × 486–582 (265 × 97) | 2.732 | 44.0 | 49.9 | 6.2 | 2.4 |
-| Top (796,402,1011,651) | 833–947 × 424–614 (115 × 191) | 0.602 (W : L) | 68.9 | 30.9 | 0.1 | 0.7 |
-
-- Shares are of W + K + Y; O and B are left out. **Verifier tolerance:** W / K ±6 points (they split on value, so the
-  studio light moves them); Y ±1.5 (rope thickness and wrap size); W : H ±0.08 on f34, r34 and side; positions ±0.05.
-- The f34's Y includes the pegs (its second fifth, 9.4 %). The top view's rope barely shows (0.1 %): the wraps are
-  hidden under the caps' outlines and no swag is drawn there (§3.2).
-
-**Top profiles** (highest silhouette pixel per column, fraction of H, every 0.05 f):
-
-| f | .00 | .05 | .10 | .15 | .20 | .25 | .30 | .35 | .40 | .45 | .50 | .55 | .60 | .65 | .70 | .75 | .80 | .85 | .90 | .95 | 1.0 |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| f34 | .38 | .61 | .55 | .57 | .61 | .66 | .79 | .73 | .74 | .76 | .80 | .92 | .85 | .84 | .86 | .89 | .99 | .79 | .79 | .89 | .71 |
-| r34 | .36 | .57 | .51 | .55 | .61 | .74 | .67 | .68 | .71 | .75 | .80 | .91 | .84 | .84 | .86 | .89 | .99 | .80 | .78 | .88 | .69 |
-| Front | .63 | .99 | .98 | .76 | .72 | .74 | .80 | .99 | .79 | .73 | .72 | .74 | .79 | .99 | .79 | .74 | .72 | .75 | .96 | .99 | .62 |
-| Side | .61 | .63 | .99 | .99 | .98 | .81 | .79 | .77 | .75 | .74 | .74 | .74 | .75 | .76 | .79 | .82 | .96 | .99 | .99 | .86 | .61 |
-| Rear | .63 | .99 | .98 | .77 | .74 | .75 | .81 | .99 | .80 | .74 | .72 | .73 | .79 | .99 | .86 | .74 | .73 | .76 | .96 | .99 | .63 |
-
-- **f34:** eight peaks = the caps (f .05 far-left corner F1, .25–.30 F2, .55 F3, .80 F4; the near row N1–N4 at .15,
-  .40, .65–.70, .95); the swags fill between (.55–.79). The deck rises steadily from .38 at the near-left end.
-- **Front / rear:** four posts at the peaks (.99), swags dipping to .72–.74 between, the deck ends at .62–.63.
-- **Side:** two posts (.99), one swag drawn between them (.74, §3.3), the deck end at .61.
-
-**Width per height** (fraction of W at h .05 → .95):
-
-```
-f34    .07 .22 .46 .74 .93 .95 .76 .70 .45 .06
-r34    .07 .31 .47 .74 .94 .94 .79 .53 .46 .06
-front  .92 .92 .92 .92 .98 1.0 .92 .92 .94 .92
-side   .85 .85 .85 .85 .97 .99 .85 .85 .89 .85
-rear   .92 .92 .92 .92 .98 1.0 .92 .92 .94 .92
-```
-
-**Fifths** (bottom → top, % of each class): f34 W 2.1 / 19.5 / 37.3 / 35.6 / 5.6; K 8.3 / 26.8 / 35.4 / 22.0 / 7.5;
-Y 0.2 / 9.4 / 33.2 / 38.3 / 18.9. r34 W 2.1 / 19.9 / 36.3 / 34.4 / 7.3; Y 0.6 / 13.2 / 30.2 / 39.3 / 16.7. Front W 6.1 /
-12.8 / 39.3 / 28.4 / 13.4; K 16.4 / 17.6 / 48.3 / 12.6 / 5.1; Y 0 / 0 / 7.1 / 61.5 / 31.4.
-
-**Level and size measurements** (sheet px; `ortho.py`, `colp.py`):
-
-| Item | Front cell (long side) | Side cell (end) | Rear cell | Top cell | f34 / r34 |
-| --- | --- | --- | --- | --- | --- |
-| Post centres | 49.5 / 125 / 207.5 / 283.5 (bays 75.5, 82.5, 76) | 363 / 468 (105) | 540.5 / 613 / 695.5 / 767 (72.5, 82.5, 71.5) | x 847.5 / 932.5 (85); y ≈ 430 / 516 / 600 (3 a side) | caps F1 (65,213) F2 (180,161) F3 (296,126) F4 (410.5,105); N1 (138,246) N2 (246,194) N3 (364,160.5) N4 (474,134). r34 F (547.9,215) (635,166.4) (774.3,115.7) (897.7,88.6); N (623,249.3) (732.1,199.3) (853.7,152.3) (962,121.4) |
-| Post width | 17.5 (41–58) | 20.5 | 16–17 | 17 (caps 839–856) | — |
-| Post top → ground | 486 → 582 (97) | 471 → 591 (121) | 486 → 582 | — | N1 cap 246 → foot ≈ 372 |
-| Rope wraps | Y 500–501, 504–505 (band 499–506); wraps stand 3 px proud each side (38–61 vs 41–58) | 488–489, 492–494 | same as front | — | two wraps on every post |
-| Swag at mid-bay | 512–516.5 (Ø ≈ 5 px) | 500–507 | same | not drawn | three swags per long side |
-| Deck top / plank bottom | 520.5 / 528.5 | 514.5 / 525.5 | 521 / 529 | — | |
-| Stringer band | 529–543.5, x 33–300 (0.8 past the end posts) | 527–543 (crossbeam band, with the stringer ends) | 531–543 | edge strips under the board ends | dark band under the plank ends |
-| Block / peg | blocks 529–543.5 at each post, peg centre y 536 (Ø 5–6) | blocks on both posts' end faces, pegs at 533 | same | ears 6 px outside the caps | block on the outer face below the deck, wider than the post |
-| Deck ends | x 30 / 303: 11 px past the end posts' outer faces | x 341 / 489: 12 px past the posts' outer faces | 522 / 786 | y 436 → 604; edges x 841 / 939 = the posts' outer faces | the end boards past the end posts, the stringer end under them |
-| Boards | plank-end gaps at 75, 98, 150/153, 180, 234, 257: **3 visible + 1 behind each post = 4 per bay** | one end board's side face, drawn as 3 blocks between the posts + 2 stubs outside | same | seams every 14.3 px (y 451 … 604): **6 per bay**, a seam at every post row | about 4 per bay along the near edge; exploded 5 + 9 |
-| Braces | knee braces in the end bays only: foot on the end leg's inner face at y 570, top on the stringer underside ≈ 26 px in from the leg | X between the legs, feet ≈ 585, tops ≈ 546, peg at the crossing (403, 553) | same as front | — | dark diagonals between the near-end legs (f34 sheet ≈ (60–80, 300–330)) and under the far end |
-
-### 1.3 Silhouette and composition per view
-
-**Front three-quarter (`n_f34.png`, `z_f34a.png`, `z_f34b.png`, `z_f34under.png`, `z_f34under2.png`): governs.**
-Camera at −X, −Y (**kit az ≈ −40, e ≈ 23**), clear perspective (the near end's across vector is 79 px, the far end's 70).
-The −X end at the lower left, the near long side (−Y) running back to the upper right.
-- **Deck:** boards run **across the width** (upper left to lower right). Their ends form a row of chunky blocks along
-  the near edge, about 4 per bay, roughly flush with the posts' outer faces. Each board is a crisp box with lighter top
-  edges; values vary a little board to board. A few boards seem to break near mid-width (the top view and the exploded
-  draw full-width boards, §3.5). At the near-left end the deck runs on past the end posts and the stringer's end
-  (with a peg dot) shows under it.
-- **Posts:** eight caps above the deck. Each cap is a square with softened top edges and a small dark peg dot; faces
-  show faint vertical split lines and darker streaks.
-- **Rope:** two wraps round each post about 1.5–1.9 above the deck; swags sag low between the posts along both long
-  sides (3 + 3). **None across either end.**
-- **Under the deck:** the near stringer under the plank ends, a block with a big round pale-gold peg on every near
-  post's outer face at stringer height (N2, N3, N4 clearly), the near legs (N1's reaches lowest at y ≈ 372), the far
-  legs in shade, the end X braces between each end's legs.
-
-**Rear three-quarter (`n_r34.png`, `z_r34a.png`, `z_r34b.png`).** The same composition from the other side (the
-bridge is symmetric): camera at +X, +Y (**kit az ≈ 140, e ≈ 23–26**). The far-right post F4 rises highest (y 81).
-
-**Front (`n_fs.png`, `g_front.png`).** A long side, level: four posts, three swags, the plank-end row (gaps between
-3 visible ends per bay), the stringer band running the full length and **0.8 past each end post**, four blocks with
-pegs (one per post, about the post's width), four legs, and **one knee brace in each end bay, from the end leg's
-inner face (low) to the stringer underside, rising toward the middle at about 45° on the cell**. The middle legs have
-none. The middle bay is drawn 10 % longer than the end bays.
-
-**Side (`n_fs.png`, `g_side.png`).** An end, level: two posts, the end board's side face (drawn as 3 blocks between
-the posts plus a stub outside each post), the crossbeam band with blocks and pegs on both posts' end faces, an **X
-brace** between the legs with a peg at the crossing, and **a swag drawn across between the two posts** (§3.3).
-
-**Rear (`n_rt.png`).** The other long side: identical to the front (same knee braces, no middle braces).
-
-**Top (`n_rt.png`, the top cell).** A rectangle (W : L 0.602): boards across the width with seams at every post row,
-**only three posts per side and two square bays** (§3.2), the deck edges flush with the posts' outer faces, small block
-ears outside each post, a dark strip under each long edge (the stringers seen past the board ends), no swags drawn.
-
-### 1.4 Parts (exploded (12,660,742,1181), `z_expl.png`, `z_expl_deck.png`; key parts (744,660,1011,1181), `z_keys.png`)
-
-A near-isometric view from the front-left. **The hero governs every size**; the parts give shapes and boundaries.
-
-| Part | Box (sheet px) | Notes |
-| --- | --- | --- |
-| Post (7 drawn) | e.g. (82,852,122,980); key (787,712,824,831) | A square post with **two rope wraps 0.2–0.35 of its length below the top**, cap with a dark peg dot, two dark slots near the foot (key). The exploded posts stop at the deck; separate leg stubs and "L" pieces below (§3.7) |
-| Deck groups (about 5 + 9 boards) | (132,880,293,966), (293,798,597,916) | Full-width boards, chunky, a faint lengthwise line on some tops; lit tops `#E08644` |
-| Plank (key) | (768,822,918,909) | One long board, top `#F2A858`, a faint line along the top (§3.8) |
-| Stringer (3 drawn) | (193,948,540,1073) long; (520,886,624,963); key (768,890,918,978) | Long square beams, dark `#7C3715`, peg dots |
-| Crossbeam (2 drawn) | (215,1016,329,1116) labelled; (347,913,479,973); key (790,975,887,1040) | Short beams, `#7E3C17` |
-| Brace | (368,1034,468,1123) labelled; key (802,1031,893,1112) | A short square board, ends cut square on the key |
-| Corner L pieces (2) | (79,1013,157,1105), (507,988,625,1088) | A leg with a short beam end on top: the leg + stringer end of a corner |
-| Blocks with pegs (about 8) | e.g. (54,1009,72,1030), (468,905,511,945) | Small cubes with one round pale-gold peg head |
-| Rope Segment | (132,695,540,848) strung over the posts; key (780,1121,887,1153) | A thick twisted rope, sagging, **round knob ends** on the key |
-
-- **Underside close-up** (22,1236,290,1412): dark plank bottoms (`#6F371D` median), crossbeams and a stringer seen from
-  below, a block with a peg, a leg with a diagonal brace.
-- **Post junction** (301,1236,500,1412): the post rising past the deck edge; **two snug rope wraps** with the swag
-  leaving from between them to the right; the plank ends butting the post on both sides; under the deck a **block on
-  the post's outer face, wider than the post, with a faceted round peg head** (about 0.35 of the block's width).
-- **Plank detail** (512,1236,720,1412): a chunky board (about 2.5 : 1 width to thickness, crisp edges, a lighter top
-  `#F0974A`) resting on a dark stringer (`#763B17`) with a round peg head `#FCDE96` on its face.
-
-## 2. Layout (starting values; tune on the renders)
-
-Studs, build frame (long axis X, ±Y long sides, ground z 0). Builder constants (decision §8.4): `W = 8.0` (post
-centres across), `NB = 14` boards, `BOARD = 32 / 14 = 2.2857`, `BAY = 4 * BOARD = 9.1429`, `POST = 1.5`,
-`DECK_TOP = 5.6`, `PLANK_T = 0.85`, `BEAM_D = 1.30`, `POST_TOP = 8.85`, `SINK = 0.02`.
-
-### 2.1 The seam contract (binding; record it in the builder docstring and the export notes)
-
-| Item | Value | Notes |
-| --- | --- | --- |
-| Ground / leg feet | **z 0**, flat leg bottoms | a water tile's plate; legs pass through the bed and the see-through water like the dock's |
-| Deck top (walk surface) | **z 5.6**, flat, boards ± 0.02 | flush with M048's deck and M043's lower lawn; 4.6 above the water |
-| Both ends | **x ±16.0**, the end boards' outer faces; no rope, no brace above the deck | walk-on seams: a 5.6 lawn, the dock's open end, or another bridge |
-| Sides | boards to y ±4.75 (= the posts' outer faces); blocks to ±5.25; pegs to ±5.5 | nothing past ±5.6 |
-| Post centres | y ±4.0; x ±4.571, ±13.714 | |
-| Under the deck | stringers to x ±15.26 | nothing below the deck past x ±15.3 except the boards |
-
-- **Walkability:** the walk surface is **level (0° slope)**, boards flat within ±0.02, gaps 0.10 (no step anywhere
-  above 0.02). At both ends the deck is flush (≤ 0.02) with a 5.6 surface. **Steps the sheet does not solve:** from
-  sand or M034's banks (1.6–1.8) the deck is 3.8–4.0 up, from the ground 5.6: those need a later stairs / ramp-end
-  piece (the dock has the same need, M048 decision 3). Default Roblox jumps (JumpHeight 7.2) clear it, but it is not a
-  walk.
-- **With M048's dock:** turn the bridge 90° and butt one end (x −16) against the dock's open end (its end board face
-  y −9.6): both decks at 5.6, both post lines at ±4.0 across, the dock's boards to ±5.1 and the bridge's to ±4.75.
-- **With M043 (lower lawn 5.6):** an end against the lawn's front so the deck meets the turf flush; the end legs stand
-  2.3 inside the deck end, clear of a terrace face at the seam.
-- **With water tiles (M041 / M032 / M037):** legs on the plate (z 0) anywhere in open water; nothing touches the water
-  mesh (the legs read through the see-through water).
-- **With M034 (the stream tile) — does not fit as built.** The geometry fits the channel: along X over the tile, the
-  deck is exactly the tile's 32, the end legs (x ±13.71) stand on the banks and the middle legs (±4.57) in the 14-wide
-  channel. But M034's dressing leaves no clear 11-wide band across the tile: its waterline boulders B1–B4 (6.9–7.3
-  wide, tops 5.6–7.4, at y 11.0 / 7.0 / −5.2 / −9.4), mid rocks M1, M2, S1 and bank rocks K1–K6 sit inside any bridge
-  footprint (at y 0, K2 (−14.0, −2.4) stands under the −Y end posts and M2 (−6.8, −2.6) under the deck; B2's 5.6 top
-  hits the stringers at y ≈ 4–7). A bridge over a stream needs a rock-free stream variant (a later piece) or open water
-  (decision §8.1).
-
-### 2.2 Posts, stringers, crossbeams, blocks
-
-| Piece | Position | Size | Notes |
-| --- | --- | --- | --- |
-| Posts P1–P8 | centres (±4.571 / ±13.714, ±4.0) | 1.5 × 1.5, z 0 → 8.85 | cap chamfer 0.10 on the four top edges (the only bevel, §3.10); optional cap peg dot (§4.4) |
-| Leg region | each post below z 3.45 | | colour only (§5); one shell per post (decision §8.5) |
-| Stringers S±Y | y ±2.35 … ±3.25 (outer face sunk 0.02 into the posts' inner faces at ±3.25), x −15.26 … +15.26 | 0.9 wide × 1.32 deep, z 3.45 → 4.77 (top sunk 0.02 into the boards) | ends 0.8 past the end posts' outer faces (front cell); crisp |
-| Crossbeams C1–C4 | x = each post row ± 0.45, y −2.35 … +2.35 between the stringers | 0.9 × 1.32, z 3.45 → 4.77 | end faces sunk 0.02 into the stringers |
-| Blocks, outer faces (8) | each post's outer face: x = post ± 0.85, y ±4.73 → ±5.25 | 1.7 along × 1.25 tall × 0.5 proud, z 3.50 → 4.75 | sunk 0.02 into the post; open sky above (outside the board ends): the top view's ears |
-| Blocks, end faces (4) | the corner posts' end faces: x ±14.444 → ±14.964, y ±3.25 … ±4.75 | 1.5 × 1.27 × 0.5, z 3.50 → 4.77 | top sunk 0.02 into the end board above; inner side touching the stringer's outer face |
-| Pegs (12 + 2) | centre of each block's outer face, z 4.12; one on each X brace crossing | round, Ø 0.55, 0.25 proud incl. a 0.06 dome | 8 sides (the junction's head is faceted); sunk 0.03 into the block |
-
-### 2.3 Deck
-
-- **14 boards across the width**, pitch 2.2857 over x −16 … +16, each **2.186 wide** (0.10 gaps), **0.85 thick**
-  (z 4.75 → 5.6), y −4.75 … +4.75 (9.5 long). **Seams on the four post rows** (x ±4.571, ±13.714), as the top view
-  draws; 4 boards per bay; the end boards run 1.54 past the end posts' outer faces.
-- **At the posts (decision §8.3):** the 8 boards that meet a post row (boards 1, 2, 5, 6, 9, 10, 13, 14 counted from
-  −X) are **notched at both ends round the post**: an open L notch from the post's inner face (|y| 3.23) to the deck
-  edge (4.75), 0.72 deep in x (to 0.02 clear of the post's face). The board is one closed prism of an 8-vertex plan
-  polygon. The 6 others are plain boxes.
-- **Each board** is a crisp box (no top chamfer: "no small bevels", §3.10) with a per-board height jitter of ±0.02 and
-  yaw ±0.3° (no gap opening or closing past 0.06–0.14). No grain, no groove.
-- **Underside:** boards rest on both stringers (sunk 0.02) and on the crossbeam under them, if any. The end boards
-  overhang the stringer ends by 0.74 (supported over 1.55 of their width).
-
-### 2.4 Braces
-
-| Brace | From | To | Section | Sheet evidence |
-| --- | --- | --- | --- | --- |
-| Knee braces, both long sides (4) | the end leg's inner face (x ±12.964) at z 1.10 | the stringer underside (z 3.45) at x ±10.36 | 0.6 (in the brace's plane) × 0.45, centred in y on ±3.25 (straddling the leg / stringer line: ≥ 0.22 overlap with the leg face and with the stringer underside) | front and rear cells; ≈ 42° |
-| X braces, both ends (2 × 2 boards) | each leg's inner face (y ±3.25) at z 0.45 | the opposite leg's inner face at z 3.30 (under the crossbeam's 3.45) | 0.6 × 0.35; board A x ±(13.764 … 14.114), board B ±(14.114 … 14.464) (stacked, touching at the crossing; B flush with the legs' outer end faces) | side cell; f34 near and far ends |
-
-- Ends are cut to the faces they meet (vertical against a leg, horizontal against a stringer) and sunk 0.02. A peg on
-  board B's outer face at the crossing (y 0, z 1.88). **No braces at the middle legs** (front and rear cells).
-
-### 2.5 Rope
-
-| Piece | Path | Size | Notes |
-| --- | --- | --- | --- |
-| Wraps (2 per post, 16) | rounded square round the post, centreline 0.93 from the post axis on the flats (an 8-segment ring: four flats, four 45° corners); centres **z 7.06 and 7.46** | tube Ø 0.40 | inner surface sunk 0.02 into the post faces; the two wraps touch |
-| Swags (6) | both long sides, between neighbouring posts at y ±4.0 | Ø 0.45 | ends start inside the wraps (sunk ≥ 0.15) at z 7.26; **low point centre z 6.20** at mid-bay (rope bottom 5.98, 0.38 above the deck) |
-
-- **Low-poly twisted rope (as M048):** 5–6-sided tube, a ring every ~0.6 along a swag; **turn each ring half a side**
-  so the facets spiral like the sheet's twist; no fibres. Sag as a catenary sampled at the ring points.
-- **Rope part (`TimberBridgeRope`):** one swag with the key part's **round knob ends** (Ø 0.6, 8 sides); in the hero the
-  ends tuck into the wraps, so no knobs show.
-
-### 2.6 Expected extents
-
-- **Extents (build frame):** X −16.0 … +16.0 (boards); Y −5.5 … +5.5 (pegs; blocks ±5.25, boards ±4.75); Z 0 … 8.85.
-  Bbox ≈ 32.0 × 11.0 × 8.85.
-
-### 2.7 Screen checks (floor hidden; `measure_render.py`, the studio's paper colour as the second argument)
-
-- **Self-consistency (`proj050.py`, orthographic block model):** f34 (−40, 23) W : H 1.677 (sheet 1.670; az −36 /
-  −44 give 1.68 / 1.60 at e 26, e 20 / 28 give 1.78 / 1.53 at az −40); r34 (140, 26) 1.587 (1.577); side (90, 0)
-  1.243 (1.221). The front cell's 2.825 against the model's **3.62** is the recorded ortho-cell miss (§3.1).
-- **f34_sheet (−40, 23)** (probe az −35 / −40 / −45 × e 20 / 23 / 26, keep the best):
-  - W : H 1.59–1.75 (1.670);
-  - shares W 41.7 ± 6, K 52.4 ± 6, Y 5.9 ± 1.5;
-  - Y fifths within ±8 of §1.2 (0.2 / 9.4 / 33.2 / 38.3 / 18.9);
-  - top profile within ±0.08 (mean ≤ 0.05) of §1.2: eight cap peaks with the swags between, the deck rising from .38;
-  - read: the −X end at the lower left, boards across the width with their ends as blocks along the near edge, three
-    swags per side, both ends open, legs with the end X brace under the near end.
-- **r34_sheet (140, 26)** (probe az 135 / 140 / 145 × e 23 / 26): W : H 1.50–1.66 (1.577); Y 6.0 ± 1.5.
-- **front_sheet (0, 0)** (−Y side): four posts, three swags, 3 visible plank ends between posts, four blocks with pegs,
-  two knee braces (end bays only), the stringer 0.8 past each end post; levels per §1.1; W : H ≈ 3.6 against 2.825
-  (recorded).
-- **side_sheet (90, 0)** (+X end): two posts, the end board's side face, the crossbeam / stringer band with two end
-  blocks and pegs, the X brace with its peg; W : H 1.17–1.30 (1.221); **no swag across** (§3.3).
-- **rear_sheet (180, 0):** the mirror of the front.
-- **top (0, 89.9):** the sheet draws the long axis vertical: rotate the image 90° to compare. W : L ≈ 0.34 against the
-  top cell's 0.602 (its two-bay drawing, §3.2); boards across the width with seams at every post row; posts flush with
-  the deck edges; block ears outside each post.
-
-## 3. View conflicts and resolutions
-
-### 3.1 Bay length: the three-quarters (bay / W 1.35–1.38) vs front and rear (0.93) vs top (1.0)
-
-- **Evidence:** §1.1. Both three-quarters are consistent with each other; the front and rear cells draw the long side
-  at 0.78 of the height's scale (their W : H 2.8 against the model's 3.6); the top cell draws a different, two-bay
-  bridge.
-- **Resolution (decision §8.1):** **bay 9.143 (1.143 W)**, 3 bays, deck 32.0. The f34 governs the read (block model
-  1.677 against 1.670). The front and side cells are judged on content and level fractions (which agree), not on W :
-  H. **Alternatives:** bay 8 (= W, the ortho cells; deck 28.6, f34 W : H 1.78) or bay 10.8 (the three-quarters
-  literally; deck 37.1, longer than a tile).
-
-### 3.2 Posts per side: top view 3 (two bays) vs every other view 4 (three bays)
-
-- **Resolution:** **4 per side, 3 bays** (f34, r34, front, rear, exploded). The top view is judged for its plan
-  content (boards across, seams at the post rows, posts flush with the edges, ears), not its post count.
-
-### 3.3 A swag across the end (side cell) vs open ends (f34, r34)
-
-- **Evidence:** the f34 and r34 show no rope between the two posts at either end (blank paper between F1–N1 and
-  F4–N4); the top view draws no rope. Only the side cell draws a swag between its two posts.
-- **Resolution:** **no end rope; both ends open** (a bridge is walked on at both ends). The side cell's swag is a
-  drawing convention (the long-side swags seen end-on would be vertical lines at the posts). The side_sheet render
-  shows no swag: a recorded miss.
-
-### 3.4 Deck width: boards past the posts (side cell, 0.88) vs flush (top cell) vs nearly flush (f34)
-
-- **Resolution:** **board ends flush with the posts' outer faces (y ±4.75)**; the blocks (0.5 proud) and pegs (to
-  ±5.5) supply the side view's stubs outside the posts. **Alternative:** boards to ±5.2 with a 0.45 sliver of board
-  outside each post (needs U notches; reads as a gap beside each post).
-
-### 3.5 Board count and layout: top 6 per bay, front and f34 4 per bay, exploded about 14 in all
-
-- **Resolution (decision §8.3):** **14 boards, 4 per bay, seams on the post rows, notched round the posts.** No butt
-  joints (the f34's apparent mid-width breaks are not in the top view or the exploded).
-
-### 3.6 Bracing
-
-- **Evidence:** front and rear cells: one knee brace in each end bay from the end leg; none at the middle legs. Side
-  cell: an X between the end legs with a peg at the crossing. f34: diagonals between the near-end legs and under the
-  far end.
-- **Resolution:** **4 knee braces (the end legs, both long sides) + an X brace at each end.** Symmetric, as the front
-  and rear cells are identical.
-
-### 3.7 Posts: one piece (every assembled view) vs post + leg stubs + corner L pieces (exploded)
-
-- **Resolution (decision §8.5):** **one closed post per position**, ground → cap; the leg region is colour only. The
-  exploded's split is a drawing of how the frame goes together, not hidden stacked faces.
-
-### 3.8 Plank top line (key plank, plank close-up)
-
-- **Resolution:** not modelled (a groove would read as 28 boards from above and the f34 board tops show none). Per-board
-  tint carries the board-to-board variation.
-
-### 3.9 Pegs: "wooden pegs" (junction text) vs pale gold rendering
-
-- **Resolution (decision §8.9):** **wooden peg heads coloured pale gold** (`m050_peg`, rough 0.55, metal 0): the text
-  says wood; the colour follows the render. **Alternative:** M048's brass (metal 0.5) for a dock-and-bridge match.
-
-### 3.10 "Broad flat-shaded faces, no small bevels" vs softened caps and M048's chamfered boards
-
-- **Resolution:** crisp boxes everywhere (boards, stringers, crossbeams, blocks, braces); **only the post caps get
-  one 0.10 chamfer** (their corners read softened in the front, side and f34 cells). This differs from M048's 0.06
-  board chamfer: the sheet's note governs (decision §8.3).
-
-### 3.11 Leg colour: mildly darker (assembled) vs uniform (exploded and keys)
-
-- **Evidence:** front cell middle posts: cap v .70, above the deck .65, leg .58–.61 (and 0.1 less saturated); f34 legs
-  `#7E3911` / `#72320D` (v .45–.49) against the post above the deck `#8A3D0A` (.54): **0.87–0.92**. M048's legs were
-  0.84 and much browner.
-- **Resolution:** legs darken **by position** below the stringers, half as strongly as M048's (§5.5). Recorded.
-
-### 3.12 Rear three-quarter
-
-- The bridge is symmetric about both axes, so the "rear" three-quarter is the same composition from the other diagonal:
-  camera (140, 26). Its slightly lower W : H (1.577) suggests a higher elevation than the f34's.
-
-### 3.13 Cast shadow
-
-- The sheet's ground shadows are pale blue-grey (B). Render every `*_sheet` view with the studio floor hidden.
-
-## 4. Construction plan (stages 1–3)
-
-### 4.1 Parts first, each from its own function, checked against its cell
-
-All pieces are explicit low-poly solids from vertex lists (boxes, plan-polygon prisms, cut-end braces, tubes). **No
-booleans are needed**: every piece is its own closed shell, touching or sunk 0.02 into what carries it.
-
-**Helper reuse (decision §8.10).** `m048.py` already has `_prism` (plan polygon → prism, optional top chamfer),
-`_box`, `_brace_quad`, `_tube` (twisted rope with groove strand and pinch), `_knob`, `_bolt`, `_catenary`,
-`coil_path` / `coil`, `swag_ends` / `swag` and a notched `board_outline`. If M048 is committed when M050 starts,
-import those helpers from `m048` (models already import m012 / m033 / m040); if it is still in flight, copy them into
-`m050.py`. Never import M048's constants, and never edit `m048.py`.
-
-1. `post(i)` → each of the eight posts: a prism with a 0.10 cap chamfer, its block(s) and peg(s), its two wraps.
-   **Part `TimberBridgePost`** = the −X / −Y corner post with both blocks, both pegs and its wraps (key "Post"),
-   compared with the key part and the junction close-up.
-2. `board(i)` / `deck()` → the 14 boards (§2.3). **Part `TimberBridgePlank`** = one plain board (key "Plank").
-3. `stringer(side)` → **Part `TimberBridgeStringer`**.
-4. `crossbeam(x)` → **Part `TimberBridgeCrossbeam`**.
-5. `knee(sx, sy)`, `xbrace(sx)` → **Part `TimberBridgeBrace`** = one knee brace.
-6. `wrap(post, z)`, `swag(p0, p1)` → **Part `TimberBridgeRope`** = one swag with knob ends (key "Rope Segment").
-7. **Hero `TimberBridge`** = 8 posts (with 12 blocks, 12 pegs, 16 wraps) + 14 boards + 2 stringers + 4 crossbeams +
-   4 knee braces + 2 X braces (4 boards, 2 pegs) + 6 swags.
-   - Each piece a closed shell in one object; no unions.
-   - `M.fix_bowties`; origin at the bbox bottom centre; transforms applied.
-8. **Parts shot** (az −35, e 25), laid out like the exploded: boards above the stringers, posts at the corners, the
-   crossbeam and brace in front, the rope above.
-
-### 4.2 Stage 1 acceptance (render, compare every view, measure with this folder's scripts)
-
-1. **Overall read:** a long level trestle footbridge on eight square legs, chunky boards across the width, eight posts
-   with snug double rope wraps and six low swags (both ends open), blocks with pale-gold pegs at the stringer line,
-   end-bay knee braces and end X braces.
-2. **f34_sheet, r34_sheet, front_sheet, side_sheet, rear_sheet, top** per §2.7.
-3. **Level check (numbers):** leg feet z 0.00; stringers and crossbeams 3.45 → 4.77; deck top 5.60 ± 0.02 on every
-   board; wraps 7.06 / 7.46; swag low points 6.20 ± 0.05; post tops 8.85.
-4. **Underside extra** `under_cu (−35, −30)` against the underside close-up: board bottoms on the stringers and
-   crossbeams, a knee brace meeting leg and stringer, the X brace, a block and peg; nothing floating.
-5. **Junction extra** `junc_cu (−60, 15)` framed on the −X / −Y corner post: notched board ends against the post, the
-   wraps snug, the swag leaving from between the wraps, the block and peg under the deck edge.
-6. **Scale shot:** 5.5-stud character markers on the deck at x 0 and on the ground beside a leg.
-7. **Kit shot** (if M048 / M043 are in the kit file): the bridge's −X end against the dock's open end and its +X end
-   against an M043 lower lawn, from (45, 20): decks flush at 5.6.
-
-### 4.3 Budget
-
-| Piece | Count | Tris each | Total |
-| --- | --- | --- | --- |
-| Posts (prism + 0.10 cap chamfer; + cap peg dot) | 8 | 20 (28) | 160–224 |
-| Blocks (crisp boxes) | 12 | 12 | 144 |
-| Pegs (8-sided, domed) | 14 | 30 | 420 |
-| Boards: plain / notched (8-vertex plan prism) | 6 / 8 | 12 / 28 | 296 |
-| Stringers | 2 | 12 | 24 |
-| Crossbeams | 4 | 12 | 48 |
-| Knee braces | 4 | 12 | 48 |
-| X brace boards | 4 | 12 | 48 |
-| Wraps (5 sides × 8 segments) | 16 | 80 | 1280 |
-| Swags (6 sides × 13 segments + caps) | 6 | 164 | 984 |
-| **Hero** | | | **about 3450–3520** (limit 4000) |
-| Parts: Post / Plank / Stringer / Crossbeam / Brace / Rope | | | ≈ 264 / 12 / 12 / 12 / 12 / 260 (limit 1000) |
-
-- **The wraps are the cost.** If the hero is over 3900: swags to 5 sides (−160), then pegs to 6 sides (−110). Wraps at 6
-  sides (+256) only if the budget allows. Never drop a wrap (two per post is a defining look), a swag, a peg or a board.
-
-### 4.4 Shape targets (binding; check with `M.audit` and own bmesh code)
-
-| Target | Posts | Boards | Stringers / crossbeams / braces | Rope | Pegs |
-| --- | --- | --- | --- | --- | --- |
-| Section | square 1.5; faces planar | 2.186 × 0.85; tops flat | square-ish boxes | round-ish 5–6 sides, spiral facets | round 8 sides |
-| Edges | cap chamfer 0.08–0.12; sides sharp | crisp | crisp | — | dome ≤ 0.08 |
-| Not | no rounded tops, no taper, no octagonal caps | no gaps > 0.14, no grain, no warping > 0.02 | no floating braces | **not thin**: swags Ø 0.43–0.47, wraps Ø 0.38–0.42; no fibres; no rope through a board or post | not flat discs, not cubes |
-
-- **Chunky, not skinny:** board W : T 2.4–2.7; post W ≥ 0.16 of its height; rope Ø ≥ 0.05 of the post height.
-- **Optional cap peg dot:** a 0.22 square inset 0.03 into each cap's top face (+8 tris per post), in `m050_wood_dark`;
-  it reads in the f34 and the key part. Drop it first if the notes' "no additional details" is preferred.
-
-### 4.5 Stages 2 and 3
-
-- **Stage 2:** every shell closed and manifold; zero non-manifold edges and verts (`nonmanifold_verts` 0), boundary,
-  wire and loose elements; no zero-area faces or n-gons (the notched boards' 8-gon tops and bottoms, the wrap rings and
-  the peg domes are the places to check); normals outward; **0 winding errors** in `build()`'s problems list (STAGES
-  "Consistent winding"; the notched boards are non-convex: triangulate the plan polygon with ear clipping, not a fan
-  from vertex 0, and check each triangle's normal against the face's); no corners under 5° on visible faces; the deck
-  top planar at 5.60 ± 0.02.
-- **Stage 3:** smart UV, margin ≥ 0.008, no overlaps, even texel density.
-
-## 5. Colour plan (stage 4)
-
-### 5.1 Swatches (flat; medians of the inner box, sd ≤ 1.5)
-
-| Swatch | Header box / §5 copy | Hex (header / §5) | HSV | Use |
-| --- | --- | --- | --- | --- |
-| 1 Orange wood | (736,19,762,43) | `#BF743D` / `#B76E3A` | 25°, 0.68, 0.75 | the framing's paint tone (between the rendered tops and the vertical faces) |
-| 2 Tan | (783,19,809,43) | `#E6C18F` / `#E6BA80` | 34°, 0.38, 0.90 | hue reference for the rope (the rendered rope is brighter) |
-| 3 Cream | (830,19,855,43) | `#DDD4C6` / `#DED1BE` | 36°, 0.10, 0.87 | **unused** (nothing on the sheet renders cream; nearest is a peg highlight) |
-| 4 Grey | (877,19,902,43) | `#A2ABB1` / `#A6AFB4` | 204°, 0.08, 0.69 | **unused** (no metal or stone) |
-| 5 Green | (924,19,949,43) | `#84A457` / `#85A655` | 85°, 0.47, 0.64 | **unused** (no moss or grass) |
-| 6 Blue | (970,19,996,43) | `#36A3D0` / `#359FD1` | 198°, 0.74, 0.82 | **unused** (no water drawn) |
-
-### 5.2 Rendered regions (`samp050.py`; median / lit quartile / shade quartile)
-
-| Region | f34 / r34 | front / side | top | keys / exploded / close-ups |
-| --- | --- | --- | --- | --- |
-| Board tops | **`#DE833B`** (27°, .73, .87) / lit `#EF9747`; r34 `#DE843D` | | `#D47935` (26°, .75, .83); board-to-board value sd 0.012, range 0.043 | exploded `#E08644`; key plank `#F2A858`; plank detail `#F0974A` |
-| Board ends (vertical) | | front **`#B25415`** (24°, .88, .70); side end face `#A25020` | | |
-| Post faces above the deck | N3 `#8A3D0A` (24°, .93, .54) | front `#A64E13` (24°, .89, .65) | | key post `#8B3D12`; junction `#81360E` |
-| Caps | N3 top **`#F4903E`** (27°, .75, .96) | front cap `#B4581A` (lit `#F79435`) | **`#F39641`** (29°, .73, .95), lighter than the boards beside them | |
-| Stringers / crossbeams | | front stringer `#954B1F` (22°, .79, .58); side crossbeam `#7A462B` | | key stringer `#7C3715`; key crossbeam `#7E3C17`; exploded `#7D3B1D`; plank detail `#763B17` |
-| Blocks | N3 `#A34707` | front `#B2520C` | | |
-| Legs (below the stringers) | N1 **`#7E3911`** (22°, .87, .49); N4 `#72320D` | front `#9B5224` / `#A3511C` (v .58–.64); side `#8A4825` | | |
-| Braces | | front knee `#9B4918`; side X `#803F22` (19°, .73, .50) | | key brace `#8C3F12` |
-| Board bottoms (shade) | | | | underside close-up K `#6F371D` |
-| All dark wood (K) | f34 `#78350F` / r34 `#783610` | | | |
-| Rope | f34 **`#F8CD74`** (40°, .53, .97) / lit `#FDE997` / shade `#E8B155`; r34 `#F9CF78` | front swag `#F9D58D` (40°, .43, .98); wraps `#F5C954`; side `#F8D188` | | key `#FAD78C`; exploded `#F9D275`; junction `#FCD581` |
-| Pegs | `#F2D088` (41°, .44, .95), `#F8D08B`, `#FAC674` | front `#E4C89C` (36°, .32, .90) | | junction `#FBDE92`; plank detail `#FCDE96` (42°, .40, .99) |
-
-### 5.3 How the colour works
-
-**Wood: one warm orange timber family, by role and position, never by facing — the same family as M048.** The sheet's
-board tops (`#DE833B`) are within 13 of M048's (`#E19044`), its post faces (`#8A3D0A`) within 10 of M048's (`#8D4212`),
-its rope (`#F8CD74`–`#F9D58D`) the same as M048's (`#F8D088`).
-- The lit tops (27°, sat 0.73) against the vertical faces (24°, sat 0.88, value 0.54–0.70) is mostly the light: a
-  **hue miss of 2–4° on the vertical faces is a known miss**, not a key error.
-- **Role:** boards `m050_wood`; posts and blocks `m050_wood_deep`; stringers and crossbeams `wood_deep` with 35 %
-  `wood_dark` (they read a step darker than the post faces in every cell: `#7C3715` against `#8B3D12` on the keys).
-- **Position:**
-  - **caps lighter:** the top 0.45 of each post blends toward `m050_wood_light` (rising to 60 % on the cap faces):
-    the f34 cap `#F4903E` and the top view's caps `#F39641` against boards `#DE833B` / `#D47935`;
-  - **legs darker, mildly:** below the stringer bottom (z 3.45) the posts blend toward `wood_dark` over 0.6 (3
-    steps) to **50 %** at z 2.85 and below (value 0.87–0.92 of the post above, §3.11);
-  - **braces** 60 % `wood_dark` (`#803F22`, `#8C3F12`);
-  - **blocks** `wood_deep` with 15 % `wood` (front `#B2520C` a touch brighter than the post `#A64E13`).
-- **Boards:** per-board tint ±0.03 (the sheet's boards differ by 0.012 sd in value); one broad lighter field (15 %
-  `wood_light`) across the deck; two or three boards a step deeper (15 % `wood_deep`).
-- **Not red:** keep the board key's hue at 26–29° and R − G ≤ 95; check the f34 board-top median hue ≥ 26° (W08's dock
-  and footbridge both rendered "slightly red" / "flat orange").
-
-**Rope.** One warm golden tan, brighter and more yellow than the tan swatch: `m050_rope` on the outer strands and
-`m050_rope_dark` at 45 % on the groove strand, chosen **by the strand's index round the tube (its role in the twist),
-never by the face's normal**. The rope reads clearly lighter than every wood face.
-
-**Pegs.** Pale gold wooden peg heads `m050_peg`, a touch paler and less saturated than the rope; a lower roughness so
-they catch a highlight like the sheet's.
-
-### 5.4 Keys (start from M048's calibrated hexes; `K.calibrate`; write the calibrated hexes into `palette()`)
-
-Calibration targets are medians of unshadowed rendered regions, not swatches. `K.sample` kinds: `"brown"` for the
-woods, `"vivid"` for rope and pegs. **Start values:** `m048.py`'s calibrated `PALETTE` (today: wood `#B8732F`,
-wood_light `#C2803A`, wood_deep `#7E4314`, wood_dark `#5C391E`, rope `#EEC87C`, rope_dark `#99601A`, brass `#EBC772`)
-— the same studio and light, so they should land within a few units; read them from the file at build time.
-
-| Key | Calibration target | Hue / sat / order | Where | Finish |
-| --- | --- | --- | --- | --- |
-| `m050_wood` | **`#DE833B`** board tops (r34 `#DE843D`, exploded `#E08644`) | 26–29°, 0.68–0.76, R > G > B | boards; default | rough 0.85, metal 0, low spec |
-| `m050_wood_light` | `#F2933F` (f34 cap top `#F4903E`, top-view caps `#F39641`) | 27–30°, 0.70–0.76 | caps and the top 0.45 of each post (to 60 %); the deck's lighter field at 15 % | rough 0.85 |
-| `m050_wood_deep` | `#8B3D10` (f34 post `#8A3D0A`, key post `#8B3D12`, junction `#81360E`); check the front_sheet post faces near `#A64E13` and board ends near `#B25415` (± 18, light) | 22–26°, 0.80–0.90 | posts, blocks; stringers and crossbeams with 35 % dark; deeper boards at 15 % | rough 0.85 |
-| `m050_wood_dark` | `#6F3518` (f34 legs `#72320D`–`#7E3911`, side X `#803F22`, underside `#6F371D`) | 19–24°, 0.72–0.85 | legs (to 50 %), braces (60 %), stringers (35 %), the cap peg dot | rough 0.9 |
-| `m050_rope` | **`#F8D088`** (f34 `#F8CD74`, front `#F9D58D`, side `#F8D188`, key `#FAD78C`) | 38–42°, 0.43–0.53, value ≥ 0.92 | swags, wraps, knob ends | rough 0.95, low spec |
-| `m050_rope_dark` | `#BE7019` (M048's groove target; the sheet's swag mid-tones `#E2A455`–`#ECAE5F`) | 32–36°, 0.70–0.85 | the groove strand at 45 % | rough 0.95, low spec |
-| `m050_peg` | `#F6D48E` (f34 `#F2D088` / `#F8D08B`, junction `#FBDE92`, plank detail `#FCDE96`) | 38–43°, 0.36–0.46 | peg heads | rough 0.55, metal 0 (decision §8.9) |
-
-**Calibration warnings:**
-- **Board tops:** f34 W-class median within 12 of `#DE833B`, hue 26–29°, sat ≥ 0.66. Not red (hue < 25°), not brown
-  (value < 0.8), not yellow-tan (hue > 31°).
-- **Vertical faces:** front_sheet board ends within 18 of `#B25415`, post faces within 18 of `#A64E13`, stringer face
-  within 18 of `#954B1F`; the value order **board ends > post faces > stringer ≥ legs** must hold.
-- **Legs:** visibly but mildly darker than the posts above (value ratio 0.85–0.93), not M048's brown legs.
-- **Caps:** clearly lighter than the board tops beside them in the top render.
-- **Rope:** f34 Y median within 12 of `#F8CD74`, hue 38–42°, clearly lighter than any wood. Not white-cream, not
-  orange.
-- **Pegs:** pale gold, distinct from the rope by being paler and smoother; not grey (the grey swatch is unused), not
-  wood-orange.
-
-### 5.5 Blending (`K.blend(mode="blend", steps=3)` over explicit face lists; fields are positions, never facing)
-
-- **Boards:** `wood` base; per-board tint ±0.03; `wood_light` by a broad noise field (scale ≈ 0.08, one or two patches
-  along the deck) at 15 %; 2–3 boards 15 % `wood_deep`. **Hard edges** only between boards (each board is its own
-  shell).
-- **Posts:** `wood_deep` base; `wood_light` by height over the top 0.45 of the post (rising to 60 % on the cap faces);
-  `wood_dark` by height below z 3.45, 3 steps to 50 % at z 2.85.
-- **Stringers, crossbeams:** `wood_deep` + 35 % `wood_dark`; per-member tint ±0.03.
-- **Braces:** 60 % `wood_dark`. **Blocks:** `wood_deep` + 15 % `wood`.
-- **Rope:** strand roles (§5.3); per-swag tint ±0.02.
-- **Hard edges only** where materials meet: rope | post, peg | block, board | post.
-
-### 5.6 Texture (Tint) and finish
-
-- **Tint:** boards amp 0.03 per board (whole board) plus 0.02 at scale 0.3; framing 0.03 per member; legs 0.03; rope
-  0.02 per piece; pegs none. **Never per-triangle confetti**, no grain stripes (the faint streaks on the sheet's posts
-  are carried by the per-member tint).
-- **Finish:** wood rough 0.85–0.9, metal 0, low spec; rope rough 0.95, low spec; pegs rough 0.55, metal 0. No emission
-  anywhere.
-
-### 5.7 Re-measure (final renders against the sheet, same boxes and masks)
-
-- **Shares** per §2.7; **colours** per the §5.4 warnings, in f34_sheet, front_sheet and top. `K.check` facing
-  correlation < 0.5 on every wood material (board tops and ends are one key; post faces one key).
-
-## 6. Joins and contact (no floating dressing)
-
-- **Posts:** feet flat on z 0 (each post one shell, ground → cap).
-- **Stringers on posts:** each stringer's outer face sunk 0.02 into the four posts' inner faces; its top sunk 0.02 into
-  the boards.
-- **Crossbeams:** end faces sunk 0.02 into the stringers' inner faces; tops sunk 0.02 into the boards.
-- **Boards on the frame:** every board's underside sunk 0.02 into both stringers (and the crossbeam under it, if any);
-  notched boards clear the post faces by 0.02 (no coincident faces); board-to-board gaps 0.10 (no overlaps).
-- **Blocks:** sunk 0.02 into the post faces; the end-face blocks also sunk 0.02 into the end board above and touching
-  the stringer's outer face. **Pegs:** sunk 0.03 into the block (or X board B).
-- **Braces:** each end face flush with (sunk 0.02 into) the leg face or stringer underside it meets; X boards touch each
-  other at the crossing.
-- **Rope:** wraps' inner surfaces sunk 0.02 into the post faces; the two wraps touch; swag ends sunk ≥ 0.15 into the
-  wraps. **No rope passes through a board or a post** (the swags hang at y ±4.0, inside the deck edge, and their low
-  points are 0.38 above the deck).
-- **Chain to ground:** boards → stringers → posts → ground; crossbeams → stringers; wraps → posts; swags → wraps;
-  blocks → posts; pegs → blocks; braces → legs and stringers.
-- **Count floating shells before reporting** (STAGES; 035 and 036 failed round 1 on this): **0**. A shell floats if its
-  nearest distance to every other shell and the ground is > 0.03, or if it doesn't chain to the ground.
-- **Buried shells:** no peg, wrap or block more than 0.05 inside a post or board (ray parity against the posts and
-  boards after the final placement), as STAGES now asks (046 had leaves inside a core).
-- **Bowties:** `M.fix_bowties` on every object; `nonmanifold_verts` 0 (peg domes, wrap rings).
-- **Winding:** 0 errors per shell (the notched boards' non-convex caps and the hand-listed box and brace builders are
-  where a reversed face slips in; 044's wedge back face).
-
-## 7. Water, lighting and VFX plan (stages 5 and 6)
-
-**What the sheet shows:** sunlit timber, tan rope and pale-gold pegs on white paper. **No water, foam, glow, light,
-sparkle, dust, smoke or VFX callout** ("No additional details, props or text").
-
-- **Water and foam: none in the model.** No `*water*` key, no foam mesh, no sockets.
-- **Stage 5 (lighting): skip, and record why.** No emissive faces, no PointLight. Studio notes (Requires Manual
-  Validation):
-  - the boards read warm orange (not red, not brown) under the game's sun; caps lighter, legs a little darker;
-  - the rope reads golden tan, the pegs pale gold;
-  - **a character walks onto the deck from a 5.6 surface at either end, across it, and off the other end**; the low
-    swags are an edge marker, not a guard rail (a 0.38–0.6 rope will not reliably stop a running character; if edge
-    safety matters, Studio adds an invisible collider: not part of this model).
-- **Stage 6 (VFX): skip, and record "the sheet shows no effect".**
-- **Collision:** hero `precise` (the deck walkable, the posts and rope solid, the space under the deck open);
-  `TimberBridgePlank` `box`; `TimberBridgePost`, `Stringer`, `Crossbeam`, `Brace` `hull`; `TimberBridgeRope` `none`.
-
-## 8. Naming and decisions for the main session
-
-**Names owned elsewhere.** Searched `art/blender/kit/mcp/*.py`, every `art/roblox/kit/*/manifest.json` and the repo
-text (`git grep`) for Bridge, Plank, Timber, Rope, Span, Stringer, Trestle:
-- **W08** owns `Footbridge`, `FootbridgePost`, `FootbridgePlank`, `FootbridgeStringer`, `FootbridgeCrossbeam`,
-  `FootbridgeBrace`, `FootbridgeRopeSegment`, `FootbridgeShortSpan`, `FootbridgeArched`, `FootbridgeBroken` (this
-  sheet's own labels under the old kit's prefix), `RopeCrossing*` (incl. `RopeCrossingPlank`), `Dock*`,
-  `Boardwalk*`, `GantryRopeLift*`, `TimberHut*`, `TimberFence*`; keys `w08_*`.
-- Other names: `MinecartBasePlank`, `LookoutPlatformFloorPlanks`, `WallWalkFloorPlank`, `WayfindingPostRopeTie`,
-  `TableAndSeatingTrestle`, `NaturalArchTopSpan`, `StoneGateSpan`; M048's `TimberDock*` (keys `m048_*`).
-- **`TimberBridge` and `m050_` occur nowhere** in the builders, the manifests or the repo text. (`.blend` contents were
-  not decompressed for this study; `M.mk` renames a clash to `<name>M050`, so check the built names once.)
-
-| Object | Part | Why |
-| --- | --- | --- |
-| `TimberBridge` | hero: posts, boards, stringers, crossbeams, braces, rope, blocks, pegs | W08 owns `Footbridge*`; parallels `TimberDock` |
-| `TimberBridgePost` | "Post": the −X / −Y corner post (full height) with its blocks, pegs and wraps | |
-| `TimberBridgePlank` | "Plank": one plain board | |
-| `TimberBridgeStringer` | "Stringer" | |
-| `TimberBridgeCrossbeam` | "Crossbeam" | |
-| `TimberBridgeBrace` | "Brace" (a knee brace) | |
-| `TimberBridgeRope` | "Rope Segment" (one swag with knob ends) | |
-
-- Palette keys `m050_wood`, `m050_wood_light`, `m050_wood_deep`, `m050_wood_dark`, `m050_rope`, `m050_rope_dark`,
-  `m050_peg` (§5.4). Collection `Kit/M050 Timber Bridge`. No sockets.
-
-**Decisions needed (a recommendation each):**
-1. **Size and crossing** (§1.1, §2.1, §3.1): **post centres 8 across × 3 bays of 9.143; deck 32.0 long, top 5.6; posts
-   to 8.85; overall 32.0 × 11.0 × 8.85** (recommended: the f34's proportions between the ortho cells and the
-   three-quarters; the deck is one 32-stud tile and level with the dock and M043's lower lawn, so it crosses **a gap
-   between 5.6 surfaces — lawn to lawn, dock to lawn — over open water or low ground**, legs on z 0).
-   - Or **bay 8** (deck 28.6; the ortho cells' squarer bays; f34 W : H 1.78 against 1.670).
-   - **Not recommended: over M034 as built** (its boulders and rocks fill every bridge-wide band, §2.1), nor **a low
-     bank-level crossing** (deck ≈ 1.9 needs a frame shallower than the sheet's 2.15 of boards + stringers; that is a
-     different piece, like W08's old footbridge). A rock-free stream variant would be a later tile.
-2. **Build frame:** **long axis X, symmetric about both axes, both ends open** (recommended: the sheet's front view is
-   a long side, the kit's `front` camera then matches it, and the bridge lies across M034-style streams without
-   turning). Or long axis Y like M048.
-3. **Boards** (§2.3, §3.4, §3.5, §3.10): **14 full-width boards, 2.186 × 0.85, 4 per bay, seams on the post rows,
-   ends flush with the posts' outer faces, the 8 boards at post rows L-notched round the posts, crisp edges (no
-   chamfer)** (recommended). Or keep M048's 0.06 top chamfer for a closer dock match (against the sheet's "no small
-   bevels").
-4. **Builder parameters:** **write `m050.py` with `W`, `NB`, `BOARD`, `BAY`, `DECK_TOP`, `POST_TOP` constants; build
-   only the drawn version now** (recommended), so a 10.4-level bridge (M040 plateaus) or a two-bay short span is a
-   parameter change.
-5. **Posts** (§3.7): **one closed post per position, ground → cap, 1.5 square, 0.10 cap chamfer; legs darkened by
-   colour below the stringers** (recommended). Or post + leg as two stacked shells (the exploded's split).
-6. **Framing and bracing** (§2.2, §2.4, §3.6): **stringers inside the post lines (0.9 × 1.32, 0.8 past the end
-   posts), 4 crossbeams at the post rows, 12 blocks with pegs (8 outer faces + 4 corner end faces), 4 knee braces in
-   the end bays, an X brace at each end with a crossing peg, nothing at the middle legs** (recommended: front, rear,
-   side cells and the f34).
-7. **Rope** (§2.5, §3.3): **two wraps per post (Ø 0.40 at z 7.06 / 7.46), six swags along the long sides only (Ø
-   0.45, low point 6.20), none across the ends, twisted 5–6-sided tubes with spiral facets, no knot** (recommended).
-   Or add end swags (the side cell's drawing; would close both walk-on ends).
-8. **Colour** (§5): **M048's timber family by role and position: boards `#DE833B`, posts and blocks `#8B3D10`,
-   stringers 35 % darker, caps toward `#F2933F`, legs 50 % toward `#6F3518`, braces 60 % dark; rope `#F8D088` with a
-   45 % groove strand `#BE7019`; pegs `#F6D48E`; the cream, grey, green and blue swatches unused** (recommended). Never
-   by facing.
-9. **Pegs** (§3.9): **wooden (rough 0.55, metal 0), pale gold** (recommended: the junction text). Or M048's brass
-   finish (metal 0.5).
-10. **Helpers:** **import M048's geometry helpers if `m048.py` is committed, else copy them; never its constants**
-    (recommended).
-11. **Packaging:** **one hero object of closed shells (no booleans); six parts as the key labels: Post, Plank,
-    Stringer, Crossbeam, Brace, Rope** (recommended).
-12. **Comparison cameras** (§2.7): `f34_sheet (−40, 23)` governing (probe az −35 / −40 / −45 × e 20 / 23 / 26);
-    `r34_sheet (140, 26)`; `front_sheet (0, 0)` (−Y side); `side_sheet (90, 0)` (+X end); `rear_sheet (180, 0)`;
-    `top (0, 89.9)` (compare rotated 90°). Extras: parts shot (−35, 25), `under_cu (−35, −30)`, `junc_cu (−60, 15)`,
-    the scale shot, the kit shot. Floor hidden in every `*_sheet` render.
-13. **Stages 5 and 6:** **skip both, recorded; no water, foam or sockets** (recommended).
-14. **Collision** as in §7 (recommended).
-15. **Budget** (§4.3): **4000 limit, plan about 3450; cut swag sides, then peg sides** (recommended).
-16. **Names** as proposed: `TimberBridge*`, keys `m050_*`.
-
-## 9. Pitfalls to avoid (recent verifier failures written as targets)
-
-1. **A hovering plank carpet** (WorldModeling §13.2). Load-bearing first: legs on the ground, stringers on the posts,
-   crossbeams between the stringers, boards on the frame, braces meeting real faces. The underside render must show
-   every board resting on both stringers.
-2. **Floating or buried dressing** (STAGES; 035 and 036 round 1; 046's leaves inside a core). Wraps hug the posts
-   (sunk 0.02, never standing off), swag ends sit inside the wraps, pegs sit in the blocks, blocks on the posts.
-   Count floating shells: **0**; buried (> 0.05 inside a post or board): **0**.
-3. **Inward faces / broken winding** (044's wedge back face; STAGES "Consistent winding"). Every box, notched board,
-   brace, peg and tube is hand-listed: 0 winding errors per shell, checked with a parity ray test, not only the signed
-   volume. The notched boards' non-convex 8-gon caps are the new risk: ear-clip them and check every triangle.
-4. **Thin rope that reads as an outline** (W08's rope; M034's foam outlines). Swags Ø 0.45, wraps Ø 0.40, golden and
-   lit, sagging to just above the deck; two distinct fat wraps per post. Not a thin line, not a halo round the posts.
-5. **Wood that reads red, brown or flat orange** (W08 dock "slightly red", W08 footbridge "flat orange"; 012's wood).
-   Board tops hue 26–29°, sat 0.66–0.76, value ≥ 0.82; posts a step deeper; stringers deeper still; legs only
-   mildly darker; per-board tint so the deck isn't one flat colour.
-6. **Colour by facing.** The sheet's light tops and dark sides are the light. Role (board / framing / rope strand) and
-   position (cap height, leg zone) only; `K.check` < 0.5 on every material.
-7. **Egg or blob shapes where the sheet is square** (M034 / M037 "egg boulders"). Posts, boards, stringers, blocks and
-   braces are crisp boxes; only the caps carry one chamfer; pegs round but flat-domed. No subdivision, no smooth
-   shading.
-8. **Proportions from the ortho cells.** The front and rear cells are drawn horizontally compressed and the top cell
-   is a two-bay drawing; the f34 governs (bay 1.143 W, H 1.106 W).
-9. **Ropes across the ends** (the side cell's convention). Both ends stay open: six swags, none across x ±16.
-10. **Spiky foliage:** none on this sheet; add none (no moss, grass or props: "No additional details, props or text").
-11. **Budget.** The wraps and swags are about 60 % of the count. Follow the cut order in §4.3; never drop a wrap, swag,
-    peg or board.
-12. **Names and scope.**
-    - No `Footbridge*`, `RopeCrossing*`, `Dock*` or `Boardwalk*` (W08); no `TimberDock*` (M048).
-    - Only one agent drives a Blender session at a time.
-    - No commits, pushes or exports in stage agents.
-    - Don't edit other models' builders, `kit_models.py`, `kit_mcp.py`, `build_kit.py` or `lib/vfx.py` (frozen).
-
-## Decisions (main session, 2026-10-29)
-All the recommendations are accepted.
-1. **Size and crossing.** Post centres are 8 across, with three bays of 9.143. The deck is 32.0 long (one tile). Deck top is at 5.6 and post tops at 8.85. The bridge crosses a gap between 5.6 surfaces, lawn to lawn or dock to lawn. It is not built to sit over M034 as that tile is now; record that as a known limit.
-2. **Orientation.** The long axis runs along X, and the bridge is symmetric about both axes.
-3. **Boards.** 14 boards, 2.186 × 0.85, with seams on the post rows and **crisp edges with no chamfer**, as the sheet's note says. Boards at post rows are L-notched around the posts.
-4. **Posts.** One closed post per position, 1.5 square, with a 0.10 cap chamfer. Legs are darkened by position only, to about 50 % of `wood_dark`.
-5. **Framing.** Stringers, 4 crossbeams, 12 peg blocks, 4 knee braces in the end bays, and 2 end X braces. Nothing at the middle legs.
-6. **Rope.** Two wraps per post at Ø 0.40, and six swags along the long sides only at Ø 0.45 with a low point of 6.20. No rope across the ends. The rope must not read as a thin outline.
-7. **Colour.** Use M048's timber family, calibrated to this sheet. Colour by role and position, **never by facing**, and the wood must not read red. Leave the cream, grey, green and blue swatches unused.
-8. **Pegs.** Wooden, pale gold, roughness 0.55, metal 0.
-9. **Helpers.** Import M048's geometry helpers if they are committed; never import its constants.
-10. **Stages 5 and 6.** Skipped and recorded. Collision is precise on the hero, hull on the framing, box on the plank, and none on the rope.
-
-Every piece is its own closed shell, with **no floating pieces** and **0 winding errors**. The hero stays under 4000 tris; if it runs over, cut the swag sides first, then the peg sides. The f34 shares (W 41.7, K 52.4, Y 5.9, each ±4) are binding.
-
-## Stage 1 — Modelling (modeller, 2026-10-29)
-
-Builder `art/blender/kit/mcp/m050.py` (background session, port 9877, `wip/M050.blend`). Constants: `W` 8, `NB` 14,
-`BOARD` 2.2857, `BAY` 9.1429, `DECK_TOP` 5.6, `PLANK_T` 0.85, `POST` 1.5, `POST_TOP` 8.85, `CAP_CH` 0.10, `SINK` 0.02.
-`build()` builds six parts and the hero, runs every check and renders. Every piece is its own closed shell built from
-explicit vertex lists; there are no booleans and no unions. Geometry helpers are imported from `m048` (`_solid`,
-`_prism`, `_rect`, `_plank2d`, `_brace_quad`, `_knob`, `_catenary`, `_tri_ngons`, `winding_report`, `measure`,
-`_hsv`); none of its constants.
-
-- **Posts (8):** 1.5 square, z 0 → 8.85, centres (±4.571 / ±13.714, ±4.0). Rings at 2.85 / 3.15 / 3.45 carry the leg
-  colour bands. Each has a 0.10 cap chamfer and a flat 0.22 square peg dot in the middle of the cap (no recess). One
-  shell each.
-- **Deck (14 boards):**
-  - 2.186 × 0.85 with 0.10 gaps and seams on the four post rows. The end boards' outer faces are at x ±16.0, and the
-    boards run to y ±4.75 (the posts' outer faces).
-  - Tops are jittered ±0.01 (5.592–5.609), and the six plain boards are yawed ±0.12° (gaps 0.08–0.12).
-  - The 8 boards at a post row are **L-notched** at both ends of the post edge (|y| 3.23 → 4.75, 0.72 deep, 0.02 clear
-    of the post). Each is a 10-point plan prism whose caps are cut into four rectangles, so there are no n-gons and no
-    slivers.
-  - Crisp edges, no chamfer (decision 3).
-- **Stringers — a deviation from §2.2, recorded for the main session.**
-  - **What:** the stringer lines sit **on the post lines** (|y| 3.55 → 4.45, 0.3 behind the board ends), z 3.45 →
-    4.77. Each line is a span between every pair of posts (sunk 0.02 into the post faces) plus an **end stub to x
-    ±15.26** (0.8 past the end posts) that carries a peg on its end face.
-  - **Why:**
-    - The sheet's f34 shows a dark stringer band right under the plank ends and, at the near-left end, "the
-      stringer's end (with a peg dot)" under the end boards. The top view shows the dark strip along the long edges.
-    - With the stringer hidden 1.5 under the deck, the front cell's value order (board ends > posts > stringer ≥ legs)
-      failed: the front stringer rendered `#5B2E11` (v .36), darker than the legs.
-    - With the §2.2 layout (inside the post lines) the stringer is invisible in the f34, which costs 2 points of K.
-  - **Blocks:** the 4 corner end-face blocks of §2.2 are replaced by these stub ends. They are in the same place and
-    read the same in the side cell: a block with a peg on each corner post's end face. So there are 8 peg blocks on
-    the posts' outer faces plus 4 stringer end stubs with pegs. The pegs are still 8 + 4 + 2 = 14.
-- **Crossbeams (4):** 0.9 × 1.32 at each post row, between the row's two posts (ends sunk 0.02 into the posts' inner
-  faces at |y| 3.25), z 3.45 → 4.77.
-- **Peg blocks (8):** 1.7 × 1.24 × 0.5 proud on each post's outer face, z 3.50 → 4.74.
-- **Pegs (14):** round 8-sided heads (r 0.275, 0.19 side + 0.06 dome, sunk 0.03) at z 4.12. They sit on the 8 blocks,
-  the 4 stringer stubs and the 2 X-brace crossings.
-- **Knee braces (4):** end bays only, from the end leg's inner face (|x| 12.964) at z 1.10 to the stringer underside at
-  |x| 10.36. 0.6 × 0.45, centred on the post / stringer line (|y| 4.0). Nothing at the middle legs.
-- **X braces (2 ends × 2 boards):** 0.6-tall boards between the legs' inner faces, z 0.45 → 3.30.
-  - Board A runs at |x| 13.764 → 14.124 and board B at 14.104 → 14.464 (flush with the legs' end faces).
-  - They cross at z 1.875, with a peg on B.
-- **Rope (decision 6):**
-  - **Wraps (16):** two per post, at z 7.06 / 7.46.
-    - Each is an 8-point ring: flat points at 0.82 and diagonal points at (0.80, 0.80).
-    - Each wrap is **snug: sunk 0.13 and 0.27 proud** of the post faces and corners (§1.1's "standing 0.27 proud").
-    - Tube r 0.205 (crowns 0.226, grooves 0.185: Ø 0.38–0.45).
-  - **Swags (6):** both long sides only.
-    - Their ends sit inside the wraps, at z 7.26 on the wrap centreline.
-    - Catenary low point **6.20**: the rope bottom is at 5.97, 0.37 above the deck.
-    - 10 segments, r 0.23 (Ø 0.46). **No rope across the ends.**
-  - **Geometric twist (M048 ruling: the coils read as faceted collars).** `_rope` keeps the rings aligned, so there is a
-    ridge on top and never a flat lid.
-    - The **three ply crowns sit on spiral lines** that advance one side per ring.
-    - Crown vertices bulge (r × 1.10 on the wraps) and groove vertices pinch (× 0.90).
-    - Each quad is split along the spiral line, so the outline breaks into diagonal facets that follow the twist.
-    - A closed wrap skips two evenly spread advances (8 rings, 6 sides), so the spiral closes with no seam.
-    - The swags keep the same spiral split with round rings (bump 0): a 6-sided cord whose twist is carried by thin
-      colour bands (Stage 4).
-  - **Tried and dropped:**
-    - lobes turning a full side per ring with bump 0.15 (crumpled plates, ribbon swags);
-    - rings turned 36–45° each (one slow turn per loop, which reads as plain collars).
+Reference: `art/blender/assets/references/050.png` (remade 2026-11-03, "TIMBER BRIDGE / BUILDING MODEL STUDY"). The
+earlier spec followed the old sheet; git history keeps it. Builder: `art/blender/kit/mcp/m050.py` (on `kit_parts` /
+`kit_build`). Procedure: `art/blender/kit/mcp/STAGES.md`, `HOUSE_RULES.md`.
+
+## Brief
+
+- **Sheet:** 050 Timber bridge (remake: yes). Family: none.
+- **Class and budget:** structure (a bridge, walked on), ceiling 6000, plan 5400. Built: hero 4416, parts ≤ 338.
+- **Size:** the side view (one scale, 4 posts) measured in sheet px: post centres 233.5 / 326.5 / 416.5 / 509.5 (bay
+  92 px), posts 20 px, deck and stringer ends 214–528 (314 px), post tops 104 px above the ground line, deck top 59 px,
+  boards 12 px, stringer 14 px; R6 90 px (= 5 studs → 18 px/stud). The tiling cell puts 3 bays + an end-post gap of
+  ~0.7 post widths in one module, which is the 314 px span, so the module is one **16-stud tile** (0.051 stud/px; R6
+  scale would give 17.4, 8 % larger). Hero **15.996 L × 6.780 W (pegs, ±3.390) × 4.90 H**; deck top 2.60.
+- **Hero view:** f34 at camera (-37, 23) (fitted from the cap positions: along / across foreshortening). r34 is a
+  redraw of the f34 (content only). Front and rear cells are the short ends (az -90 / 90), side is the -Y long
+  elevation (az 0), top is a two-bay plan drawn turned (content only).
 - **Parts:**
-  - `TimberBridgePost`: the −X/−Y corner post with its block, peg and two wraps;
-  - `TimberBridgePlank`: one plain board;
-  - `TimberBridgeStringer`: one 7.68 span between two posts;
-  - `TimberBridgeCrossbeam`;
-  - `TimberBridgeBrace`: a knee brace;
-  - `TimberBridgeRope`: one swag with 8 × 4 ball knobs (r 0.3).
-- **Renders** (`renders/models/M050/`):
-  - the kit's seven default views;
-  - `f34_sheet (−45, 20)`, `f34_probe_sheet (−50, 16)`, `r34_sheet (140, 26)`, `front_sheet (0, 0)`,
-    `side_sheet (90, 0)`, `rear_sheet (180, 0)` and `top_sheet (0, 89.9)`, all with the floor hidden (lens 3× on the
-    three-quarters, 8× on the orthos);
-  - six part shots at (−35, 25);
-  - `exploded`: planks in 5 + 9 groups above, corner posts pulled out, stringer spans and crossbeams below, the
-    braces and two rope segments;
-  - `scale`: 5.5 markers on the deck at x 0 and on the ground beside a −Y leg;
-  - close-ups `junc_cu`, `rope_cu`, `peg_cu`, `under_cu` and `xbrace_cu`;
-  - everything together in `M050_views.png`.
-- **f34 camera (decision 12, "probe and keep the best").** Probed az −35 / −40 / −45 × e 20 / 23 / 26, and lower, at
-  lens 3× and cell 480 × 400:
+  | Part | What | Tris target |
+  | --- | --- | --- |
+  | TimberBridge (hero) | 8 legs and 8 upper posts on the stringer line, 16 boards + 2 end strips, 2 stringers on the long sides, 4 crossbeams, 4 knee braces, 12 blocks (8 pegged), 16 rope turns, 6 rope rails | ≤ 5400 (4416) |
+  | TimberBridgePost | upper post with its two turns, side block and end block | ≤ 500 (338) |
+  | TimberBridgePlank | one deck board 0.87 × 0.54 × 6.0 | 28 |
+  | TimberBridgeStringer | full-length 16.0 stringer | 28 |
+  | TimberBridgeCrossbeam | crossbeam between the stringers | 28 |
+  | TimberBridgeBrace | 38° knee brace in the long-side plane | 12 |
+  | TimberBridgeRope | one sagging rope rail (one bay) | 152 |
+- **Palette:** swatches (header and §5, flat medians): wood `#C16926`, tan `#E9BA7E`, cream `#E5D9C8`, grey `#A7ADB2`,
+  green `#78A949`, blue `#0FA2DA`. Rendered f34 targets: board tops `#E78237`, cap tops `#FBA13E`, post faces
+  `#933F06` / `#AE4D0A`, blocks `#BA530B`, legs `#843A0B`, stringer `#703410`, brace `#73350A`, rope `#F7C556`, pegs
+  `#F8CB61`. Keys: `m050_wood` (boards), `m050_wood_deep` (posts and legs), `m050_block` `#A4530B` (side and end
+  blocks), `m050_wood_dark` (stringers, crossbeams, braces), `m050_wood_light` (cap tops), `m050_rope` / `m050_rope_dark` (groove strand),
+  `m050_peg`; all matte (rough 0.85–0.95, pegs 0.55), metal 0. Cream, grey, green and blue unused (sheet chrome).
+- **Lights / VFX:** none (the sheet shows no glow, light or effect).
+- **Collision:** hero precise (walked on); Post hull, Plank / Stringer / Crossbeam box, Brace hull, Rope none.
+- **Checks to switch on in kit_verify:** `cls="structure"`; `walk` along the deck (paths y 0 / ±0.6 from x -7.95 to
+  7.95, feet z 2.60, boards skipped as the floor, turning at (0, 0) and (-4.7, 0)); `seams` pitch (16, 0, 0).
+- **Departures from HOUSE_RULES:** none. Notes:
+  - deck top at the house raised-floor 2.60 (sheet scale gives 3.0): the legs under the stringers are 0.4 shorter than
+    the sheet draws them; above-deck heights are the sheet's (posts 2.30 above the deck);
+  - the module length is the house 16-stud pitch (R6 scale gives 17.4).
+- **Questions for the main session:** none. (A deck at 3.0 would match the sheet's leg length exactly; one constant.)
 
-  | Camera | W : H | W | K | Y | Top-profile err mean / max |
-  | --- | --- | --- | --- | --- | --- |
-  | (−40, 23) | 1.669 | 51.6 | 41.7 | 6.7 | 0.042 / 0.10 |
-  | **(−45, 20), kept** | 1.656 | 48.6 | 45.2 | 6.2 | 0.050 / 0.14 |
-  | (−45, 18) | 1.724 | 46.6 | 48.1 | 5.2 | 0.050 / 0.15 |
-  | **(−50, 16), probe** | 1.683 | 43.3 | 50.3 | 6.4 | 0.060 / 0.16 |
-  | (−55, 14) | 1.643 | 41.6 | 53.4 | 5.0 | 0.061 / 0.15 |
+### Reading the sheet (recorded misses, not blockers)
 
-  The adopted proportions (bay / W 1.143, against the three-quarters' 1.38, §3.1) draw the deck relatively wider than
-  the sheet's f34 does. So more lit board top shows at the sheet's own elevation. See the known misses.
+- The front and rear (short-end) cells draw a rope swag across the end and two braces in the end plane; the f34 / r34
+  (governing) and the notes ("Both short ends are open") show open ends and knee braces on the long sides in the end
+  bays (side cell agrees). Built: open ends, four long-side knee braces (= "two braces per short end").
+- Front / rear cells draw the end deck as four board ends; the governing views lay the boards across the width.
+- The top cell is a two-bay plan (3 post rows) with edge strips; built three bays as every other cell.
+- The exploded view's corner "L" pieces and leg stubs are construction shorthand; posts are one piece ground to cap.
+
+## Stage 1 — Modelling (2026-11-04)
+
+Build frame: long axis X, front -Y, ground z 0, symmetric about both axes. Seam contract in the builder docstring.
+- **Posts:** 8 at x ±2.35 / ±7.05 (bay 4.70), y ±2.50; 1.0 square, vertical edges chamfered 0.05, 0 → 4.90, an
+  0.08 cap bevel to a flat top (the sheet's softened cap). One shell each.
+- **Deck:** 16 boards across the width, 0.87 × 0.54 (top 2.60, bottom 2.06), 0.04 edge chamfer, 0.94 pitch (5 to a
+  bay, 4 between posts as the side cell draws). The 4 boards on post rows run between the posts' inner faces (sunk
+  0.01); the rest run the full width to y ±3.0 (the posts' outer faces). An end strip (0.445 wide, square edges so the
+  end section is one flat face) runs full width from 0.003 off the end posts to the seam at x ±7.998.
+- **Frame:** 2 stringers end to end (x ±7.998, |y| 1.40–2.01, z 1.42–2.07: sunk 0.01 into posts and boards; the side
+  cell's beam ends past the end posts), 4 crossbeams on the post rows between them (0.6 wide).
+- **Blocks and pegs:** a 1.1 × 1.05 × 0.25 block on every post's outer long face (z 1.45–2.50, 0.003 off the face), a
+  0.65-tall block on each end post's end face under the end strip (to x ±7.84); a square peg (0.40, proud 0.10, low
+  pyramid dome 0.04: `P.bolt`) centred on each — the junction close-up's square peg.
+- **Braces:** 4 knee braces, 45°, 0.45 wide, |y| 1.85–2.35 (straddling the leg face and stringer underside), from the
+  end leg's inner face at z 0.30–0.94 to the stringer underside 1.13 along (side cell ≈ 1.3 at sheet scale).
+- **Rope:** two turns per post (Ø 0.22, centres z 3.93 / 4.13, sunk 0.02, touching), loops following the post's
+  offset outline with rounded corners; six rails (Ø 0.22), catenaries from wrap to wrap at z 4.03 sagging to 3.32 (0.72
+  above the deck), ends seated 0.025 into the turns. No rope across the ends.
+- `P.rope_band` (8-point twisted turns) read as flat plates with mitre spikes on a square post; the builder's own
+  `wraps()` (12 points, 6-sided, spiral groove strand, corner arcs about a point 0.10 inside the post corner so the
+  tube never folds) reads as round coils. **Candidate for kit_parts:** a rounded-rectangle turn round square timber.
 
 ## Stage 2 — Optimisation and cleanup
 
-Final build in a freshly restarted session (`bgmcp stop` / `start`, then `m050.build()`):
-
-| Object | Tris | Size (studs) | Shells |
-| --- | --- | --- | --- |
-| `TimberBridge` | **3860 / 4000** | 32.00 × 11.00 × 8.85 | 88 |
-| `TimberBridgePost` | 286 | 2.03 × 2.52 × 8.85 | 5 |
-| `TimberBridgePlank` | 12 | 2.20 × 9.50 × 0.86 | 1 |
-| `TimberBridgeStringer` | 12 | 7.68 × 0.90 × 1.32 | 1 |
-| `TimberBridgeCrossbeam` | 12 | 0.90 × 6.54 × 1.32 | 1 |
-| `TimberBridgeBrace` | 12 | 3.09 × 0.45 × 2.79 | 1 |
-| `TimberBridgeRope` | 224 | 8.10 × 0.60 × 1.57 | 3 |
-
-- **Hero by kind:**
-  - wood: 52 shells, 1136 tris (8 posts, 14 boards, 10 stringer pieces, 4 crossbeams, 8 blocks, 4 knees, 4 X boards);
-  - pegs: 14 shells, 420 tris;
-  - rope: 22 shells, 2304 tris (16 wraps × 96, 6 swags × 128).
-- **Every object:**
-  - 0 non-manifold edges, 0 bowtie verts (`fix_bowties` found 0), 0 boundary, wire or loose elements, 0 zero-area
-    faces, 0 n-gons and 0 duplicate verts;
-  - normals outward, transforms applied, origin at the bbox bottom centre (hero offset 0, 0, 0);
-  - smallest corner 11.7° (none under 5°);
-  - per shell (`m040.shells_report`): 0 self-hits, 0 inverted faces, every volume positive, no mixed-material shell.
-- **Winding:** 0 errors and 0 unpaired edges on every object (directed-edge check).
-- **Contact:** 0 floating and 0 unchained shells (hero, post part, rope part). The chains:
-  - boards → stringers / crossbeams → posts → ground;
-  - wraps → posts; swags → wraps;
-  - blocks → posts; pegs → blocks / stringer stubs / X boards;
-  - braces → legs and stringers.
-- **Buried** (ray parity against the 8 posts and 14 boards, depth 0.05): 0 shells buried. The worst share of a shell's
-  verts deeper than 0.05 is 0 for wood and pegs, and 0.33 for rope (the snug wraps' inner verts round the post, by
-  design).
-- **Levels:**
-
-  | Item | Measured |
-  | --- | --- |
-  | Feet | z 0.00 |
-  | Post tops | 8.85 |
-  | Stringers / crossbeams | 3.45 → 4.77 |
-  | Board tops | 5.592–5.609 (all 14 within 5.60 ± 0.01) |
-  | Largest step between neighbouring boards | **0.014** |
-  | Wraps | 7.06 / 7.46 |
-  | Swag lows | 6.20 × 6 |
-  | X-brace crossing | 1.875 |
-  | Rope across the ends | 0 |
-- **Budget:** under 3900, so no cut was needed (swags 6 sides, pegs 8 sides).
+kit_verify (`cls="structure"`, walk, seams): **problems []**. Tris: hero 4696 / 6000 (rope 16 turns × 144 + 6 rails ×
+152 = 3216, 68 %); parts Post 400, Plank 28, Stringer 28, Crossbeam 28, Brace 12, Rope 152. 82 closed shells, 0
+non-manifold / bowtie / boundary / loose / zero-area / n-gon, 0 winding errors, floating 0 / unchained 0, buried 0
+(deepest 0.061 rope in rope, limit 0.08), min corner 7.5°. Sizes 15.996 × 6.786 × 4.90, origin bottom centre,
+transforms applied. Deck check: 54 samples, every board top 2.600.
+- **Walk:** centre path clearance 0.63, side paths (y ±0.6) 0.238 to the turns, 0 intersecting steps, no rises
+  (level 2.60 end to end), no headroom limit (nothing overhead); turning at (0, 0) and (-4.7, 0) clearance 0.708, 0
+  intersecting yaws. Clear width between the turns 3.60 (posts' inner faces 4.0).
+- **Seams:** pitch 16: 0 crossing triangle pairs, gap at the seam 0.004, nothing past ±8.000, end sections identical
+  (z 1.42–2.60, mismatch 0.0).
 
 ## Stage 3 — UV
 
-`M.smart_uv` (angle 45, `ANGLE_BASED`, margin 0.008) followed by `m012._uv_unfold` (0 cuts needed).
-
-| Object | Islands | Overlaps | Flipped | Min gap | Border | Density | Conformal p95 |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| `TimberBridge` | 881 | 0 | 0 | 0.016 | 0.008 | 1.0 / 1.0 / 1.0 | 1.041 |
-| `TimberBridgeRope` | 30 | 0 | 0 | 0.016 | 0.008 | 0.979 / 1.001 / 1.001 | 1.091 |
-| Other parts | 5–67 | 0 | 0 | 0.016 | 0.008 | 1.0 | ≤ 1.025 |
+kit_build cleanup (Smart UV, margin 0.008): 740 islands, 0 overlaps, 0 flips, min gap 0.016, border 0.008, density
+even, conformal stretch p95 1.107.
 
 ## Stage 4 — Materials, colour and texture
 
-**Calibration** (`m050.calibrate()`, `K.calibrate` dome, targets from §5.4):
+Calibrated by rendering the hero at the f34 camera with `compare.py` and matching the same regions of the sheet's f34
+(per-channel linear ratios), not the dome, because the studio lights the posts' -X faces far more than the sheet:
 
-| Key | Target | Dome-calibrated hex (rendered) | Final hex in `PALETTE` |
-| --- | --- | --- | --- |
-| `wood` | `#DE833B` | `#B1703A` (222, 131, 60) | `#BB722E` (M048's) |
-| `wood_light` | `#F2933F` | `#BF7C3D` (241, 146, 63) | `#C57A35` |
-| `wood_deep` | `#8B3D10` | `#713710` (136, 60, 17) | `#80410F` |
-| `wood_dark` | `#6F3518` | `#5D3018` (110, 51, 24) | `#65361A` |
-| `rope` | `#F8D088` | `#CEAB7A` (255, 208, 136) | `#EEC677` |
-| `rope_dark` | `#BE7019` | `#99601A` (190, 110, 25) | `#99601A` |
-| `peg` | `#F6D48E` | `#C3AE7C` (246, 212, 142) | `#E8C47E` |
+| Region | Sheet | Ours |
+| --- | --- | --- |
+| Board tops | `#E88438` | `#E28437` / `#E58536` |
+| Cap tops | `#FBA33F` | `#FFA03E` |
+| Post -Y face | `#AC4B0C` | `#AE4D17` |
+| Post -X face | `#7C3403` | `#A34816` (studio light; recorded) |
+| Legs | `#843A0B` / `#6C2F05` | `#873911` / `#903D12` |
+| Side block | `#BA540C` | `#B3581D` |
+| Rope (Y median) | `#FBD064` | `#FFD05A` |
 
-As on M048, the dome keys render tan or cream on the model's lit faces. So the final hexes were set from the hero
-renders (`region_report()`), starting from M048's calibrated palette:
-- `wood` is kept: the board tops land within 5;
-- `wood_deep` and `wood_dark` are a step darker and more saturated: the f34 post face lands within 4 and the legs
-  within 8;
-- `wood_light` is set so the cap tops read clearly lighter than the boards;
-- `rope` is toned down so the f34 gold median lands within 11.
-
-**Colour by role and position only, never facing.** No paint selection reads a normal. `K.check` baked-shading
-correlation: hero 0.03, post part 0.16, rope part 0.02, the others 0.0.
-- **Boards:** one key per board, `wood`. Boards inside a broad noise field along the deck are 15 % `wood_light`; boards
-  3, 7 and 11 are 15 % `wood_deep`. Tint ±0.03 per board, plus `K.texture` 0.02 (scale 0.3, no per-face jitter).
-- **Posts:** `wood_deep`, varied by height:
-  - legs 50 % `wood_dark` below 2.85, 35 % up to 3.15 and 15 % up to 3.45;
-  - the cap chamfer and top `wood_light`, and the cap's peg dot `wood_dark`;
-  - Tint ±0.03 plus texture 0.03.
-- **Framing:** stringers and crossbeams `wood_deep` + 35 % `wood_dark`; braces 60 % `wood_dark`; blocks `wood_deep` +
-  15 % `wood`. Tint ±0.03 per member plus texture 0.03.
-- **Pegs:** `peg`, wooden (rough 0.55, metal 0; decision 8).
-- **Rope:** coloured by **spiral band index**, the band's place in the twist (`_ply_keys`):
-  - golden `rope` on bands 0 and 3;
-  - light amber (45 % `rope_dark`) on band 1;
-  - amber (70 %) on bands 2 and 4;
-  - the deep groove (85 %) on band 5.
-
-  So the rope reads golden with thin amber and deep twist lines. Two thirds of the bands are amber or deeper (the M048
-  ruling asked for more amber plies), balanced so the f34 gold share sits on the sheet's: 6.2 against 5.9. Tint ±0.02
-  per piece.
-- **Finish:** wood roughness 0.85 (dark 0.9), metal 0, low specular; rope roughness 0.95, low specular; pegs 0.55. No
-  emission anywhere.
-
-**Re-measured** on the final renders with the study masks (sheet values in brackets):
-
-| View | W : H | W % | K % | Y % | W median | K median | Y median | Top err mean / max |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| **f34 (−45, 20)** | 1.656 (1.670) | **48.6 (41.7)** | **45.2 (52.4)** | 6.2 (5.9) | `#E58936` | `#813D16` (`#78350F`) | `#FFD876` (`#F8CD74`) | 0.050 / 0.14 |
-| f34 probe (−50, 16) | 1.683 | 43.3 | 50.3 | 6.4 | `#E48737` | `#803D15` | `#FFD876` | 0.060 / 0.16 |
-| r34 (140, 26) | 1.582 (1.577) | 49.9 (45.1) | 44.0 (48.8) | 6.1 (6.0) | `#E48535` | `#753915` | `#E6BB67` | 0.051 / 0.14 |
-| front (0, 0) | 3.593 (2.825, §3.1) | 24.9 (44.4) | 68.5 (49.1) | 6.6 (6.4) | `#D1772A` | `#833E18` | `#FDCA73` | 0.010 / 0.03 |
-| side (90, 0) | 1.234 (1.221) | 15.9 (28.8) | 79.5 (67.1) | 4.6 (4.2) | `#A45D23` | `#5F2D11` | `#CEA75B` | 0.090 / 0.23 |
-| rear (180, 0) | 3.593 (2.732) | 22.6 (44.0) | 69.9 (49.9) | 7.4 (6.2) | `#BD6E27` | `#773916` | `#E3BB6A` | 0.012 / 0.07 |
-| top (0, 89.9), W : L | 0.344 (0.602, §3.2) | 88.1 (68.9) | 7.5 (30.9) | 4.4 (0.1) | `#EE8831` | | | |
-
-The f34 Y fifths are 1.9 / 6.5 / 38.1 / 38.3 / 15.1, against the sheet's 0.2 / 9.4 / 33.2 / 38.3 / 18.9: all within ±8.
-
-**Region samples** (`region_report()`, 5 × 5 px medians at build-frame points):
-
-| Region | Ours | Sheet | Max channel diff |
-| --- | --- | --- | --- |
-| f34 board tops (18 points) | `#E3883A` (28°, 0.74, 0.89) | `#DE833B` | 5 |
-| f34 cap tops (8) | `#FD953D` | `#F4903E` | 9 |
-| f34 legs | `#7C3D19` | `#7E3911` | 8 |
-| f34 post faces | `#8B3F0E` | `#8A3D0A` | 4 |
-| front board ends | `#CC7228` | `#B25415` | 30 |
-| front post faces | `#8A3F0D` | `#A64E13` | 28 |
-| front legs | `#7C3D18` | `#A3511C` | 39 |
-| front stringer | `#813D17` | `#954B1F` | 20 |
-| top board tops | `#E88430` | `#D47935` | 20 |
-| top cap tops | `#FD9338` | `#F39641` | 10 |
-
-- Wood hue is 22–28° everywhere: one orange family, **not red**. The board tops' R − G is 91 (limit 95).
-- The value order holds: board ends (.80) > post faces (.54) > stringer (.51) ≥ legs (.48). The legs / post value ratio
-  is 0.89 (target 0.85–0.93).
-- The caps are clearly lighter than the boards beside them: f34 `#FD953D` against `#E3883A`, top `#FD9338` against
-  `#E88430`.
-- The front cell is drawn lighter than the sheet's own f34 (post faces `#A64E13` there against `#8A3D0A` in the f34).
-  Our diffuse faces have one value in both views, so the governing f34 is matched and the front misses by 20–39.
+Final keys: wood `#B47031`, wood_light `#E8873A`, wood_deep `#9C4E1B`, wood_dark `#7A3812`, rope `#E2AE55`,
+rope_dark `#C99441`, peg `#EDBF5E`. Colour by role and position only (legs below z 1.42 70 % toward wood_dark, cap
+bevel 60 % and top toward wood_light); per-board Tint ±6 % so the deck is not one flat colour; K.check / Tint vs normal
+worst 0.0. Class shares (f34): sheet W 55.4 / K 37.0 / Y 7.6, ours W 72.7 / K 15.7 / Y 11.6 — the W / K split is the
+lighting (the sheet's light falls from the left, darkening post sides and the deck underside); Y is higher because
+the turns are wider in the render than the sheet's thin drawing at that scale (rails cut to Ø 0.22, turns Ø 0.22).
 
 ## Stage 5 — Lighting: skipped
 
-The sheet shows no emissive part, glow or light, so there are no emissive faces and no lights. To check in Studio
-(Requires Manual Validation):
-- the boards read warm orange (not red, not brown), the caps lighter and the legs a little darker;
-- the rope reads golden tan with darker twist lines, and the pegs pale gold;
-- a character walks on from a 5.6 surface at either end and off the other. The swags are a low edge marker, not a
-  guard rail.
+The sheet shows no lantern, glow or emissive part. No Studio-side lighting needed.
 
 ## Stage 6 — VFX: skipped
 
-The sheet shows no effect, water or foam. The hero has no sockets; `checks()` flags any. Collision: hero `precise`;
-Post, Stringer, Crossbeam and Brace `hull`; Plank `box`; Rope `none`.
+No smoke, sparkle or other effect on the sheet; no sockets.
+
+## Renders and compare
+
+`build(close=True)` writes `M050_views.png` (f34, r34, side, front, rear, top, exploded, scale), `joint_cu.png`,
+`under_cu.png`. `m050.compare()` writes the side-by-side sheet to `<temp>/RBLX-Flintborn/compare/M050/`
+(cell boxes in `m050.COMPARE`). W : H, sheet / ours: f34 1.650 / 1.631, r34 1.633 / 1.632, side 3.149 / 3.268,
+front 1.444 / 1.361, rear 1.458 / 1.361, top 0.623 / 0.421 (two-bay plan).
 
 ## Modeller's notes for the verifier
 
-- **Rebuild:**
-  `import importlib, kit_models, m050; importlib.reload(kit_models); importlib.reload(m050); m050.build()`.
-  - `build()` returns `audit`, `uv`, `materials`, `views`, `contact`, `winding`, `buried`, `levels`, `measure` and
-    `problems` (empty).
-  - `m050.region_report()` gives the §5.4 region samples; `m050.calibrate()` runs the dome calibration.
-- **Known misses:**
-  1. **f34 W / K: 48.6 / 45.2 against 41.7 / 52.4 (±4 binding) at the kept camera (−45, 20).** Y 6.2 is in band.
-     - The board-top, post, leg and rope medians all match (within 4–11).
-     - The cause is the adopted proportions. Bay / W is 1.143 (decision 1) against the three-quarters' fitted 1.38, so
-       the deck reads wider than the sheet's f34 and more lit board top shows. The sheet's own deck is about 80 % W.
-     - At **(−50, 16)** (`f34_probe_sheet`) all three shares are in band: 43.3 / 50.3 / 6.4, W : H 1.683, top-profile
-       error mean 0.060.
-     - Widening the board gaps from 0.10 to 0.12 changed nothing measurable.
-  2. **Stringers on the post lines** (Stage 1): a deviation from §2.2 and recommendation 6, chosen from the f34, top and
-     front cells. The 4 corner end-face blocks became the stringer end stubs with their pegs.
-  3. **Ortho cells:**
-     - front / rear W : H 3.59 against 2.83 / 2.73 (§3.1, recorded);
-     - the side_sheet has no swag across the end (§3.3: both ends open), which is most of its top-profile error (0.09
-       mean / 0.23 max);
-     - the front_sheet framing is darker than the cell (the front-lighting miss above);
-     - the top view's W : L is 0.344 against the two-bay drawing's 0.602 (§3.2).
-  4. **Rope close-up:** the wraps now break into diagonal crown facets with spiral bands, but at 8 rings × 6 sides they
-     still read partly as faceted bands close up. The swags read as a golden cord with thin twist lines, coarser than
-     the sheet's fine strands. More rope detail needs more rings, and the hero is at 3860 / 4000.
-  5. **Not modelled:** the sheet's apparent mid-width board breaks (§3.5), the faint plank-top line (§3.8) and the grain
-     streaks on the posts (carried by Tint).
-- **Judge the rope by eye:** compare `rope_cu` and `junc_cu` with the post-junction close-up, `peg_cu` with the
-  plank-detail peg, and `under_cu` and `xbrace_cu` with the underside close-up and the side cell's X.
+- Leftover look differences: legs shorter than the sheet's (deck 2.60 rule); the short-end cells' end swag and
+  end-plane braces (not built, hero governs); the sheet's turns read as fatter twisted coils in the junction close-up
+  than ours (smooth 6-sided tubes with a groove strand); post -X faces lighter than the sheet (studio light).
+- Stored points and sockets: none.
 
-## Main session ruling before verification (2026-10-29)
-- **Stringers on the post lines** (a departure from §2.2): accepted. They match the sheet's stringer under the plank ends, its pegged end, and the dark edge strip seen from above.
-- **Governing f34 camera:** now (−50, 16), `f34_probe_sheet`. Decision 1's bay-to-width proportion is fixed, and this is the probe camera where all three binding shares land in band. Same precedent as M048's (40, 12).
+## Stage 7 verification (round 1)
 
-## Verification round 1 (verifier, 2026-10-29)
+**Result: FAIL, 6/10.** Technically clean; one visual blocker: the frame (stringers and knee braces) sits a stud
+inside the long sides, so the hero view loses the timber beam under the board ends and the diagonal braces.
 
-A fresh verifier, read-only, in a background session on port 9877 with `wip/M050_verify.blend` (the integrated model;
-nothing was built, edited or saved). Every number below comes from my own bmesh, BVH and ray code, and my own renders
-in the scratchpad (`m050_verify/`). Shares and colours were measured with my own implementation of the spec's masks. A
-self-test on the sheet cells reproduces §1.2 exactly (f34 1.670 / 41.7 / 52.4 / 5.9).
+### Technical (kit_verify, re-run on a copy of the work file, 2026-11-04)
 
-### Measured
+`kit_verify.run` on the hero and all six parts, `cls="structure"`, `size` (15.996, 6.786, 4.90), the builder's `WALK`
+paths and turns, `seams` pitch (16, 0, 0): **problems []** (2.1 s).
+- Hero 4696 / 6000 tris, 82 shells (post 8, rope_wrap 16, block 12, peg 12, plank 18, stringer 2, crossbeam 4, brace
+  4, rope_rail 6). 0 non-manifold, bowtie, boundary, wire, loose, zero-area, n-gon or duplicate; 0 winding errors,
+  self-hits, parity-inward or negative shells; min corner 7.52°. Floating 0, unchained 0, 8 grounded; buried 0
+  (deepest rope_rail in rope_wrap 0.061, under the 0.08 rope pair limit). UV 740 islands, 0 overlaps / flips, gap
+  0.016, border 0.008, stretch p95 1.107. Tint against normal worst 0.0. Transforms applied, origin bottom centre,
+  no modifiers or custom normals, K.check clean, no sockets (none wanted).
+- Parts: Post 400, Plank 28, Stringer 28, Crossbeam 28, Brace 12, Rope 152, each one or more clean closed shells.
+- Size 15.996 × **6.780** × 4.90. The spec and builder docstring give 6.786 / pegs to ±3.393; the pegs reach ±3.390
+  (within the 0.01 target tolerance).
+- Walk: centre path clearance 0.63 (to the crossbeams below the feet), side paths ±0.6 clearance 0.238 to the turns,
+  0 intersecting steps, level 2.60 end to end, nothing overhead; turns at (0, 0) and (-4.7, 0) clearance 0.708, 0
+  intersecting yaws.
+- Seams at 16: 0 crossing pairs, gap 0.004, extent ±7.998, nothing past the seams, end sections identical
+  (z 1.42–2.60, mismatch 0.0).
 
-**Mesh** (own bmesh audit; `M.audit` agrees on the hero)
+### Views against the sheet
 
-| Object | Tris | Size (studs) | Shells | Non-manifold / bowtie / boundary / wire / loose | Zero-area / n-gons / dup verts | Winding errors | Self-hits in a shell | Inward faces (per-shell parity) | Min corner |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| `TimberBridge` | **3860 / 4000** | 32.00 × 11.00 × 8.85 | 88 | 0 / 0 / 0 / 0 / 0 | 0 / 0 / 0 | **0** | 0 | 0 / 3180 | 11.7° |
-| `TimberBridgePost` | 286 | 2.03 × 2.52 × 8.85 | 5 | 0 | 0 | 0 | 0 | 0 / 246 | 11.7° |
-| `TimberBridgePlank` | 12 | 2.20 × 9.50 × 0.86 | 1 | 0 | 0 | 0 | 0 | 0 | 90° |
-| `TimberBridgeStringer` | 12 | 7.68 × 0.90 × 1.32 | 1 | 0 | 0 | 0 | 0 | 0 | 90° |
-| `TimberBridgeCrossbeam` | 12 | 0.90 × 6.54 × 1.32 | 1 | 0 | 0 | 0 | 0 | 0 | 90° |
-| `TimberBridgeBrace` | 12 | 3.09 × 0.45 × 2.79 | 1 | 0 | 0 | 0 | 0 | 0 | 42.1° |
-| `TimberBridgeRope` | 224 | 8.10 × 0.60 × 1.57 | 3 | 0 | 0 | 0 | 0 | swag 0; knobs convex (every face's dot with the centroid direction ≥ 0.997) | 14.8° |
+`compare.py` (the builder's `COMPARE` boxes) into `<temp>/.../cmp/`, and again at 570 px high for f34, r34, side and
+front. W : H sheet / ours: f34 1.650 / 1.631, r34 1.633 / 1.632, side 3.149 / 3.268, front 1.444 / 1.361, rear
+1.458 / 1.361, top 0.623 / 0.421.
+- **f34 (governs):** layout, post count (4 + 4), three bays, five boards a bay across the width, the post heights
+  above the deck, the two turns under each cap and six sagging rails all match. The long sides do not: on the sheet
+  each long side shows a board-end face and directly under it a thick stringer face (column at render x 570 between
+  front posts 2 and 3: board end 16 px, then stringer 25 px, `#552007`–`#73350E`, then the ground shadow), the pegged
+  block bridging post and stringer, and a large knee brace in the long-side plane from the end leg up to the
+  stringer. Ours shows only the 0.54 board end (25 px) and then open background. The boards look like a slab on four
+  pairs of free-standing legs, and the braces are barely visible slivers behind the legs.
+- **Joint close-up:** the sheet's stringer runs under the board ends, flush with the post's outer face, with the block
+  over the junction and the brace dropping from the stringer underside. In `joint_cu.png` and `under_cu.png` there is
+  only shadow under the board ends.
+- **Side:** heights check out against the sheet in sheet px (0.051 stud/px): post tops 2.35 above the deck (ours
+  2.30); turns 0.71–1.22 below the top (ours 0.66–1.08); rail sag 0.64 (ours 0.72), low point 0.74 above the deck
+  (ours 0.72); side block 0.2–0.9 below the deck top (ours 0.1–1.15); four boards visible between posts. Brace: the sheet's
+  runs at about 38° and reaches 1.6 along the stringer underside from the leg face. Ours is 45° and reaches 1.13 (low
+  end height matches, 0.35–0.9 after scaling to our 1.42 stringer underside). Past the end posts the sheet draws the
+  end block at deck level (top at the deck top, about 0.5 proud) above a short stringer stub. Ours has the end strip
+  0.45 past the posts with the end block tucked under it.
+- **r34:** a redraw of the f34; same content and the same long-side difference.
+- **Front / rear:** as recorded in the brief (end swag and end-plane braces drawn there; the governing views and the
+  notes have open ends). Not scored.
+- **Top:** two-bay plan (recorded). Its content includes a beam strip along each long side on the post line, which
+  agrees with the f34 / close-up reading of the stringers.
+- **Exploded / parts:** six parts as the parts panel lists (Post x8 with turns, Deck Plank, Stringer x2, Crossbeam x4,
+  Brace x4, Rope Segment x6). The sheet's exploded view drops the posts onto the stringer line, with legs below.
+- **Colour** (hex medians, sheet f34 / ours at the same camera): board tops `#E58038` / `#E88839`, cap tops
+  `#FDA746` / `#FFA742`, post -Y face `#AC4C0A` / `#AE4D17`, side block `#B9540A` / `#AA4C16`, leg -Y face
+  `#A84C0F` / `#903D12`. Post -X face `#7B3304` / `#A34816` and board end faces `#A35012` / `#CC752C` are studio
+  light (recorded).
 
-- Every shell has positive volume. Origins are at the bbox bottom centre (offset 0, 0, 0 on every object), with rotation 0, scale 1 and no modifiers.
-- Hero shells: 8 posts, 8 blocks, 14 pegs, 16 wraps, 14 boards (8 notched at 36 tris, 6 plain at 12), 10 stringer pieces (6 spans and 4 end stubs), 4 crossbeams, 4 knee braces, 4 X boards and 6 swags.
-- UV: inside 0.008 … 0.992, 0 zero-area UV tris, and 0 overlapping texels in a 1024² raster (hero, Post, Rope, Plank).
+### Blockers
 
-**Contact** (BVH overlap or gap ≤ 0.03, chained from the 8 ground shells): **0 floating, 0 unchained** on the hero, the Post part and the Rope part. The largest gap from any shell to its nearest neighbour is 0.00.
-- **Boards:** bottoms at 4.75, sunk 0.02 into the stringer tops (4.77) across their full width.
-- **Rope:** the wraps are sunk 0.13 into the posts, and the swag ends sit inside the wraps.
-- **Braces:** knee ends sunk 0.02 into the leg (|x| 12.984 against 12.964) and into the stringer underside (3.47 against 3.45).
-- **Buried:** no shell is fully buried. At most 37.5 % of a wrap's verts lie deeper than 0.05 in a post. These are the snug wraps' inner verts, by design.
+1. **Stringers and knee braces sit inside the long sides.** Stringers are at |y| 1.40–2.01 and braces at |y|
+   1.85–2.35, while the board ends and post outer faces are at 3.00. The hero, r34 and joint views lose the sheet's
+   continuous timber beam under the board ends and its visible diagonal braces. The Stringer part note ("beam under
+   the board ends") also does not match the geometry. **Fix:**
+   - Move the stringers onto the post line, outer face 0.03–0.05 inside the board ends (about |y| 2.05–2.95, z
+     1.42–2.07, full length to ±7.998 as now, so Stringer stays "x2"). The sheet's exploded view stands the posts on
+     the stringer line with legs below, so split each post at the stringer into a leg (0 → 1.43) and an upper post
+     (2.06 → 4.90), each seated 0.01 into the stringer. Keep TimberBridgePost as the upper post with its turns and
+     block; the leg goes into the hero. Bay segments between the posts, seated in the posts' ±X faces, are the
+     fallback.
+   - Widen the crossbeams to meet the new stringer inner faces.
+   - Move the four braces into the long-side plane (|y| about 2.25–2.75, under the stringer). Lengthen them to the
+     sheet's 35–40°, reaching about 1.5–1.6 along the stringer underside from the leg face.
+   - Re-run walk and seams. The end section changes but stays the same at both ends.
 
-**Levels and walkability** (9600 downward rays over |y| ≤ 2.9, x −15.95 … 15.95)
+### Minors (recorded, not blocking)
 
-| Item | Measured |
-| --- | --- |
-| Deck top under every ray | 5.5915 – 5.6085 (step between neighbouring boards ≤ 0.014) |
-| Ends | x ±16.00. Tops 5.606 / 5.601: flush with a 5.6 surface |
-| Board gaps at y 0 / ±2 / ±4.5 | 0.10 (0.086 – 0.114) |
-| Anything above the deck inside the walkway | none. The clear width between the wraps is 5.97 (|y| < 2.985) |
-| Rope across either end | none; nothing above the deck past |x| 14.73 |
-| Feet / stringers and crossbeams / post tops | 0.00 / 3.45 → 4.77 / 8.85 |
-| Wraps / swag lows (rope bottom) | 6.83 – 7.69 / 5.97 – 6.00 (centre ≈ 6.20) |
+- Brace angle and reach (45°, 1.13 against about 38°, 1.6), if not handled with the blocker.
+- End blocks: the sheet draws them at deck level (top at the deck top, about 0.5 proud). Ours sit under the
+  0.45 end-strip overhang, so the back-left one, prominent on the sheet, nearly vanishes in the f34.
+- Rope turns read as flat stacked straps, wider off the post than the sheet's tight round coils. Rope also reads
+  heavier and paler: yellow-pixel share about 1.7× the sheet's in the f34, median `#FFD05B` against `#FABE56`.
+- Legs darkened 70 % toward wood_dark (`#903D12` against the sheet's `#A84C0F`): the sheet's legs are the post colour
+  on the lit face.
+- Side blocks slightly dark (`#AA4C16` against `#B9540A`).
+- Spec and builder size 6.786 / pegs ±3.393 against the measured 6.780 / ±3.390. The hero note says "twisted rope
+  turns", but the turns are `twist=False` with a groove strand.
 
-A character can walk on at either end, along the full length and off the other end.
+## Main session after round 1 (2026-11-04)
 
-**Shares** (480 × 400, floor hidden; sheet in brackets)
+Fix round, in this order:
+1. **Blocker: the frame goes on the long sides.** Do the verifier's fix:
+   - stringers on the post line, just inside the board ends;
+   - posts split into a leg and an upper post seated on the stringer;
+   - crossbeams widened to meet the stringers;
+   - braces in the long-side plane at about 35–40°.
+   Re-run walk and seams.
+2. **End blocks:** at deck level and about 0.5 proud, so the back-left one reads in the f34.
+3. **Rope:**
+   - turns as tight round coils, like m048's corner-cut twisted turns, not flat straps;
+   - rails and turns a little thinner;
+   - colour toward `#FABE56`.
+4. **Colour:**
+   - legs the same colour as the posts;
+   - side blocks toward `#B9540A`.
+5. **Text:** correct the size, the rope-turn note and the Stringer part note.
 
-| View | W : H | W | K | Y | W median | K median | Y median | Top profile err mean / max |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| **f34 (−50, 16), governing** | 1.683 (1.670) | **43.3** (41.7) | **50.1** (52.4) | **6.6** (5.9) | `#E58837` (`#DB7F36`) | `#803D15` (`#78350F`) | `#FFD877` (`#F8CD74`) | 0.061 / 0.17 |
-| f34 (−45, 20), old | 1.643 | 48.5 | 45.0 | 6.5 | | | | |
-| r34 (140, 26) | 1.582 (1.577) | 49.9 (45.1) | 43.9 (48.8) | 6.2 (6.0) | `#E48535` | `#753915` | `#E8BD69` | |
-| front (0, 0) | 3.593 (2.825) | 24.9 (44.4) | 68.2 (49.1) | 6.9 (6.4) | `#D1772A` (`#AE5418`) | `#833E18` (`#793A19`) | `#FCCC76` | 0.004 / 0.02 |
-| side (90, 0) | 1.240 (1.221) | 16.0 (28.8) | 79.5 (67.1) | 4.5 (4.2) | `#A45D23` (`#B05518`) | `#5F2D11` (`#7A3E22`) | `#CFA75C` | |
-| rear (180, 0) | 3.593 (2.732) | 22.7 (44.0) | 69.7 (49.9) | 7.6 (6.2) | | | | |
-| top (0, 89.9), W : L | 0.344 (0.602) | 88.1 (68.9) | 7.5 (30.9) | 4.4 (0.1) | `#EE8831` (`#D37835`) | | | |
+Round 2 goes to a fresh verifier.
 
-- The binding f34 shares are all within ±4 at the ruled camera; Y is also within the ±1.5 study tolerance.
-- f34 Y fifths: 2.3 / 5.7 / 34.9 / 39.3 / 17.7, against 0.2 / 9.4 / 33.2 / 38.3 / 18.9 (all within ±8).
+## Fixes after round 1
 
-**Region colours** (5 × 5 px medians at projected build-frame points)
+The main session's fix list, nothing else (2026-11-04, `m050.py` rebuilt in the light work file).
 
-| Region | Ours (h°, s, v) | Sheet | Note |
-| --- | --- | --- | --- |
-| f34 board tops | `#E68A3C` (27, .74, .90) | `#DE833B` | within 8; R − G 92 (≤ 95) |
-| f34 cap tops | `#FD953F` (27, .75, .99) | `#F4903E` | within 9; lighter than the boards |
-| f34 post faces | `#8B3F0E` (23, .90, .54) | `#8A3D0A` | within 4 |
-| f34 legs | `#7C3D19` (22, .80, .49) | `#7E3911` | within 8; legs / post value 0.91 |
-| front board ends | `#CC7228` (27, .80, .80) | `#B25415` | +26 lighter |
-| front post faces | `#8A3E0D` (24, .91, .54) | `#A64E13` | −28 darker |
-| front blocks / stringer / legs / knee | `#964818` (.59) / `#813D18` (.51) / `#7B3D18` (.48) / `#783A19` (.47) | `#B2520C` / `#954B1F` / `#A3511C` / `#9B4918` | order board ends > blocks > posts > stringer ≥ legs ≥ braces holds |
-| front pegs | `#FECF7C` (38, .51, 1.0) | `#E4C89C` (36, .32, .90) | barely apart from the rope (finding 5) |
-| top board tops / caps | `#E98431` / `#FE9338` | `#D47935` / `#F39641` | caps lighter than the boards |
+1. **Frame on the long sides (blocker).**
+   - Stringers on the post lines: |y| 2.05–2.96 (outer face 0.04 inside the board ends at 3.00), z 1.42–2.07 (top
+     sunk 0.01 into the boards), full length to ±7.998; still two (Stringer x2).
+   - Posts split at the stringer: a leg (0 → 1.43, sunk 0.01 into the stringer underside, kind `leg`) and an upper post
+     (2.06 → 4.90, sunk 0.01 into the stringer top). TimberBridgePost is the upper post with its turns, side block and
+     end block; the legs are in the hero only. The side block (unchanged size and place) now bridges post and stringer.
+   - Crossbeams widened to |y| 2.06 (0.01 into the stringers' inner faces): 4.12 long.
+   - Braces in the long-side plane: |y| 2.25–2.75 (inside the leg and the stringer), 38° from horizontal, reaching
+     1.55 along the stringer underside from the leg face; low cut on the leg's inner face at z 0.22–0.79.
+   - Every full-width board now rests on both stringers; the post-row boards rest on the crossbeams.
+2. **End blocks.** At deck level, z 2.06–2.60 (top at the deck top, sitting 0.01 into the stringer end), the post's
+   width (|y| 2.004–2.996), from 0.01 inside the end post's end face to the seam (±7.998): 0.45 proud of the post, the
+   most the 16-stud seam allows. Chamfered 0.04 like the boards. The end strip now runs between the two end blocks
+   (|y| ≤ 2.014, sunk 0.01 into them), so the walk surface stays continuous across the join. The end-face peg is
+   dropped (it would cross the seam); 8 pegs remain, on the side blocks.
+3. **Rope.**
+   - Turns: m048's corner-cut twisted turns (12 points, 5 sides, `twist=True`, corners cut 0.10 along each side),
+     r 0.10 (was 0.11 straps), centres z 3.95 / 4.13 (touching), inner strands sunk 0.02 (0.017 measured into the
+     posts); 120 tris each (was 144).
+   - Rails r 0.10 (was 0.11), ends 0.65 off the post axis, seated about 0.03 into the turns (deepest rope in rope
+     0.056, limit 0.08).
+   - `m050_rope` `#E2AE55` → `#D4A04F`, `m050_rope_dark` `#C99441` → `#BC8A3B`.
+4. **Colour.** Legs are `m050_wood_deep`, the post colour (no darkening toward wood_dark). Side and end blocks get
+   their own key `m050_block` `#A4530B` (posts keep `m050_wood_deep`).
+5. **Text.** Size 6.780 (pegs ±3.390) in the brief, the builder's docstring and `TARGET_SIZE`; the hero and Post notes
+   describe the twisted turns that are now built; the Stringer note gives the new 0.91 × 0.65 section on the long side
+   under the board ends and posts; the Brace note gives 38° in the long-side plane; the Rope Segment note no longer
+   says twisted (the rails are smooth 6-sided tubes with a groove strand).
 
-- **Wood:** one orange family everywhere, hue 21–28°, never red. Palette hues: wood 29°, wood_light 29°, wood_deep 27°, wood_dark 22°. The cream, grey, green and blue swatches are unused.
-- **Shading check:** `K.check` reports 0 problems. Baked-shading correlation: hero 0.03, Post 0.16, Rope 0.02, the others 0.0. No object carries a `kit_shading_ok` waiver.
-- **No colour by facing in the builder:** every `normal` in `m050.py` is geometric placement (peg axis, block face, rope frame).
-  - Posts are coloured by face-centre height (`_post_colour`).
-  - Boards are coloured by board index and a noise field on x.
-  - Rope faces are coloured by spiral band index, `(k − adv_i) mod S` (`_rope` / `_ply_keys`): the band's place in the twist.
-- **Tint:** per face, never varying within a face; wood 0.94–1.05 (sd 0.022), rope 0.98–1.02, pegs none. No confetti in the renders.
-- **Finish:** wood roughness 0.85–0.9, rope 0.95, pegs 0.55. Metal 0 everywhere, no emission.
-- **Lighting, VFX, water:** none. No emission, no light objects, no sockets or children.
+### Re-measured
 
-### Shape against the sheet (every cell)
+kit_verify (`cls="structure"`, size, walk, seams): **problems []** (2.5 s).
+- Tris: hero 4416 / 6000 (leg 8 × 28, post 8 × 44, rope_wrap 16 × 120, block 12, peg 8, plank 18, stringer 2,
+  crossbeam 4, brace 4, rope_rail 6 × 152); parts Post 338, Plank 28, Stringer 28, Crossbeam 28, Brace 12, Rope 152.
+- 86 closed shells; 0 non-manifold, bowtie, boundary, loose, zero-area, n-gon; 0 winding errors, self-hits,
+  parity-inward or negative shells; min corner 12.9°. Floating 0, unchained 0, buried 0 (deepest rope_wrap / rope_rail
+  0.056, limit 0.08; everything else ≤ 0.03). UV 1240 islands, 0 overlaps / flips, gap 0.016, border 0.008. Size
+  15.996 × 6.780 × 4.90. Deck check: 54 samples, every board top 2.600.
+- Walk: centre path clearance 0.63 (crossbeam below the feet), side paths ±0.6 clearance 0.254 to the turns, 0
+  intersecting steps, no rises, nothing overhead; turns at (0, 0) and (-4.7, 0) clearance 1.149, 0 intersecting yaws.
+- Seams at 16: 0 crossing pairs, gap 0.004, extent ±7.998, nothing past the seams, end sections identical (13 faces
+  each end, z 1.42–2.60, mismatch 0.0).
 
-- **f34 / r34:** the read matches the sheet.
-  - A long, level trestle on 8 square posts with chamfered caps and peg dots, and 3 swags per long side.
-  - Both ends are open. The end boards run past the end posts.
-  - A dark stringer band runs under the plank ends, with pegged blocks on every post's outer face.
-  - Darker legs, the end X brace and knee braces under the near end.
-  - The deck rises from the lower left in the f34 and from the lower right in the r34.
-- **Front / rear:** match element for element:
-  - 4 posts and 3 swags;
-  - 3 visible plank ends per bay;
-  - the stringer band with 4 pegged blocks and pegged stubs 0.8 past the end posts;
-  - one knee brace per end bay and none at the middle legs.
+Colour (hex medians, sheet f34 / ours at the same camera, `compare.py` at 640 px high):
 
-  The profile against the cell is 0.004 mean.
-- **Side:** two posts, the end board, the stringer stubs with pegs on both corner posts' end faces, the crossbeam, and the X brace with its crossing peg. There is no end swag, as ruled (§3.3).
-- **Top:** 14 boards across the width with seams on the post rows, posts flush with the deck edges, and block ears outside every post.
-- **Close-ups:**
-  - `under_cu`: boards on the stringers and crossbeams, the knee brace from leg to stringer, the X brace, nothing floating.
-  - `peg_cu`: a crisp block with an 8-sided domed peg, like the plank-detail and junction pegs.
-  - `junc_cu`: the notched boards meet the post, two wraps, the swag leaving between them, the block and peg under the deck edge.
-- **Parts:** Post, Plank, Stringer, Crossbeam, Brace and Rope (with knob ends) match the key-part shapes. The wraps are discussed under finding 1.
-- **Rope:** the swags are thick (Ø 0.46), golden, sag low and read as twisted rope at the sheet's scale, not an outline. The wraps are fat double bands (0.85 tall, 0.27 proud).
+| Region | Sheet | Ours |
+| --- | --- | --- |
+| Side block (front post 2) | `#B7510A` | `#B8530B` |
+| Leg -Y face (front post 2) | `#A94D0F` | `#AE4D17` |
+| Post -Y face (front post 2) | `#A64B0A` | `#AE4D17` |
+| Rope, hue 36–55° pixels | `#F7C755` | `#FFC858` |
+| Rope, RGB yellow mask | `#F8C059` | `#FBB44E` |
 
-### Findings
+The two rope masks bracket the sheet (the lit strands clip red). Rope pixel share is now about 0.7–1.3× the sheet's
+depending on the mask (was 1.7×).
 
-1. **minor — the wraps read as flattened, faceted plates close up.**
-   - In `junc_cu`, `rope_cu`, the side view and the Post part, each wrap reads as a stack of thin twisted plates with pointed corner crowns. The sheet's junction and key Post show round, rope-like coils.
-   - The swags read as a twisted ribbon close up.
-   - At the f34 / r34 scale, both read as golden rope bands with a twist, so this matches M048's "faceted collars" finding (minor).
-   - **Fix target:** smooth-shade the rope faces (no tri cost). If they still look sharp, lower `WRAP_BUMP` (0.10 → 0.05) so the corner crowns stop spiking the side silhouette. `junc_cu` and the side view should read as round coils.
-2. **minor — the deck reads as one slab in the f34.**
-   - The 0.10 gaps are hairlines at sheet scale, and the board ends along the near edge merge into one band.
-   - The sheet draws chunky, separate board blocks with dark gaps.
-   - **Fix target:** gaps 0.14 (the spec's limit), or a darker groove key on the board end faces chosen by board index and position. The near-edge board ends should read as separate blocks in the f34.
-3. **minor — the ortho cells' colours.**
-   - Front post faces are −28 (`#8A3E0D` against `#A64E13`), board ends +26, and legs −40.
-   - The side cell's K median is `#5F2D11` against `#7A3E22`, and its W share is 16.0 against 28.8.
-   - The sheet lights its ortho cells frontally, while one diffuse key per role is already matched in the governing f34 (within 4–9). This is the modeller's leftover. Accept it, since lightening the posts would break the f34 match.
-4. **minor — the ortho proportions (recorded, §3.1–3.3).**
-   - Front and rear W : H are 3.59 against 2.83 / 2.73, and the top W : L is 0.344 against the two-bay 0.602.
-   - The side cell has no end swag.
-   - The f34 top-profile error is 0.061 / 0.17, because the peaks shift with bay / W 1.143 (decision 1).
-   - The r34 W / K (49.9 / 43.9) is within ±6 of the sheet, but outside ±4 (not binding).
-5. **minor — the pegs barely differ from the rope.**
-   - The palette has peg `#E8C47E` (40°, .46) against rope `#EEC677` (40°, .50). In the front render they are `#FECF7C` against the rope's `#FFD877`.
-   - Spec §5.4 asks for pegs paler and less saturated (target `#F6D48E`, sat .36–.46; the sheet's front peg is sat .32).
-   - **Fix target:** move the peg key toward sat ≈ 0.38, for example about `#E9CF98`, so the rendered pegs land at sat ≤ 0.42.
-6. **minor — the "lighter field" on the deck is invisible.** `wood_x_light_15` (`#BC732F`) is 1 unit from `wood` (`#BB722E`). **Fix target:** blend 30–40 % toward `wood_light`, or give `wood_light` a real lift, so one or two broad lighter patches show on the deck as §5.5 intends. Keep the f34 board median within 12.
-7. **minor — the Plank part keeps its board's yaw and jitter.** It measures 2.197 × 9.502 × 0.859, not 2.186 × 9.5 × 0.85. A reusable part with box collision should be square to its axes. **Fix target:** build `plank_part` with yaw 0 and the top at exactly 5.6 / 0.85 thick.
-8. **note — decision 5's "12 peg blocks".** There are now 8 blocks plus 4 pegged stringer end stubs. This follows directly from the accepted stringers-on-the-post-lines ruling, and the stubs read the same as end-face blocks in the side cell. Accepted; no action.
+Compare (`m050.compare()`, `<temp>/.../cmp/M050_compare.png`), W : H sheet / ours: f34 1.650 / 1.631, r34 1.633 /
+1.637, side 3.149 / 3.268, front 1.444 / 1.361, rear 1.458 / 1.361, top 0.623 / 0.421.
+- f34 / r34: each long side now shows the board-end face over the dark stringer face, the pegged block over the
+  junction, and the knee brace under the stringer in the end bays (front-left and back-right in the f34); the
+  back-left end block reads at deck level past its post.
+- Side: post, stringer under the board row, block bridging both, braces from the leg to the stringer underside at the
+  sheet's angle; the end blocks stand 0.45 past the end posts at deck level over the stringer ends.
+- `joint_cu.png` / `under_cu.png`: the stringer runs under the board ends with the block over the junction and the
+  brace dropping from the stringer underside, as the joint close-up.
 
-All 10 decisions were checked and met, as amended by the ruling:
-- size and levels;
-- X axis and symmetry;
-- 14 crisp, L-notched boards;
-- posts with a 0.10 cap chamfer and position-darkened legs;
-- framing with no middle braces;
-- rope at Ø 0.41–0.45 / 0.46, with 6 swags and no end rope;
-- colour by role and position, never red;
-- wooden pegs at roughness 0.55, metal 0;
-- M048 helper functions only (no constants);
-- stages 5 and 6 skipped, with collision precise / hull / box / none.
+Left as before (recorded misses): legs 0.4 shorter than the sheet's (deck 2.60 rule); the short-end cells' end swag
+and end-plane braces; post -X faces lighter than the sheet (studio light); the sheet's end block is a little taller
+(about 0.85) than ours (0.54, the board depth, because the stringer runs under it to the seam).
 
-**No blockers.** Nothing found in these areas:
-- **Mesh:** clean, 0 winding errors.
-- **Budget:** 3860 / 4000; parts at most 286.
-- **Contact:** no floating or unchained pieces.
-- **Deck:** level and walkable from end to end.
-- **Shape:** the silhouette and parts are right.
-- **Rope:** thick, not an outline.
-- **Colour:** one orange family, nothing coloured by facing.
-- **Decisions:** all followed.
+## Stage 7 verification (round 2)
 
-**Score: 8 / 10.** **Verdict: PASS.** Findings 1, 2 and 5 are the most worthwhile polish if a round 2 is run:
-- the wraps' round read;
-- the board-end blocks in the f34;
-- the pegs set apart from the rope.
+**Result: PASS, 8/10.** Round 1's blocker is fixed: each long side now shows the board ends over a dark stringer
+face, with the pegged block over the joint and the knee brace in the long-side plane. The other fix-list items are in,
+and the fixes added no technical problem. The leftovers are cosmetic or already recorded.
 
-## Main session ruling (2026-10-29)
-- **Verdict:** passed in round 1 (8/10) and committed.
-- **Left for a later polish pass:**
-  - Wraps and swags read as faceted plates or ribbon close up. Smooth-shade the rope, or set `WRAP_BUMP` to 0.05.
-  - The deck reads as one slab in f34. Widen the gaps to 0.14, or darken the board ends by board index.
-  - The pegs are too close to the rope colour. Use about `#E9CF98`.
-  - The light deck field is invisible. Blend 30–40 % toward `wood_light`.
-  - The Plank part keeps its yaw and jitter. Build it square.
-  - Ortho-cell colours and proportions are recorded misses.
-- **Export:** 7 assets, 7 solid pieces, 4418 tris, 0 VFX sockets, palette 16 colours, 0 problems.
+### Technical (kit_verify, re-run on a copy of the work file, 2026-11-04)
+
+`kit_verify.run` on the hero and all six parts, `cls="structure"`, size (15.996, 6.780, 4.90), the builder's `WALK`
+paths and turns, `seams` pitch (16, 0, 0): **problems []** (2.3 s).
+- Hero 4416 / 6000 tris, 86 shells (leg 8, post 8, rope_wrap 16 × 120, block 12, peg 8, plank 18, stringer 2,
+  crossbeam 4, brace 4, rope_rail 6 × 152). 0 non-manifold, bowtie, boundary, wire, loose, zero-area, n-gon or
+  duplicate. 0 winding errors, self-hits, parity-inward or negative shells. Min corner 12.9°.
+- Contact: floating 0, unchained 0, 8 grounded (the legs).
+- Burial: 0 buried. Deepest is rope_wrap / rope_rail at 0.056, under the 0.08 rope pair limit; peg / block 0.03;
+  rope_wrap in post 0.017; everything else 0.01.
+- UV: 1240 islands, 0 overlaps or flips, gap 0.016, border 0.008. Tint against normal worst 0.0. Transforms applied,
+  origin bottom centre, no modifiers or custom normals, K.check clean, no sockets (none wanted).
+- Parts: Post 338, Plank 28, Stringer 28 (15.996 × 0.91 × 0.65), Crossbeam 28 (0.6 × 4.12 × 0.65), Brace 12
+  (1.55 × 0.5 × 1.211, 38°), Rope 152. Every part is clean.
+- Walk: the centre path clears by 0.63 (crossbeam below the feet). Side paths at ±0.6 clear the turns by 0.254. 0
+  intersecting steps, level 2.60 end to end, nothing overhead. Turns at (0, 0) and (-4.7, 0) clear by 1.149, 0
+  intersecting yaws.
+- Seams at 16: 0 crossing pairs, gap 0.004, extent ±7.998, nothing past the seams, end sections identical (13 faces
+  each end, z 1.42–2.60, mismatch 0.0).
+
+### Blocker check (round 1's blocker: frame on the long sides)
+
+- **f34, column between front posts 2 and 3** (sheet crop scaled to the render, `compare.py` at 480 px high):
+  - sheet: board end 15 px `#9A480E`, then stringer 23 px `#682D0A`–`#74350E`, then ground shadow;
+  - ours: board end 22 px `#CD752C`, then stringer 20 px `#843510`, then background.
+  The stringer face now shows directly under the board ends along both long sides in the f34 and r34. The pegged
+  blocks bridge post and stringer. The knee braces show under the stringer in the end bays (front-left and
+  back-right in the f34, the matching pair in the r34).
+- **Joint close-up** (own renders at the end post and a middle post): the stringer runs under the board ends, the
+  block sits over the post-stringer junction, and the brace drops from the stringer underside to the leg. The end
+  block sits at deck level, 0.45 past the end post, over a stringer stub. This is the sheet close-up's layout.
+- **Side:** post, stringer under the board row, block bridging both, end blocks at deck level past the end posts. The
+  braces run from the leg's lower part to the stringer underside at the sheet's angle and reach. The low cut is at
+  about 0.2–0.8 of the leg height; the sheet's is about 0.22–0.67.
+- **Other fix-list items:**
+  - End blocks: at deck level (z 2.06–2.60). The back-left one reads in the f34.
+  - Rope: m048 corner-cut twisted turns at r 0.10, and thinner rails. Rope colour and pixel share now match the
+    sheet: yellow mask median `#F8C65F` on the sheet against `#FFC156` ours, share 2.13 % against 2.07 %.
+  - Colours: legs are the post colour, and side blocks are on target (table below).
+  - Text: size, rope-turn and Stringer notes corrected.
+- **New problems from the fixes:** none found. Board-row boards, crossbeams, legs and upper posts seat 0.01. The
+  walk surface is continuous across the end strip and end blocks.
+  - One tiny gap: the stringer (|y| 2.05–2.96) is 0.09 narrower than the post (2.0–3.0). This leaves a 0.04–0.05 slot
+    between the leg top and the upper-post bottom at the post's inner and outer edges. It is hidden by the side block
+    and the crossbeam from every normal view.
+
+### Views against the sheet
+
+`compare.py` with the builder's `COMPARE` boxes at 480 px high into `<temp>/.../v2/cmp/`, plus own close-ups. W : H,
+sheet / ours:
+
+| Cell | Sheet | Ours |
+| --- | --- | --- |
+| f34 | 1.652 | 1.634 |
+| r34 | 1.633 | 1.642 |
+| side | 3.142 | 3.250 |
+| front | 1.442 | 1.363 |
+| rear | 1.458 | 1.363 |
+| top | 0.627 | 0.422 |
+
+- **f34 (governs):** these match the sheet: layout, 4 + 4 posts, three bays, the boards across the width, the
+  post-above-deck height, two turns under each cap, six sagging rails, the long-side board-end and stringer band,
+  the pegged blocks, the end-bay knee braces, and the deck-level end blocks. Legs read shorter (deck 2.60 rule,
+  recorded).
+- **r34:** a redraw of the f34, with the same content. Matches.
+- **Side:** matches on content and heights (see the blocker check). Rails sag to about 0.72 above the deck, as
+  before.
+- **Front / rear:** the sheet's end swag and end-plane braces are recorded misses (the hero and the notes say open
+  ends). In these cells the turns show pointed lens-shaped ends past the post sides, where the sheet's coils are
+  round (minor 1).
+- **Top:** two-bay plan with edge strips (recorded). The content is right: posts, caps, boards across the width, and
+  rails along the long sides. The studio throws rope shadows across the deck.
+- **Exploded / scale:** six parts as the parts panel lists. The R6 marker stands about at post-top height, as on the
+  sheet.
+- **Colour** (hex medians, sheet f34 / ours at the same camera):
+
+  | Region | Sheet | Ours | Note |
+  | --- | --- | --- | --- |
+  | Board tops | `#E68436` | `#DA8537` | |
+  | Cap tops | `#FDA245` | `#FFA943` | |
+  | Post -Y face | `#AC4C0A` | `#AE4D17` | |
+  | Leg -Y face | `#A84C0E` | `#AE4D17` | |
+  | Side block, lower part | `#A74905` | `#B8530B` | the fixer's upper patch, sheet `#B7510A` |
+  | Brace | `#893D08` | `#893E1E` | |
+  | Stringer face | `#682D0A`–`#74350E` | `#843510` | |
+  | Rope | `#F8C65F` | `#FFC156` | |
+  | Post -X face | `#763204` | `#A34816` | studio light, recorded |
+  | Board end faces | `#9A480E` | `#CD752C` | studio light, recorded |
+
+### Blockers
+
+None.
+
+### Minors (recorded, not blocking)
+
+1. **Rope turns are faceted and pointed.** They are m048's corner-cut 5-sided twisted turns, as the fix list asked.
+   In the f34 they read as twisted bands. Close up and in the front / rear cells, though, each turn is a flattish
+   faceted strap whose corner segments end in lens-shaped points about 0.14 past the post faces. The sheet's coils are
+   fat, round tubes with round ends.
+   - **Fix, if wanted:** 6–8 sides on the turns. At 6 sides that is 16 × 144 = 2304 tris, hero about 4800.
+   - Or round the corner arcs with two or three points per corner instead of one 45° cut.
+2. **Stringer looks thin in the f34.** On the sheet's f34 the stringer face is about 1.5× the board-end face (23 : 15
+   px); ours is about 0.9× (20 : 22). The side cell (14 : 12 px) agrees with ours, so this is a sheet inconsistency.
+   Recorded only.
+3. **Stringer slightly lighter than the sheet:** `#843510` against `#682D0A`–`#74350E`. Within the studio-light
+   spread; no change needed.
+4. **Stale brief and table text.** The Brief still gives hero 4696 / parts ≤ 400 / "12 pegged blocks". The parts table
+   gives Post 400 and a "45° knee brace". The palette line says "legs 70 % toward it" and has no `m050_block` key.
+   Built: hero 4416, Post 338, 8 pegs on 12 blocks, braces 38°, legs `m050_wood_deep`, blocks `m050_block`
+   `#A4530B`. **Fix:** update the Brief bullets and table.
+5. **Slots beside the stringer.** A 0.04–0.05 slot between leg top and upper-post bottom where the post is wider than
+   the stringer (|y| 2.0–2.05 and 2.96–3.0). Not visible in any sheet view. If wanted, stringers at |y| 2.0–3.0 less
+   0.04 on the outside, or the upper post on a 0.91-wide foot.
+6. **Already recorded and unchanged:**
+   - legs 0.4 shorter than the sheet's (deck 2.60 rule);
+   - the short-end cells' swag and end-plane braces;
+   - the top cell's two-bay plan;
+   - post -X faces lighter than the sheet (studio light);
+   - the end block at 0.54 tall against the sheet's about 0.85.
