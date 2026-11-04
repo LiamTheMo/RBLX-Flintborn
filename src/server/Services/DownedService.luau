@@ -22,6 +22,13 @@ local WorldAdmissionService = require(script.Parent.WorldAdmissionService)
 local DownedService = {}
 
 DownedService.RANGE_ALLOWANCE = 2
+-- Where a player counts as standing for revive range. AntiExploitService sets it
+-- to the server-validated position (it requires this module, so it cannot be
+-- required back).
+DownedService.PositionOf = function(player: Player): Vector3?
+	local root = Characters.RootOf(player)
+	return root and root.Position or nil
+end
 
 local downed = {}
 
@@ -150,12 +157,11 @@ local function step(dt: number)
 		local reviverId = entry.rules.reviverId
 		if reviverId then
 			local reviver = Players:GetPlayerByUserId(reviverId)
-			local reviverRoot = reviver and Characters.RootOf(reviver)
-			local root = Characters.RootOf(player)
-			local inRange = reviverRoot ~= nil
-				and root ~= nil
-				and (reviverRoot.Position - root.Position).Magnitude
-					<= DownedRules.REVIVE_RANGE + DownedService.RANGE_ALLOWANCE
+			local reviverAt = reviver and DownedService.PositionOf(reviver)
+			local at = DownedService.PositionOf(player)
+			local inRange = reviverAt ~= nil
+				and at ~= nil
+				and (reviverAt - at).Magnitude <= DownedRules.REVIVE_RANGE + DownedService.RANGE_ALLOWANCE
 			if not inRange or not canRevive(reviver, player) then
 				DownedRules.StopRevive(entry.rules, reviverId)
 			end

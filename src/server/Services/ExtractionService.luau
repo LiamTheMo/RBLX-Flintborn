@@ -28,6 +28,7 @@ local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local WorldState = require(ReplicatedStorage.Shared.World.WorldState)
 local AntiExploitService = require(script.Parent.AntiExploitService)
 local DownedService = require(script.Parent.DownedService)
+local InteractionService = require(script.Parent.InteractionService)
 local InventoryService = require(script.Parent.InventoryService)
 local ProfileService = require(script.Parent.ProfileService)
 local WorldAdmissionService = require(script.Parent.WorldAdmissionService)
@@ -39,6 +40,8 @@ ExtractionService.STRUCTURE_TAGS = { "Workbench", "Structure" }
 ExtractionService.ACTIVE_FIXED_SITES = 2
 ExtractionService.DEFAULT_ZONE_RADIUS = { Fixed = 12, Center = 8, Portable = 10 }
 ExtractionService.COOLDOWN_SECONDS = 60
+-- How far from a portal it can be started (its prompt shows at 10).
+ExtractionService.PORTAL_REACH = 12
 ExtractionService.ANIMATION_SECONDS = 3
 ExtractionService.DEFAULT_MAP_RADIUS = 1000
 ExtractionService.ALERT_RADIUS = 400
@@ -242,7 +245,9 @@ local function registerSite(position: Vector3, kind: string, radius: number, nam
 	prompt.Parent = portal
 	local site = { name = name, kind = kind, center = position, radius = radius, part = portal }
 	prompt.Triggered:Connect(function(player)
-		if not canStart(player) then
+		-- Started from beside the portal, where the server knows the player is.
+		local reach = ExtractionService.PORTAL_REACH
+		if not canStart(player) or not InteractionService.CanInteract(player, portal, reach) then
 			return
 		end
 		if site.event then
@@ -331,11 +336,13 @@ local function placeRune(player: Player, hotbarIndex: any)
 	if def == nil or def.placeable ~= "ExtractionRune" then
 		return false, "NotARune"
 	end
+	-- Set under where the server knows the player is, not where the client says.
 	local root = Characters.RootOf(player)
+	local at = root and AntiExploitService.Vouch(player, root.Position) and AntiExploitService.TrustedPosition(player)
 	local params = RaycastParams.new()
 	params.FilterType = Enum.RaycastFilterType.Exclude
 	params.FilterDescendantsInstances = { player.Character }
-	local ground = root and workspace:Raycast(root.Position, Vector3.new(0, -12, 0), params)
+	local ground = at and workspace:Raycast(at, Vector3.new(0, -12, 0), params)
 	if ground == nil then
 		return false, "NoGround"
 	end

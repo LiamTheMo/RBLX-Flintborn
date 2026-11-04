@@ -137,14 +137,15 @@ function FakeRoblox.Players(threaded: boolean?)
 end
 
 -- A character at `position` (default 0, 5, 0): `humanoid`, `root` and `head` are
--- plain tables a spec may change. Died runs threaded handlers when `threaded`.
+-- plain tables a spec may change. Died (and ChildRemoved) run threaded handlers
+-- when `threaded`.
 function FakeRoblox.Character(position: Vector3?, threaded: boolean?)
 	local at = position or Vector3.new(0, 5, 0)
 	local humanoid =
 		{ Health = 100, MaxHealth = 100, WalkSpeed = 16, JumpHeight = 7.2, Died = EngineSignal.new(threaded) }
 	local root = { Position = at, Anchored = false, CFrame = { LookVector = Vector3.new(0, 0, 1) } }
 	local head = { Position = at + Vector3.new(0, 1.5, 0) }
-	local character = { humanoid = humanoid, root = root, head = head }
+	local character = { humanoid = humanoid, root = root, head = head, ChildRemoved = EngineSignal.new(threaded) }
 	function character.FindFirstChildOfClass(_, className)
 		return if className == "Humanoid" then humanoid else nil
 	end

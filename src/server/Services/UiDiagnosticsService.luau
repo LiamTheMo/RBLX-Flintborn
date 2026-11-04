@@ -1,13 +1,16 @@
 -- Keeps the clients' HUD image reports (UiDiagnosticsController) so the "Probe
 -- UI images" workflow can read how images load on real devices. Each player may
--- send a few reports per server; the latest REPORTS_KEPT across the universe are
--- kept in one DataStore key. Reports hold counts, image ids and device kind
--- only; the player is recorded by user id.
+-- send a few reports per server, and every one is printed to the server output;
+-- the latest REPORTS_KEPT from admins (the owner checking devices) across the
+-- universe are kept in one DataStore key, which no other player can fill or
+-- overwrite. Reports hold counts, image ids and device kind only; the player is
+-- recorded by user id.
 
 local DataStoreService = game:GetService("DataStoreService")
 local HttpService = game:GetService("HttpService")
 
 local Remotes = require(game:GetService("ReplicatedStorage").Shared.Net.Remotes)
+local AdminService = require(script.Parent.AdminService)
 
 local UiDiagnosticsService = {}
 
@@ -54,7 +57,9 @@ function UiDiagnosticsService.Start()
 			lines = kept,
 		}
 		print("[UiDiagnostics] " .. HttpService:JSONEncode({ entry.summary, #kept }))
-		task.spawn(store, entry)
+		if AdminService.IsAdmin(player.UserId) then
+			task.spawn(store, entry)
+		end
 	end)
 end
 

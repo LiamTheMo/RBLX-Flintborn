@@ -22,7 +22,6 @@ local DamageRules = require(ReplicatedStorage.Shared.Combat.DamageRules)
 local GameConstants = require(ReplicatedStorage.Shared.GameConstants)
 local HarvestRules = require(ReplicatedStorage.Shared.Resources.HarvestRules)
 local ModifierRules = require(ReplicatedStorage.Shared.Progression.ModifierRules)
-local MovementRules = require(ReplicatedStorage.Shared.Security.MovementRules)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local SessionStates = require(ReplicatedStorage.Shared.Admission.SessionStates)
@@ -46,9 +45,6 @@ local CombatService = {}
 CombatService.Damaged = Signal.new()
 -- Fires (targetPlayer) whenever a player takes damage from anything.
 CombatService.Hurt = Signal.new()
--- How far (horizontally) a swing's root may be from the last validated position:
--- two samples of sprinting (one of them a forgiven overrun from jitter).
-CombatService.VALIDATED_SLACK = 12
 -- Set by SiegeService: `(player, aim)` handles the attack input while a siege
 -- item (Fire Bomb, Breaching Charge) is equipped. Kept as a hook so CombatService
 -- does not require SiegeService (which uses ApplyHit).
@@ -217,10 +213,10 @@ local function melee(player: Player, sequence: any, direction: any)
 	if Characters.AliveHumanoid(player) == nil or not WorldAdmissionService.IsAtRisk(player) then
 		return
 	end
-	-- Reach is measured from the client-owned root, so it must also sit near where
-	-- the server last validated the player (no teleport, swing, teleport back).
-	local validated = AntiExploitService.ValidatedPosition(player)
-	if not MovementRules.NearValidated(root.Position, validated, CombatService.VALIDATED_SLACK) then
+	-- Reach and sight are measured from the client-owned root and head, so both
+	-- must be where the player could really be (no teleport, swing, teleport
+	-- back; no head poked through a wall).
+	if AntiExploitService.Body(player) == nil then
 		return
 	end
 	local profile = WeaponCatalog.For(equipped and equipped.catalogId)
@@ -300,9 +296,9 @@ local function shoot(player: Player, sequence: any, drawSeconds: any, direction:
 	if SafeZoneService.ContainsPlayer(player) then
 		return
 	end
-	-- The arrow leaves from the client-owned head: it must be near the validated spot.
-	local validated = AntiExploitService.ValidatedPosition(player)
-	if not MovementRules.NearValidated(head.Position, validated, CombatService.VALIDATED_SLACK) then
+	-- The arrow leaves from the client-owned head: it must be one the player could
+	-- really have, on this side of any wall.
+	if AntiExploitService.Body(player) == nil then
 		return
 	end
 	local equipped = InventoryService.Equipped(player)
@@ -319,7 +315,7 @@ local function shoot(player: Player, sequence: any, drawSeconds: any, direction:
 	local damage = DamageRules.ArrowDamage(profile, WeaponCatalog.ARROW, equipped.qualityRoll)
 	-- The draw cannot have lasted longer than the server saw since the last attack.
 	local draw = DamageRules.ObservedDraw(drawSeconds, previous, lastAttack[player])
-	-- Launched from the head itself, so an arrow can never start beyond a wall.
+	-- Launched from the head itself, vouched for above, so never beyond a wall.
 	ProjectileService.Fire(head.Position, aim * DamageRules.ArrowSpeed(draw), character, function(result)
 		local model = result.Instance:FindFirstAncestorOfClass("Model")
 		local target = model and Players:GetPlayerFromCharacter(model)

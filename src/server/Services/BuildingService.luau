@@ -41,6 +41,8 @@ BuildingService.STRUCTURE_TAG = "Structure"
 BuildingService.GENERATED_TAG = "GeneratedStructure"
 BuildingService.NO_BUILD_TAG = "NoBuildZone"
 BuildingService.MAX_PIECES_PER_OWNER = 300
+-- How far a door or totem can be worked from (their prompts show at 8 and 10).
+BuildingService.MANAGE_REACH = 12
 BuildingService.HIT_ALLOWANCE = 2
 BuildingService.FOLDER_NAME = PlacementProbe.FOLDER_NAME
 -- Extra slack between the live and the last validated root position for reach.
@@ -181,14 +183,19 @@ local function remove(record, reason: string)
 	end
 end
 
-local function countFor(ownerKey: string): number
-	local count = 0
+-- Pieces standing for `ownerKey`, and pieces `builderId` placed (whoever owns
+-- them now), in one pass.
+local function countFor(ownerKey: string, builderId: number): (number, number)
+	local owned, built = 0, 0
 	for _, record in records do
 		if record.ownerKey == ownerKey then
-			count += 1
+			owned += 1
+		end
+		if record.builderId == builderId then
+			built += 1
 		end
 	end
-	return count
+	return owned, built
 end
 
 local function turned(center: Vector3, yaw: number): CFrame
@@ -349,8 +356,11 @@ local function ownerName(player: Player, ownerKey: string): string
 	return if string.sub(ownerKey, 1, 5) == "solo:" then player.DisplayName else (player.DisplayName .. "'s tribe")
 end
 
+-- The owner, beside the piece where the server knows they are (a door or totem
+-- is never worked from across the map).
 local function canManage(player: Player, record): boolean
-	return InteractionService.CanAct(player) and BuildingService.IsOwnedBy(player, record)
+	return InteractionService.CanInteract(player, record.part, BuildingService.MANAGE_REACH)
+		and BuildingService.IsOwnedBy(player, record)
 end
 
 local function setupDoor(record)
@@ -467,7 +477,10 @@ local function placePiece(player: Player, pieceId: any, tier: any, position: any
 		return false, "NoLineOfSight"
 	end
 	local ownerKey = BuildingService.OwnerKey(player)
-	if countFor(ownerKey) >= BuildingService.MAX_PIECES_PER_OWNER then
+	-- Per owner, and per builder too: leaving a tribe and founding another
+	-- starts a new owner, not a new allowance.
+	local owned, built = countFor(ownerKey, player.UserId)
+	if owned >= BuildingService.MAX_PIECES_PER_OWNER or built >= BuildingService.MAX_PIECES_PER_OWNER then
 		return false, "PieceLimit"
 	end
 	if pieceId == "Totem" and BuildRules.TotemLimitReached(totems(), ownerKey) then
@@ -487,6 +500,7 @@ local function placePiece(player: Player, pieceId: any, tier: any, position: any
 		hp = level and level.hp or stats.hp,
 		maxHp = level and level.hp or stats.hp,
 		ownerKey = ownerKey,
+		builderId = player.UserId,
 		position = center,
 		half = half,
 		localHalf = localHalf,

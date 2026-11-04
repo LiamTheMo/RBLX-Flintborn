@@ -37,7 +37,35 @@ function InteractionService.CanInteract(player: Player, part: BasePart, reach: n
 		return false
 	end
 	local validated = AntiExploitService.ValidatedPosition(player)
-	return validated == nil or (validated - part.Position).Magnitude <= reach + InteractionService.VALIDATED_SLACK
+	if validated and (validated - part.Position).Magnitude > reach + InteractionService.VALIDATED_SLACK then
+		return false
+	end
+	return AntiExploitService.Vouch(player, root.Position)
+end
+
+-- CanInteract, and in sight: nothing solid between the player's head (vouched
+-- for, so not one poked through a wall) and `part`, other than `part` itself or
+-- what lies past it (a body or drop does not collide, so the ray may go on to
+-- the ground under it). For anything a wall should protect: chests, bodies, loot.
+function InteractionService.CanReach(player: Player, part: BasePart, reach: number): boolean
+	if not InteractionService.CanInteract(player, part, reach) then
+		return false
+	end
+	local _, head = AntiExploitService.Body(player)
+	if head == nil then
+		return false
+	end
+	local params = RaycastParams.new()
+	params.FilterType = Enum.RaycastFilterType.Exclude
+	params.FilterDescendantsInstances = { player.Character :: Instance }
+	params.RespectCanCollide = true
+	params.IgnoreWater = true
+	local offset = part.Position - head.Position
+	local hit = workspace:Raycast(head.Position, offset, params)
+	if hit == nil or hit.Instance == part or hit.Instance:IsDescendantOf(part) then
+		return true
+	end
+	return (hit.Position - head.Position).Magnitude >= offset.Magnitude - part.Size.Magnitude / 2
 end
 
 return InteractionService

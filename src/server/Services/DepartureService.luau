@@ -18,6 +18,7 @@ local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local ProfileSchema = require(ReplicatedStorage.Shared.Data.ProfileSchema)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local Validation = require(ReplicatedStorage.Shared.Data.Validation)
+local AntiExploitService = require(script.Parent.AntiExploitService)
 local InteractionService = require(script.Parent.InteractionService)
 local InventoryService = require(script.Parent.InventoryService)
 local ProfileService = require(script.Parent.ProfileService)
@@ -31,11 +32,9 @@ local bodies = {}
 local lastPositions = {}
 local handled = {}
 
+-- In reach and in sight, from where the server knows the looter is.
 local function canLoot(player: Player, body): boolean
-	local root = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
-	return root ~= nil
-		and InteractionService.CanAct(player)
-		and (root.Position - body.part.Position).Magnitude <= DepartureService.LOOT_RANGE
+	return InteractionService.CanReach(player, body.part, DepartureService.LOOT_RANGE)
 end
 
 local function createBody(position: Vector3, contents, ownerName: string)
@@ -135,8 +134,10 @@ local function depart(player: Player, position: Vector3?)
 	if not ok then
 		warn(("[DepartureService] Could not settle departure for %s: %s"):format(player.Name, tostring(err)))
 	end
-	-- Never lose a body for lack of a position (a logout right after spawning).
-	local at = position or lastPositions[player]
+	-- Where the server last validated them, not wherever the client put its
+	-- character as it died or left. Never lose a body for lack of a position (a
+	-- logout right after spawning).
+	local at = AntiExploitService.ValidatedPosition(player) or position or lastPositions[player]
 	if at == nil then
 		warn("[DepartureService] No known position for " .. player.Name .. "; placing the body at the origin")
 		at = Vector3.new(0, 5, 0)
@@ -172,9 +173,8 @@ function DepartureService.Start()
 		end
 		elapsed = 0
 		for _, player in Players:GetPlayers() do
-			local root = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
-			if root and WorldAdmissionService.IsAtRisk(player) then
-				lastPositions[player] = root.Position
+			if WorldAdmissionService.IsAtRisk(player) then
+				lastPositions[player] = AntiExploitService.TrustedPosition(player) or lastPositions[player]
 			end
 		end
 	end)

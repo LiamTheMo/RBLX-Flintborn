@@ -136,7 +136,11 @@ local function handle(player: Player, action: any, argument: any)
 	else
 		return false, "BadRequest"
 	end
-	broadcast()
+	-- Only a change is worth telling everyone about (a refused request changes
+	-- nothing, and spamming them must not cost the server a broadcast each).
+	if ok then
+		broadcast()
+	end
 	return ok, reason
 end
 

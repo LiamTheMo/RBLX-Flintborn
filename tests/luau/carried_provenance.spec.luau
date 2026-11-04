@@ -191,6 +191,17 @@ local stubs = FakeRoblox.StubServices({
 		ValidatedPosition = function(player)
 			return validated[player]
 		end,
+		TrustedPosition = function(player)
+			return validated[player] or (player.Character and player.Character.root.Position)
+		end,
+		-- Every character here stands where the server last saw it.
+		Vouch = function()
+			return true
+		end,
+		Body = function(player)
+			local character = player.Character
+			return character and character.root, character and character.head
+		end,
 	},
 	BuildingService = { Placed = Signal.new(), Removing = Signal.new() },
 	DownedService = {
@@ -333,7 +344,7 @@ test("body and chest listings name each item by its catalog id", function()
 	expectEq(entry and entry.name, "Wood", "and its display name")
 	expectEq(entry and entry.index, 1, "and its index")
 
-	local part = { Position = Vector3.new(3, 5, 0) }
+	local part = { Position = Vector3.new(3, 5, 0), Parent = "PlayerStructures" }
 	stubs.BuildingService.Placed:Fire({ id = "chest-ids", pieceId = "Chest", part = part, position = part.Position })
 	local storer = inRun({ stack("IronOre", 5) })
 	expect(handlers.ChestPut(storer, "chest-ids", slotOf(storer, "IronOre")), "stored")
@@ -345,7 +356,7 @@ test("body and chest listings name each item by its catalog id", function()
 end)
 
 test("a chest keeps the carried units of what goes in and comes out", function()
-	local part = { Position = Vector3.new(3, 5, 0) }
+	local part = { Position = Vector3.new(3, 5, 0), Parent = "PlayerStructures" }
 	stubs.BuildingService.Placed:Fire({ id = "chest-1", pieceId = "Chest", part = part, position = part.Position })
 	local alt = inRun({ stack("IronOre", 500, 500) })
 	local ok, reason = handlers.ChestPut(alt, "chest-1", slotOf(alt, "IronOre"))
@@ -380,7 +391,7 @@ test("a take names its entry by key, so a double press or stale index takes noth
 	end
 	expectEq(held(main, "Wood"), nil, "nothing taken by malformed requests")
 
-	local part = { Position = Vector3.new(3, 5, 0) }
+	local part = { Position = Vector3.new(3, 5, 0), Parent = "PlayerStructures" }
 	stubs.BuildingService.Placed:Fire({ id = "chest-keys", pieceId = "Chest", part = part, position = part.Position })
 	local storer = inRun({ stack("IronOre", 5), stack("Wood", 3) })
 	handlers.ChestPut(storer, "chest-keys", slotOf(storer, "IronOre"))
@@ -405,7 +416,7 @@ test("a take that fits nothing reports NoRoom, from a body as from a chest", fun
 	expectEq(held(other, "IronBar").quantity, 50, "all 50 of them")
 	expectEq(held(other, "IronBar").carried, 30, "with their carried units")
 
-	local part = { Position = Vector3.new(3, 5, 0) }
+	local part = { Position = Vector3.new(3, 5, 0), Parent = "PlayerStructures" }
 	stubs.BuildingService.Placed:Fire({ id = "chest-full", pieceId = "Chest", part = part, position = part.Position })
 	local storer = inRun({ stack("IronBar", 50) })
 	expect(handlers.ChestPut(storer, "chest-full", slotOf(storer, "IronBar")), "stored")
