@@ -20,6 +20,31 @@
 - Verification findings go back to a modeller (a fresh one if the first has finished). A model gets at most 2 verification rounds; after that the main session commits it with the leftovers noted, unless something is actually broken or the model's defining feature still reads clearly unlike the sheet. In those cases a targeted third round fixes only the named blockers (018's leaf rosette was the first).
 - Each passed model gets its own commit, straight on the active version branch (no feature branch or PR; owner's decision, 2026-11-04). Commits stay local: the owner pushes.
 
+## Shared library (2026-11-04)
+
+Build every new model on the shared library, in the light work file. A builder is then a few hundred lines of
+model-specific shapes and data (`demo_m067.py`, 396 lines, rebuilds 067 exactly: m067.py is 1,582).
+- **`kit_parts.py` (P): the pieces.** Closed, outward-wound, flat-shaded shells with defaults from the best passed
+  model: `plank` (chamfered, V-seam option), `plank_wall` (board rows and butt joints that close), `post` (pyramid tip,
+  foot bands), `log`, `leg`, `bolt`, `stairs`, `rope` / `rope_turn` / `rope_band` / `x_lashing` / `strap`, `canvas`
+  (sag, hem, thickness, holes), `banner` / `emblem` / `banner_set`, `crate`, `barrel`, `lantern` (glass key) /
+  `bracket`, `block` (chamfers, chips), `rock`, `stone`, `moss`, `leaf` (m070's tent leaf that passes the 5° sweep),
+  `ivy`; and the core `shell` / `prism` / `box` / `ext` / `beam` / `hull`, `frame()` placement, `earclip`. Every named
+  piece goes into the register kit_verify reads. The file's docstring lists the API.
+- **`kit_build.py` (B): the scaffold.** `MODEL = B.Model(NNN, title, palette=PALETTE, targets=TARGETS)`, then
+  `MODEL.run(hero=(name, fn), parts=..., notes=..., collision=..., budgets=..., target_size=..., points=..., fx=...,
+  views=...)` builds the parts and hero, cleans them (normals, bowties, ear-clipped n-gons, UVs, origin), stores points
+  and sockets, puts them on display, calls `kit_verify.run` and renders. Default renders: the sheet views you list, an
+  exploded view and a scale view, all on `MNNN_views.png`; close-ups, part shots and the spin only when asked. Add
+  model-specific checks with `checks=[fn]`; pass kit_verify's optional checks with `verify={...}`.
+- **The light work file.** `art/blender/assets/kit/wip/LIGHT.blend` (3.3 MB against the kit's 36 MB): the studio,
+  the Kit collection and every palette material, no models. Copy it to `wip/MNNN.blend` and start bgmcp on that copy.
+  Make or refresh it with `make_workfile.py` (its docstring says how; `--keep M067` keeps a model to build next to).
+  In a background session it opens about 3x faster, renders about 3x faster and saves about 5x faster than a kit copy,
+  and a build there gives the same tris, sizes, offsets and materials as in the kit file.
+- **New reusable pieces go into `kit_parts.py` only through the main session.** A modeller who needs one writes it in
+  its own `mNNN.py` and reports it; the main session moves it into the library. The same holds for `kit_build.py`.
+
 ## Parallel sessions
 
 Each modeller drives its own live Blender. The open GUI (`FlintbornWorldKit.blend`, the MCP tool, port 9876)
