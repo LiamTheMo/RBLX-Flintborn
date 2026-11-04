@@ -44,11 +44,11 @@ BOTTLE, AMBER, PAPER = "m066_bottle", "m066_amber", "m066_paper"
 # key -> (hex, roughness, metal, emission, low specular). Stage 4 (spec "Stage 4"): woods and metal from
 # MODEL.calibrate(); canvas, rope, stone and banner then corrected against the hero render (the dome pulls the canvas
 # salmon, so don't recalibrate it blindly).
-PALETTE = {TIMBER: ("#935018", 0.85, 0.0, 0.0, True), PLANK: ("#9A5E2A", 0.85, 0.0, 0.0, True),
-           WOOD_DARK: ("#7D4316", 0.85, 0.0, 0.0, True), WOOD_DEEP: ("#522810", 0.9, 0.0, 0.0, True),
+PALETTE = {TIMBER: ("#B96825", 0.85, 0.0, 0.0, True), PLANK: ("#9A5621", 0.85, 0.0, 0.0, True),
+           WOOD_DARK: ("#8B4C16", 0.85, 0.0, 0.0, True), WOOD_DEEP: ("#522810", 0.9, 0.0, 0.0, True),
            CANVAS: ("#D2B99E", 0.95, 0.0, 0.0, True), CANVAS_DEEP: ("#B09276", 0.95, 0.0, 0.0, True),
            ROPE: ("#C29237", 0.95, 0.0, 0.0, True), ROPE_DEEP: ("#9A6E20", 0.95, 0.0, 0.0, True),
-           STONE: ("#908886", 0.92, 0.0, 0.0, True), STONE_DEEP: ("#726A68", 0.92, 0.0, 0.0, True),
+           STONE: ("#AAA4A4", 0.92, 0.0, 0.0, True), STONE_DEEP: ("#878080", 0.92, 0.0, 0.0, True),
            BANNER: ("#BE1F14", 0.9, 0.0, 0.0, True), BANNER_DEEP: ("#821410", 0.9, 0.0, 0.0, True),
            BANNER_WHITE: ("#F2EAE6", 0.9, 0.0, 0.0, True),
            METAL: ("#543F30", 0.55, 0.4, 0.0, False), IRON: ("#6E6A6C", 0.5, 0.5, 0.0, False),
@@ -83,6 +83,9 @@ SEAT = 0.02
 TURN_R, TURN_CUT = 0.16, 0.13
 TURN_OUT = TURN_R - P.SINK              # a turn's centreline off the post face
 DIAG_R = 0.15
+# diagonal ends PH - X_IN off the face centre, pulled PULL * TURN_R out of the turn (1.65 sank 0.12 into the turns on
+# the 1.3 post, where the X runs flatter; 2.4 leaves 0.065, under the 0.08 rope-in-rope limit)
+X_IN, PULL = 0.10, 2.4
 LASH = {                                # turns (z) and the faces carrying an X; "over": the timber the X crosses
     "FL": dict(turns=(8.40, 9.80), faces=[((0, -1), "rod"), ((-1, 0), None)]),
     "BL": dict(turns=(8.40, 9.60), faces=[((-1, 0), None), ((0, 1), None)]),
@@ -105,7 +108,7 @@ BAN_W = 2.05
 BAN_X = (-PX - 0.10 - BAN_W, -PX - 0.10)                # cloth right edge 0.10 short of the post centre
 BAN_Y = ROD_Y - 0.25                                    # cloth plane: 0.03 clear of the rod, 0.07 of the lower turn
 BAN_TOP = ROD_Z - 0.10
-BANDS = ((BAN_X[0] - 0.02, BAN_X[0] + 0.30), (-PX - PH - 0.47, -PX - PH - 0.15))   # red bands, clear of the lashing
+BANDS = ((BAN_X[0] - 0.02, BAN_X[0] + 0.30), (-PX - PH - 0.65, -PX - PH - 0.33))   # red bands, clear of the lashing
 BAND_RO = ROD_R + 0.13
 ROD_X = (BAN_X[0] - 0.35, -PX + 0.45)
 ROD_XE = 0.25                                           # the front X's ends on the rod top, either side of the centre
@@ -121,7 +124,7 @@ SEAT_Z, SEAT_T, SEAT_D = 1.50, 0.40, 1.30
 STOOL_C = (0.0, 0.0)
 CRATE_C, CRATE_W, CRATE_H = (5.15, -1.75), 2.30, 2.30     # clear of the table end and the front bench
 BRACE_PROUD = 0.10                      # crate braces stand this far off the recessed panels (P.crate: 0.05)
-BARREL_C = (-8.30, 2.40)                # outside the left side, beside the back-left post in the front / rear cells
+BARREL_C = (-5.70, 2.50)                # just inside the left posts, as the hero, front, rear and r34 cells draw it
 GAP = 0.04
 
 
@@ -174,7 +177,7 @@ def diagonals(a, cx, cy, z_lo, z_hi, face, name, over=None, lift=0.24):
     c = Vector((cx, cy, 0.0))
     dt = PH + TURN_OUT
     d0 = PH + 0.8 * DIAG_R - P.SINK
-    xh = PH - 0.10
+    xh = PH - X_IN
     out = []
     for k, sg in enumerate((1, -1)):
         S = c + n * dt + ax * (-sg * xh)
@@ -196,8 +199,8 @@ def diagonals(a, cx, cy, z_lo, z_hi, face, name, over=None, lift=0.24):
             mid = c + n * (d0 + lf)
             mid.z = (z_lo + z_hi) / 2
             inner = [mid]
-        S0 = S + (inner[0] - S).normalized() * (1.65 * TURN_R)
-        E0 = E + (inner[-1] - E).normalized() * (1.65 * TURN_R)
+        S0 = S + (inner[0] - S).normalized() * (PULL * TURN_R)
+        E0 = E + (inner[-1] - E).normalized() * (PULL * TURN_R)
         out.append(P.rope(a, [S0] + inner + [E0], DIAG_R, ROPE, ROPE_DEEP, sides=4, up=n, name=f"{name}_x{k}",
                           kind="rope_diag"))
     return out
@@ -211,7 +214,7 @@ def rod_x(a, cx, cy, z_hi, face, name, lift=0.24):
     c = Vector((cx, cy, 0.0))
     dt = PH + TURN_OUT
     d0 = PH + 0.8 * DIAG_R - P.SINK
-    xh = PH - 0.10
+    xh = PH - X_IN
     rc = abs(ROD_Y - cy)                                    # the rod's centre off the post centre
     ze = ROD_Z + ROD_R + 0.8 * DIAG_R - P.SINK
     out = []
@@ -222,7 +225,7 @@ def rod_x(a, cx, cy, z_hi, face, name, lift=0.24):
         E.z = ze
         mid = c + n * (d0 + (lift if k else 0.0))
         mid.z = (z_hi + ze) / 2
-        S0 = S + (mid - S).normalized() * (1.65 * TURN_R)
+        S0 = S + (mid - S).normalized() * (PULL * TURN_R)
         out.append(P.rope(a, [S0, mid, E], DIAG_R, ROPE, ROPE_DEEP, sides=4, up=n, name=f"{name}_x{k}",
                           kind="rope_diag"))
     return out
@@ -599,7 +602,7 @@ NOTES = {
 COLLISION = {HERO: "precise", POST_P: "hull", FOOT_P: "box", RIDGE_P: "box", CANOPY_P: "none", BANNER_P: "none",
              LANTERN_P: "none", TABLE_P: "box", BENCH_P: "box", STOOL_P: "box", CRATE_P: "box", BARREL_P: "hull"}
 BUDGETS = {HERO: 6000}
-TARGET_SIZE = ((18.15, 0.05), (12.75, 0.05), (12.0, 0.01))
+TARGET_SIZE = ((17.60, 0.05), (12.90, 0.05), (12.0, 0.01))
 VIEWS = {"f34_sheet": (-30, 20), "r34_sheet": (-22, 24), "front_sheet": (0, 0), "side_sheet": (90, 0),
          "rear_sheet": (180, 0), "top_sheet": (0, 89.9)}
 EXPLODED = {POST_P: [(-8.5, -6.5, 1.6), (-8.5, 6.5, 1.6), (8.5, -6.5, 1.6), (8.5, 6.5, 1.6)],
@@ -611,7 +614,7 @@ CLOSE = {"lash_cu": dict(at=(-PX, -PY, 8.7), r=1.6, az=-35, el=12),
          "foot_cu": dict(at=(-PX, -PY, 0.8), r=1.6, az=-35, el=15),
          "fr_cu": dict(at=(PX - 0.6, -PY, 8.6), r=2.4, az=-30, el=10),
          "under_cu": dict(cam=(-4.3, -3.5, 1.5), look=(1.0, 1.0, 8.5), lens=14.0)}
-WALK = {"paths": [[(-4.85, -10.0), (-4.85, -0.5)], [(-11.0, -0.8), (-4.5, -0.8)], [(4.45, 11.0), (4.45, 1.5)],
+WALK = {"paths": [[(-4.83, -10.0), (-4.83, -0.5)], [(-11.0, -0.8), (-4.5, -0.8)], [(4.45, 11.0), (4.45, 1.5)],
                   [(11.0, 2.4), (3.9, 2.4)]],
         "ride": False, "turn": [(-5.2, -0.8, 0.0)]}
 VERIFY = dict(cls="structure", walk=WALK, sockets={HERO: ["heat_glow"], LANTERN_P: ["heat_glow"]},
