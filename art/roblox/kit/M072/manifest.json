@@ -1,0 +1,1167 @@
+{
+ "version": 1,
+ "source": "art/blender/assets/kit/FlintbornWorldKit.blend",
+ "sheet": "M072",
+ "module": null,
+ "units": "1 stud = 1 Blender unit. Sizes and offsets are in studs; set each MeshPart's Size from 'size'.",
+ "axes": "Roblox axes (Y up). Blender (x, y, z) -> Roblox (x, z, -y); an asset's front (Blender -Y) faces Roblox +Z. The asset origin is the bottom centre of its footprint: a piece's MeshPart sits at origin CFrame * CFrame.new(offset); VFX positions are relative to the same origin.",
+ "palette": {
+  "file": "palette.png",
+  "width": 512,
+  "height": 512,
+  "cell": 16,
+  "columns": 32,
+  "uv": "row i, level j: u = (j + 0.5) / columns, v = 1 - (i + 0.5) * cell / height (v up from the bottom of the image); a row's spare cells repeat its last level",
+  "rows": [
+   {
+    "key": "m072_banner",
+    "hex": "#E81C1A",
+    "levels": [
+     0.96038,
+     0.96921,
+     0.97922,
+     0.98397,
+     0.98606,
+     0.98885,
+     0.99195,
+     0.9968,
+     0.99869,
+     1.00174,
+     1.00484
+    ],
+    "used": true
+   },
+   {
+    "key": "m072_banner_deep",
+    "hex": "#8E1212",
+    "levels": [
+     0.98178,
+     1.00489,
+     1.01302
+    ],
+    "used": true
+   },
+   {
+    "key": "m072_cream",
+    "hex": "#F2E6CF",
+    "levels": [
+     0.98238,
+     0.98691,
+     0.99341,
+     0.99591,
+     1.00033,
+     1.00368,
+     1.0099,
+     1.01293
+    ],
+    "used": true
+   },
+   {
+    "key": "m072_glow",
+    "hex": "#F9D83A",
+    "levels": [
+     1.0
+    ],
+    "used": true
+   },
+   {
+    "key": "m072_iron",
+    "hex": "#545866",
+    "levels": [
+     0.95704,
+     0.96144,
+     0.96691,
+     0.97016,
+     0.97203,
+     0.974,
+     0.97729,
+     0.98064,
+     0.98379,
+     0.98591,
+     0.98811,
+     0.99237,
+     0.99412,
+     0.99612,
+     0.99997,
+     1.00363,
+     1.00558,
+     1.0097,
+     1.01329,
+     1.01511,
+     1.01769,
+     1.01843,
+     1.02091,
+     1.02374,
+     1.02623,
+     1.02762,
+     1.03131,
+     1.03701,
+     1.04386
+    ],
+    "used": true
+   },
+   {
+    "key": "m072_lantern_iron",
+    "hex": "#3A3C45",
+    "levels": [
+     0.9,
+     0.97037,
+     0.97226,
+     0.9755,
+     0.97863,
+     0.9805,
+     0.98874,
+     0.9918,
+     0.99485,
+     1.00095,
+     1.00493,
+     1.00977,
+     1.012,
+     1.0148,
+     1.01681,
+     1.01974,
+     1.02195,
+     1.0253,
+     1.02681
+    ],
+    "used": true
+   },
+   {
+    "key": "m072_leaf",
+    "hex": "#72A307",
+    "levels": [
+     0.96048,
+     0.96317,
+     0.97264,
+     0.98228,
+     0.98476,
+     0.98926,
+     1.00496,
+     1.01328,
+     1.02648,
+     1.02862,
+     1.03428
+    ],
+    "used": true
+   },
+   {
+    "key": "m072_leaf_dark",
+    "hex": "#3E6E04",
+    "levels": [
+     0.9769,
+     0.9907,
+     1.01369,
+     1.02082,
+     1.02804,
+     1.03291
+    ],
+    "used": true
+   },
+   {
+    "key": "m072_leaf_lime",
+    "hex": "#8ABA0B",
+    "levels": [
+     0.96352,
+     0.97271,
+     0.9793,
+     0.98181,
+     0.98562,
+     0.99825,
+     1.00168,
+     1.00854,
+     1.01757,
+     1.01921,
+     1.03289,
+     1.0363
+    ],
+    "used": true
+   },
+   {
+    "key": "m072_plank",
+    "hex": "#9A5F21",
+    "levels": [
+     0.96244,
+     0.96913,
+     0.98005,
+     0.98252,
+     0.98492,
+     1.00268,
+     1.00687,
+     1.011,
+     1.0133,
+     1.01501,
+     1.0185,
+     1.02527,
+     1.02796,
+     1.03778,
+     1.041,
+     1.04316,
+     1.05333,
+     1.05682,
+     1.05812,
+     1.06119,
+     1.06708,
+     1.06972
+    ],
+    "used": true
+   },
+   {
+    "key": "m072_plank_x_timber_deep_10",
+    "hex": "#965C22",
+    "levels": [
+     0.96082,
+     0.96486,
+     0.96652,
+     0.96798,
+     0.97127,
+     0.97314,
+     0.97519,
+     0.97983,
+     0.98383,
+     0.98685,
+     0.98875,
+     0.99138,
+     0.99454,
+     0.99686,
+     1.0005,
+     1.0039,
+     1.01743,
+     1.02151,
+     1.02541,
+     1.02875,
+     1.03357,
+     1.03502
+    ],
+    "used": true
+   },
+   {
+    "key": "m072_plank_x_timber_end_35",
+    "hex": "#A86C2A",
+    "levels": [
+     0.95901,
+     0.96813,
+     0.99767,
+     0.99956,
+     1.00343,
+     1.00732,
+     1.00989,
+     1.0126,
+     1.01529,
+     1.03142,
+     1.03519,
+     1.03804,
+     1.05051,
+     1.05403
+    ],
+    "used": true
+   },
+   {
+    "key": "m072_rope",
+    "hex": "#C2A058",
+    "levels": [
+     0.97672,
+     0.98484,
+     0.9883,
+     0.9952,
+     1.0,
+     1.00669,
+     1.008,
+     1.01363,
+     1.01624,
+     1.02146,
+     1.02993
+    ],
+    "used": true
+   },
+   {
+    "key": "m072_rope_deep",
+    "hex": "#9A7A40",
+    "levels": [
+     0.97672,
+     0.98484,
+     0.98832,
+     0.9952,
+     0.99999,
+     1.00667,
+     1.008,
+     1.01363,
+     1.01624,
+     1.02147,
+     1.02993
+    ],
+    "used": true
+   },
+   {
+    "key": "m072_stone",
+    "hex": "#797C8D",
+    "levels": [
+     0.93027,
+     0.93685,
+     0.94482,
+     0.94955,
+     0.95542,
+     0.96133,
+     0.96664,
+     0.96983,
+     0.9732,
+     0.97505,
+     0.97721,
+     0.98265,
+     0.99201,
+     0.99566,
+     0.99839,
+     1.00192,
+     1.00404,
+     1.00621,
+     1.00978,
+     1.01155,
+     1.01509,
+     1.01705,
+     1.01931,
+     1.02177,
+     1.02528,
+     1.02688,
+     1.03102,
+     1.0396
+    ],
+    "used": true
+   },
+   {
+    "key": "m072_stone_x_dark_50",
+    "hex": "#6D7084",
+    "levels": [
+     0.93412,
+     0.95277,
+     0.97569,
+     0.97857,
+     0.98021,
+     0.98341,
+     0.98881,
+     0.99072,
+     0.99459,
+     0.99584,
+     1.00316,
+     1.00823,
+     1.0114,
+     1.01729,
+     1.0204,
+     1.02712,
+     1.03451,
+     1.04033,
+     1.06563
+    ],
+    "used": true
+   },
+   {
+    "key": "m072_timber",
+    "hex": "#9A5E21",
+    "levels": [
+     0.95477,
+     0.95686,
+     0.96835,
+     0.97508,
+     0.98371,
+     0.98613,
+     0.98889,
+     1.00208,
+     1.01003,
+     1.01694
+    ],
+    "used": true
+   },
+   {
+    "key": "m072_timber_end",
+    "hex": "#C2843A",
+    "levels": [
+     0.95477,
+     0.95686,
+     0.96749,
+     0.96998,
+     0.97508,
+     0.98058,
+     0.98371,
+     0.98613,
+     0.98966,
+     0.99285,
+     0.99939,
+     1.00208,
+     1.01003,
+     1.01514,
+     1.0246,
+     1.03805
+    ],
+    "used": true
+   },
+   {
+    "key": "m072_timber_x_deep_15",
+    "hex": "#935A22",
+    "levels": [
+     1.01049,
+     1.03216
+    ],
+    "used": true
+   },
+   {
+    "key": "m072_timber_x_end_25",
+    "hex": "#A46827",
+    "levels": [
+     0.96548,
+     0.98225
+    ],
+    "used": true
+   },
+   {
+    "key": "m072_timber_x_end_50",
+    "hex": "#AE712E",
+    "levels": [
+     0.96835,
+     0.98966
+    ],
+    "used": true
+   }
+  ]
+ },
+ "water": {
+  "keys": {},
+  "material": "SmoothPlastic",
+  "tile_studs": 16.0,
+  "uv": "Water pieces carry their own UVs (not palette cells): a box projection in studs from the asset origin, one texture tile per tile_studs. Up-facing faces: u = X / tile, v = Z / tile (mod 1, Roblox axes); faces toward +-Z use (X, -Y), toward +-X use (-Z, -Y). Set MeshPart.TextureID to the uploaded texture (it wraps), Transparency from the piece, Material SmoothPlastic, CastShadow false. Assets placed on a tile_studs grid continue the pattern seamlessly.",
+  "flow": "Pieces of an asset with a water_flow socket carry flow = {direction (unit, Roblox X/Z), speed (studs/s), socket}. To animate, use a Texture (Face Top, StudsPerTileU/V = tile_studs) on the piece instead of TextureID and move OffsetStudsU/V along direction * speed each frame."
+ },
+ "assets": [
+  {
+   "name": "TimberGate",
+   "sheet": "M072",
+   "subject": "Timber Gate",
+   "role": "hero",
+   "size": [
+    18.6951,
+    11.08,
+    4.8697
+   ],
+   "tris": 5448,
+   "budget": 6000,
+   "collision": {
+    "CollisionFidelity": "PreciseConvexDecomposition",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "precise"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TimberGate.glb",
+     "kind": "solid",
+     "tris": 5400,
+     "offset": [
+      0.0,
+      5.54,
+      0.0
+     ],
+     "size": [
+      18.6951,
+      11.08,
+      4.8697
+     ]
+    },
+    {
+     "file": "meshes/TimberGate_glow_m072_glow.glb",
+     "kind": "glow",
+     "tris": 48,
+     "offset": [
+      -0.0016,
+      5.175,
+      0.6793
+     ],
+     "size": [
+      17.24,
+      1.06,
+      0.74
+     ],
+     "key": "m072_glow",
+     "color": "#F9D83A",
+     "material": "Neon",
+     "collision": {
+      "CollisionFidelity": "Box",
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CastShadow": false
+     }
+    }
+   ],
+   "vfx": [
+    {
+     "name": "VFX_TimberGate_heat_glow_1",
+     "kind": "heat_glow",
+     "position": [
+      -5.1016,
+      5.175,
+      0.6793
+     ],
+     "vfx_scale": 1.0,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Halo",
+        "texture": "glow_soft",
+        "color": [
+         "#FFC23A",
+         "#FF9A1E"
+        ],
+        "size": [
+         1.2,
+         1.5
+        ],
+        "transparency": [
+         0.65,
+         1.0
+        ],
+        "lifetime": [
+         1.0,
+         1.5
+        ],
+        "rate": 2,
+        "speed": [
+         0,
+         0.05
+        ],
+        "spread": 0,
+        "light_emission": 1.0
+       }
+      ],
+      "light": {
+       "color": "#FFB347",
+       "brightness": 1.0,
+       "range": 10,
+       "flicker": true
+      }
+     }
+    },
+    {
+     "name": "VFX_TimberGate_heat_glow_2",
+     "kind": "heat_glow",
+     "position": [
+      -8.2516,
+      5.175,
+      0.6793
+     ],
+     "vfx_scale": 1.0,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Halo",
+        "texture": "glow_soft",
+        "color": [
+         "#FFC23A",
+         "#FF9A1E"
+        ],
+        "size": [
+         1.2,
+         1.5
+        ],
+        "transparency": [
+         0.65,
+         1.0
+        ],
+        "lifetime": [
+         1.0,
+         1.5
+        ],
+        "rate": 2,
+        "speed": [
+         0,
+         0.05
+        ],
+        "spread": 0,
+        "light_emission": 1.0
+       }
+      ],
+      "light": {
+       "color": "#FFB347",
+       "brightness": 1.0,
+       "range": 10,
+       "flicker": true
+      }
+     }
+    },
+    {
+     "name": "VFX_TimberGate_heat_glow_3",
+     "kind": "heat_glow",
+     "position": [
+      5.0984,
+      5.175,
+      0.6793
+     ],
+     "vfx_scale": 1.0,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Halo",
+        "texture": "glow_soft",
+        "color": [
+         "#FFC23A",
+         "#FF9A1E"
+        ],
+        "size": [
+         1.2,
+         1.5
+        ],
+        "transparency": [
+         0.65,
+         1.0
+        ],
+        "lifetime": [
+         1.0,
+         1.5
+        ],
+        "rate": 2,
+        "speed": [
+         0,
+         0.05
+        ],
+        "spread": 0,
+        "light_emission": 1.0
+       }
+      ],
+      "light": {
+       "color": "#FFB347",
+       "brightness": 1.0,
+       "range": 10,
+       "flicker": true
+      }
+     }
+    },
+    {
+     "name": "VFX_TimberGate_heat_glow_4",
+     "kind": "heat_glow",
+     "position": [
+      8.2484,
+      5.175,
+      0.6793
+     ],
+     "vfx_scale": 1.0,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Halo",
+        "texture": "glow_soft",
+        "color": [
+         "#FFC23A",
+         "#FF9A1E"
+        ],
+        "size": [
+         1.2,
+         1.5
+        ],
+        "transparency": [
+         0.65,
+         1.0
+        ],
+        "lifetime": [
+         1.0,
+         1.5
+        ],
+        "rate": 2,
+        "speed": [
+         0,
+         0.05
+        ],
+        "spread": 0,
+        "light_emission": 1.0
+       }
+      ],
+      "light": {
+       "color": "#FFB347",
+       "brightness": 1.0,
+       "range": 10,
+       "flicker": true
+      }
+     }
+    }
+   ],
+   "notes": "Timber gate (sheet 072), closed: two pillars (1.70-square main post, outer post, cap block, front bolster, rear rail and diagonal brace, rope collar and lashing), a 16.5 lintel with rope wraps, two plank leaves with iron straps, bolts, ring handles and hinge knuckles on hinge blocks (axes |x| 4.20, y 0.30; open 90 deg inward), a latch bar on the back, four Neon lanterns (heat_glow), two red banners with the cream diamond, rock bases with leaf clumps. Opening 8.70 between the posts, 8.22 under the lintel (7.40 under the bolster ends); open, 7.2 clear between the leaves. Hinges stored as m072_hinges."
+  },
+  {
+   "name": "TimberGateBanner",
+   "sheet": "M072",
+   "subject": "Timber Gate",
+   "role": "part",
+   "size": [
+    2.75,
+    5.12,
+    0.4574
+   ],
+   "tris": 268,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TimberGateBanner.glb",
+     "kind": "solid",
+     "tris": 268,
+     "offset": [
+      0.0,
+      2.56,
+      0.0
+     ],
+     "size": [
+      2.75,
+      5.12,
+      0.4574
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Banner: knobbed rod, hem sleeve, red swallowtail with cream stripes and double diamond"
+  },
+  {
+   "name": "TimberGateHinge",
+   "sheet": "M072",
+   "subject": "Timber Gate",
+   "role": "part",
+   "size": [
+    0.297,
+    1.32,
+    0.36
+   ],
+   "tris": 72,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TimberGateHinge.glb",
+     "kind": "solid",
+     "tris": 72,
+     "offset": [
+      0.0,
+      0.66,
+      0.0
+     ],
+     "size": [
+      0.297,
+      1.32,
+      0.36
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Hinge Block & Pin: iron plate, two barrels on the pin axis, pin head"
+  },
+  {
+   "name": "TimberGateLantern",
+   "sheet": "M072",
+   "subject": "Timber Gate",
+   "role": "part",
+   "size": [
+    1.07,
+    2.92,
+    1.07
+   ],
+   "tris": 164,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TimberGateLantern.glb",
+     "kind": "solid",
+     "tris": 152,
+     "offset": [
+      0.0,
+      1.46,
+      0.0
+     ],
+     "size": [
+      1.07,
+      2.92,
+      1.07
+     ]
+    },
+    {
+     "file": "meshes/TimberGateLantern_glow_m072_glow.glb",
+     "kind": "glow",
+     "tris": 12,
+     "offset": [
+      0.0,
+      0.675,
+      0.0
+     ],
+     "size": [
+      0.74,
+      1.06,
+      0.74
+     ],
+     "key": "m072_glow",
+     "color": "#F9D83A",
+     "material": "Neon",
+     "collision": {
+      "CollisionFidelity": "Box",
+      "CanCollide": false,
+      "CanQuery": false,
+      "CanTouch": false,
+      "CastShadow": false
+     }
+    }
+   ],
+   "vfx": [
+    {
+     "name": "VFX_TimberGateLantern_heat_glow_1",
+     "kind": "heat_glow",
+     "position": [
+      0.0,
+      0.675,
+      0.0
+     ],
+     "vfx_scale": 1.0,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Halo",
+        "texture": "glow_soft",
+        "color": [
+         "#FFC23A",
+         "#FF9A1E"
+        ],
+        "size": [
+         1.2,
+         1.5
+        ],
+        "transparency": [
+         0.65,
+         1.0
+        ],
+        "lifetime": [
+         1.0,
+         1.5
+        ],
+        "rate": 2,
+        "speed": [
+         0,
+         0.05
+        ],
+        "spread": 0,
+        "light_emission": 1.0
+       }
+      ],
+      "light": {
+       "color": "#FFB347",
+       "brightness": 1.0,
+       "range": 10,
+       "flicker": true
+      }
+     }
+    }
+   ],
+   "notes": "Lantern: dark iron lantern, Neon amber glass, hanging ring and hook (heat_glow halo)"
+  },
+  {
+   "name": "TimberGateLatchBar",
+   "sheet": "M072",
+   "subject": "Timber Gate",
+   "role": "part",
+   "size": [
+    2.826,
+    0.4,
+    0.4
+   ],
+   "tris": 84,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TimberGateLatchBar.glb",
+     "kind": "solid",
+     "tris": 84,
+     "offset": [
+      0.0,
+      0.2,
+      0.0
+     ],
+     "size": [
+      2.826,
+      0.4,
+      0.4
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Latch Bar: round drop bar with knobbed ends, rests in the leaves' keepers"
+  },
+  {
+   "name": "TimberGateLeafLeft",
+   "sheet": "M072",
+   "subject": "Timber Gate",
+   "role": "part",
+   "size": [
+    4.297,
+    7.38,
+    0.955
+   ],
+   "tris": 592,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TimberGateLeafLeft.glb",
+     "kind": "solid",
+     "tris": 592,
+     "offset": [
+      2.0215,
+      3.69,
+      0.1775
+     ],
+     "size": [
+      4.297,
+      7.38,
+      0.955
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Left Gate Leaf: four planks, iron straps with bolts both faces, ring handle, latch keeper, hinge knuckles; origin on the hinge axis (swing about local Z, opens +90 deg)"
+  },
+  {
+   "name": "TimberGateLeafRight",
+   "sheet": "M072",
+   "subject": "Timber Gate",
+   "role": "part",
+   "size": [
+    4.297,
+    7.38,
+    0.955
+   ],
+   "tris": 592,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TimberGateLeafRight.glb",
+     "kind": "solid",
+     "tris": 592,
+     "offset": [
+      -2.0215,
+      3.69,
+      0.1775
+     ],
+     "size": [
+      4.297,
+      7.38,
+      0.955
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Right Gate Leaf: four planks, iron straps with bolts both faces, ring handle, latch keeper, hinge knuckles; origin on the hinge axis (swing about local Z, opens -90 deg)"
+  },
+  {
+   "name": "TimberGateLintel",
+   "sheet": "M072",
+   "subject": "Timber Gate",
+   "role": "part",
+   "size": [
+    16.64,
+    3.1327,
+    1.8453
+   ],
+   "tris": 356,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TimberGateLintel.glb",
+     "kind": "solid",
+     "tris": 356,
+     "offset": [
+      0.0,
+      1.5663,
+      0.0
+     ],
+     "size": [
+      16.64,
+      3.1327,
+      1.8453
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Top Beam (Lintel): 16.5 x 1.30 x 1.44 beam, the two cap blocks and the inner rope wraps"
+  },
+  {
+   "name": "TimberGatePost",
+   "sheet": "M072",
+   "subject": "Timber Gate",
+   "role": "part",
+   "size": [
+    4.8,
+    8.24,
+    3.5841
+   ],
+   "tris": 638,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TimberGatePost.glb",
+     "kind": "solid",
+     "tris": 638,
+     "offset": [
+      0.0,
+      4.12,
+      0.0
+     ],
+     "size": [
+      4.8,
+      8.24,
+      3.5841
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Upright Post: main post 1.70 sq to 8.24, outer post, front bolster, rear rail, diagonal brace, three-turn rope collar and the rail lashing"
+  },
+  {
+   "name": "TimberGateRockBase",
+   "sheet": "M072",
+   "subject": "Timber Gate",
+   "role": "part",
+   "size": [
+    6.0333,
+    1.8357,
+    2.7189
+   ],
+   "tris": 230,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TimberGateRockBase.glb",
+     "kind": "solid",
+     "tris": 230,
+     "offset": [
+      0.0,
+      0.9178,
+      0.0
+     ],
+     "size": [
+      6.0333,
+      1.8357,
+      2.7189
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Rock Base: grey faceted rock with two leaf clumps"
+  },
+  {
+   "name": "TimberGateRopeWrap",
+   "sheet": "M072",
+   "subject": "Timber Gate",
+   "role": "part",
+   "size": [
+    2.2453,
+    0.86,
+    2.2453
+   ],
+   "tris": 360,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TimberGateRopeWrap.glb",
+     "kind": "solid",
+     "tris": 360,
+     "offset": [
+      0.0,
+      0.43,
+      0.0
+     ],
+     "size": [
+      2.2453,
+      0.86,
+      2.2453
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Rope Wrap: three-turn twisted rope coil for a 1.70-square post"
+  }
+ ],
+ "stats": {
+  "assets": 11,
+  "pieces": 13,
+  "solid": 11,
+  "water": 0,
+  "glow": 2,
+  "tris": 8804,
+  "vfxSockets": 5,
+  "paletteColours": 21,
+  "paletteLevels": 259,
+  "meshBytes": 747104
+ },
+ "problems": []
+}
