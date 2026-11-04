@@ -120,15 +120,13 @@ function InventoryService.TakeAll(player: Player, costs: { [string]: number })
 	return taken
 end
 
--- Removes and returns the entry in a hotbar or backpack slot, unequipping it.
+-- Removes and returns the entry in a hotbar or backpack slot (a held slot stays
+-- held, now bare hands).
 function InventoryService.TakeAt(player: Player, area: string, index: number)
 	local entry = entries[player]
 	local item = entry and InventoryRules.TakeAt(entry.inventory, area, index)
 	if item == nil then
 		return nil
-	end
-	if area == InventoryRules.Hotbar and entry.equipped == index then
-		entry.equipped = nil
 	end
 	InventoryService.Publish(player)
 	return item
@@ -208,7 +206,8 @@ end
 local function startRun(player: Player, _character, items)
 	-- The lobby's hotbar and worn armour come back as they were (loadoutSlot tags).
 	local inventory, leftovers = InventoryRules.FromLoadout(items or {})
-	entries[player] = { inventory = inventory, equipped = nil }
+	-- A hotbar slot is always held (an empty one is bare hands), the first at start.
+	entries[player] = { inventory = inventory, equipped = 1 }
 	if #leftovers > 0 then
 		keepInLobby(player, leftovers)
 	end
@@ -229,14 +228,14 @@ local function move(player: Player, fromArea: any, fromIndex: any, toArea: any, 
 	if not InventoryRules.Move(entry.inventory, fromArea, fromIndex, toArea, toIndex) then
 		return false, "InvalidMove"
 	end
-	-- The held item stays held wherever it moves; a held slot that swapped its item
-	-- out for one from the backpack puts it away.
+	-- Within the hotbar the held item stays held where it moves; otherwise the held
+	-- slot stays held, with whatever it holds now (empty: bare hands).
 	local hotbar = InventoryRules.Hotbar
-	if entry.equipped then
-		if fromArea == hotbar and fromIndex == entry.equipped then
-			entry.equipped = if toArea == hotbar then toIndex else nil
-		elseif toArea == hotbar and toIndex == entry.equipped then
-			entry.equipped = if fromArea == hotbar then fromIndex else nil
+	if fromArea == hotbar and toArea == hotbar then
+		if fromIndex == entry.equipped then
+			entry.equipped = toIndex
+		elseif toIndex == entry.equipped then
+			entry.equipped = fromIndex
 		end
 	end
 	InventoryService.Publish(player)
@@ -248,13 +247,11 @@ local function equip(player: Player, index: any)
 	if entry == nil then
 		return false, "NotInRun"
 	end
-	if index == nil then
-		entry.equipped = nil
-	elseif type(index) == "number" and index % 1 == 0 and index >= 1 and index <= InventoryRules.Size("hotbar") then
-		entry.equipped = if entry.equipped == index then nil else index
-	else
+	-- Any hotbar slot, filled or empty (bare hands); pressing the held one keeps it.
+	if type(index) ~= "number" or index % 1 ~= 0 or index < 1 or index > InventoryRules.Size("hotbar") then
 		return false, "BadRequest"
 	end
+	entry.equipped = index
 	InventoryService.Publish(player)
 	return true, nil
 end
@@ -303,9 +300,6 @@ function InventoryService.Start()
 		end
 		if not InventoryRules.UnequipArmorTo(entry.inventory, slot, area, index) then
 			return false, "SlotTaken"
-		end
-		if area == InventoryRules.Hotbar and entry.equipped == index then
-			entry.equipped = nil
 		end
 		InventoryService.Publish(player)
 		return true, nil

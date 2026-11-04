@@ -118,9 +118,10 @@ compass letters included).
 
 - Hotbar keys (Hotbar1–6 binds) and slot presses select and use a slot
   (`InventoryController.ActivateHotbar`); the right bumper steps the selection.
-  A consumable's slot is held like a tool (GDD §59): the attack input (click,
-  the touch attack button, RT) eats or drinks it, and the same key or tap again
-  puts it away.
+  A hotbar slot is always held and highlighted (GDD 1.31): slot 1 at the start,
+  an empty slot is bare hands, and the held slot's key again keeps it. A
+  consumable's slot is held like a tool (GDD §59): the attack input (click, the
+  touch attack button, RT) eats or drinks it.
 - While the local player eats or drinks, `ConsumeController` shows a kit stat
   bar (food fill, the item kind's icon, "Eating Cooked Meat") 300 × 46, centred
   52 px under the screen centre, where the bow draw bar sits (one item is held

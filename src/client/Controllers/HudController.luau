@@ -58,12 +58,10 @@ HudController.MENU = {
 	{ "Progress", "trophy", "Progression", "ProgressionController", "Toggle" },
 }
 
--- The selected hotbar slot, or nil for none. The selection follows the equipped
--- slot (and clears when the held item is put away, used up or dropped), and
--- every key press or tap on a slot also uses it. Nothing is selected until
--- something is (empty hands show no highlight), and a key or tap on an empty
--- slot puts the held item away and clears it.
-HudController.Selected = nil :: number?
+-- The selected hotbar slot. A slot is always held in a run (slot 1 at start; an
+-- empty one is bare hands), so a slot is always selected: the selection follows
+-- the held slot, and every key press or tap on a slot selects and uses it.
+HudController.Selected = 1 :: number?
 
 -- Status text ticks fast (the medicine countdown); party, objective and event
 -- panels refresh a little slower.
@@ -549,17 +547,6 @@ local function selectSlot(index: number?)
 	widgets.bottom:Select(index)
 end
 
--- What a key press or tap on hotbar slot `index` selects: the slot when it holds
--- something, else nothing (it empties the hands).
-local function pressedSlot(index: number): number?
-	for _, slot in InventoryController.Snapshot.slots do
-		if slot.area == "hotbar" and slot.index == index then
-			return index
-		end
-	end
-	return nil
-end
-
 local function bindHotbar(active: boolean)
 	if active == hotbarBound then
 		return
@@ -588,12 +575,9 @@ local function bindHotbar(active: boolean)
 			local index = slotKeys[input.KeyCode]
 			local step = HOTBAR_STEP_KEYS[input.KeyCode]
 			if index then
-				selectSlot(pressedSlot(index))
+				selectSlot(index)
 			elseif step then
-				-- From no selection, a step forward lands on the first slot and a
-				-- step back on the last.
-				local from = HudController.Selected or (if step > 0 then 0 else count + 1)
-				selectSlot(HudModel.HotbarStep(from, step, count))
+				selectSlot(HudModel.HotbarStep(HudController.Selected or 1, step, count))
 			end
 		end
 		return Enum.ContextActionResult.Pass
@@ -845,24 +829,18 @@ function HudController.Start()
 	-- selection. The mouse wheel stays on camera zoom (GDD Q58). Slot badges name
 	-- the bound keys and follow rebinds.
 	local count = layout.bottom.hotbar.count
-	-- The equipped slot of the last snapshot: when it goes from a slot to none
-	-- (put away with its key again, used up or dropped) the selection clears.
-	local held = nil
 	local function showItems(snapshot)
 		widgets.bottom:SetSlotItems(HudController.HotbarItems(snapshot, count))
 		local equipped = snapshot.equipped
 		if equipped and equipped ~= HudController.Selected then
 			selectSlot(equipped)
-		elseif equipped == nil and held ~= nil then
-			selectSlot(nil)
 		end
-		held = equipped
 	end
 	InventoryController.Changed:Connect(showItems)
 	-- Fills freshly mounted regions (at start and after a remount).
 	local function fill()
 		widgets.bottom.SlotPressed:Connect(function(index)
-			selectSlot(pressedSlot(index))
+			selectSlot(index)
 			task.spawn(InventoryController.ActivateHotbar, index)
 		end)
 		-- Hotbar items drag to other hotbar slots, and to and from the Inventory

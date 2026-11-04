@@ -239,7 +239,7 @@ follows the lobby's other windows (not specified by this reference).
 | DetailIcon / ItemName | selected item art and name | ItemCatalog | — |
 | ItemDescription | flavour text | **none**: ItemCatalog has no description field | open question 6 |
 | Stat rows | Harvest Power, Attack Speed, Durability | `ItemInfo.StatRows(item)` → {icon, label, value} rows (the older `ItemInfo.Stats` chips this spec first read are removed) | **labels and values differ** from the mock; **no durability** in the catalog (open question 7) |
-| EquipButton | equips the selected item | world: `InventoryController` EQUIP/USE/PUT AWAY; lobby: no equip action exists (the old lobby screen had STORE/TAKE) | open question 8 |
+| EquipButton | equips the selected item | world: `InventoryController` EQUIP/USE (HELD, disabled, for the held slot); lobby: no equip action exists (the old lobby screen had STORE/TAKE) | open question 8 |
 
 ## Vault tab (assumptions)
 

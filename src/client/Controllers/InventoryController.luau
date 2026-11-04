@@ -135,7 +135,8 @@ end
 local function activateHotbar(index: number)
 	local slot = slotAt("hotbar", index)
 	if slot == nil then
-		Remotes.Invoke("EquipSlot", nil)
+		-- An empty slot is held as bare hands.
+		Remotes.Invoke("EquipSlot", index)
 		return
 	end
 	local def = ItemCatalog.Get(slot.catalogId)
@@ -359,13 +360,16 @@ local function actionsFor(choice, slot)
 	if choice.area == "hotbar" then
 		local using = def and def.family == ItemCatalog.Families.Consumable
 		local held = InventoryController.Snapshot.equipped == choice.index
+		-- A hotbar slot is always held: the held one shows as such.
+		local equipped = held and not using and not (def and def.placeable)
 		main = {
 			id = "activate",
 			label = if using
 				then "Use"
 				elseif def and def.placeable then "Place"
-				elseif held then "Put Away"
+				elseif held then "Held"
 				else "Equip",
+			enabled = not equipped,
 		}
 	elseif choice.area == "armor" then
 		main = { id = "takeOff", label = "Take Off" }
