@@ -28,6 +28,8 @@ Drag.THRESHOLD = 6
 -- far it may wander meanwhile (further is a scroll).
 Drag.HOLD_SECONDS = 0.3
 Drag.TOUCH_SLOP = 12
+-- How far above a finger its ghost draws, in ghost heights.
+Drag.TOUCH_LIFT = 0.75
 -- The picture under the pointer: a share of the source slot's size, and its fade.
 Drag.GHOST_SCALE = 0.85
 Drag.GHOST_FADE = 0.15
@@ -138,6 +140,10 @@ local function place(point: Vector2)
 		-- Offsets inside the drag gui count from its own corner.
 		local at = point - active.gui.AbsolutePosition
 		local size = active.ghost.AbsoluteSize
+		if active.touch then
+			-- Above the finger, which would hide it.
+			at -= Vector2.new(0, size.Y * Drag.TOUCH_LIFT)
+		end
 		active.ghost.Position = UDim2.fromOffset(at.X - size.X / 2, at.Y - size.Y / 2)
 	end
 end
@@ -171,6 +177,10 @@ local function begin(point: Vector2)
 	gui.IgnoreGuiInset = true
 	gui.ResetOnSpawn = false
 	gui.DisplayOrder = Tokens.Order("drag")
+	-- The ghost is placed in screen px, so the menu UiScale (SettingsController,
+	-- below 1 on short screens such as phones) must not scale it away from the
+	-- pointer.
+	gui:SetAttribute("FitsItself", true)
 	pcall(function()
 		gui.ScreenInsets = Enum.ScreenInsets.None
 	end)
