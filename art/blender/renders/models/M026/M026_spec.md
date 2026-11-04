@@ -1364,3 +1364,43 @@ minor and listed below with cheap fixes the main session can take or leave.
 ## Main session after verification round 2 (2026-10-28)
 
 Ruling: the `m026_cut_top` key is accepted. The sheet paints stub tops paler than the cut face even in its unshadowed exploded cell, so it is a calibrated region key, not lighting compensation; it is on the Studio check list. Tried minor 1 (`GROUND_HUB` −0.05): the floor cut split the ground clumps off the hero (3 shells, 11 self-hits), so it was reverted to 0.14 and the hover is recorded. The final rebuild in the kit file gave a hero of 2266 tris, one shell, `problems` empty. Export: 0 problems.
+
+## Touch-up for the restyled sheet (2026-11-04)
+
+The restyled sheet keeps the design but draws clean faceted bark ("Broad, flat-shaded faces; no texture or wood grain"): no dark slits and no raised plates or step ledges. Builder change only, everything else as built:
+- `SLITS = ()`: no V-groove slits (the old list is kept in a comment); the groove machinery makes nothing from an empty list.
+- `PLATE["count"]` 14 → 0 and `LEDGES = ()`: no raised plates and no step ledges at the cut end, so the trunk is the plain 11-sided lofted log.
+- The hero and trunk notes no longer mention plates and slits.
+- Unchanged: the knot hole (still `m026_bark_dark`, 5 faces), the bark rim on the cut end, the broad bark tone patches, the cut face, both stubs, the knot and the clumps.
+
+| | Before | After |
+| --- | --- | --- |
+| FallenSoftwoodLog (hero) | 2266 | 1980 |
+| FallenSoftwoodLogTrunk | 956 | 678 |
+| Trunk raw (before the knot hole) | 940 | 634 |
+| CutEnd / StubLarge / StubSmall / LeafClump | 124 / 162 / 108 / 198 | unchanged |
+
+- `m026.build()` problems: none (slits 0 of 0, plates 0; trunk and hero 1 shell, 0 non-manifold, 0 bowties).
+- `kit_verify.run(objs, cls="asset")` on the hero and five parts: no problems (before and after).
+- Removed: no part, socket or material. `m026_bark_dark` stays in use on the knot hole and in the cut-end rim mix.
+
+## Touch-up verification (2026-11-04)
+
+**Result: PASS, 8/10.** The trunk is clean faceted bark: no V-groove slits, raised plates or step ledges. Nothing else changed.
+
+**Technical** (`kit_verify.run`, cls asset, on the work copy; the committed kit objects were appended read-only for comparison):
+- **0 problems** on the hero and all five parts, before and after.
+- FallenSoftwoodLog 1980 tris (was 2266), 9.33 × 7.10 × 4.81, 1 shell, thinnest corner 5.02°. Trunk 678 (was 956), 1 shell.
+- CutEnd 124, StubLarge 162, StubSmall 108 and LeafClump 198 are identical to the committed parts (tris, sizes, thinnest corners).
+- No sockets and no glow keys; no part or material removed. `m026_bark_dark` stays on the knot hole.
+- UVs clean (gap 0.016, border 0.008, no overlaps or flips).
+
+**Against the sheet** (compare at f34 (−34, 12) and r34 (130, 12), new and committed side by side; high-resolution shots at (−34, 12), (−60, 40) and (150, 25), `<temp>/.../M026/`):
+- The committed build's dark slits and stepped plates (clear in its f34 and r34) are gone. The trunk reads as the sheet's plain 11-sided faceted log, with the knot hole and knot nub kept.
+- **Colours** (rendered medians, f34): bark #845940 against the sheet's #8B6046; cut face #E9C494 against #EECA9A; leaves #569619 against #5EA01A. All unchanged from the committed build (#835940 / #E9C494 / #579619).
+- f34 content W : H 1.642 (sheet 1.825; committed 1.623).
+
+**Blockers:** none.
+
+**Minors:**
+1. Pre-existing: the broad bark tone patches read as faint bands round the log. The restyled sheet's bark is nearly one tone. Optional: lower the patch contrast.

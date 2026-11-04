@@ -284,9 +284,11 @@ def _grid():
 # column lines (the line's vertices split into a low-side, a high-side and a bottom copy; a midpoint on every band),
 # pointed at both ends: 0.12 wide at the surface and 0.10 deep at its middle. >= 6 on the front / top half
 # (90-235 deg, the hero's side); the long one low on the front at t .4-.65.
-SLITS = ((-3.30, 160.0, 2, 1.0), (-2.45, 207.0, 2, 1.0), (-1.45, 122.0, 1, 0.9), (0.55, 222.0, 3, 1.0),
-         (1.95, 150.0, 2, 1.0), (2.85, 196.0, 2, 0.9), (3.30, 114.0, 1, 0.9), (-1.20, 40.0, 2, 1.0),
-         (2.00, 18.0, 2, 1.0))
+# Touch-up 2026-11-04: the restyled sheet draws clean faceted bark ("no texture or wood grain"): no slits. The
+# machinery stays (an empty list makes no groove); the earlier list was
+# ((-3.30, 160.0, 2, 1.0), (-2.45, 207.0, 2, 1.0), (-1.45, 122.0, 1, 0.9), (0.55, 222.0, 3, 1.0),
+#  (1.95, 150.0, 2, 1.0), (2.85, 196.0, 2, 0.9), (3.30, 114.0, 1, 0.9), (-1.20, 40.0, 2, 1.0), (2.00, 18.0, 2, 1.0))
+SLITS = ()
 SLIT = dict(width=0.12, depth=0.10, wpow=0.8, dpow=0.6)
 # round 2: the hole moved 0.85 toward -X (was x 3.85) to leave the crest at x 3.7 for the BR clump's hub
 KNOT_HOLE = dict(x=3.0, th=96.0, r=0.175, depth=0.12, above=0.08, seed=26011)
@@ -314,11 +316,12 @@ def _small_end():
     return _mix(k1, k2, t), SMALL_END[1]
 STUB_FOOT = 0.18       # the flared ring this far out along the stub: a ring lying on the bark left a sliver
 
-PLATE = dict(seed=26031, count=14, tries=1500, levels=(0.07, 0.10), bands=(1, 2, 2, 3), cols=(2, 3, 3, 4),
+# (touch-up 2026-11-04: count 14 -> 0 and no ledges: the restyled sheet's bark has no raised plates or step ledges)
+PLATE = dict(seed=26031, count=0, tries=1500, levels=(0.07, 0.10), bands=(1, 2, 2, 3), cols=(2, 3, 3, 4),
              bottom=(228.0, 312.0), stub_clear=0.95, knot_clear=0.75, hole_clear=0.45)
 PLATE_SHIFT = 0.3       # the most a plate's end slides inward along the log at one column (studs)
 # the two short step ledges on the top near the cut end (spec 1.4): (band, first half-column angle deg, width)
-LEDGES = ((0, 100.0, 2), (0, 145.0, 2))
+LEDGES = ()             # was ((0, 100.0, 2), (0, 145.0, 2))
 
 
 def _cell_centre(i, j):
@@ -1300,11 +1303,11 @@ def hero(a):
 
 
 NOTES = {
-    HERO: "fallen softwood log: a long chunky 11-sided bark log with raised bark plates, step ledges and dark slits, "
+    HERO: "fallen softwood log: a long chunky 11-sided log of clean faceted bark, "
           "a pale ringed flush cut end in a thin bark rim at one end and a blunt faceted bark dome at the other, a "
           "large leaning branch stub with a pale broken top and a knot nub, a small stub down to the ground with a "
           "pale end, four bright six-leaf flat star clumps; one closed mesh, flat contact strip. No VFX",
-    "FallenSoftwoodLogTrunk": "Main Log (reusable): 11-sided bark log with raised plates, slits, a knot hole, a pale "
+    "FallenSoftwoodLogTrunk": "Main Log (reusable): 11-sided faceted bark log with a knot hole, a pale "
                               "ringed flush cut face with a chamfer and a blunt bark dome at the far end",
     "FallenSoftwoodLogCutEnd": "Cut-End Insert (reusable): 0.38-thick 11-sided pale disc, painted rings, chamfered "
                                "edge",
