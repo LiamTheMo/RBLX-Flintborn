@@ -17,9 +17,9 @@
     "key": "m012_amber_dark",
     "hex": "#924A0E",
     "levels": [
-     0.96982,
-     0.97599,
-     0.99566
+     0.95748,
+     0.98684,
+     0.99561
     ],
     "used": true
    },
@@ -27,15 +27,11 @@
     "key": "m012_amber_dark_x_amber_mid_25",
     "hex": "#AB5210",
     "levels": [
-     0.96166,
-     0.96929,
-     0.97896,
-     0.98436,
-     0.98739,
-     0.99131,
-     0.99808,
-     1.00553,
-     1.00842
+     0.97948,
+     0.98233,
+     0.98488,
+     0.98808,
+     0.9971
     ],
     "used": true
    },
@@ -43,14 +39,13 @@
     "key": "m012_amber_dark_x_amber_mid_50",
     "hex": "#C45912",
     "levels": [
-     0.94923,
-     0.96616,
-     0.97593,
-     0.98215,
-     0.98619,
-     0.99133,
+     0.96712,
+     0.96944,
+     0.97599,
+     0.98383,
+     0.99308,
      0.99593,
-     1.00655
+     1.00553
     ],
     "used": true
    },
@@ -58,50 +53,30 @@
     "key": "m012_amber_dark_x_amber_mid_75",
     "hex": "#DD6014",
     "levels": [
-     0.961,
-     0.96991,
-     0.97956,
-     0.98298,
-     0.98731,
-     0.99362
-    ],
-    "used": true
-   },
-   {
-    "key": "m012_amber_glow",
-    "hex": "#FDB76E",
-    "levels": [
-     0.96288,
-     0.97887,
-     0.98112,
-     0.98591,
-     0.98969,
-     0.99559,
-     0.99846
+     0.96616,
+     0.9747,
+     0.99003,
+     0.99392,
+     0.99606
     ],
     "used": true
    },
    {
     "key": "m012_amber_light",
-    "hex": "#FDAE30",
+    "hex": "#FDB348",
     "levels": [
+     0.94923,
      0.96288,
-     0.97872,
-     0.98217,
-     0.98625,
-     0.98975,
-     0.99341,
-     0.99594
-    ],
-    "used": true
-   },
-   {
-    "key": "m012_amber_light_x_amber_glow_50",
-    "hex": "#FDB24F",
-    "levels": [
+     0.97154,
+     0.97197,
      0.97528,
+     0.97878,
+     0.98181,
+     0.98663,
+     0.98953,
      0.99204,
-     0.99587
+     0.99591,
+     0.99846
     ],
     "used": true
    },
@@ -109,70 +84,43 @@
     "key": "m012_amber_mid",
     "hex": "#F66816",
     "levels": [
-     0.94923,
-     0.9621,
-     0.97583,
-     0.97899,
-     0.98385,
-     0.98696,
-     0.99112,
-     0.99563,
-     1.00553,
-     1.00842
+     0.98563,
+     0.99391,
+     1.01022,
+     1.01851
     ],
     "used": true
    },
    {
     "key": "m012_amber_mid_x_amber_light_25",
-    "hex": "#F87A1C",
+    "hex": "#F87B22",
     "levels": [
-     0.94923,
-     0.9621,
-     0.96616,
-     0.97152,
-     0.97572,
-     0.97888,
-     0.98242,
-     0.98574,
-     0.9874,
-     0.98962,
-     0.99593,
-     0.99846,
-     1.00629,
-     1.00842
+     0.98663
     ],
     "used": true
    },
    {
     "key": "m012_amber_mid_x_amber_light_50",
-    "hex": "#FA8B23",
+    "hex": "#FA8E2F",
     "levels": [
-     0.96288,
-     0.96616,
-     0.97167,
-     0.97579,
-     0.97972,
-     0.98293,
-     0.98648,
-     0.98843,
-     0.99341,
-     0.99594,
-     1.00655
+     0.961,
+     0.97672,
+     0.98311,
+     0.98544,
+     0.99133,
+     1.00406
     ],
     "used": true
    },
    {
     "key": "m012_amber_mid_x_amber_light_75",
-    "hex": "#FB9C2A",
+    "hex": "#FBA03C",
     "levels": [
-     0.96616,
-     0.97528,
-     0.97887,
-     0.98251,
-     0.98603,
-     0.98953,
-     0.9958,
-     0.99846
+     0.96982,
+     0.97496,
+     0.98206,
+     0.98409,
+     0.99807
     ],
     "used": true
    },
@@ -739,189 +687,8 @@
      ]
     }
    ],
-   "vfx": [
-    {
-     "name": "VFX_Amber_crystal_glow_1",
-     "kind": "crystal_glow",
-     "position": [
-      1.0786,
-      4.4,
-      4.7239
-     ],
-     "vfx_scale": 1.0,
-     "trigger": null,
-     "spec": {
-      "emitters": [],
-      "light": {
-       "color": "#FFA63A",
-       "brightness": 0.7,
-       "range": 8.0,
-       "shadows": true,
-       "flicker": false
-      }
-     }
-    },
-    {
-     "name": "VFX_Amber_ore_glint_1",
-     "kind": "ore_glint",
-     "position": [
-      1.7336,
-      5.792,
-      0.96
-     ],
-     "vfx_scale": 1.0,
-     "trigger": null,
-     "spec": {
-      "emitters": [
-       {
-        "name": "Glint",
-        "texture": "spark_diamond",
-        "color": [
-         "#FFF4C8",
-         "#FEC029"
-        ],
-        "transparency": [
-         0.1,
-         1.0
-        ],
-        "lifetime": [
-         0.5,
-         0.8
-        ],
-        "speed": [
-         0,
-         0
-        ],
-        "spread": 0,
-        "light_emission": 1.0,
-        "rotation": [
-         0,
-         90
-        ],
-        "rate": 0.5,
-        "size": [
-         0,
-         0.6,
-         0
-        ],
-        "shape": [
-         0.47,
-         0.67,
-         0.6
-        ]
-       }
-      ],
-      "light": null
-     }
-    },
-    {
-     "name": "VFX_Amber_ore_glint_2",
-     "kind": "ore_glint",
-     "position": [
-      0.8596,
-      5.506,
-      2.2209
-     ],
-     "vfx_scale": 1.0,
-     "trigger": null,
-     "spec": {
-      "emitters": [
-       {
-        "name": "Glint",
-        "texture": "spark_diamond",
-        "color": [
-         "#FFF4C8",
-         "#FEC029"
-        ],
-        "transparency": [
-         0.1,
-         1.0
-        ],
-        "lifetime": [
-         0.5,
-         0.8
-        ],
-        "speed": [
-         0,
-         0
-        ],
-        "spread": 0,
-        "light_emission": 1.0,
-        "rotation": [
-         0,
-         90
-        ],
-        "rate": 0.35,
-        "size": [
-         0,
-         0.5,
-         0
-        ],
-        "shape": [
-         0.57,
-         0.73,
-         0.4
-        ]
-       }
-      ],
-      "light": null
-     }
-    },
-    {
-     "name": "VFX_Amber_ore_glint_3",
-     "kind": "ore_glint",
-     "position": [
-      2.3156,
-      5.047,
-      0.205
-     ],
-     "vfx_scale": 1.0,
-     "trigger": null,
-     "spec": {
-      "emitters": [
-       {
-        "name": "Glint",
-        "texture": "spark_diamond",
-        "color": [
-         "#FFF4C8",
-         "#FEC029"
-        ],
-        "transparency": [
-         0.1,
-         1.0
-        ],
-        "lifetime": [
-         0.5,
-         0.8
-        ],
-        "speed": [
-         0,
-         0
-        ],
-        "spread": 0,
-        "light_emission": 1.0,
-        "rotation": [
-         0,
-         90
-        ],
-        "rate": 0.25,
-        "size": [
-         0,
-         0.45,
-         0
-        ],
-        "shape": [
-         0.58,
-         0.81,
-         0.79
-        ]
-       }
-      ],
-      "light": null
-     }
-    }
-   ],
-   "notes": "amber resource: a chunky faceted amber egg (broad facets in rows) sunk in a nest of weathered split timber - a long fused beam low across the front on a stub block, a hewn post and plank at the left, a split upright pair at the right, a three-plank tepee behind; one closed mesh, flat base. VFX: crystal_glow (steady soft amber PointLight in front of the nodule, shadows on) and 3 ore_glint (sparse amber twinkles at the upper +X flank's light facet junctions)"
+   "vfx": [],
+   "notes": "amber resource: a chunky faceted amber egg (broad facets in rows) sunk in a nest of weathered split timber - a long fused beam low across the front on a stub block, a hewn post and plank at the left, a split upright pair at the right, a three-plank tepee behind; one closed mesh, flat base. Flat light / mid / dark amber facets; no VFX"
   },
   {
    "name": "AmberCrystalMain",
@@ -1126,10 +893,10 @@
   "water": 0,
   "glow": 0,
   "tris": 6744,
-  "vfxSockets": 4,
-  "paletteColours": 25,
-  "paletteLevels": 505,
-  "meshBytes": 620512
+  "vfxSockets": 0,
+  "paletteColours": 23,
+  "paletteLevels": 467,
+  "meshBytes": 606848
  },
  "problems": []
 }

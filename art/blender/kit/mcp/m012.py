@@ -30,11 +30,11 @@ Stage 2+3: _polish() (all triangles, no corner under POLISH_LIM = 5 degrees, bot
 _uv_unfold() (faces an angle-based unwrap folds over are cut free) run on every part and the hero after _finish().
 Stage 4 (palette, colour_parts: colour_nodule, colour_wood): calibrated keys blended by position fields on the finished
 parts (only material indices and Tint change); the hero inherits them through _paste. Amber: a ranked core field per
-facet graded dark -> mid -> light with in-between keys, darker angular inclusions in multi-triangle facets, per-facet
-Tint drift. Wood: grain streaks along each board's own axis (board() records its frame in BOARDS), worn chamfers, end
-grain, dark V grooves / creases, a warm bleed by the amber, broad Tint mottling.
-Stages 5+6 (STUDIO_LIGHT, GLINTS, _vfx): no emissive faces; the hero carries a crystal_glow socket (soft amber
-PointLight in front of the nodule) and three ore_glint sockets boxed tight round upper light-facet junctions.
+facet graded dark -> mid -> light with in-between keys, one flat tone per facet (broad four-sided facets as two
+triangles), per-piece Tint drift. Wood: grain streaks along each board's own axis (board() records its frame in
+BOARDS), worn chamfers, end grain, dark V grooves / creases, a warm bleed by the amber, broad Tint mottling.
+Stages 5+6 (_vfx): no emissive faces and, since the 2026-11-04 touch-up for the restyled sheet, no sockets and no
+bright facet seams (the crystal_glow light and the three ore_glint emitters went with the sheet's glow and glints).
 """
 import math
 import random
@@ -50,7 +50,6 @@ import m011
 
 NUM, TITLE, SHEET = 12, "Amber", "M012"
 A_LIGHT, A_MID, A_DARK = "m012_amber_light", "m012_amber_mid", "m012_amber_dark"
-A_GLOW = "m012_amber_glow"
 WOOD, WOOD_LIGHT, WOOD_END = "m012_wood", "m012_wood_light", "m012_wood_end"
 WOOD_DARK, WOOD_WARM = "m012_wood_dark", "m012_wood_warm"
 
@@ -63,8 +62,7 @@ def palette():
     # test dome, then corrected in linear light against the hero renders; targets and re-measures in M012_spec.md,
     # "Stage 4"). Sheet swatches: amber light #FECD64, mid #FE7719, dark #D25117, wood #8E5E3D.
     # Amber: roughness 0.45 and low specular (no white glints, no cream-washed facets).
-    K.set_colour(A_GLOW, "#FDB76E", rough=0.45, low_spec=True)     # seam lines in the core (renders #FFEC81)
-    K.set_colour(A_LIGHT, "#FDAE30", rough=0.45, low_spec=True)
+    K.set_colour(A_LIGHT, "#FDB348", rough=0.45, low_spec=True)   # was #FDAE30 (rendered #FFC72B, too saturated)
     K.set_colour(A_MID, "#F66816", rough=0.45, low_spec=True)
     K.set_colour(A_DARK, "#924A0E", rough=0.45, low_spec=True)     # red-orange (dome renders #CD5214)
     K.set_colour(WOOD, "#6E4A2F", rough=0.9)
@@ -483,9 +481,8 @@ WOOD_PARTS = [n for n, _ in PARTS if n.startswith("AmberWood")]
 NOTES = {
     "Amber": "amber resource: a chunky faceted amber egg (broad facets in rows) sunk in a nest of weathered split "
              "timber - a long fused beam low across the front on a stub block, a hewn post and plank at the left, a "
-             "split upright pair at the right, a three-plank tepee behind; one closed mesh, flat base. VFX: "
-             "crystal_glow (steady soft amber PointLight in front of the nodule, shadows on) and 3 ore_glint "
-             "(sparse amber twinkles at the upper +X flank's light facet junctions)",
+             "split upright pair at the right, a three-plank tepee behind; one closed mesh, flat base. Flat "
+             "light / mid / dark amber facets; no VFX",
     "AmberCrystalMain": "Amber Nodule (main crystal): cut-gem egg of broad facets in rows (crown, upper ring, belt, "
                         "lower ring, blunt bottom)",
     "AmberWoodFront": "Wood Base (Front): a long beam of two fused split boards (V groove, staggered oblique ends) "
@@ -504,24 +501,22 @@ NOTES = {
 # change); the hero inherits it through _paste. Every field is a position (the nodule's own frame, or the shared
 # build frame for the wood); no colour is ever chosen by which way a face points.
 #
-# Amber: a "core" field per facet (coplanar triangles kept together, so each facet is one main tone): up the stone,
-# minus the distance from a core point inside it (upper, right of centre, a little forward), plus broad noise. Facets
-# are ranked by it and the rank (area fraction, low -> high) is graded dark -> mid over AMBER_LOW and mid -> light over
-# AMBER_HIGH with the 25/50/75 % in-between keys, so the sheet's hue shares come out whatever the facet sizes are and
-# neighbours step through in-between tones. In facets of two or more triangles the triangle lowest in the field drops
-# one or two steps darker: the sheet's angular inclusions, without splitting any face.
-AMBER_FIELD = dict(core=(0.25, -0.1, 0.6), up=0.3, near=0.7, noise=0.3, scale=0.35, seed=12061,
+# Amber: a "core" field per piece (a facet's triangles kept together, so each piece is one flat tone): up the stone,
+# minus the distance from a core point inside it (upper, right of centre, a little forward), plus noise. Pieces are
+# ranked by it and the rank (area fraction, low -> high) is graded dark -> mid over AMBER_LOW and mid -> light over
+# AMBER_HIGH with the 25/50/75 % in-between keys, so the sheet's hue shares come out whatever the piece sizes are and
+# neighbours step through in-between tones. A piece is a whole facet, or half of a broad four-sided one (AMBER_SPLIT).
+# Fixes after touch-up verification (2026-11-04): the inclusion patches are gone (they read as camouflage mottling);
+# the noise is stronger and finer (0.3 at scale 0.35 before, seed 12061) so neighbouring facets differ by a step and
+# the facet rows don't band, and the bands moved (from (0.0, 0.2) / (0.3, 0.9)) to the sheet's light / mid / dark
+# shares of about 0.28 / 0.46 / 0.26 in the hero view.
+AMBER_FIELD = dict(core=(0.25, -0.1, 0.6), up=0.3, near=0.7, noise=0.6, scale=0.5, seed=12072,
                    crown=(0.82, 0.6))   # above 0.82 of the height the field drops (up to 0.4 at the top): the
                                         # sheet's top view shows the crown orange, the yellow sits on the upper flank
-AMBER_LOW = (0.0, 0.2)         # rank band of the dark -> mid grade
-AMBER_HIGH = (0.34, 1.0)       # rank band of the mid -> light grade
-AMBER_INCL_BIG = 1.5           # facets over this area (studs^2) get a two-step inclusion, smaller ones one step
-# verifier round 1 (stage 4 fixes): inclusions both ways and glowing seams
-AMBER_INCL_LIGHT = dict(level=0.1, min_rank=0.3, seed=12065)   # a facet's other patch goes a step LIGHTER where a
-                                                               # broad noise over the patch centres is above level
-# seam strips (one side of each facet edge) step up the ladder by facet rank: (rank from, steps); the ladder ends in
-# light -> glow 50 % -> glow, so in the core the lines read pale yellow and lower down they fade to a faint edge
-SEAM_STEPS = ((0.0, 0), (0.2, 1), (0.5, 2), (0.8, 3))
+AMBER_LOW = (0.0, 0.5)         # rank band of the dark -> mid grade
+AMBER_HIGH = (0.35, 0.8)       # rank band of the mid -> light grade (pieces ranked from AMBER_LOW[1] up)
+AMBER_SPLIT = 1.5              # four-sided facets over this area (studs^2) split into two triangles (_halves);
+                               # 0 / None turns the split off
 AMBER_MOTTLE = dict(amp=0.03, scale=0.9, seed=12063)       # per facet, no per-triangle jitter
 AMBER_SPEC = 0.0               # Specular IOR Level on every amber key (see colour_nodule)
 # Wood: grain streaks along each board's own axis (noise stretched along the board: GRAIN scales along / across),
@@ -545,11 +540,6 @@ WOOD_MOTTLE = dict(amp=0.07, scale=0.65, jitter=0.012, seed=12075)
 def _ladder():
     return ([A_DARK] + [K.mix_key(A_DARK, A_MID, t) for t in (0.25, 0.5, 0.75)] + [A_MID] +
             [K.mix_key(A_MID, A_LIGHT, t) for t in (0.25, 0.5, 0.75)] + [A_LIGHT])
-
-
-def _seam_ladder():
-    """_ladder() plus the seam-only glow steps above light."""
-    return _ladder() + [K.mix_key(A_LIGHT, A_GLOW, 0.5), A_GLOW]
 
 
 def _facets(faces):
@@ -594,7 +584,18 @@ def colour_nodule(o):
         if f.index in reg:
             by_id.setdefault(reg[f.index][1], []).append(f)
     known = {f for g in by_id.values() for f in g}
+    # Fixes after touch-up verification (2026-11-04): no inclusions and no seam-to-patch pass. Every triangle of a
+    # piece (its seam strip, patches and plain parts alike) takes the piece's graded tone, as the restyled sheet's
+    # plain light / mid / dark facets. A piece is a facet, except that the broad four-sided facets split corner to
+    # corner into two triangles, each ranked on its own (the sheet's regions are triangles; whole quads banded the
+    # belt into rows).
+    pieces, halves = [], []
     for g in list(by_id.values()) + _facets([f for f in faces if f not in known]):
+        h = _halves(g) if AMBER_SPLIT else None
+        pieces += h or [g]
+        if h:
+            halves.append(h)
+    for g in pieces:
         area = sum(f.calc_area() for f in g)
         c = sum((f.calc_center_median() * f.calc_area() for f in g), Vector()) / area + p.off
         groups.append((field(c), area, c, g))
@@ -609,61 +610,18 @@ def colour_nodule(o):
                 sum(AMBER_LOW) / 2, AMBER_LOW[1] - AMBER_LOW[0])
     m011._grade(p, [f for f in faces if rank[f] >= AMBER_LOW[1]], A_MID, A_LIGHT, rank.get,
                 sum(AMBER_HIGH) / 2, AMBER_HIGH[1] - AMBER_HIGH[0])
+    # two halves of one facet that graded to the same key step apart (the one higher in the field one step lighter)
     lad = _ladder()
-    slad = _seam_ladder()
-    incl = [0, 0]
-    rng_i = random.Random(AMBER_INCL_LIGHT["seed"])
-    ioff = Vector((rng_i.uniform(0, 100), rng_i.uniform(0, 100), rng_i.uniform(0, 100)))
-    from mathutils import noise
-    for fv, area, c, g in groups:
-        i = lad.index(p.key(g[0]))
-        pats = {}
-        for x in g:
-            r = reg.get(x.index)
-            if r and r[0] == "patch":
-                pats.setdefault((r[1], r[2]), []).append(x)
-        if len(g) < 2 or (i < 4 and not pats):
-            continue
-        pc = {k: sum((x.calc_center_median() for x in fs), Vector()) / len(fs) + p.off for k, fs in pats.items()}
-        if pats:            # the facet's patch lowest in the field: an angular darker inclusion
-            dk = min(pats, key=lambda k: field(pc[k]))
-            pick = pats[dk]
-        else:
-            dk, pick = None, [min(g, key=lambda x: field(x.calc_center_median() + p.off))]
-        step = 3 if area > AMBER_INCL_BIG else 2
-        for f in pick:
-            f.material_index = p._mi(lad[max(0, i - step)])
-        incl[0] += 1
-        # ... and, in the lighter facets, another patch a step lighter where a broad noise says so (the sheet's
-        # inclusions are both lighter and darker angular shapes)
-        rest = [k for k in pats if k != dk]
-        if rest and rank[g[0]] >= AMBER_INCL_LIGHT["min_rank"]:
-            lk = max(rest, key=lambda k: noise.noise(pc[k] * 0.9 + ioff))
-            if noise.noise(pc[lk] * 0.9 + ioff) > AMBER_INCL_LIGHT["level"]:
-                for f in pats[lk]:
-                    f.material_index = p._mi(slad[min(len(lad) - 1, i + 1)])
-                incl[1] += 1
-    # glowing seams: along each facet edge the border strip on ONE side (the facet with the higher number) steps up
-    # the seam ladder by its facet's rank (SEAM_STEPS), so the line is one strip (0.1 stud) wide, pale yellow in the
-    # core and only a faint lighter edge low down: glowing lines, not a cage
-    seams = 0
-    for f in faces:
-        r = reg.get(f.index)
-        if not (r and r[0] == "seam"):
-            continue
-        # the strip's facet neighbours: facets touching its outer verts (its inner triangles share only a vert with
-        # the next facet). The facet a strip triangle borders most is the one across its edge.
-        cnt = {}
-        for v in f.verts:
-            for x in v.link_faces:
-                if x.index in reg and reg[x.index][1] != r[1]:
-                    cnt[reg[x.index][1]] = cnt.get(reg[x.index][1], 0) + 1
-        other = {max(cnt, key=cnt.get)} if cnt else set()
-        if other and r[1] > min(other):
-            st = max(s for r0, s in SEAM_STEPS if rank[f] >= r0)
-            f.material_index = p._mi(slad[min(len(slad) - 1, slad.index(p.key(f)) + st)])
-            seams += 1
-    # Tint: broad per-facet brightness drift (each facet stays one flat tone)
+    for h in halves:
+        if p.key(h[0][0]) == p.key(h[1][0]):
+            i = lad.index(p.key(h[0][0]))
+            lo, hi = sorted(h, key=lambda g: field(sum((f.calc_center_median() for f in g), Vector()) / len(g)
+                                                   + p.off))
+            j = (i + 1, i) if i < len(lad) - 1 else (i, i - 1)
+            for g, k in ((hi, j[0]), (lo, j[1])):
+                for f in g:
+                    f.material_index = p._mi(lad[k])
+    # Tint: broad per-piece brightness drift (each piece stays one flat tone)
     rng = random.Random(AMBER_MOTTLE["seed"])
     off = Vector((rng.uniform(0, 100), rng.uniform(0, 100), rng.uniform(0, 100)))
     from mathutils import noise
@@ -683,7 +641,59 @@ def colour_nodule(o):
         b = m.node_tree.nodes.get("Principled BSDF") if m.node_tree else None
         if b and "Specular IOR Level" in b.inputs:
             b.inputs["Specular IOR Level"].default_value = AMBER_SPEC
-    return {"facets": len(groups), "inclusions": incl, "seam_faces": seams, "keys": counts}
+    return {"facets": len(groups) - len(halves), "split": len(halves), "keys": counts}
+
+
+def _corners(g, lim=10.0):
+    """A facet's outline corners in loop order (boundary vertices that turn by more than lim degrees: the edge
+    splits made for the old seam strips are straight runs)."""
+    gs = set(g)
+    nb = {}
+    for e in {e for f in g for e in f.edges}:
+        if sum(1 for x in e.link_faces if x in gs) == 1:
+            a, b = e.verts
+            nb.setdefault(a, []).append(b)
+            nb.setdefault(b, []).append(a)
+    if not nb or any(len(x) != 2 for x in nb.values()):
+        return []
+    start = next(iter(nb))
+    loop, prev, v = [start], None, start
+    while True:
+        nxt = nb[v][0] if nb[v][0] is not prev else nb[v][1]
+        if nxt is start:
+            break
+        loop.append(nxt)
+        prev, v = v, nxt
+    n = len(loop)
+    return [v for i, v in enumerate(loop)
+            if math.degrees((v.co - loop[i - 1].co).angle(loop[(i + 1) % n].co - v.co, 0.0)) > lim]
+
+
+def _halves(g):
+    """A four-sided facet over AMBER_SPLIT studs^2 as its two corner-to-corner halves, cut along the diagonal nearer
+    its fan hub (the inner point its patches were fanned from), so the cut runs hub to corners along existing edges.
+    None for any other facet."""
+    cs = _corners(g)
+    if len(cs) != 4 or sum(f.calc_area() for f in g) < AMBER_SPLIT:
+        return None
+    gs = set(g)
+    hub = max({v for f in g for v in f.verts}, key=lambda v: sum(1 for f in v.link_faces if f in gs)).co
+    nrm = sum((f.normal * f.calc_area() for f in g), Vector()).normalized()
+
+    def off_line(a, b):
+        d = (b.co - a.co).normalized()
+        q = hub - a.co
+        return (q - d * q.dot(d)).length
+    a, b = min(((cs[0], cs[2]), (cs[1], cs[3])), key=lambda x: off_line(*x))
+    ra, rb = a.co - hub, b.co - hub
+    side = {}
+    for f in g:
+        q = f.calc_center_median() - hub
+        # in the wedge turning from ray a to ray b (counter-clockwise about the normal), or in the other one
+        wa, wb = nrm.dot(ra.cross(q)), nrm.dot(q.cross(rb))
+        inside = (wa >= 0 and wb >= 0) if nrm.dot(ra.cross(rb)) >= 0 else not (wa < 0 and wb < 0)
+        side.setdefault(inside, []).append(f)
+    return list(side.values()) if len(side) == 2 else None
 
 
 def _box_d(b, c):
@@ -825,61 +835,13 @@ def hero(a):
     m011._paste(a, n, _nod_matrix() @ _frame(n))
 
 
-# ---- stage 5: lighting (see M012_spec.md, "Stage 5+6") -------------------------------------------------------------
-# No emissive faces. The sheet's amber is lit from within (bright seams, shade facets staying saturated orange) but
-# casts no halo on the wood. Emission >= 1.0 exports as Neon in one flat colour per key, erasing the graded
-# light / mid / dark facets (and blooming); emission between 0 and 1 doesn't glow in Roblox and only drops the Tint.
-# The "lit from within" in game is one soft amber PointLight (crystal_glow socket) in front of the nodule, above the
-# front beam, outside the solid: build frame (1.2, -4.6, 4.4), 1.84 studs from the nearest amber facet and 3.0 from
-# the nearest wood (BVH on the hero). At 0.9 stud (the study's first suggestion, (0.9, -3.6, 3.4)) the preview showed
-# a round hot spot on the lower front facets (+28 levels at the 99th percentile), a "light bulb" the sheet doesn't
-# have; from here the lift is spread evenly over the facets (+15) and the wood warms only slightly (+3). Shadows on,
-# so the nodule keeps it off the tepee behind; range 8 keeps the pool on the ground in front small.
-STUDIO_LIGHT = dict(pos=(1.2, -4.6, 4.4), color="#FFA63A", brightness=0.7, range=8.0, shadows=True)
-
-# ---- stage 6: VFX sockets on the hero -----------------------------------------------------------------------------
-# ore_glint: sparse amber twinkles at the facet junctions of the upper +X flank's light facets (amber_light /
-# amber_mid_x_amber_light_75), where the sheet's star glints sit. Each entry: (a build-frame point near the junction,
-# snapped to the nearest nodule vertex through _nod_matrix(), rate per second, particle peak size in studs). The box
-# hugs the surface: the vertex plus the points GLINT_REACH along each of its hull edges, padded by GLINT_PAD.
-GLINTS = (((2.11, -0.92, 6.14), 0.5, 0.6),       # upper-right junction of three light facets (the main glint)
-          ((0.93, -2.5, 5.77), 0.35, 0.5),       # upper front-centre junction (light / light_75 / light)
-          ((2.77, 0.09, 5.16), 0.25, 0.45))      # +X flank junction of four light / light_75 facets (not the mid
-#                                                  junction at (2.62, -1.65, 4.45): the split block's top touches it)
-GLINT_REACH = 0.45
-GLINT_PAD = 0.05
-GLINT = {"name": "Glint", "texture": "spark_diamond", "color": ["#FFF4C8", "#FEC029"], "transparency": [0.1, 1.0],
-         "lifetime": [0.5, 0.8], "speed": [0, 0], "spread": 0, "light_emission": 1.0, "rotation": [0, 90]}
-
-
-def _glint_fx(n):
-    """Stage 6 ore_glint sockets (kind, build-frame loc, overrides) for M.mk's fx, fitted per GLINTS entry."""
-    m = _nod_matrix() @ _frame(n)
-    bm = bmesh.new()
-    bm.from_mesh(n.data)
-    out = []
-    for at, rate, size in GLINTS:
-        v = min(bm.verts, key=lambda x: ((m @ x.co) - Vector(at)).length)
-        p0 = m @ v.co
-        pts = [p0]
-        for e in v.link_edges:
-            q = m @ e.other_vert(v).co
-            pts.append(p0.lerp(q, min(1.0, GLINT_REACH / (q - p0).length)))
-        lo = Vector([min(p[i] for p in pts) - GLINT_PAD for i in range(3)])
-        hi = Vector([max(p[i] for p in pts) + GLINT_PAD for i in range(3)])
-        d = hi - lo
-        em = dict(GLINT, rate=rate, size=[0, size, 0],
-                  shape=[round(d.x, 2), round(d.z, 2), round(d.y, 2)])   # Roblox XYZ: x, height, depth
-        out.append(("ore_glint", tuple(round(c, 3) for c in (lo + hi) / 2), {"emitters": [em]}))
-    bm.free()
-    return out
-
-
+# ---- stages 5+6: lighting and VFX ---------------------------------------------------------------------------------
+# Touch-up 2026-11-04: the restyled sheet shows flat facets with no glow, seams or glints, so under the house rule (no
+# light or VFX the sheet doesn't show) the hero carries no sockets: the crystal_glow PointLight and the three ore_glint
+# emitters are gone. No emissive faces, as before.
 def _vfx(n):
-    """Stages 5+6: the hero's sockets (build frame), the amber light first."""
-    light = {k: STUDIO_LIGHT[k] for k in ("color", "brightness", "range", "shadows")}
-    light["flicker"] = False
-    return [("crystal_glow", STUDIO_LIGHT["pos"], {"light": light})] + _glint_fx(n)
+    """Stages 5+6: the hero's sockets (build frame): none."""
+    return []
 
 
 def _drop_inner(o):

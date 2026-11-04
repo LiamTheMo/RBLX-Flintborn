@@ -1020,3 +1020,129 @@ Open minors, kept for a later polish pass:
 - The egg's latitude rings show as a regular belt.
 - The lit band is a little yellow in the front three-quarter view.
 - The inclusion patches repeat into a star on the front.
+
+## Touch-up for the restyled sheet (2026-11-04)
+
+The owner restyled `references/012.png` (same design, flatter colour, no glow). The compare pass found only colour and effect changes, so the mesh is unchanged: 3364 tris on the hero, the same five parts and sizes.
+
+- **Bright facet seams dropped.** `colour_nodule` no longer steps the seam strips up to the pale glow ladder. Each strip triangle (still in the mesh, coplanar with its facet) now takes the tone of the nearest inclusion patch of its own facet, so the patches run to the facet edge as plain angular light / mid / dark regions. Leaving the strips in the facet's base tone was tried first; the strips then framed every inclusion as a darker outline.
+- **Light band moved.** Without the seam strips the light share fell from 0.26 to 0.16 against the sheet's 0.21–0.25. `AMBER_HIGH` went from (0.34, 1.0) to (0.3, 0.9), which brings it back to 0.21.
+- **Material removed:** `m012_amber_glow` (`#FDB76E`, the seam colour), with `_seam_ladder` and `SEAM_STEPS`.
+- **Sockets removed:** the `crystal_glow` PointLight and the three `ore_glint` emitters (`STUDIO_LIGHT`, `GLINTS`, `_glint_fx`). The restyled sheet shows no glints and no glow, so under the house rule (no light or VFX unless the sheet shows it) the hero now has no sockets. No emissive faces, as before.
+
+Colour measures: amber pixels split by green channel (light G > 175, mid 110–175, dark G ≤ 110), share of amber pixels, then median.
+
+| Region | Sheet front 3/4 | Sheet front | Ours front 3/4 | Ours front | Before (front 3/4) |
+| --- | --- | --- | --- | --- | --- |
+| Light | 0.25, `#FDD246` | 0.21, `#FED346` | 0.21, `#FFC72B` | 0.18, `#FFCB2C` | 0.26, `#FFCE2C` |
+| Mid | 0.50, `#FD8310` | 0.54, `#FC8010` | 0.57, `#FF8F1B` | 0.60, `#FF8F1A` | 0.51, `#FF8C1A` |
+| Dark | 0.25, `#E46305` | 0.25, `#E26104` | 0.22, `#E65D0C` | 0.22, `#EF5D0C` | 0.23, `#EC5F0C` |
+| Pale seam pixels (against the amber pixels) | 0.004 | 0.007 | 0.001 | 0.002 | 0.015, `#FFDF75` |
+
+The sheet's few pale pixels are anti-aliased highlights on facet edges, not seam lines.
+
+Checks: `build()` problems `[]`; `kit_verify.run(cls="asset")` on the hero and five parts: 0 problems (min corner 5.02°, 0 floating, 0 buried). Renders in this folder were re-made by `build()`; the views match the sheet's flat facets with no seams, glints or glow.
+
+## Touch-up verification (2026-11-04)
+
+**Result: FAIL, 6.5 / 10.** One blocker: the nodule's facets are still multi-tone patchwork, not the restyled sheet's plain light / mid / dark facets. Everything technical is clean, and the seams, glints and glow are gone as asked.
+
+Method: read-only, in a background Blender on a copy of the work file with the touch-up build in it. `kit_verify.run(cls="asset", sockets=[])` on the hero and five parts, a comparison against the pre-touch-up objects in `FlintbornWorldKit.blend`, and `compare.compare` on the new sheet's cells (f34 (222,135,612,452), rear34 (615,135,1010,452), front (15,485,248,668), top (830,485,1010,668), exploded nodule (230,715,480,1012)). Renders went to `<temp>/...`.
+
+### Technical
+- `kit_verify`: **0 problems.** Amber 3364 / 3999 tris, 9.18 × 7.31 × 6.94. Parts: AmberCrystalMain 882, WoodFront 626, WoodBack 892, WoodLeft 602, WoodRight 378. Each part is one shell, with 0 floating and 0 buried; the thinnest corner is 5.02°. No sockets on the hero (the `sockets=[]` check passes) and no lights or emissive materials (every `m012` material has emission 0).
+- **Only colour changed.** Against the pre-touch-up kit objects, the vertices are identical on all six objects (max Δ 0.0) and the wood parts' material indices are unchanged. Only the nodule's faces were recoloured: 486 faces on the part and 439 on the hero. `m012_amber_glow` and `m012_amber_light_x_amber_glow_50` are gone from both objects.
+- The builder diff matches the spec: `A_GLOW`, `_seam_ladder`, `SEAM_STEPS`, `STUDIO_LIGHT`, `GLINTS` and `_glint_fx` are removed, `_vfx` returns `[]`, and `AMBER_HIGH` is (0.3, 0.9). No dangling references.
+
+### Colours against the sheet
+Amber pixels are split by green channel (light G > 175, mid 110–175, dark ≤ 110), giving each class's share and median. My compare renders are at lens ×3, so the numbers differ slightly from the modeller's.
+
+| Cell | Sheet light / mid / dark | Ours light / mid / dark |
+| --- | --- | --- |
+| f34 | 0.30 `#FDD246` / 0.43 `#FD840C` / 0.27 `#E56305` | 0.17 `#FFC72B` / 0.63 `#FF891E` / 0.20 `#E75D0C` |
+| front | 0.24 `#FED346` / 0.48 `#FD820B` / 0.28 `#E36204` | 0.16 `#FFCB2C` / 0.64 `#FF8A1D` / 0.20 `#E75D0C` |
+| top | 0.27 `#FDCA3D` / 0.49 `#FD9712` / 0.24 `#E76408` | 0.12 `#FFB427` / 0.58 `#E38124` / 0.30 `#FF640E` |
+
+Sheet swatches: light `#FDC944`, mid `#FD7D10`, dark `#D04E0A`, wood `#8E5A3A`. The medians are close, within about 10 levels, except the light class, which is about 27 levels short on blue (more saturated). Pale pixels (G > 200, B > 90): sheet 0.04, ours 0.00. The bright seam lines are gone.
+
+### Views
+Seams, glints and glow are gone, as asked. The wood and silhouette are unchanged from the passed build. The rear34 and top layout differences against the sheet are not part of this touch-up and are not scored here.
+
+### Blockers
+1. **The nodule is patchwork, not plain facets.** 41 of the nodule's 59 facets carry two or more tones. The inclusion patches from verifier round 1, now extended to the facet edges through the old seam strips, give notched, non-convex light / mid / dark shapes inside the facets. In the f34, front and exploded cells the amber reads as camouflage mottling. The restyled sheet shows one clean tone per facet ("Broad flat facets, no fine noise", "Simple solid color regions", "No textures or fine triangulation"). This is the model's focal element and the touch-up's stated target.
+   **Fix (`m012.colour_nodule`):** drop the inclusion step, both the darker and the lighter patch, and the seam-to-patch pass, so that every triangle of a facet (plain, patch and seam regions) takes the facet's graded tone; keep the per-facet Tint. Then re-tune `AMBER_LOW` / `AMBER_HIGH` against the f34 and front cells, toward sheet shares of about 0.25–0.30 light / 0.45–0.50 mid / 0.25 dark. Neighbouring facets should differ by a step, so the quad rows don't read as horizontal bands; add more noise to `AMBER_FIELD` if they do. An in-memory test that gave each facet its majority non-patch tone already read much closer to the sheet's clean facets (the exploded nodule cell, `<temp>/...`). If the rows still band, splitting a quad facet's two triangles into adjacent tones is acceptable; the sheet's regions are triangles. Confirm with `kit_verify` (K.check's baked-shading test) and the f34 and front compare cells.
+
+### Minors
+- The light class is more saturated than the sheet's (`#FFC72B` against `#FDD246`). Lift `A_LIGHT` slightly toward `#FDC944` / `#FED346` when re-tuning.
+- The sheet has a few pale-yellow lit facets (about 4 % of the amber, for example the top-right facet in Detail A); ours has none. Optional.
+
+## Fixes after touch-up verification (2026-11-04)
+
+The blocker was the patchwork: the old inclusion patches, run out to the facet edges through the seam strips, gave 41 of the 59 facets two or more tones. This pass changes colour only. The mesh is unchanged: the five parts are 882 / 626 / 892 / 602 / 378 tris, the same sizes as before.
+
+- **One tone per facet.** `colour_nodule` no longer has the inclusion step (both the darker and the lighter patch) or the seam-to-patch pass, and `AMBER_INCL_BIG` and `AMBER_INCL_LIGHT` are gone. Every triangle of a facet (its seam strip, patches and plain parts) takes the facet's graded tone. The per-facet Tint drift stays (now per piece).
+- **Broad quads split into two triangles.** With whole facets graded, the belt of four-sided facets read as horizontal rows: the verifier's in-memory flat test, and my first flat build, both showed a light row above a mid row. A four-sided facet over `AMBER_SPLIT` (1.5 studs²) is now two pieces, cut corner to corner (`_halves`). The cut uses the diagonal nearer the facet's fan hub, so it runs hub to corners along existing edges and both halves are clean straight-edged regions. Each half is ranked on its own. If both halves grade to the same key, the half higher in the field goes one ladder step lighter. 15 facets split: the 7 belt quads, 4 upper and lower flank quads, and 4 quads low in the seat, mostly hidden by the wood.
+- **Noise and bands re-tuned.** `AMBER_FIELD` noise went from 0.3 at scale 0.35 (seed 12061) to 0.6 at scale 0.5 (seed 12072), so neighbouring facets differ by a step. Of 78 edge-sharing facet pairs, 9 share one tone. Seeds 12061–12072 at scales 0.5 / 0.65 were swept against the f34 and front shares; 12072 / 0.5 came closest and has the lowest face-direction correlation (`kit_baked_shading` 0.14 on the nodule part; the limit is 0.5). `AMBER_LOW` went from (0.0, 0.2) to (0.0, 0.5) and `AMBER_HIGH` from (0.3, 0.9) to (0.35, 0.8).
+- **`A_LIGHT` less saturated:** base `#FDAE30` → `#FDB348`. The light class now renders `#FFD247` (sheet `#FDD246`; it was `#FFC72B`). The mid class picks up some of that blue through the mid → light mixes (median `#FF942E` against the sheet's `#FD840C`, before `#FF8F1C`).
+
+Multi-tone facets (the nodule part, by the build's own facet record, 47 facets; the verifier grouped by normal and got 59): 39 before, 15 after. All 15 are the deliberate two-triangle splits, and no facet has a third tone or a patch.
+
+Colour shares: the same method as the verification (amber pixels split by green channel: light G > 175, mid 110–175, dark ≤ 110), `compare.compare` at lens ×3 on the verifier's cells.
+
+| Cell | Sheet light / mid / dark | Ours before | Ours now |
+| --- | --- | --- | --- |
+| f34 (hero, −28° / 12°) | 0.30 / 0.43 / 0.27 | 0.19 / 0.60 / 0.21 | 0.28 / 0.45 / 0.27 |
+| front (0° / 4°) | 0.24 / 0.49 / 0.28 | 0.16 / 0.63 / 0.21 | 0.25 / 0.50 / 0.25 |
+| top (0° / 89°) | 0.27 / 0.49 / 0.24 | 0.15 / 0.51 / 0.35 | 0.37 / 0.40 / 0.24 |
+| exploded nodule (−20° / 10°, part alone) | 0.22 / 0.43 / 0.35 | 0.21 / 0.45 / 0.34 | 0.31 / 0.45 / 0.24 |
+
+The hero and front cells now sit within about 0.03 of the sheet. The top and exploded cells carry a little more light than the sheet; both were tuned only through the shared bands.
+
+Checks: `build()` problems `[]`. `kit_verify.run(cls="asset", sockets=[])` on the hero and five parts: 0 problems. Amber is 3364 / 3999 tris, one shell, 0 floating, 0 buried, thinnest corner 5.02°. The renders in this folder were deleted and re-made by `build()`. Front34, front and exploded show plain flat facets in light / mid / dark triangles, with no mottling, seams or glow and no banded rows. Compare image: `<temp>/.../M012_compare.png`.
+
+Note: once, in the middle of a long parameter sweep, a build came out with the hero at 3366 tris and two nodule pieces one step off. Repeated clean builds (with and without module reloads) all give 3364 and the colours above. The old hero cleanup seems to depend slightly on session state; the main session should check the tri count after its build.
+
+## Touch-up verification, round 2 (2026-11-04)
+
+**Result: PASS, 7.5 / 10.** The blocker is fixed: every facet of the nodule is one flat tone, and the 15 corner-to-corner splits read as the sheet's triangular facets, not as patchwork. No blockers. Technical checks are clean and only the nodule's colouring changed.
+
+Method: read-only, in a background Blender on a copy of the work file with the fix build in it (nothing built, nothing saved). `kit_verify.run(cls="asset", sockets=[])` on the hero and five parts; the six objects compared against the same objects in the committed `FlintbornWorldKit.blend` (HEAD, loaded into the session from a copy); `compare.compare` on the new sheet's cells (f34 (222,135,612,452) at −28° / 12°, front (15,485,248,668) at 0° / 4°, top (830,485,1010,668) at 0° / 89°, rear34 (615,135,1010,452) at 152° / 12°, exploded nodule (230,715,480,1012) at −20° / 10°, part alone), plus nodule close-ups at −28°, +60°, +150° and −110°. Output went to fresh, empty folders under `<temp>/...`.
+
+### Blocker check (patchwork)
+- **The build in the work file is the current builder.** Re-running `m012.colour_nodule` on a copy of the nodule part gives the same key on all 882 faces (0 differ). It reports 47 facets and 15 split.
+- **One tone per facet.** By the build's facet record (`nod_regions`, 47 facets, every face known), 32 facets carry exactly one key and 15 carry two. All 15 are the deliberate halves; no facet has a third tone, a patch or a seam strip in another tone. The Tint attribute has at most two values per facet (the per-piece drift), so it adds no sub-tones.
+- **How the splits read.** In the f34, front, exploded and close-up renders the halves read as two straight-edged triangles meeting on a facet diagonal, the same as the sheet's triangular regions (Detail A, the exploded nodule). There are no notched or non-convex shapes and no camouflage mottling. The belt doesn't read as horizontal rows. Most splits step one or two keys; one (facet 3) jumps from dark→mid 50 % to mid→light 50 %, which still reads as two facets.
+- The repo renders `front34.png` and `exploded.png` (re-made by the fix build) show the same clean faceting.
+
+### Shares and colours against the sheet
+Amber pixels are R > 150, B < 0.33 R and R ≥ G ≥ B, split by green channel (light G > 175, mid 110–175, dark ≤ 110), with each class's share and median. This mask differs slightly from round 1's: the sheet's hero cell measures 0.26 / 0.44 / 0.30 here against the 0.30 / 0.43 / 0.27 quoted above, so compare the two columns with each other, not with earlier tables.
+
+| Cell | Sheet light / mid / dark | Ours light / mid / dark |
+| --- | --- | --- |
+| f34 (hero) | 0.26 `#FDD044` / 0.44 `#FD840C` / 0.30 `#E46305` | 0.29 `#FFD247` / 0.38 `#FF952C` / 0.33 `#FC650E` |
+| front | 0.20 `#FED245` / 0.50 `#FD820B` / 0.30 `#E26104` | 0.25 `#FFD247` / 0.45 `#FF952D` / 0.30 `#DE650E` |
+| exploded nodule | 0.20 `#FED146` / 0.43 `#FD8C11` / 0.37 `#E46008` | 0.31 `#FFDB4B` / 0.42 `#FFA02D` / 0.26 `#DC5A0D` |
+| top | 0.23 `#FDC537` / 0.50 `#FD9712` / 0.27 `#E66308` | 0.34 `#FFB83F` / 0.24 `#FF9C31` / 0.42 `#C1520A` |
+| rear34 | 0.20 `#FDD244` / 0.57 `#FD9314` / 0.23 `#DE5E04` | 0.51 `#FFC143` / 0.38 `#FF9931` / 0.10 `#D55A0C` |
+
+- **Hero and front:** within about 0.06 of the sheet in every class. Pass.
+- **Light:** `#FFD247` against the sheet's `#FDD246`. This fixes round 1's saturation minor.
+- **Mid:** `#FF952C` against `#FD840C`: about 17 levels too high on green and 32 on blue, so lighter and a little paler. That is the light shift bleeding through the mid → light mixes, as the fix notes say. It's visible as a slightly lighter orange; minor.
+- **Dark:** `#FC650E` / `#DE650E` against `#E46305` / `#E26104`. Close.
+- Pale pixels (R, G > 200, B > 90): 0 in the sheet and in ours.
+
+### Technical
+- `kit_verify`: **0 problems.** Amber 3364 / 3999 tris, 1 shell, 9.182 × 7.309 × 6.943; AmberCrystalMain 882, WoodFront 626, WoodBack 892, WoodLeft 602, WoodRight 378, each 1 shell, 0 floating, 0 buried, thinnest corner 5.016°. `kit_baked_shading`: 0.14 on the nodule part, 0.22 on the hero (limit 0.5).
+- **Mesh unchanged against the committed kit objects:** the same vertex and face counts, vertex positions identical (max Δ 0.0) and the same face lists on all six objects, at the same locations. Material keys are identical on all four wood parts. Only amber faces changed (717 on the part, 674 on the hero), and `m012_amber_glow` and `m012_amber_light_x_amber_glow_50` are no longer used.
+- **No glow, no sockets:** no child objects on the hero, `sockets=[]` passes, and no `m012` material has emission above 0.
+- The builder diff touches only the nodule's colouring, the removed seam, glint and light code, and the notes and docstring. No dangling references were found.
+
+### Blockers
+None.
+
+### Minors
+- **Mid a little light** (`#FF952C` against `#FD840C`). Optional fix: darken `A_MID` slightly (toward about `#F05E10`), or bias the mid → light 25 % key toward mid, then re-check the hero and front cells.
+- **Top view:** more dark than the sheet (0.42 against 0.27, median `#C1520A`, browner), and the light sits on the front rim instead of the upper right. The crown drop and the field noise cause it. Top cells are judged for content, so it's recorded only. Optional: soften `AMBER_FIELD["crown"]` (lower drop).
+- **Rear34:** too much light (0.51 against 0.20). The rear layout was not scored in this touch-up; recorded only.
+- **Position of the light region:** in the hero and front views the yellow sits upper-left of centre, while the sheet's sits upper-centre to right. The passed build had the same placement (HEAD `front34.png`), so it's not a regression.
+- **Shaded flanks (studio lighting, recorded, not scored):** seen from +X (+60°), the nodule's shaded facets turn dull khaki-gold (about `#D48E2F`), where the sheet keeps its shade saturated orange. The bottom facets go dark brown in the close-ups.
