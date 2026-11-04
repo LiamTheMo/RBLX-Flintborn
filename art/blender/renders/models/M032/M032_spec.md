@@ -1558,3 +1558,74 @@ Passed in round 2 (7/10) and committed. Round 1 failed (6/10) because the turf s
 - The water preview is paler than the sheet (Studio check).
 
 **Export:** 6 assets, 9 pieces (5 solid, 4 water), 6054 tris, 8 VFX sockets, palette 18 colours, 0 problems.
+
+## Touch-up for the restyled sheet (2026-11-04)
+
+The restyled sheet keeps the design. Two changes follow from it.
+
+**Water.** The water is plain cyan, with no lighter ripple or caustic net.
+- `palette()` now calls `_plain_water()` on both water keys (`m032_water`, `m032_water_foam`). It drops the kit's water preview texture (`FB_WaterTex`, the caustic net from `lib/kitwater.py`) from the material, so the renders show the key's flat colour × Tint. Keys, hexes and transparency are unchanged.
+- **Main session:** the Roblox exporter still writes its own `water/<key>.png` with the caustic net for every water key. That is shared code (`export_kit_roblox.py` / `kitwater.py`), so a plain water texture there needs the main session.
+
+**Grass top.** The grass top is square and edge-matched, as both sheets' top views, the exploded Grass Top and the new edge-to-edge tiling panel draw it. It was the oval hull of the column tops.
+- `ridge_outline()` adds `square_block()` to its union. The block is a straight-edged region running to the tile's left edge (x −16) and back edge (y 13):
+  - its front edge runs 1.6 behind the front columns' centres, so the creases between the columns keep their depth;
+  - its front-left edge sits at y −4.4, behind the low box B1;
+  - its right side sits at x 12.3.
+- `ridge_core()` adds a soil fill under the block, from below the ground into the slab. `_fill_poly()` takes the fill's tile-edge sides from the ridge outline's own points. The fill's joining walls then share the slab's vertical edges: one fill corner between two slab points had left 2–3° slivers on the merged back wall.
+- The left and back sides are flat tan joining faces (turf band over soil, as the slab sides). Two new columns, BK9 and BK10 (facing +X, at x 11.6), dress the block's right side behind the water's back cut. The back columns BK1–BK8 and CL are now inside the fill (CL's corner shows at the front-left).
+- This replaces decision 2 of 2026-10-29 (the back-left and front-left corners empty) as the restyled sheet asks. The rear and r34 cells now show the flat back joining face instead of the back cliff row: a recorded miss, because the sheet's rear cells are redraws (house rules).
+
+**Daisies.** Six larger white daisies (`DAISIES_BACK`, r 0.75–0.8) stand on the new back-left lawn in the hero, so the daisies read as on the sheet. The GrassTop part keeps its three, for its budget.
+
+| | Before | After |
+| --- | --- | --- |
+| ShorelineCorner (hero) | 3614 (32.2 × 25.9 × 16.4) | 3640 (32.2 × 26.4 × 16.3) |
+| land / vegetation shells | 1970 / 1008 (116) | 1850 / 1170 (129) |
+| ShorelineCornerGrassTop | 942 (24.7 × 22.1) | 972 (28.3 × 23.2) |
+| SandStrip / RockSlope / WaterPlane / Foam | 196 / 550 / 416 / 336 | unchanged |
+
+- `m032.build()` problems: `ShorelineCorner: 2 faces with a corner under 5.0 deg`. These are the rock faces at (0.44, −2.83) and (11.56, 5.42). The unchanged builder gives the same two plus two more in this work file (4 before the touch-up), so neither comes from this change. Shells: one land shell, 0 bad; 8 sockets.
+- `kit_verify.run(objs, cls="asset")`: no new findings. These remain as before:
+  - the vegetation shells set `VEG_GAP` 0.05 above the land report as floating (decision 9);
+  - the water slab is its own shell;
+  - RockSlope has 1 parity-inward face.
+- The closest the water comes to the land is 0.051, at the bed (by design). BK9 and BK10 stay clear of the water.
+- Removed: no part, socket or material. The water keys' preview texture nodes are gone (render only). Added: columns BK9 and BK10 (inside the hero; the RockSlope part is the front row and is unchanged).
+
+## Touch-up verification (2026-11-04)
+
+**Result: PASS, 7/10.**
+- The water is plain cyan.
+- The grass top is square and runs to the tile's left and back edges, as the top cell, the exploded Grass Top and the underside cell ("simple blocky joining volumes") draw it.
+- The daisies read as white flowers.
+- The filled back-left corner reads right against the hero and top cells. The flat soil wall it shows from behind is a recorded miss against the redrawn rear cells, not a blocker.
+
+**Technical** (`kit_verify.run`, cls asset, on the work copy; the committed kit objects were appended read-only for comparison):
+- ShorelineCorner 3640 tris (was 3614), 32.20 × 26.38 × 16.33, 138 shells (was 125), 8 `water_foam` sockets. GrassTop 972 / 999 (was 942; 28.3 × 23.2, was 24.7 × 22.1). SandStrip 196, RockSlope 550, WaterPlane 416 and Foam 336 are unchanged.
+- **Water material.** `FB_m032_water` and `FB_m032_water_foam` no longer have `FB_WaterTex`, Mapping or Texture Coordinate; the committed materials still have them. Keys, roughness and the alpha node are unchanged.
+- **Daisies.** The six new daisies' petals sit 0.060–0.076 above the lawn and their centres sit on the petals. That is the same `VEG_GAP` stand-off as the existing three (0.054–0.068, decision 9).
+- **Edges.** The grass top along the left edge (x −16) is level at 9.67–9.74. Along the back edge (y 13) it rises from 9.72 at the left to 10.45 (minor 2).
+- **Problems, all pre-existing** (same in the committed objects), none visible:
+  - vegetation floating by design: 105 floating shells, before and after;
+  - the water slab is its own shell (WaterPlane floating 1);
+  - RockSlope 1 parity-inward face (winding 0);
+  - thin corners: the two rock faces under 5° (4.01° at (0.54, −2.6), 4.55° at (11.66, 5.4)) are in the committed hero too, which also had 3.15° and 3.33°;
+  - every foam face under 5° is identical before and after.
+- No new problem.
+
+**Against the sheet** (compare at f34 (0, 32), front (0, 26), side (90, 12), rear (180, 18), r34 (180, 30), top (0, 89) and the tiling cell; new and committed side by side for f34, top and r34; high-resolution shots at (120, 25), (−135, 30), (−40, 25) and (0, 89); the GrassTop and WaterPlane parts. All in `<temp>/.../M032/`.)
+- **Water.** The caustic net is gone. Top median #1BD9FF against the sheet's #01D2F9. The spread inside the water drops from 0.105 / 0.053 / 0.038 (R / G / B, committed) to 0.045 / 0.036 / 0.037 (sheet 0.070 / 0.022 / 0.020).
+- **Square top.** The top view now matches the sheet's layout: grass to the left and back edges, the sand diagonal, water at the lower right. The committed oval band did not. The GrassTop part is a straight-edged slab.
+- **Back-left corner.** Filling it follows the hero, the top cell and the exploded Grass Top. From behind, the rear and r34 now show the flat tan joining face, about 10 studs tall, instead of the back cliff row the sheet's redrawn rear cells draw. In use a neighbouring tile covers that face, so this is a recorded miss.
+- **Daisies.** In the top and f34 views they read as white five-point flowers with yellow centres, about the sheet's size (1.6 studs across).
+- **Proportions** (shares of the top view): grass 0.632 (committed 0.521, sheet 0.317), water 0.160 (0.206, sheet 0.329), sand 0.084 (sheet 0.152). The plateau was already deeper than the sheet's (ruling of 2026-10-29); the block adds to it, as the restyled top asks.
+- **Grass** colour, top view: #A9D105 against #92BF12 (committed #90BB05). More flat lawn now shows; the key is unchanged.
+
+**Blockers:** none.
+
+**Minors:**
+1. **The new back-left lawn is bare.** f34 grass share is 0.384 against the sheet's 0.238. The sheet's grass top is dense with bushes and flowers; ours has six small daisies on about 200 sq studs. Fix: add 3–4 bushes and 3–4 yellow flowers on the lawn, hero only. That fits in the hero's 359 spare tris; the GrassTop part has no room (972 / 999).
+2. **Back joining edge not level.** Along the back edge the grass rises 9.72 → 10.45, so a neighbouring tile would meet a step of up to 0.7. Fix: blend `grass_z` to one height (about 9.73, the left edge's) within about 1.5 studs of the tile's left and back edges.
+3. Main session: the exporter still writes the caustic water texture for both keys (shared code, as the modeller noted).
+4. Pre-existing: the plateau is deeper than the sheet's and the water share is low (ruling of 2026-10-29); the rear cells show the joining face (above).

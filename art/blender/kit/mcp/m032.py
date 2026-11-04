@@ -97,7 +97,24 @@ def palette():
         K.set_colour(k, hexcol, rough=rough, low_spec=low)
         if k in TRANSPARENCY:
             f.set_water_transparency(mat, TRANSPARENCY[k])
-            _refresh_water_texture(mat, k, hexcol)
+            _plain_water(mat)
+            K.set_colour(k, hexcol, rough=rough, low_spec=low)
+
+
+def _plain_water(mat):
+    """Touch-up 2026-11-04: the restyled sheet's water is plain cyan, with no lighter ripple or caustic net. Drop the
+    kit's water preview texture (lib/kitwater.py's caustic net) from the material, so the key's flat colour x Tint
+    shows. (The Roblox exporter still writes its own water texture per water key; that is shared code.)"""
+    nt = mat.node_tree
+    tex = nt.nodes.get("FB_WaterTex") if nt else None
+    if tex is None:
+        return
+    mapping = tex.inputs["Vector"].links[0].from_node if tex.inputs["Vector"].links else None
+    coord = mapping.inputs["Vector"].links[0].from_node if mapping and mapping.inputs["Vector"].links else None
+    for n in (tex, mapping, coord):
+        if n is not None:
+            nt.nodes.remove(n)
+    mat.pop("m032_tex_hex", None)
 
 
 def _refresh_water_texture(mat, key, hexcol):
@@ -502,7 +519,41 @@ BACK_COLS = {
     "BK6": ((3.27, 10.79), 5.6, 3.6, 172.0, 32017),
     "BK7": ((7.98, 9.52), 4.2, 3.4, -155.0, 32018),
     "BK8": ((9.55, 9.08), 3.0, 2.8, -170.0, 32019),
+    # touch-up 2026-11-04 (square grass top): two columns facing +X dress the land block's right side behind the
+    # water's back cut (not in COL_RING; their feet stay clear of the water and the tile's back edge)
+    "BK9": ((11.6, 10.2), 3.0, 2.8, -90.0, 32020),
+    "BK10": ((11.6, 12.1), 1.6, 2.6, -90.0, 32021),
 }
+# Touch-up 2026-11-04: the restyled sheet (top view, exploded Grass Top, edge-to-edge tiling panel) draws a square
+# grass top that runs to the tile's left (x -16) and back (y 13) edges as flat joining faces, not an oval band. The
+# ridge outline is the union of the old band and this block (CCW): its front edge runs SQUARE_IN behind the front
+# columns' centres (so the creases between them keep their depth), its right side SQUARE_X inside BK9 / BK10's tops,
+# where the fill's wall is the slab's (the fill's tile-edge sides use the ridge outline's points: _fill_poly),
+# its front-left corner behind the low box B1. A soil fill under it (ridge_core) carries the slab to the ground.
+SQUARE_IN = 1.6
+SQUARE_FRONT = ("C0", "C1", "C2", "C3a", "C3b", "C4", "C5", "C6")
+SQUARE_LEFT_Y = -4.4          # the block's front-left edge (B1 reaches y -4.57)
+SQUARE_X = (12.3, 12.3)       # the block's right side: slab (0.6 inside BK9's top edge) and fill (one wall)
+SQUARE_EDGE = 0.0             # the fill's walls at the tile edges (0: flush with the slab's, one joining face)
+SQUARE = {}
+
+
+def square_block(fill=False):
+    """The block the square grass top adds (slab) or the soil fill under it (fill=True), CCW."""
+    key = "fill" if fill else "slab"
+    if key in SQUARE:
+        return SQUARE[key]
+    x0, y0, x1, y1 = TILE
+    e = SQUARE_EDGE if fill else 0.0
+    front = []
+    for nm in SQUARE_FRONT:
+        c, _w, _d, yaw, _s, _n, _r = col_spec(nm)
+        yr = math.radians(yaw)
+        front.append(Vector(c) + Vector((math.sin(yr), math.cos(yr))) * SQUARE_IN)     # c - n * SQUARE_IN
+    xr = SQUARE_X[1] if fill else SQUARE_X[0]
+    SQUARE[key] = ([Vector((x0 + e, SQUARE_LEFT_Y)), Vector((front[0].x - 1.6, SQUARE_LEFT_Y))] + front +
+                   [Vector((xr, front[-1].y + 0.6)), Vector((xr, y1 - e)), Vector((x0 + e, y1 - e))])
+    return SQUARE[key]
 # the ring round the ridge (front left to right, then the back right to left): the slab outline bridges each
 # neighbour pair
 COL_RING = ("C0", "C1", "C1b", "C2", "C3a", "C3b", "C4", "C5", "C6", "BK8", "BK7", "BK6", "BK4", "BK3", "BK2", "BK1",
@@ -557,6 +608,9 @@ BUSHES = [((-4.6, -6.4), 2.0, 6, 32301, None), ((-11.2, -3.2), 1.6, 6, 32302, No
           ((-6.2, -8.9), 1.8, 6, 32331, "hero"), ((-9.6, 0.6), 1.8, 6, 32332, "hero"),
           ((6.47, 10.18), 1.9, 6, 32333, "hero")]
 DAISIES = [((-9.0, -2.4), 0.55), ((-6.0, -4.0), 0.6), ((-3.3, 3.9), 0.55)]
+# touch-up 2026-11-04: white daisies on the square top's new back-left lawn (the hero; the GrassTop part keeps three)
+DAISIES_BACK = [((-13.0, 1.5), 0.8), ((-11.5, 7.5), 0.8), ((-8.0, 10.8), 0.8), ((-6.5, 8.0), 0.75),
+                ((-2.0, 11.6), 0.8), ((-9.5, 4.2), 0.75)]
 YELLOWS = [((-12.0, -4.8), None), ((-8.6, -5.0), None), ((-5.2, -1.6), None), ((1.62, 1.66), None), ((4.32, 4.04), None)]
 # the sand path along the rim on the ridge (spec 1.3), a constrained region of the grass slab's top (widened by
 # PATH_WIDEN; fix round 1 moved the plants that stood on the wider path just off it)
@@ -719,6 +773,7 @@ def ridge_outline(tol=0.08):
     pos += [_hull2(ins[COL_RING[i]] + ins[COL_RING[(i + 1) % n_]]) for i in range(n_)]
     cen = [Vector(col_spec(nm)[0]) for nm in COL_RING]
     pos.append(cen if _area2(cen) > 0 else list(reversed(cen)))
+    pos.append(square_block())          # touch-up 2026-11-04: the square, edge-matched top
     out = _rdp_closed(_union_outline(pos), tol)
     # no edge under 0.35 (thin wall quads): merge the closest neighbours
     while len(out) > 4:
@@ -853,7 +908,31 @@ def ridge_core(a):
     co, tris = cdt_region([keep], tidy=False)
     tf, wf, bf, vs = slab(a, co, tris, lambda p: grass_z(p) - GRASS_THICK + 0.3, lambda p: -0.45,
                           _mix(ROCK, SOIL_DARK, 0.25))
-    return vs
+    # touch-up 2026-11-04: the soil fill under the square top's block (its walls are the tile's joining faces: the
+    # tan soil of the slab sides and the sheet's "simple blocky joining volumes")
+    co, tris = cdt_region([_fill_poly()], tidy=False)
+    tf2, wf2, bf2, vs2 = slab(a, co, tris, lambda p: grass_z(p) - GRASS_THICK + 0.3, lambda p: -0.45, SOIL)
+    _paint(a, tf2 + bf2, SOIL_DARK)
+    _mottle(a, wf2, 0.04, 0.5, 32506)
+    return vs + vs2
+
+
+def _fill_poly():
+    """The fill's outline (touch-up 2026-11-04): square_block(fill=True) with its tile-edge sides taken from the
+    ridge outline's own points there, so the fill's joining walls share the slab's vertical edges (a fill corner
+    between two slab points left 2-3 degree slivers on the merged wall)."""
+    fill = square_block(fill=True)
+    x0, _y0, _x1, y1 = TILE
+    ridge = ridge_outline()
+    back = sorted((p for p in ridge if abs(p.y - y1) < 1e-4), key=lambda p: -p.x)
+    left = sorted((p for p in ridge if abs(p.x - x0) < 1e-4), key=lambda p: -p.y)
+    xr = min((p.x for p in back), key=lambda x: abs(x - SQUARE_X[1]))
+    back = [p for p in back if p.x <= xr + 1e-6]
+    left = [p for p in left if p.y < y1 - 1e-4 and p.y > SQUARE_LEFT_Y + 1e-4]
+    right = sorted((p for p in ridge if abs(p.x - xr) < 1e-4 and fill[-3].y + 1e-4 < p.y < y1 - 1e-4),
+                   key=lambda p: p.y)
+    return (fill[:-3] + [Vector((xr, fill[-3].y))] + [p.copy() for p in right] + [p.copy() for p in back] +
+            [p.copy() for p in left])
 
 
 def core_poly():
@@ -1240,7 +1319,7 @@ def vegetation(a, ground, ridge_only=False, guard=None):
     for c, size, n, seed, on in BUSHES:
         if on is None or not ridge_only:
             bush(a, c, size, n, seed, ground, guard)
-    for i, (c, r) in enumerate(DAISIES):
+    for i, (c, r) in enumerate(DAISIES + ([] if ridge_only else DAISIES_BACK)):
         daisy(a, c, r, 32901 + i, ground, guard)
     for i, (c, on) in enumerate(YELLOWS):
         if on is None or not ridge_only:
@@ -1811,6 +1890,7 @@ def build(render=True, parts=True):
     M.coll(NUM, TITLE)
     palette()
     RIDGE.clear()
+    SQUARE.clear()
     HOLES.clear()
     holes()
     log = {}
