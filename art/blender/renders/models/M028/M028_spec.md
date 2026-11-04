@@ -1435,3 +1435,54 @@ lightness of the front rocks is swapped against the sheet (ours lit from the lef
 ## Main session after verification round 1 (2026-10-29)
 
 Applied minor 1: `ROCK` #755A50 → #78594A and `ROCK_COOL` #6A5A5B → #6B5953, so the rocks read as the sheet's warm and grey-brown pair instead of one pinkish brown. The rebuild in the kit file gave a hero of 1644 tris, one shell, 0 bowties, `K.check` clean. Export: 0 problems.
+
+## Touch-up for the restyled sheet (2026-11-04)
+
+The owner restyled `references/028.png` (same design, flatter colours, deeper leaf blues). The compare pass found only the leaf colour changed, so the mesh is unchanged: hero 1644 tris, stem 404, leaf 60, ice nodule 46, base 944; same sizes. Nothing else changed: the model had no sockets and no emission before, and has none now.
+
+- **Deeper leaf blues.** The three leaf keys were scaled by ×(0.649, 0.612, 0.626) in linear light: the sheet / ours ratio of the leaf medians in the `front_sheet` and `rear_sheet` renders (geometric mean). `m028_leaf` `#3D6DB6` → `#315693`, `m028_leaf_deep` `#2A5393` → `#214176`, `m028_leaf_light` `#4678BE` → `#385F9A`. `TARGETS` now holds the new swatches: leaf `#527ABE`, deep `#31528A`.
+- `M028_sheet_compare.png` was re-made with `compare()`; it was still the earlier palette.
+
+Colour measures (leaf pixels: blue, b > r + 60 and b > g + 35, sat > 0.45), as median / lit quartile / shade quartile:
+
+| View | Sheet | Ours now | Before |
+| --- | --- | --- | --- |
+| Front three-quarter | `#395D9B` / `#4E76BC` / `#244172` | `#3B5E9B` / `#4F76BB` / `#2D4D84` | `#4576C2` / `#5C92E7` / `#335B9D` |
+| Rear | `#345691` / `#5078BB` / `#254172` | `#38588F` / `#4563A1` / `#274071` | `#436CB1` / `#4E7AC8` / `#2E528F` |
+| Exploded leaves | `#395E9C` / `#4F77BD` / `#264376` | `#385487` / `#5374B4` / `#223A64` | `#3965A8` / `#5F8FE0` / `#284676` |
+| Swatches | mid `#537BBF`, dark `#315289` | keys `#315693`, `#214176` | |
+
+The medians now match within 4 levels in the front three-quarter and rear views (they were 12–39 levels too light).
+
+Checks: `build()` problems `[]`. `kit_verify.run(cls="asset")` on the hero and four parts: 0 problems. Renders in this folder were re-made by `build()`.
+
+## Touch-up verification (2026-11-04)
+
+**Result: PASS, 9/10.** Fresh verifier, read-only, in a background session on a copy of the work file with the touch-up built (`TOUCH_Av2.blend`); nothing rebuilt or saved. The leaves now carry the sheet's deeper blues; nothing else changed. No blockers.
+
+Technical:
+- `kit_verify.run(cls="asset", sockets=[])` on the hero and four parts: **0 problems.** Hero 1644 / 3999, stem 404, leaf 60, ice nodule 46, base 944; one shell each; hero 4.51 × 2.99 × 3.60; 0 floating, 0 buried; min corner 4.09°.
+- Against the committed kit file's builds, hero, stem, leaf and nodule are vertex-for-vertex identical. `FrostBushBase` has 3 of 472 vertices off by up to 0.039, and its material slot order differs. The builder's base code is unchanged (the diff is the palette and `TARGETS` only), so this is union nondeterminism between the two build files, not this touch-up's work. The part is clean in `kit_verify`.
+- No sockets and no emission, before or after.
+
+Colours against the sheet (`compare.compare` cells f34 (0, 12), r34 (180, 14), front (0, 12), side (90, 12), rear (180, 12), top (0, 89); the spec's leaf mask b > r + 60, b > g + 35, sat > 0.45; median / lit quartile / shade quartile):
+
+| View | Sheet | Ours |
+| --- | --- | --- |
+| Front three-quarter | `#395D9B` / `#4E76BC` / `#244172` | `#3B5E9B` / `#4F76BB` / `#2D4D84` |
+| Front | `#385D9B` / `#4C76BB` / `#244172` | `#3B5E9B` / `#4F76BB` / `#2D4D84` |
+| Rear three-quarter | `#385C99` / `#4E76BB` / `#264274` | `#39588F` / `#4362A0` / `#284171` |
+| Rear | `#345691` / `#5078BB` / `#254171` | `#38588F` / `#4563A1` / `#274071` |
+| Side | `#355791` / `#698EC8` / `#224071` | `#3A568B` / `#4262A0` / `#2B4779` |
+| Top | `#3B609D` / `#4C75B8` / `#2C4D84` | `#4166A9` / `#4F76BC` / `#395891` |
+| Sheet swatches | mid `#537BBF`, dark `#315289` | keys `#315693`, deep `#214176` |
+
+The medians match within 2–6 levels in every view but the top (+6 / +6 / +12). The sheet's exploded and joint-detail leaves measure `#385C9B`–`#3A5F9D`, the same. The leaves read as the sheet's deep blue in every cell.
+
+Blockers: none.
+
+Minors:
+1. From the rear, the lit quartile is about 11 levels darker than the sheet's (`#4563A1` against `#5078BB`), and the front shade quartile is about 12 levels lighter (`#2D4D84` against `#244172`). The facet spread is a little narrower than the sheet's. That is lighting; recorded, not scored.
+2. The base's 3-vertex drift (above) is invisible. The kit file's build will be whatever `build()` gives in the GUI.
+
+Silhouette, ice and rock colours are unchanged from the passed build and not re-scored. Scratch renders: `<temp>/.../cmp/M028/`.

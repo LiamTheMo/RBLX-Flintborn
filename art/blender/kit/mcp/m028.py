@@ -55,10 +55,13 @@ POLISH_LIM = 5.0
 # ice (base nodule FL against the sheet's #7DA2E1) x(1.32, 1.24, 1.12). Pass 3: the snow's shaded lumps read grey: the snow
 # blue key x(1.08, 1.10, 1.14) (bluer, not greyer); the snow key stays (x1.07-1.15 clipped the lit lumps to #D7EBFF-
 # #DCF0FF against the sheet's #D1E0F4).
+# Touch-up 2026-11-04 (restyled sheet: deeper leaf blues, swatches dark #31528A and mid #527ABE): the three leaf keys
+# x(0.649, 0.612, 0.626) in linear light, the sheet / ours ratio of the leaf medians in the front_sheet and rear_sheet
+# renders (sheet #395D9B / #345691 against our #4576C2 / #436CB1). Were leaf #3D6DB6, deep #2A5393, light #4678BE.
 PALETTE = {
-    LEAF: ("#3D6DB6", 0.55, False),
-    LEAF_DEEP: ("#2A5393", 0.55, False),
-    LEAF_LIGHT: ("#4678BE", 0.55, False),
+    LEAF: ("#315693", 0.55, False),
+    LEAF_DEEP: ("#214176", 0.55, False),
+    LEAF_LIGHT: ("#385F9A", 0.55, False),
     ICE: ("#9DCDFF", 0.3, False),
     ICE_PALE: ("#BADEFF", 0.3, False),
     ICE_DEEP: ("#769AD0", 0.3, False),
@@ -74,7 +77,7 @@ PALETTE = {
     ROCK_DARK: ("#5E4B4A", 0.95, False),
 }
 # calibration targets: the sheet's rendered medians of unshadowed regions (M028_spec.md 5.4). key -> (sRGB, kind)
-TARGETS = {LEAF: ((0x48, 0x77, 0xC0), "vivid"), LEAF_DEEP: ((0x35, 0x5A, 0x99), "vivid"),
+TARGETS = {LEAF: ((0x52, 0x7A, 0xBE), "vivid"), LEAF_DEEP: ((0x31, 0x52, 0x8A), "vivid"),   # the 2026-11-04 swatches
            LEAF_LIGHT: ((0x53, 0x83, 0xC8), "vivid"),
            ICE: ((0xA8, 0xCD, 0xFA), "all"), ICE_PALE: ((0xCF, 0xE5, 0xFD), "all"),
            ICE_DEEP: ((0x7E, 0xA6, 0xE6), "all"),
