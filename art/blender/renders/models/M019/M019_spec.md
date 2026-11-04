@@ -1548,3 +1548,57 @@ from behind; known, not paint).
 ## Main session after verification round 2 (2026-10-28)
 
 Applied L2: `END_TURN["A_low"]` is (−15, 0), down from (−45, 0), so the bark spike under the large lump in front34 is gone. The rebuild in the kit file gave a hero of 2334 tris, 7.19 × 5.75 × 4.63, one shell, 0 non-manifold, `problems` empty, `K.check` clean. Export: 6 assets, 2 vfx sockets, 0 problems. L1 (the chisel-like A_up top from the side) needs a re-layout and is recorded as a minor.
+
+## Touch-up for the restyled sheet (2026-11-04)
+
+The owner restyled `references/019.png` (same design, flatter colours; the sparkle stars round the lumps are gone, and the notes say "simple, solid colors—no texture, gradients, or noise"). The compare pass found only colour and effect changes, so the mesh is unchanged: hero 2334 tris, body 786, cut end 120, lumps 70 / 54, clump 154; same sizes.
+
+- **Plain cream cut ends.** `CAP_BANDS` is all `m019_cut`, and the insert's side band is `m019_cut` (was a 25 % `cut_ring` mix). The dome's loop edges are still in the mesh, but they no longer carry a colour. The `m019_cut_ring` key (`#D8B384`) and its mix `cut_x_ring_25` are gone from `PALETTE` and `TARGETS`, and their two unused materials were removed from the work file.
+- **Darker inner wood.** `m019_bark_light` (the sheet's Wood (Inner): the lighter bark lip at the cut ends and the broad patches) `#7A5236` → `#714E39`: the old key scaled in linear light by the new swatch `#926246` over the old target `#9E6743`. Its `TARGETS` entry is now `#926246`.
+- **Sockets removed:** the two `ore_glint` emitters round the lumps (`GLINT`, `GLINTS`). The hero has no sockets; there was no light or emission before either.
+
+Colour measures (whole render or sheet cell, by class: cream = cut wood, bark = brown bark incl. the inner-wood mixes), as median / lit quartile / shade quartile:
+
+| Region | Sheet | Ours now | Before |
+| --- | --- | --- | --- |
+| Cut end (sheet "Cut End Detail" / our `cut_end.png`) | `#F2C898` / `#F7CEA0` / `#EFC293` | `#EEC088` / `#FFD497` / `#E5B882` | `#EABC85` / `#FFD497` / `#D7AB75` |
+| Cut ends, front three-quarter | `#F7CC9D` / `#FDE1B4` / `#F1C493` | `#FFCF94` / `#FFF4B2` / `#E7BB85` | `#FFD395` / `#FFF2B1` / `#DFB27C` |
+| Bark, front three-quarter | `#7F563E` / `#A57051` / `#5B3E2C` | `#80573C` / `#8A5E43` / `#5D3E2A` | `#81573B` / `#906042` / `#5E3D29` |
+| Bark, exploded body | `#875C43` / `#A67152` / `#674633` | `#80573B` / `#8C6145` / `#5A3C29` | — |
+| Swatches | Wood (Inner) `#926246`, Wood (Bark) `#77513A`, Cut End `#EDC293` | keys `#714E39`, `#614129`, `#E6C192` | |
+
+With the rings gone, the cut end's dark quartile rose from `#D7AB75` to `#E5B882`, now one flat cream like the sheet's. The bark's lit quartile fell by about 6 levels with the darker inner wood. The sheet's lit bark is still lighter than ours (`#A57051`), a studio-lighting split that the earlier rounds recorded too.
+
+Checks: `build()` problems `[]`. `kit_verify.run(cls="asset")` on the hero and five parts reports one problem, `ResinBranchLeafClump shell 0 (leaf#0): ... self-hits 3`. That comes from the leaf clump part's mesh, which this touch-up doesn't change (colour and sockets only), so it is left for the next rebuild of the clump. The hero has 0 self-hits; floating 0 and buried 0 everywhere. Renders in this folder were re-made by `build()`.
+
+## Touch-up verification (2026-11-04)
+
+**Result: PASS, 8.5 / 10.** The cut ends are plain cream, the sparkle sockets are gone and the inner wood is darkened toward `#926246`. The only `kit_verify` problem is pre-existing and doesn't show. No blockers.
+
+Method: read-only, in a background Blender on a copy of the work file with the touch-up build in it. `kit_verify.run(cls="asset", sockets=[])` on the hero and five parts, a comparison against the pre-touch-up objects in `FlintbornWorldKit.blend`, and `compare.compare` on the new sheet's cells (f34 (15,135,528,445), rear34 (530,135,1008,445), front (15,475,285,685), top (775,475,1008,685)) plus this folder's `cut_end.png` against the sheet's Cut End Detail (810,1120,905,1228). Renders went to `<temp>/...`.
+
+### Technical
+- `kit_verify`: **1 problem**, `ResinBranchLeafClump shell 0 (leaf#0): ... self-hits 3`. ResinBranchNode 2334 / 3999 tris, 7.19 × 5.75 × 4.63. Parts: Body 786, CutEnd 120, LumpLarge 70, LumpSmall 54, LeafClump 154. Each part is one shell, with 0 floating and 0 buried; the thinnest corner is 5.06°. No sockets on the hero (the `sockets=[]` check passes).
+- **The self-hits are pre-existing and invisible.** The leaf clump's mesh is identical to the pre-touch-up kit object (max vertex Δ 0.0, no material changes), and `kit_verify` on that old object reports the same 3 self-hits. The three intersecting triangle pairs are all `m019_leaf_base` slivers of 0.003–0.016 studs² at the hub (about 0.3 from the part's origin, z 0.08–0.11), under the leaves. The hero has 0 self-hits.
+- **Only colour changed.** Against the pre-touch-up kit objects, the vertices are identical on all six objects. The only material changes are `m019_cut_ring` → `m019_cut` (40 faces on the CutEnd part, 161 on the hero) and `m019_cut_x_ring_25` → `m019_cut` (20 and 141). Both ring materials are gone from both objects. Body, lumps and clump are unchanged. The new `m019_bark_light` hex `#714E39` checks out: it is `#7A5236` scaled in linear light by `#926246` / `#9E6743`.
+- The builder diff matches the spec: `CUT_RING` is removed, `CAP_BANDS` is all `CUT`, the side band is `CUT`, and `GLINT`, `GLINTS` and the `_vfx` body are removed. No dangling references.
+
+### Colours against the sheet (median / lit quartile / shade quartile)
+
+| Region | Sheet | Ours |
+| --- | --- | --- |
+| Cut ends, f34 | `#F3C998` / `#FDE0B2` / `#E6BA89` | `#F1C38A` / `#FFDF9F` / `#E3B781` |
+| Cut ends, front | `#F7D1A0` / `#FDE0B3` / `#EFC493` | `#F1C38A` / `#FFDFA0` / `#E3B781` |
+| Cut end close-up (sheet Cut End Detail / `cut_end.png`) | `#F2C898` / `#F8CFA0` / `#ECBF8E` | `#EEC088` / `#FFD396` / `#E3B781` |
+| Bark, f34 | `#7E553D` / `#A46F51` / `#5A3E2B` | `#80563B` / `#8B5F43` / `#5A3B27` |
+| Bark, top | `#77513A` / `#99684C` / `#5B3C29` | `#7F563C` / `#8D6045` / `#6A4732` |
+
+Swatches: Wood (Bark) `#77513A`, Wood (Inner) `#926246`, Resin `#FD8F01`, Cut End `#EDC293`, Leaves `#609B1A`. The cut ends read as one flat cream with no rings: the close-up's shade quartile went from `#D7AB75` before the touch-up to `#E3B781`, and only the dome's facet shading remains. The bark medians match within 3 levels.
+
+### Blockers
+None.
+
+### Minors
+- `ResinBranchLeafClump` leaf#0 has 3 self-hits at the hub. They are pre-existing and hidden. Fix them at the clump's next rebuild: seat the leaf bases so they don't cross at the hub, or union the clump.
+- The cut cream is about 14 levels short on blue against the sheet (`#F1C38A` against `#F3C998`), so it is slightly more yellow. Optional: nudge `m019_cut` toward `#E8C59A`.
+- The sheet's lit bark is lighter than ours (`#A46F51` against `#8B5F43`). This is the lighting split earlier rounds recorded; the darker inner wood widened it by about 6 levels, as the brief asked.

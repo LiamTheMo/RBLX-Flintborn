@@ -13,7 +13,7 @@ names are ResinBranch* (M019_spec.md section 8, main-session decision 10):
 - ResinBranchBody (body): Main Branch Body. Six faceted 8-sided log tubes (A_low, A_up, B_back, B_front, stubs C and
   D; `_tube`: jittered, twisted rings along the axis, a flared bark lip and a flat cut face at the end) fused through
   a hull knot at the fork (`_knot`), plus the two hexagonal resin join pads ("Flat Join Surface"). No caps.
-- ResinBranchCutEnd (cut_end): Branch Cut End, a thick 10-sided insert with a slightly domed face in two ring bands.
+- ResinBranchCutEnd (cut_end): Branch Cut End, a thick 10-sided insert with a slightly domed, plain cream face.
 - ResinBranchLumpLarge / ResinBranchLumpSmall: the resin lumps, convex hulls of jittered Fibonacci points with the
   largest faces poked (broad facets split into a few triangles of slightly different tone).
 - ResinBranchLeafClump (clump): five broad kite leaves (midrib ridge, keel) radiating from a hidden hub.
@@ -43,7 +43,7 @@ NUM, TITLE, SHEET = 19, "Resin Node", "M019"
 OFF = "m019_offset"
 
 BARK, BARK_LIGHT, BARK_DARK = "m019_bark", "m019_bark_light", "m019_bark_dark"
-CUT, CUT_RING, JOIN = "m019_cut", "m019_cut_ring", "m019_join"
+CUT, JOIN = "m019_cut", "m019_join"
 RESIN, RESIN_LIGHT, RESIN_DARK = "m019_resin", "m019_resin_light", "m019_resin_dark"
 LEAF, LEAF_TIP, LEAF_BASE = "m019_leaf", "m019_leaf_tip", "m019_leaf_base"
 
@@ -60,9 +60,11 @@ RESIN_SPEC = 0.08
 # Round 2 (verifier findings 4 and 5): bark_light at its dome-calibrated #7A5236 (pass 1 converged at once; the
 # lighter bark at the cut ends); cut x 1.14 (B's front end rendered 20 levels dark) and cut_ring at ~40 % of its
 # round-1 contrast against cut (the sheet's rings are faint). Bark stays at its round-1 pass-2 value.
-PALETTE = {BARK: ("#614129", BARK_ROUGH, False), BARK_LIGHT: ("#7A5236", BARK_ROUGH, False),
+# Touch-up 2026-11-04 (restyled sheet): bark_light (the sheet's Wood (Inner)) #7A5236 -> #714E39, the old key scaled
+# in linear light by the new swatch #926246 over the old target #9E6743; the cut_ring key is gone (plain cut ends).
+PALETTE = {BARK: ("#614129", BARK_ROUGH, False), BARK_LIGHT: ("#714E39", BARK_ROUGH, False),
            BARK_DARK: ("#462D1D", 0.95, False),
-           CUT: ("#E6C192", CUT_ROUGH, False), CUT_RING: ("#D8B384", CUT_ROUGH, False), JOIN: ("#B28A53", 0.8, False),
+           CUT: ("#E6C192", CUT_ROUGH, False), JOIN: ("#B28A53", 0.8, False),
            RESIN: ("#EC8600", RESIN_ROUGH, False), RESIN_LIGHT: ("#F99A08", RESIN_ROUGH, False),
            RESIN_DARK: ("#E67A02", RESIN_ROUGH, False),
            LEAF: ("#497C14", LEAF_ROUGH, True), LEAF_TIP: ("#6BA51E", LEAF_ROUGH, True),
@@ -102,9 +104,9 @@ def _resin_spec():
 
 # calibration targets: the sheet's rendered medians of unshadowed regions (M019_spec.md section 5.4).
 # key -> (sRGB, kind)
-TARGETS = {BARK: ((0x85, 0x57, 0x3A), "brown"), BARK_LIGHT: ((0x9E, 0x67, 0x43), "brown"),
+TARGETS = {BARK: ((0x85, 0x57, 0x3A), "brown"), BARK_LIGHT: ((0x92, 0x62, 0x46), "brown"),
            BARK_DARK: ((0x5F, 0x3E, 0x2A), "brown"),
-           CUT: ((0xF1, 0xC6, 0x8C), "all"), CUT_RING: ((0xE2, 0xB0, 0x74), "all"), JOIN: ((0xE2, 0xA8, 0x62), "all"),
+           CUT: ((0xF1, 0xC6, 0x8C), "all"), JOIN: ((0xE2, 0xA8, 0x62), "all"),
            RESIN: ((0xFC, 0x94, 0x07), "vivid"), RESIN_LIGHT: ((0xFD, 0xAA, 0x14), "vivid"),
            RESIN_DARK: ((0xE2, 0x76, 0x02), "vivid"),
            LEAF: ((0x5C, 0x9E, 0x16), "green"), LEAF_TIP: ((0x72, 0xB4, 0x1C), "green"),
@@ -574,7 +576,8 @@ def body_info():
 # ---- cut-end insert ---------------------------------------------------------------------------------------------------
 CAP_SIDES = 10
 CAP_RINGS = (0.22, 0.38, 0.62, 0.78, 1.0)      # face loops (fractions of R): centre fan + 4 bands = 2 ring bands
-CAP_BANDS = (CUT, CUT_RING, CUT, CUT_RING, CUT)   # the centre fan, then each band out to the rim
+CAP_BANDS = (CUT, CUT, CUT, CUT, CUT)   # the centre fan, then each band out to the rim: plain cream since the
+#                                        2026-11-04 touch-up (the restyled sheet has no ring bands)
 CAP_PROUD, CAP_SINK, CAP_DOME, CAP_BEVEL = 0.08, 0.12, 0.03, 0.025    # fractions of the disc's diameter
 CAP_R = 0.86         # the insert's radius, as a fraction of the log's radius at its end (inside the flared lip)
 CAP_MOTTLE = dict(amp=0.03, scale=0.9, seed=19041)
@@ -621,7 +624,7 @@ def _cap(a, centre, normal, R, seed, axis=None, u=None, phase=None, proud=None, 
         bands.append(_strip(bm, l1, l0))
     side = _strip(bm, back, loops[-1])
     bot = _fan(bm, back, bc, flip=True)
-    side_key = K.mix_key(CUT, CUT_RING, 0.25)
+    side_key = CUT
     groups = [(g, CAP_BANDS[i]) for i, g in enumerate(bands)] + [(side, side_key), (bot, CUT)]
     vs = [v for l in loops for v in l] + back + [top, bc]
     a._finish(vs, CUT)
@@ -1063,11 +1066,10 @@ NOTES = {
                        "second log across it, two short stubs), every log end a thick faceted cream cut-end insert, "
                        "two chunky faceted orange resin lumps straddling the logs (large at the front-left, small "
                        "on the right stub), five bright five-leaf clumps in the notches; one closed mesh, flat "
-                       "ground contact. VFX: 2 ore_glint (pale gold sparkle stars round each lump); no glow",
+                       "ground contact. No VFX, no glow",
     "ResinBranchBody": "Main Branch Body (reusable): two crossing faceted logs and two stubs fused through a knot at "
                        "the fork, the two resin join pads; flat cut faces with a bark lip at each end, no inserts",
-    "ResinBranchCutEnd": "Branch Cut End (reusable): thick 10-sided cream insert, low faceted dome face in two ring "
-                         "bands",
+    "ResinBranchCutEnd": "Branch Cut End (reusable): thick 10-sided cream insert, low faceted plain dome face",
     "ResinBranchLumpLarge": "Resin Lump (Large, reusable): chunky broad-faceted orange nodule, yellow top to "
                             "red-orange bottom",
     "ResinBranchLumpSmall": "Resin Lump (Small, reusable): the large lump's family at two thirds the size",
@@ -1144,30 +1146,10 @@ def _ground_faces(o):
 
 # ---- stages 5 + 6 (spec section 7) ---------------------------------------------------------------------------------
 # Stage 5: nothing. The sheet says "No glow baked into model": no emissive key, no light.
-# Stage 6: two ore_glint sockets, one per lump, the sheet's pale-gold four-point stars round each lump.
-GLINT = {"name": "Glint", "texture": "spark_diamond", "color": ["#F9E4C4", "#FBD28E"], "transparency": [0.1, 1.0],
-         "lifetime": [0.6, 0.9], "speed": [0, 0], "spread": 0, "light_emission": 1.0, "rotation": [0, 90]}
-# Round 2 (verifier finding 7): round 1 put each socket at its lump's centre, so 33 % (large; 14 % under the ground)
-# and 21 % (small) of the spawn box was inside the mesh. Each socket now sits `shift` from its lump centre (up, and a
-# little toward the upper-front-left, where the sheet's stars are), and `height` (Roblox Y) caps the box above the
-# ground.
-# Monte Carlo (3000 points, 3-ray parity): large 13.2 % hidden, small 13.1 %, none below the ground.
-GLINTS = {"large": dict(size=[0, 0.9, 0], rate=2.5, pad=0.8, shift=(-0.35, -0.55, 0.85), height=3.0),
-          "small": dict(size=[0, 0.65, 0], rate=1.5, pad=0.7, shift=(-0.4, -0.7, 0.9), height=2.6)}
-
-
+# Stage 6: nothing since the 2026-11-04 touch-up: the restyled sheet drops the pale-gold sparkle stars round the lumps,
+# so under the house rule (no VFX the sheet doesn't show) the two ore_glint sockets (GLINT, GLINTS) are gone.
 def _vfx(h):
-    off = Vector(h[OFF])
-    made = []
-    for k, g in GLINTS.items():
-        c, r, sq = LUMPS[k][:3]
-        d = [2 * r * s + 2 * g["pad"] for s in sq]
-        if g.get("height"):
-            d[2] = g["height"]
-        em = dict(GLINT, size=g["size"], rate=g["rate"], shape=[round(d[0], 2), round(d[2], 2), round(d[1], 2)])
-        p = Vector(c) + Vector(g.get("shift", (0, 0, 0))) - off
-        made.append(K.socket(h, "ore_glint", [round(x, 3) for x in p], emitters=[em]))
-    return made
+    return []
 
 
 # ---- build --------------------------------------------------------------------------------------------------------
