@@ -23,7 +23,7 @@
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local ItemCatalog = require(ReplicatedStorage.Shared.Items.ItemCatalog)
+local ItemCatalog = require(script.Parent.Parent.Items.ItemCatalog)
 local Recipe = require(script.Parent.Recipe)
 
 local GearModels = {}

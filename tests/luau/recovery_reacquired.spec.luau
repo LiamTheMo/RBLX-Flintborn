@@ -23,7 +23,7 @@ FakeRoblox.Place("World")
 FakeRoblox.Remotes()
 
 local CrashRecoveryRules = require(Server.Rules.Recovery.CrashRecoveryRules)
-local InventoryRules = require(Shared.Inventory.InventoryRules)
+local InventoryRules = require(Server.Rules.Inventory.InventoryRules)
 local ProfileSchema = require(Server.Rules.Data.ProfileSchema)
 local CheckpointStore = require(Server.Infrastructure.CheckpointStore)
 local ProfileService = require(Server.Services.ProfileService)

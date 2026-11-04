@@ -4,9 +4,10 @@
 -- materials lists.
 
 local Shared = game:GetService("ReplicatedStorage").Shared
+local Server = game:GetService("ServerScriptService").Server
 local RecipeModel = require(Shared.UI.RecipeModel)
 local Recipes = require(Shared.Crafting.Recipes)
-local CraftingRules = require(Shared.Crafting.CraftingRules)
+local CraftingRules = require(Server.Rules.Crafting.CraftingRules)
 
 local function input(id, name, owned, needed)
 	return { catalogId = id, name = name, owned = owned, needed = needed }

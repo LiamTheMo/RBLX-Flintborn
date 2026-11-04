@@ -6,7 +6,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Signal = require(ReplicatedStorage.Shared.Core.Signal)
-local Validation = require(ReplicatedStorage.Shared.Data.Validation)
+local Validation = require(script.Parent.Parent.Rules.Data.Validation)
 local ProfileService = require(script.Parent.ProfileService)
 
 local CurrencyService = {}

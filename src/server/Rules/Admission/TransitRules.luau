@@ -6,9 +6,9 @@
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local InventoryRules = require(ReplicatedStorage.Shared.Inventory.InventoryRules)
+local InventoryRules = require(script.Parent.Parent.Inventory.InventoryRules)
 local LobbyLoadoutRules = require(script.Parent.Parent.Inventory.LobbyLoadoutRules)
-local TradeRules = require(ReplicatedStorage.Shared.Economy.TradeRules)
+local TradeRules = require(script.Parent.Parent.Economy.TradeRules)
 
 local TransitRules = {}
 

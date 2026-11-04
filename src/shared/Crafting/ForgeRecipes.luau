@@ -162,8 +162,4 @@ for _, recipe in list do
 	table.insert(ForgeRecipes.List, recipe)
 end
 
-function ForgeRecipes.Get(recipeId: any)
-	return type(recipeId) == "string" and ForgeRecipes.ById[recipeId] or nil
-end
-
 return ForgeRecipes

@@ -1,9 +1,10 @@
 local Shared = game:GetService("ReplicatedStorage").Shared
-local ArmorRules = require(Shared.Combat.ArmorRules)
-local DamageRules = require(Shared.Combat.DamageRules)
-local WeaponCatalog = require(Shared.Combat.WeaponCatalog)
+local Server = game:GetService("ServerScriptService").Server
+local ArmorRules = require(Server.Rules.Combat.ArmorRules)
+local DamageRules = require(Server.Rules.Combat.DamageRules)
+local WeaponCatalog = require(Server.Rules.Combat.WeaponCatalog)
 local GameConstants = require(Shared.GameConstants)
-local InventoryRules = require(Shared.Inventory.InventoryRules)
+local InventoryRules = require(Server.Rules.Inventory.InventoryRules)
 
 local function fullSet(tier)
 	return {

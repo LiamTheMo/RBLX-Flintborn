@@ -10,7 +10,7 @@
 local Shared = game:GetService("ReplicatedStorage").Shared
 local Server = game:GetService("ServerScriptService").Server
 
-local ConsumeRules = require(Shared.Survival.ConsumeRules)
+local ConsumeRules = require(Server.Rules.Survival.ConsumeRules)
 local Consumables = require(Shared.Items.Consumables)
 local GameConstants = require(Shared.GameConstants)
 local SurvivalRules = require(Server.Rules.Survival.SurvivalRules)

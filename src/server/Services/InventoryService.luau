@@ -6,8 +6,8 @@
 local HttpService = game:GetService("HttpService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local InventoryRules = require(ReplicatedStorage.Shared.Inventory.InventoryRules)
-local ItemCatalog = require(ReplicatedStorage.Shared.Items.ItemCatalog)
+local InventoryRules = require(script.Parent.Parent.Rules.Inventory.InventoryRules)
+local ItemCatalog = require(script.Parent.Parent.Rules.Items.ItemCatalog)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local Signal = require(ReplicatedStorage.Shared.Core.Signal)

@@ -5,11 +5,11 @@
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local InventoryRules = require(ReplicatedStorage.Shared.Inventory.InventoryRules)
+local InventoryRules = require(script.Parent.Parent.Rules.Inventory.InventoryRules)
 local ListingKeys = require(script.Parent.Parent.Rules.Net.ListingKeys)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
-local StructureCatalog = require(ReplicatedStorage.Shared.Building.StructureCatalog)
+local StructureCatalog = require(script.Parent.Parent.Rules.Building.StructureCatalog)
 local BuildingService = require(script.Parent.BuildingService)
 local DropService = require(script.Parent.DropService)
 local InteractionService = require(script.Parent.InteractionService)

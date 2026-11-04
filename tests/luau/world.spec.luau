@@ -4,8 +4,8 @@ local Server = game:GetService("ServerScriptService").Server
 local BiomeCatalog = require(Shared.World.BiomeCatalog)
 local CameraRules = require(Shared.World.CameraRules)
 local IslandLayout = require(Server.Rules.World.IslandLayout)
-local NodeCatalog = require(Shared.Resources.NodeCatalog)
-local PoiCatalog = require(Shared.World.PoiCatalog)
+local NodeCatalog = require(Server.Rules.Resources.NodeCatalog)
+local PoiCatalog = require(Server.Rules.World.PoiCatalog)
 
 -- The owner's danger tiers, their risk label and their zones.
 local TIER_RISK = { OuterRim = "Low", InnerRing = "Medium", CenterCrater = "Extreme" }

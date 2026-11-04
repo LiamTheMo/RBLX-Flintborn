@@ -14,8 +14,8 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local GameConstants = require(ReplicatedStorage.Shared.GameConstants)
-local ItemCatalog = require(ReplicatedStorage.Shared.Items.ItemCatalog)
-local InventoryRules = require(ReplicatedStorage.Shared.Inventory.InventoryRules)
+local ItemCatalog = require(script.Parent.Parent.Items.ItemCatalog)
+local InventoryRules = require(script.Parent.InventoryRules)
 
 local LobbyLoadoutRules = {}
 

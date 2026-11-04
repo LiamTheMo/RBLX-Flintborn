@@ -218,20 +218,10 @@ function ItemCatalog.NameOf(catalogId: any)
 	return def and def.name or catalogId
 end
 
--- The item's rarity; an unknown id is Common.
-function ItemCatalog.RarityOf(catalogId: any): string
-	local def = ItemCatalog.Get(catalogId)
-	return def and def.rarity or "Common"
-end
-
 -- Stack cap for stackable items, or nil for unique instances.
 function ItemCatalog.StackCap(catalogId: string): number?
 	local item = ItemCatalog.Get(catalogId)
 	return item and ItemCatalog.STACK_CAPS[item.family] or nil
-end
-
-function ItemCatalog.IsStackable(catalogId: string): boolean
-	return ItemCatalog.StackCap(catalogId) ~= nil
 end
 
 function ItemCatalog.IsMaterial(catalogId: string): boolean

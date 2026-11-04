@@ -2,12 +2,12 @@ local Server = game:GetService("ServerScriptService").Server
 local Shared = game:GetService("ReplicatedStorage").Shared
 local OperationJournal = require(Server.Infrastructure.OperationJournal)
 local DeathRules = require(Server.Rules.Admission.DeathRules)
-local ExtractionRules = require(Shared.Extraction.ExtractionRules)
-local ForgeRecipes = require(Shared.Crafting.ForgeRecipes)
+local ExtractionRules = require(Server.Rules.Extraction.ExtractionRules)
+local ForgeRecipes = require(Server.Rules.Crafting.ForgeRecipes)
 local ForgeRules = require(Server.Rules.Crafting.ForgeRules)
-local InventoryRules = require(Shared.Inventory.InventoryRules)
-local ItemCatalog = require(Shared.Items.ItemCatalog)
-local PermanentRules = require(Shared.Items.PermanentRules)
+local InventoryRules = require(Server.Rules.Inventory.InventoryRules)
+local ItemCatalog = require(Server.Rules.Items.ItemCatalog)
+local PermanentRules = require(Server.Rules.Items.PermanentRules)
 local ProfileSchema = require(Server.Rules.Data.ProfileSchema)
 local Recipes = require(Shared.Crafting.Recipes)
 

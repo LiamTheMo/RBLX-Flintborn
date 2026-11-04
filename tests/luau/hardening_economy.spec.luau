@@ -4,14 +4,14 @@
 -- must not reopen the exploits those records close.
 local Server = game:GetService("ServerScriptService").Server
 local Shared = game:GetService("ReplicatedStorage").Shared
-local EconomyRules = require(Shared.Economy.EconomyRules)
-local ExtractionRules = require(Shared.Extraction.ExtractionRules)
+local EconomyRules = require(Server.Rules.Economy.EconomyRules)
+local ExtractionRules = require(Server.Rules.Extraction.ExtractionRules)
 local OfferCatalog = require(Server.Rules.Economy.OfferCatalog)
 local OperationJournal = require(Server.Infrastructure.OperationJournal)
 local ProfileSchema = require(Server.Rules.Data.ProfileSchema)
-local ProgressionRules = require(Shared.Progression.ProgressionRules)
-local ShopCatalog = require(Shared.Economy.ShopCatalog)
-local TradeRules = require(Shared.Economy.TradeRules)
+local ProgressionRules = require(Server.Rules.Progression.ProgressionRules)
+local ShopCatalog = require(Server.Rules.Economy.ShopCatalog)
+local TradeRules = require(Server.Rules.Economy.TradeRules)
 local TutorialSteps = require(Server.Rules.Tutorial.TutorialSteps)
 
 local DAY = 86400 * 20000

@@ -4,10 +4,10 @@
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local BoostRules = require(ReplicatedStorage.Shared.Survival.BoostRules)
+local BoostRules = require(script.Parent.Parent.Survival.BoostRules)
 local GameConstants = require(ReplicatedStorage.Shared.GameConstants)
-local InventoryRules = require(ReplicatedStorage.Shared.Inventory.InventoryRules)
-local SettingsRules = require(ReplicatedStorage.Shared.Settings.SettingsRules)
+local InventoryRules = require(script.Parent.Parent.Inventory.InventoryRules)
+local SettingsRules = require(script.Parent.Parent.Settings.SettingsRules)
 
 local ProfileSchema = {}
 

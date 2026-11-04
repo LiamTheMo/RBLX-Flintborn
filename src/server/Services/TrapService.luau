@@ -12,7 +12,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Characters = require(ReplicatedStorage.Shared.World.Characters)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
-local StructureCatalog = require(ReplicatedStorage.Shared.Building.StructureCatalog)
+local StructureCatalog = require(script.Parent.Parent.Rules.Building.StructureCatalog)
 local AntiExploitService = require(script.Parent.AntiExploitService)
 local BuildingService = require(script.Parent.BuildingService)
 local CombatService = require(script.Parent.CombatService)

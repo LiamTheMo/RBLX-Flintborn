@@ -4,8 +4,8 @@
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local EconomyRules = require(ReplicatedStorage.Shared.Economy.EconomyRules)
-local QuestCatalog = require(ReplicatedStorage.Shared.Economy.QuestCatalog)
+local EconomyRules = require(script.Parent.Parent.Rules.Economy.EconomyRules)
+local QuestCatalog = require(script.Parent.Parent.Rules.Economy.QuestCatalog)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local CurrencyService = require(script.Parent.CurrencyService)
 local ProfileService = require(script.Parent.ProfileService)

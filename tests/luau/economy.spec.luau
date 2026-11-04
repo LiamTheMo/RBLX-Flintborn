@@ -1,13 +1,13 @@
 local Server = game:GetService("ServerScriptService").Server
 local Shared = game:GetService("ReplicatedStorage").Shared
-local EconomyRules = require(Shared.Economy.EconomyRules)
-local ExtractionRules = require(Shared.Extraction.ExtractionRules)
+local EconomyRules = require(Server.Rules.Economy.EconomyRules)
+local ExtractionRules = require(Server.Rules.Extraction.ExtractionRules)
 local OfferCatalog = require(Server.Rules.Economy.OfferCatalog)
 local OperationJournal = require(Server.Infrastructure.OperationJournal)
 local ProfileSchema = require(Server.Rules.Data.ProfileSchema)
-local QuestCatalog = require(Shared.Economy.QuestCatalog)
-local ShopCatalog = require(Shared.Economy.ShopCatalog)
-local TradeRules = require(Shared.Economy.TradeRules)
+local QuestCatalog = require(Server.Rules.Economy.QuestCatalog)
+local ShopCatalog = require(Server.Rules.Economy.ShopCatalog)
+local TradeRules = require(Server.Rules.Economy.TradeRules)
 local VaultRules = require(Server.Rules.Extraction.VaultRules)
 
 local DAY = 86400 * 20000

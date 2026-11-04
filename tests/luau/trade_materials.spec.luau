@@ -13,9 +13,9 @@ local advance, handlers, pushed, profiles, stored =
 local session, lockAndConfirm = lobby.session, lobby.lockAndConfirm
 
 local GameConstants = require(Shared.GameConstants)
-local ItemCatalog = require(Shared.Items.ItemCatalog)
+local ItemCatalog = require(Server.Rules.Items.ItemCatalog)
 local ProfileSchema = require(Server.Rules.Data.ProfileSchema)
-local TradeRules = require(Shared.Economy.TradeRules)
+local TradeRules = require(Server.Rules.Economy.TradeRules)
 local TradeService = require(game:GetService("ServerScriptService").Server.Services.TradeService)
 
 local DAY = 86400 * 20000

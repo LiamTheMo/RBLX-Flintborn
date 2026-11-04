@@ -6,9 +6,9 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
-local ProgressionRules = require(ReplicatedStorage.Shared.Progression.ProgressionRules)
+local ProgressionRules = require(script.Parent.Parent.Rules.Progression.ProgressionRules)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
-local Validation = require(ReplicatedStorage.Shared.Data.Validation)
+local Validation = require(script.Parent.Parent.Rules.Data.Validation)
 local ProfileService = require(script.Parent.ProfileService)
 local ProgressionService = require(script.Parent.ProgressionService)
 

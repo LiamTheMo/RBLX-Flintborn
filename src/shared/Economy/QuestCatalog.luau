@@ -71,13 +71,4 @@ for _, quest in QuestCatalog.Quests do
 	QuestCatalog.ById[quest.id] = quest
 end
 
-function QuestCatalog.Get(questId: any)
-	return type(questId) == "string" and QuestCatalog.ById[questId] or nil
-end
-
--- The period a quest's progress belongs to: the UTC day, or "once".
-function QuestCatalog.Period(quest, now: number): string
-	return if quest.repeats == "Daily" then tostring(now // 86400) else "once"
-end
-
 return QuestCatalog

@@ -17,9 +17,9 @@
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local InventoryRules = require(ReplicatedStorage.Shared.Inventory.InventoryRules)
-local PermanentRules = require(ReplicatedStorage.Shared.Items.PermanentRules)
-local ProgressionRules = require(ReplicatedStorage.Shared.Progression.ProgressionRules)
+local InventoryRules = require(script.Parent.Parent.Inventory.InventoryRules)
+local PermanentRules = require(script.Parent.Parent.Items.PermanentRules)
+local ProgressionRules = require(script.Parent.Parent.Progression.ProgressionRules)
 
 local CrashRecoveryRules = {}
 

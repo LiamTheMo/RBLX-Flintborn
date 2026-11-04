@@ -61,7 +61,7 @@ other.Parent = Players
 local Client = game:GetService("StarterPlayer").StarterPlayerScripts.Client
 local Controllers = Client.Controllers
 local Theme = require(Client.Ui.Theme)
-local BoostRules = require(ReplicatedStorage.Shared.Survival.BoostRules)
+local BoostRules = require(game:GetService("ServerScriptService").Server.Rules.Survival.BoostRules)
 local started = {}
 for _, name in
 	{

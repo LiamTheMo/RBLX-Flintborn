@@ -5,15 +5,15 @@
 local Server = game:GetService("ServerScriptService").Server
 local Shared = game:GetService("ReplicatedStorage").Shared
 local AggroRules = require(Server.Rules.Enemies.AggroRules)
-local BuildRules = require(Shared.Building.BuildRules)
+local BuildRules = require(Server.Rules.Building.BuildRules)
 local Channel = require(Server.Infrastructure.Channel)
-local DamageRules = require(Shared.Combat.DamageRules)
+local DamageRules = require(Server.Rules.Combat.DamageRules)
 local EventRules = require(Server.Rules.Events.EventRules)
 local MovementRules = require(Server.Rules.Security.MovementRules)
 local Signal = require(Shared.Core.Signal)
-local StructureCatalog = require(Shared.Building.StructureCatalog)
+local StructureCatalog = require(Server.Rules.Building.StructureCatalog)
 local SurvivalRules = require(Server.Rules.Survival.SurvivalRules)
-local WeaponCatalog = require(Shared.Combat.WeaponCatalog)
+local WeaponCatalog = require(Server.Rules.Combat.WeaponCatalog)
 
 -- Movement ----------------------------------------------------------------------
 

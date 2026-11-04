@@ -1,7 +1,7 @@
 local Shared = game:GetService("ReplicatedStorage").Shared
 local Server = game:GetService("ServerScriptService").Server
 local ProfileSchema = require(Server.Rules.Data.ProfileSchema)
-local Validation = require(Shared.Data.Validation)
+local Validation = require(Server.Rules.Data.Validation)
 local ItemInstance = require(Server.Rules.Data.ItemInstance)
 local SessionLease = require(Server.Rules.Data.SessionLease)
 

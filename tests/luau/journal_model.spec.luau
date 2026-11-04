@@ -1,7 +1,8 @@
 local Shared = game:GetService("ReplicatedStorage").Shared
+local Server = game:GetService("ServerScriptService").Server
 local JournalModel = require(Shared.UI.JournalModel)
-local QuestCatalog = require(Shared.Economy.QuestCatalog)
-local EconomyRules = require(Shared.Economy.EconomyRules)
+local QuestCatalog = require(Server.Rules.Economy.QuestCatalog)
+local EconomyRules = require(Server.Rules.Economy.EconomyRules)
 
 local function quest(id, count, claimed)
 	local entry = QuestCatalog.Get(id)

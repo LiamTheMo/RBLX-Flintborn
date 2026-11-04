@@ -4,7 +4,7 @@
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local Validation = require(ReplicatedStorage.Shared.Data.Validation)
+local Validation = require(script.Parent.Validation)
 
 local ItemInstance = {}
 

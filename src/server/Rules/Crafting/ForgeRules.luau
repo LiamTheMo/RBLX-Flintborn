@@ -6,14 +6,14 @@
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local ItemCatalog = require(ReplicatedStorage.Shared.Items.ItemCatalog)
-local PermanentRules = require(ReplicatedStorage.Shared.Items.PermanentRules)
-local Receipts = require(ReplicatedStorage.Shared.Data.Receipts)
-local ExtractionRules = require(ReplicatedStorage.Shared.Extraction.ExtractionRules)
-local ForgeRecipes = require(ReplicatedStorage.Shared.Crafting.ForgeRecipes)
-local TradeRules = require(ReplicatedStorage.Shared.Economy.TradeRules)
+local ItemCatalog = require(script.Parent.Parent.Items.ItemCatalog)
+local PermanentRules = require(script.Parent.Parent.Items.PermanentRules)
+local Receipts = require(script.Parent.Parent.Data.Receipts)
+local ExtractionRules = require(script.Parent.Parent.Extraction.ExtractionRules)
+local ForgeRecipes = require(script.Parent.ForgeRecipes)
+local TradeRules = require(script.Parent.Parent.Economy.TradeRules)
 local Tiers = require(ReplicatedStorage.Shared.Items.Tiers)
-local Validation = require(ReplicatedStorage.Shared.Data.Validation)
+local Validation = require(script.Parent.Parent.Data.Validation)
 
 local ForgeRules = {}
 

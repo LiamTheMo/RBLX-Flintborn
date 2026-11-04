@@ -6,10 +6,10 @@
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local ItemCatalog = require(ReplicatedStorage.Shared.Items.ItemCatalog)
+local ItemCatalog = require(script.Parent.Parent.Items.ItemCatalog)
 local Rarity = require(ReplicatedStorage.Shared.Items.Rarity)
 local Tiers = require(ReplicatedStorage.Shared.Items.Tiers)
-local LevelCurve = require(ReplicatedStorage.Shared.Progression.LevelCurve)
+local LevelCurve = require(script.Parent.Parent.Progression.LevelCurve)
 
 local BossScaling = {}
 

@@ -11,7 +11,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local CameraRules = require(ReplicatedStorage.Shared.World.CameraRules)
 local Keybinds = require(ReplicatedStorage.Shared.Settings.Keybinds)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
-local SettingsRules = require(ReplicatedStorage.Shared.Settings.SettingsRules)
+local SettingsRules = require(script.Parent.Parent.Rules.Settings.SettingsRules)
 local Cooldown = require(script.Parent.Parent.Infrastructure.Cooldown)
 local ProfileService = require(script.Parent.ProfileService)
 

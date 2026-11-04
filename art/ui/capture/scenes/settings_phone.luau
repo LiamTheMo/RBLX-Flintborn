@@ -12,7 +12,7 @@ UserInputService.GetLastInputType = function()
 	return Enum.UserInputType.Touch
 end
 local Keybinds = require(Shared.Settings.Keybinds)
-local SettingsRules = require(Shared.Settings.SettingsRules)
+local SettingsRules = require(game:GetService("ServerScriptService").Server.Rules.Settings.SettingsRules)
 local SettingsWindow = require(Hud.Screens.SettingsWindow)
 local noop = function() end
 

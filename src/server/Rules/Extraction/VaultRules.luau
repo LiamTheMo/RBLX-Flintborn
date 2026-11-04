@@ -9,9 +9,9 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local GameConstants = require(ReplicatedStorage.Shared.GameConstants)
-local ItemCatalog = require(ReplicatedStorage.Shared.Items.ItemCatalog)
-local ExtractionRules = require(ReplicatedStorage.Shared.Extraction.ExtractionRules)
-local InventoryRules = require(ReplicatedStorage.Shared.Inventory.InventoryRules)
+local ItemCatalog = require(script.Parent.Parent.Items.ItemCatalog)
+local ExtractionRules = require(script.Parent.ExtractionRules)
+local InventoryRules = require(script.Parent.Parent.Inventory.InventoryRules)
 
 local VaultRules = {}
 

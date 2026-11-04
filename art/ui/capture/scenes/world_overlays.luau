@@ -191,7 +191,7 @@ events.EventAnnounced.OnClientEvent:Fire({
 	radius = 30,
 	endsAt = 372,
 }, false)
-local BoostRules = require(ReplicatedStorage.Shared.Survival.BoostRules)
+local BoostRules = require(game:GetService("ServerScriptService").Server.Rules.Survival.BoostRules)
 local xpAmount, xpUntil = BoostRules.Attributes("XP")
 local luckAmount, luckUntil = BoostRules.Attributes("Luck")
 player:SetAttribute(xpAmount, 0.25)

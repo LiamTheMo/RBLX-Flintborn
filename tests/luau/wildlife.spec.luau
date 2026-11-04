@@ -4,7 +4,7 @@ local Server = game:GetService("ServerScriptService").Server
 local AggroRules = require(Server.Rules.Enemies.AggroRules)
 local BiomeCatalog = require(Shared.World.BiomeCatalog)
 local EnemyCatalog = require(Server.Rules.Enemies.EnemyCatalog)
-local ItemCatalog = require(Shared.Items.ItemCatalog)
+local ItemCatalog = require(Server.Rules.Items.ItemCatalog)
 local WildlifeRules = require(Server.Rules.Enemies.WildlifeRules)
 
 local ZONE_IDS = BiomeCatalog.ZONE_IDS

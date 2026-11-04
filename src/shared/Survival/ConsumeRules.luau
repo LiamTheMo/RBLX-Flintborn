@@ -14,8 +14,6 @@
 -- not interrupt.
 
 local Consumables = require(script.Parent.Parent.Items.Consumables)
-local GameConstants = require(script.Parent.Parent.GameConstants)
-
 local ConsumeRules = {}
 
 -- The running use, as player attributes the server sets and every client reads:
@@ -23,11 +21,6 @@ local ConsumeRules = {}
 ConsumeRules.ITEM_ATTRIBUTE = "ConsumeItem"
 ConsumeRules.START_ATTRIBUTE = "ConsumeStart"
 ConsumeRules.END_ATTRIBUTE = "ConsumeEnd"
-
--- Kinds applied when the use starts rather than when it ends: medicine heals at
--- once and its animation is the only cooldown, "not a pre-heal channel" (GDD
--- §4.5, §5.4, Q64). Remove Medicine here to heal at the end of the drink instead.
-ConsumeRules.APPLY_AT_START = { [Consumables.Medicine] = true }
 
 -- How the arm moves: food is eaten in nibbles, medicine and draughts are drunk.
 ConsumeRules.Eat = "Eat"
@@ -56,51 +49,9 @@ ConsumeRules.ICONS = {
 	[Consumables.Boost] = "lightning",
 }
 
--- Seconds the use of `item` (a Consumables entry) takes.
-function ConsumeRules.Duration(item): number
-	if item.kind == Consumables.Medicine then
-		return item.animationSeconds
-	end
-	return GameConstants.CONSUME_SECONDS[item.kind] or GameConstants.CONSUME_SECONDS.Food
-end
-
--- True when `item` is applied as its use starts (medicine), false when it ends.
-function ConsumeRules.AppliesAtStart(item): boolean
-	return item ~= nil and ConsumeRules.APPLY_AT_START[item.kind] == true
-end
-
 -- "Eat" for food, "Drink" for medicine and draughts.
 function ConsumeRules.Style(item): string
 	return if item and item.kind == Consumables.Food then ConsumeRules.Eat else ConsumeRules.Drink
-end
-
--- A new use of `item` started at `now`: {requestId, catalogId, item, startedAt, endsAt}.
-function ConsumeRules.Begin(requestId: string, catalogId: string, item, now: number)
-	return {
-		requestId = requestId,
-		catalogId = catalogId,
-		item = item,
-		startedAt = now,
-		endsAt = now + ConsumeRules.Duration(item),
-	}
-end
-
--- True once the use's animation has run its full time.
-function ConsumeRules.Done(use, now: number): boolean
-	return now >= use.endsAt
-end
-
--- Why a running use of `catalogId` must stop, or nil to carry on. `view` is what
--- the server sees now: {present, alive, downed, held = the held catalog id}.
-function ConsumeRules.Interruption(view, catalogId: string): string?
-	if not view.present or not view.alive then
-		return "NotInRun"
-	elseif view.downed then
-		return "Downed"
-	elseif view.held ~= catalogId then
-		return "Interrupted"
-	end
-	return nil
 end
 
 -- How far through the use `now` is, 0..1.

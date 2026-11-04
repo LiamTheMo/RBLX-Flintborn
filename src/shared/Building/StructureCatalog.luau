@@ -86,21 +86,6 @@ StructureCatalog.TotemLevels = {
 	{ hp = GameConstants.TOTEM_HEALTH_BY_LEVEL[3], radius = 70, cost = { IronBar = 30, Stone = 60 } },
 }
 
-StructureCatalog.CHEST_SLOTS = 20
-StructureCatalog.TRAP_DAMAGE = 15
-StructureCatalog.TRAP_COOLDOWN = 2
-
--- Crops planted in a planter (GDD Q41): what one planting costs and yields.
-StructureCatalog.Crops = {
-	Redberry = { seed = { Redberry = 1 }, yield = { catalogId = "Redberry", quantity = 4 }, seconds = 180 },
-	Sweetberry = { seed = { Sweetberry = 1 }, yield = { catalogId = "Sweetberry", quantity = 4 }, seconds = 180 },
-	Herbs = { seed = { Herbs = 2 }, yield = { catalogId = "Herbs", quantity = 6 }, seconds = 300 },
-	Sapling = { seed = { Wood = 5 }, yield = { catalogId = "Wood", quantity = 25 }, seconds = 600 },
-	-- Fiber grows in planters too (GDD §53); Sunberry and Glimmerberry stay wild-only.
-	Fiber = { seed = { Fiber = 3 }, yield = { catalogId = "Fiber", quantity = 12 }, seconds = 240 },
-}
-StructureCatalog.CROP_ORDER = { "Redberry", "Sweetberry", "Herbs", "Sapling", "Fiber" }
-
 function StructureCatalog.Get(pieceId: any, tier: any)
 	local piece = type(pieceId) == "string" and StructureCatalog.Pieces[pieceId] or nil
 	local stats = piece and type(tier) == "string" and piece.tiers[tier] or nil

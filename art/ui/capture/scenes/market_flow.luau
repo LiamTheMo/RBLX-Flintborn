@@ -33,10 +33,10 @@ player:SetAttribute("Gems", 300)
 
 local Shared = ReplicatedStorage.Shared
 local Rules = game:GetService("ServerScriptService").Server.Rules
-local ItemCatalog = require(Shared.Items.ItemCatalog)
-local ShopCatalog = require(Shared.Economy.ShopCatalog)
+local ItemCatalog = require(game:GetService("ServerScriptService").Server.Rules.Items.ItemCatalog)
+local ShopCatalog = require(game:GetService("ServerScriptService").Server.Rules.Economy.ShopCatalog)
 local OfferCatalog = require(Rules.Economy.OfferCatalog)
-local EconomyRules = require(Shared.Economy.EconomyRules)
+local EconomyRules = require(game:GetService("ServerScriptService").Server.Rules.Economy.EconomyRules)
 
 local function nameOf(id: string): string
 	local def = ItemCatalog.Get(id)

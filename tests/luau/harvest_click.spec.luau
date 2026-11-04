@@ -1,6 +1,7 @@
 local Shared = game:GetService("ReplicatedStorage").Shared
-local HarvestRules = require(Shared.Resources.HarvestRules)
-local NodeCatalog = require(Shared.Resources.NodeCatalog)
+local Server = game:GetService("ServerScriptService").Server
+local HarvestRules = require(Server.Rules.Resources.HarvestRules)
+local NodeCatalog = require(Server.Rules.Resources.NodeCatalog)
 
 local ORIGIN = Vector3.new(0, 3, 0)
 local NORTH = Vector3.new(0, 0, -1)

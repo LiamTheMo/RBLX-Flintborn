@@ -6,13 +6,13 @@
 local Shared = game:GetService("ReplicatedStorage").Shared
 local Server = game:GetService("ServerScriptService").Server
 
-local BuildRules = require(Shared.Building.BuildRules)
-local CraftingRules = require(Shared.Crafting.CraftingRules)
-local InventoryRules = require(Shared.Inventory.InventoryRules)
-local ItemCatalog = require(Shared.Items.ItemCatalog)
+local BuildRules = require(Server.Rules.Building.BuildRules)
+local CraftingRules = require(Server.Rules.Crafting.CraftingRules)
+local InventoryRules = require(Server.Rules.Inventory.InventoryRules)
+local ItemCatalog = require(Server.Rules.Items.ItemCatalog)
 local Recipes = require(Shared.Crafting.Recipes)
 local Signal = require(Shared.Core.Signal)
-local StructureCatalog = require(Shared.Building.StructureCatalog)
+local StructureCatalog = require(Server.Rules.Building.StructureCatalog)
 local Tiers = require(Shared.Items.Tiers)
 
 -- Stations and recipes ------------------------------------------------------------
@@ -585,7 +585,7 @@ test("a carried ore smelts into a carried bar, carried ore first", function()
 end)
 
 test("smelting carried ore at scale never launders it into doublable bars", function()
-	local ExtractionRules = require(Shared.Extraction.ExtractionRules)
+	local ExtractionRules = require(Server.Rules.Extraction.ExtractionRules)
 	local ProfileSchema = require(Server.Rules.Data.ProfileSchema)
 	local player = carrying("IronOre", 500, 500)
 	expect(craft(player, "IronBar", CraftingRules.MAX_BATCH), "started")

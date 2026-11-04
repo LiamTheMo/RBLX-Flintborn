@@ -4,14 +4,14 @@
 local Shared = game:GetService("ReplicatedStorage").Shared
 local Server = game:GetService("ServerScriptService").Server
 local EventCatalog = require(Server.Rules.Events.EventCatalog)
-local ForgeRecipes = require(Shared.Crafting.ForgeRecipes)
-local ItemCatalog = require(Shared.Items.ItemCatalog)
-local NodeCatalog = require(Shared.Resources.NodeCatalog)
+local ForgeRecipes = require(Server.Rules.Crafting.ForgeRecipes)
+local ItemCatalog = require(Server.Rules.Items.ItemCatalog)
+local NodeCatalog = require(Server.Rules.Resources.NodeCatalog)
 local ProfileSchema = require(Server.Rules.Data.ProfileSchema)
-local QuestCatalog = require(Shared.Economy.QuestCatalog)
+local QuestCatalog = require(Server.Rules.Economy.QuestCatalog)
 local Recipes = require(Shared.Crafting.Recipes)
-local ShopCatalog = require(Shared.Economy.ShopCatalog)
-local WeaponCatalog = require(Shared.Combat.WeaponCatalog)
+local ShopCatalog = require(Server.Rules.Economy.ShopCatalog)
+local WeaponCatalog = require(Server.Rules.Combat.WeaponCatalog)
 
 -- The shape a profile had when v0.02 first saved it, before later phases added
 -- groups (permanent ledger fields, quests, trades, tutorial, boosters…).

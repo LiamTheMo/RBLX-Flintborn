@@ -7,7 +7,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
-local WeaponCatalog = require(ReplicatedStorage.Shared.Combat.WeaponCatalog)
+local WeaponCatalog = require(script.Parent.Parent.Rules.Combat.WeaponCatalog)
 
 local ProjectileService = {}
 

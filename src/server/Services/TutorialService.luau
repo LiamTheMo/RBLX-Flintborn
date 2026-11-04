@@ -6,7 +6,7 @@
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local EconomyRules = require(ReplicatedStorage.Shared.Economy.EconomyRules)
+local EconomyRules = require(script.Parent.Parent.Rules.Economy.EconomyRules)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local TutorialSteps = require(script.Parent.Parent.Rules.Tutorial.TutorialSteps)
 local CurrencyService = require(script.Parent.CurrencyService)

@@ -6,6 +6,7 @@
 -- profiles. Runs the real TradeService session flow against fake Roblox services
 -- and a fake clock.
 
+local Server = game:GetService("ServerScriptService").Server
 local lobby
 -- os.time follows the fake clock, so trade records are ordered as in a real
 -- session (each trade takes at least the confirm countdown).
@@ -20,7 +21,7 @@ lobby = require(game:GetService("ServerStorage").TestSupport.LobbyTrade).new()
 local advance, join, leave, rejoin, trader = lobby.advance, lobby.join, lobby.leave, lobby.rejoin, lobby.trader
 local profiles, stored, threadErrors = lobby.profiles, lobby.stored, lobby.threadErrors
 
-local TradeRules = require(game:GetService("ReplicatedStorage").Shared.Economy.TradeRules)
+local TradeRules = require(Server.Rules.Economy.TradeRules)
 local ProfileService = require(game:GetService("ServerScriptService").Server.Services.ProfileService)
 
 local function sword(id)

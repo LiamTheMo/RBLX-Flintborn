@@ -3,13 +3,13 @@
 -- to Premium and the paid booster, and luck that raises rare-drop chances only.
 local Shared = game:GetService("ReplicatedStorage").Shared
 local Server = game:GetService("ServerScriptService").Server
-local BoostRules = require(Shared.Survival.BoostRules)
+local BoostRules = require(Server.Rules.Survival.BoostRules)
 local Consumables = require(Shared.Items.Consumables)
 local EventRules = require(Server.Rules.Events.EventRules)
 local GameConstants = require(Shared.GameConstants)
-local ItemCatalog = require(Shared.Items.ItemCatalog)
+local ItemCatalog = require(Server.Rules.Items.ItemCatalog)
 local ModifierRules = require(Server.Rules.Progression.ModifierRules)
-local PerkCatalog = require(Shared.Progression.PerkCatalog)
+local PerkCatalog = require(Server.Rules.Progression.PerkCatalog)
 
 local catalog = Consumables.Catalog
 

@@ -18,7 +18,7 @@ local Players = FakeRoblox.Players()
 FakeRoblox.Provide({ Players = Players })
 FakeRoblox.Place("World")
 
-local BoostRules = require(Shared.Survival.BoostRules)
+local BoostRules = require(Server.Rules.Survival.BoostRules)
 local ProfileSchema = require(Server.Rules.Data.ProfileSchema)
 
 local ProfileService = require(Server.Services.ProfileService)

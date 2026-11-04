@@ -24,7 +24,7 @@ game.PrivateServerId = "world-1"
 FakeRoblox.Place("Lobby")
 local handlers = FakeRoblox.Remotes().handlers
 
-local PartyRules = require(Shared.Admission.PartyRules)
+local PartyRules = require(Server.Rules.Admission.PartyRules)
 local PartyService = require(Server.Services.PartyService)
 PartyService.Start()
 

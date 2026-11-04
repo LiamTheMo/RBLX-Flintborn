@@ -1,6 +1,6 @@
 local Shared = game:GetService("ReplicatedStorage").Shared
 local Server = game:GetService("ServerScriptService").Server
-local ItemCatalog = require(Shared.Items.ItemCatalog)
+local ItemCatalog = require(Server.Rules.Items.ItemCatalog)
 local ProfileSchema = require(Server.Rules.Data.ProfileSchema)
 local TutorialSteps = require(Server.Rules.Tutorial.TutorialSteps)
 

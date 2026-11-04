@@ -1,9 +1,10 @@
 local Shared = game:GetService("ReplicatedStorage").Shared
-local BuildRules = require(Shared.Building.BuildRules)
-local ItemCatalog = require(Shared.Items.ItemCatalog)
+local Server = game:GetService("ServerScriptService").Server
+local BuildRules = require(Server.Rules.Building.BuildRules)
+local ItemCatalog = require(Server.Rules.Items.ItemCatalog)
 local Recipes = require(Shared.Crafting.Recipes)
-local SiegeRules = require(Shared.Combat.SiegeRules)
-local StructureCatalog = require(Shared.Building.StructureCatalog)
+local SiegeRules = require(Server.Rules.Combat.SiegeRules)
+local StructureCatalog = require(Server.Rules.Building.StructureCatalog)
 local Tiers = require(Shared.Items.Tiers)
 
 test("siege items are thrown or placed, stack to 10 and craft at a Workbench", function()

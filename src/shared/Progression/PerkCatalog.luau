@@ -40,16 +40,4 @@ function PerkCatalog.Get(perkId: any)
 	return type(perkId) == "string" and PerkCatalog.Perks[perkId] or nil
 end
 
--- Modifiers granted by owned ranks: {stat, op, value}.
-function PerkCatalog.Modifiers(ownedPerks)
-	local modifiers = {}
-	for perkId, rank in ownedPerks do
-		local perk = PerkCatalog.Get(perkId)
-		if perk and rank > 0 then
-			table.insert(modifiers, { stat = perk.stat, op = "Additive", value = perk.value * rank })
-		end
-	end
-	return modifiers
-end
-
 return PerkCatalog

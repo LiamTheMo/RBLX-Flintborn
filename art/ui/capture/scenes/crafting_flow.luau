@@ -30,7 +30,7 @@ for _, name in { "InventoryChanged", "Notify" } do
 end
 
 local Shared = ReplicatedStorage.Shared
-local CraftingRules = require(Shared.Crafting.CraftingRules)
+local CraftingRules = require(game:GetService("ServerScriptService").Server.Rules.Crafting.CraftingRules)
 local Recipes = require(Shared.Crafting.Recipes)
 local Client = game:GetService("StarterPlayer").StarterPlayerScripts.Client
 local InventoryController = require(Client.Controllers.InventoryController)

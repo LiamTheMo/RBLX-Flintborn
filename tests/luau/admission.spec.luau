@@ -1,10 +1,10 @@
 local Shared = game:GetService("ReplicatedStorage").Shared
 local Server = game:GetService("ServerScriptService").Server
-local SessionStates = require(Shared.Admission.SessionStates)
+local SessionStates = require(Server.Rules.Admission.SessionStates)
 local TransitRules = require(Server.Rules.Admission.TransitRules)
 local SpawnRules = require(Server.Rules.Admission.SpawnRules)
 local MatchmakingRules = require(Server.Rules.Admission.MatchmakingRules)
-local PartyRules = require(Shared.Admission.PartyRules)
+local PartyRules = require(Server.Rules.Admission.PartyRules)
 local PlaceConfig = require(Shared.Config.PlaceConfig)
 local ProfileSchema = require(Server.Rules.Data.ProfileSchema)
 

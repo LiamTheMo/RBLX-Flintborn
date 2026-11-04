@@ -4,7 +4,6 @@
 -- and pieces add rather than multiply. The per-piece split and how quality rolls
 -- apply are starting placeholders.
 
-local GameConstants = require(script.Parent.Parent.GameConstants)
 local Tiers = require(script.Parent.Parent.Items.Tiers)
 
 local ArmorRules = {}
@@ -20,15 +19,6 @@ function ArmorRules.PieceIncrement(tier: string, slot: string, qualityRoll: numb
 		return 0
 	end
 	return (setFactor - 1) * share * (1 + (qualityRoll or 0))
-end
-
--- Combined factor for worn pieces ({tier, slot, qualityRoll} each).
-function ArmorRules.Factor(pieces): number
-	local increments = {}
-	for _, piece in pieces do
-		table.insert(increments, ArmorRules.PieceIncrement(piece.tier, piece.slot, piece.qualityRoll))
-	end
-	return GameConstants.ArmorFactor(increments)
 end
 
 return ArmorRules

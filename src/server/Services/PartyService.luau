@@ -8,7 +8,7 @@ local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local PartyRules = require(ReplicatedStorage.Shared.Admission.PartyRules)
+local PartyRules = require(script.Parent.Parent.Rules.Admission.PartyRules)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local Cooldown = require(script.Parent.Parent.Infrastructure.Cooldown)

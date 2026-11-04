@@ -2,8 +2,9 @@
 -- and every catalog item's own icon.
 
 local Shared = game:GetService("ReplicatedStorage").Shared
+local Server = game:GetService("ServerScriptService").Server
 local ItemInfo = require(Shared.Items.ItemInfo)
-local ItemCatalog = require(Shared.Items.ItemCatalog)
+local ItemCatalog = require(Server.Rules.Items.ItemCatalog)
 
 test("items sort into the category tabs", function()
 	expectEq(ItemInfo.Category("Wood"), "Materials", "wood is a material")

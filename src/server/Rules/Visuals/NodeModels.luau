@@ -23,7 +23,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Recipe = require(script.Parent.Recipe)
-local NodeCatalog = require(ReplicatedStorage.Shared.Resources.NodeCatalog)
+local NodeCatalog = require(script.Parent.Parent.Resources.NodeCatalog)
 
 local NodeModels = {}
 

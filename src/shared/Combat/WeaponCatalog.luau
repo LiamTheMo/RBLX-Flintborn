@@ -65,14 +65,7 @@ end
 WeaponCatalog.Arrows = {
 	FlintArrow = { damage = 6 },
 }
-WeaponCatalog.ARROW = "FlintArrow"
-
 WeaponCatalog.FULL_DRAW_SECONDS = 1.0
-WeaponCatalog.MIN_ARROW_SPEED = 60
-WeaponCatalog.MAX_ARROW_SPEED = 120
-WeaponCatalog.ARROW_GRAVITY_SCALE = 0.35
-WeaponCatalog.ARROW_LIFETIME = 5
-
 -- The profile for an equipped catalog ID (Hand for tools, empty hands or unknowns).
 function WeaponCatalog.For(catalogId: string?)
 	return catalogId and WeaponCatalog.Weapons[catalogId] or WeaponCatalog.Hand

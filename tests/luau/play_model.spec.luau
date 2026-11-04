@@ -2,8 +2,9 @@
 -- Play and the deploy check.
 
 local Shared = game:GetService("ReplicatedStorage").Shared
+local Server = game:GetService("ServerScriptService").Server
 local PlayModel = require(Shared.UI.PlayModel)
-local InventoryRules = require(Shared.Inventory.InventoryRules)
+local InventoryRules = require(Server.Rules.Inventory.InventoryRules)
 local BiomeCatalog = require(Shared.World.BiomeCatalog)
 
 local ME = { userId = 1, name = "LiamTheMo" }

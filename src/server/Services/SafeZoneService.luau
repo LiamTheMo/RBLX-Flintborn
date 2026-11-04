@@ -6,7 +6,7 @@
 local CollectionService = game:GetService("CollectionService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local BuildRules = require(ReplicatedStorage.Shared.Building.BuildRules)
+local BuildRules = require(script.Parent.Parent.Rules.Building.BuildRules)
 local Characters = require(ReplicatedStorage.Shared.World.Characters)
 
 local SafeZoneService = {}

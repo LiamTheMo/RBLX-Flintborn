@@ -88,26 +88,6 @@ function SettingsRules.Resolve(choices: any): { [string]: any }
 	return values
 end
 
--- Applies a client's `changes` to `choices` in place, keeping only known keys
--- with valid values. Returns how many settings changed.
-function SettingsRules.Apply(choices: { [string]: any }, changes: any): number
-	if type(changes) ~= "table" then
-		return 0
-	end
-	local changed = 0
-	for _, setting in SettingsRules.Settings do
-		local value = changes[setting.key]
-		if value ~= nil then
-			local clean = SettingsRules.Clean(setting, value)
-			if clean ~= nil and choices[setting.key] ~= clean then
-				choices[setting.key] = clean
-				changed += 1
-			end
-		end
-	end
-	return changed
-end
-
 -- Camera sensitivity percent → Roblox's mouse-delta multiplier (50 → 1).
 function SettingsRules.MouseSensitivity(percent: number?): number
 	return math.clamp((percent or 50) / 50, 0.2, 2)

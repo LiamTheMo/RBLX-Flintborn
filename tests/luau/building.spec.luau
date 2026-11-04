@@ -1,6 +1,7 @@
 local Shared = game:GetService("ReplicatedStorage").Shared
-local BuildRules = require(Shared.Building.BuildRules)
-local StructureCatalog = require(Shared.Building.StructureCatalog)
+local Server = game:GetService("ServerScriptService").Server
+local BuildRules = require(Server.Rules.Building.BuildRules)
+local StructureCatalog = require(Server.Rules.Building.StructureCatalog)
 
 local function totem(ownerKey, x, z, level)
 	local stats = StructureCatalog.TotemLevels[level or 1]

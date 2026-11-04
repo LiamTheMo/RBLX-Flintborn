@@ -9,7 +9,7 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local CrashRecoveryRules = require(script.Parent.Parent.Rules.Recovery.CrashRecoveryRules)
-local InventoryRules = require(ReplicatedStorage.Shared.Inventory.InventoryRules)
+local InventoryRules = require(script.Parent.Parent.Rules.Inventory.InventoryRules)
 local LobbyLoadoutRules = require(script.Parent.Parent.Rules.Inventory.LobbyLoadoutRules)
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local ProfileSchema = require(script.Parent.Parent.Rules.Data.ProfileSchema)

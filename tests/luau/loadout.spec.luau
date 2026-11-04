@@ -4,7 +4,7 @@
 
 local Shared = game:GetService("ReplicatedStorage").Shared
 local Server = game:GetService("ServerScriptService").Server
-local InventoryRules = require(Shared.Inventory.InventoryRules)
+local InventoryRules = require(Server.Rules.Inventory.InventoryRules)
 local LobbyLoadoutRules = require(Server.Rules.Inventory.LobbyLoadoutRules)
 local ProfileSchema = require(Server.Rules.Data.ProfileSchema)
 local TransitRules = require(Server.Rules.Admission.TransitRules)

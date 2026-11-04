@@ -22,7 +22,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local BiomeCatalog = require(ReplicatedStorage.Shared.World.BiomeCatalog)
-local PoiCatalog = require(ReplicatedStorage.Shared.World.PoiCatalog)
+local PoiCatalog = require(script.Parent.PoiCatalog)
 
 local IslandLayout = {}
 

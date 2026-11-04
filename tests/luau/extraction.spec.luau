@@ -1,10 +1,10 @@
 local Server = game:GetService("ServerScriptService").Server
 local Shared = game:GetService("ReplicatedStorage").Shared
 local OperationJournal = require(Server.Infrastructure.OperationJournal)
-local ExtractionRules = require(Shared.Extraction.ExtractionRules)
+local ExtractionRules = require(Server.Rules.Extraction.ExtractionRules)
 local VaultRules = require(Server.Rules.Extraction.VaultRules)
 local ProfileSchema = require(Server.Rules.Data.ProfileSchema)
-local Receipts = require(Shared.Data.Receipts)
+local Receipts = require(Server.Rules.Data.Receipts)
 local CrashRecoveryRules = require(Server.Rules.Recovery.CrashRecoveryRules)
 
 local function sword(id)

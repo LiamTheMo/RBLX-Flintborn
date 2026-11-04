@@ -4,11 +4,11 @@
 -- draw of a run, and a sprint that really stops when stamina runs out.
 local Shared = game:GetService("ReplicatedStorage").Shared
 local Server = game:GetService("ServerScriptService").Server
-local BuildRules = require(Shared.Building.BuildRules)
-local DamageRules = require(Shared.Combat.DamageRules)
+local BuildRules = require(Server.Rules.Building.BuildRules)
+local DamageRules = require(Server.Rules.Combat.DamageRules)
 local MovementRules = require(Server.Rules.Security.MovementRules)
 local SurvivalRules = require(Server.Rules.Survival.SurvivalRules)
-local WeaponCatalog = require(Shared.Combat.WeaponCatalog)
+local WeaponCatalog = require(Server.Rules.Combat.WeaponCatalog)
 
 -- Building ----------------------------------------------------------------------
 

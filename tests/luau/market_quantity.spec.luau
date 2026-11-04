@@ -6,11 +6,11 @@
 
 local Shared = game:GetService("ReplicatedStorage").Shared
 local Server = game:GetService("ServerScriptService").Server
-local EconomyRules = require(Shared.Economy.EconomyRules)
+local EconomyRules = require(Server.Rules.Economy.EconomyRules)
 local GameConstants = require(Shared.GameConstants)
-local ItemCatalog = require(Shared.Items.ItemCatalog)
+local ItemCatalog = require(Server.Rules.Items.ItemCatalog)
 local ProfileSchema = require(Server.Rules.Data.ProfileSchema)
-local ShopCatalog = require(Shared.Economy.ShopCatalog)
+local ShopCatalog = require(Server.Rules.Economy.ShopCatalog)
 
 local function ids()
 	local n = 0

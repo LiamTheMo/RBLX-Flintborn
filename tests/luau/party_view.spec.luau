@@ -5,7 +5,7 @@
 local Shared = game:GetService("ReplicatedStorage").Shared
 local Server = game:GetService("ServerScriptService").Server
 
-local PartyRules = require(Shared.Admission.PartyRules)
+local PartyRules = require(Server.Rules.Admission.PartyRules)
 
 -- Pure rules ------------------------------------------------------------------------
 

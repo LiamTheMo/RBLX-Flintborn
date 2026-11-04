@@ -4,7 +4,7 @@
 
 local Shared = game:GetService("ReplicatedStorage").Shared
 local Server = game:GetService("ServerScriptService").Server
-local BuildRules = require(Shared.Building.BuildRules)
+local BuildRules = require(Server.Rules.Building.BuildRules)
 local IslandLayout = require(Server.Rules.World.IslandLayout)
 
 local WALL = Vector3.new(8, 8, 1)

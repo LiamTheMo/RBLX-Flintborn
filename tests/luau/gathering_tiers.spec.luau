@@ -3,8 +3,8 @@ local Server = game:GetService("ServerScriptService").Server
 local BiomeCatalog = require(Shared.World.BiomeCatalog)
 local EventCatalog = require(Server.Rules.Events.EventCatalog)
 local EventRules = require(Server.Rules.Events.EventRules)
-local ItemCatalog = require(Shared.Items.ItemCatalog)
-local NodeCatalog = require(Shared.Resources.NodeCatalog)
+local ItemCatalog = require(Server.Rules.Items.ItemCatalog)
+local NodeCatalog = require(Server.Rules.Resources.NodeCatalog)
 local Tiers = require(Shared.Items.Tiers)
 
 local LADDER = { "Wood", "Stone", "Copper", "Iron", "Silver", "Cobalt", "Mithril", "Adamantine" }

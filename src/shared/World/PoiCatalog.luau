@@ -2,8 +2,6 @@
 -- §54), given as world X/Z (−Z north) so gameplay reads the map without hard-coded
 -- coordinates. Placeholders until the authored island.
 
-local BiomeCatalog = require(script.Parent.BiomeCatalog)
-
 local PoiCatalog = {}
 
 -- Fixed portal candidates: 3 in Low zones, 3 in Medium zones, the Center on the
@@ -34,15 +32,6 @@ PoiCatalog.SafeZones = {
 	{ id = "MossfireCamp", name = "Mossfire Camp", x = 1450, z = -850, radius = 30 },
 }
 
--- The Minotaur's altars stand on the Keep island's lower terrace (GDD §54).
-PoiCatalog.RitualSites = {
-	{ id = "KeepWestAltar", name = "Keep West Altar", x = -215, z = -60, zone = "ShatteredKeep" },
-	{ id = "KeepNorthAltar", name = "Keep North Altar", x = 150, z = -330, zone = "ShatteredKeep" },
-}
-
--- The Guardian fights in the Keep's courtyard (GDD §54).
-PoiCatalog.GuardianArena = { x = 0, z = -140, radius = 80 }
-
 -- Landmarks for navigation without a minimap.
 PoiCatalog.Landmarks = {
 	{ id = "FrostpeakSummit", name = "Frostpeak Summit", x = -64, z = -1440, style = "Peak" },
@@ -60,16 +49,6 @@ PoiCatalog.Landmarks = {
 -- World position (y = 0) of a POI.
 function PoiCatalog.Position(poi): Vector3
 	return Vector3.new(poi.x, 0, poi.z)
-end
-
--- The zone a POI stands in.
-function PoiCatalog.ZoneOf(poi): string?
-	return BiomeCatalog.ZoneAt(poi.x, poi.z)
-end
-
--- The risk tier (OuterRim / InnerRing / CenterCrater) a POI stands in.
-function PoiCatalog.RegionOf(poi): string?
-	return BiomeCatalog.RegionAt(poi.x, poi.z)
 end
 
 return PoiCatalog

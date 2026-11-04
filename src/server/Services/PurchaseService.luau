@@ -8,7 +8,7 @@ local MarketplaceService = game:GetService("MarketplaceService")
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
-local EconomyRules = require(ReplicatedStorage.Shared.Economy.EconomyRules)
+local EconomyRules = require(script.Parent.Parent.Rules.Economy.EconomyRules)
 local OfferCatalog = require(script.Parent.Parent.Rules.Economy.OfferCatalog)
 local CurrencyService = require(script.Parent.CurrencyService)
 local ProfileService = require(script.Parent.ProfileService)

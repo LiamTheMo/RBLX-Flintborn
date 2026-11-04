@@ -2,7 +2,7 @@
 
 local Shared = game:GetService("ReplicatedStorage").Shared
 local Server = game:GetService("ServerScriptService").Server
-local SettingsRules = require(Shared.Settings.SettingsRules)
+local SettingsRules = require(Server.Rules.Settings.SettingsRules)
 local ProfileSchema = require(Server.Rules.Data.ProfileSchema)
 
 test("a fresh profile has every setting at its default", function()

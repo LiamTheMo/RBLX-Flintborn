@@ -16,9 +16,9 @@ workspace:SetAttribute("FlintbornPlaceRole", "Lobby")
 
 local Shared = ReplicatedStorage.Shared
 local Rules = game:GetService("ServerScriptService").Server.Rules
-local ForgeRecipes = require(Shared.Crafting.ForgeRecipes)
+local ForgeRecipes = require(game:GetService("ServerScriptService").Server.Rules.Crafting.ForgeRecipes)
 local ForgeRules = require(Rules.Crafting.ForgeRules)
-local ItemCatalog = require(Shared.Items.ItemCatalog)
+local ItemCatalog = require(game:GetService("ServerScriptService").Server.Rules.Items.ItemCatalog)
 
 local W, H = 1672, 941
 local BACKGROUND = { background = "art/reference/ui/lobby/01_hud.png" }

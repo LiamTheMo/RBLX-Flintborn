@@ -3,8 +3,8 @@
 -- adding a second one, and profiles saved with split stacks merge on load.
 local Shared = game:GetService("ReplicatedStorage").Shared
 local Server = game:GetService("ServerScriptService").Server
-local InventoryRules = require(Shared.Inventory.InventoryRules)
-local ItemCatalog = require(Shared.Items.ItemCatalog)
+local InventoryRules = require(Server.Rules.Inventory.InventoryRules)
+local ItemCatalog = require(Server.Rules.Items.ItemCatalog)
 local VaultRules = require(Server.Rules.Extraction.VaultRules)
 local LobbyLoadoutRules = require(Server.Rules.Inventory.LobbyLoadoutRules)
 local ProfileSchema = require(Server.Rules.Data.ProfileSchema)

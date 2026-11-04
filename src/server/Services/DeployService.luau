@@ -7,7 +7,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
-local SessionStates = require(ReplicatedStorage.Shared.Admission.SessionStates)
+local SessionStates = require(script.Parent.Parent.Rules.Admission.SessionStates)
 local TransitRules = require(script.Parent.Parent.Rules.Admission.TransitRules)
 local LoadoutService = require(script.Parent.LoadoutService)
 local MatchmakingService = require(script.Parent.MatchmakingService)

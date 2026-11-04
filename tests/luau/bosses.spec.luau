@@ -4,7 +4,7 @@ local BossCatalog = require(Server.Rules.Bosses.BossCatalog)
 local BossRules = require(Server.Rules.Bosses.BossRules)
 local BossScaling = require(Server.Rules.Bosses.BossScaling)
 local EventCatalog = require(Server.Rules.Events.EventCatalog)
-local ItemCatalog = require(Shared.Items.ItemCatalog)
+local ItemCatalog = require(Server.Rules.Items.ItemCatalog)
 
 test("the Guardian returns 15–20 minutes after its last encounter with a 3 minute horn", function()
 	local rng = Random.new(21)

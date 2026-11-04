@@ -12,7 +12,7 @@ local W, H = 1672, 941
 -- Every catalog item's own icon is in the sprite manifest (the item_info spec
 -- checks UiSprites.json too).
 local Kit = require(Client.Hud.Kit)
-for id in require(game:GetService("ReplicatedStorage").Shared.Items.ItemCatalog).Items do
+for id in require(game:GetService("ServerScriptService").Server.Rules.Items.ItemCatalog).Items do
 	local sprite = ItemInfo.ItemSprite(id) :: string
 	assert(Kit.Art.SizeOf(sprite) ~= nil, "item icon missing from the manifest: " .. sprite)
 end

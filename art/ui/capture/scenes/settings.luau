@@ -20,7 +20,7 @@ local Players = game:GetService("Players")
 local Shared = game:GetService("ReplicatedStorage").Shared
 local Hud = game:GetService("StarterPlayer").StarterPlayerScripts.Client.Hud
 local Keybinds = require(Shared.Settings.Keybinds)
-local SettingsRules = require(Shared.Settings.SettingsRules)
+local SettingsRules = require(game:GetService("ServerScriptService").Server.Rules.Settings.SettingsRules)
 local Kit = require(Hud.Kit)
 local SettingsWindow = require(Hud.Screens.SettingsWindow)
 

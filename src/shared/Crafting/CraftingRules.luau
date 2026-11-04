@@ -34,11 +34,6 @@ function CraftingRules.StationFor(recipe): string?
 	return if isStation[recipe.station] then recipe.station else nil
 end
 
--- The refusal code for crafting away from `station` ("NeedsAnvil").
-function CraftingRules.Refusal(station: string): string
-	return "Needs" .. station
-end
-
 function CraftingRules.IsTimed(recipe): boolean
 	return type(recipe.seconds) == "number" and recipe.seconds > 0
 end
@@ -54,64 +49,6 @@ function CraftingRules.BatchCount(recipe, count: any): number?
 	end
 	local most = if CraftingRules.IsTimed(recipe) then CraftingRules.MAX_BATCH else 1
 	return if count <= most then count else nil
-end
-
--- A recipe's inputs for `count` units.
-function CraftingRules.BatchInputs(recipe, count: number)
-	local inputs = {}
-	for catalogId, amount in recipe.inputs do
-		inputs[catalogId] = amount * count
-	end
-	return inputs
-end
-
--- A new smelting job; `station` is the station part it is bound to.
-function CraftingRules.NewJob(recipe, count: number, now: number, station: any, character: any)
-	return {
-		recipe = recipe,
-		count = count,
-		done = 0,
-		unitEndsAt = now + recipe.seconds,
-		station = station,
-		character = character,
-	}
-end
-
--- Why a running job must stop, or nil. `check` holds what the server sees now:
--- atRisk (still in the run), sameCharacter, alive, downed, stationStanding and
--- distance (studs from the station).
-function CraftingRules.Interruption(check): string?
-	if not check.atRisk then
-		return "NotInRun"
-	end
-	if not check.sameCharacter or not check.alive then
-		return "Died"
-	end
-	if check.downed then
-		return "Downed"
-	end
-	if not check.stationStanding then
-		return "StationGone"
-	end
-	if type(check.distance) ~= "number" or check.distance > CraftingRules.STATION_RANGE then
-		return "MovedAway"
-	end
-	return nil
-end
-
--- True when the job's current unit is finished.
-function CraftingRules.UnitDue(job, now: number): boolean
-	return job.done < job.count and now >= job.unitEndsAt
-end
-
--- Records one finished unit and starts the next. True when the job is complete.
-function CraftingRules.Advance(job): boolean
-	job.done += 1
-	if job.done >= job.count then
-		return true
-	end
-	job.unitEndsAt += job.recipe.seconds
-	return false
 end
 
 -- Overall progress (0–1) and seconds left on the current unit, from the values a
@@ -169,17 +106,6 @@ end
 function CraftingRules.AvailableHere(recipe, nearby): boolean
 	local station = CraftingRules.StationFor(recipe)
 	return station == nil or nearby[station] == true
-end
-
--- True when the recipe passes the menu's filter: {category?, tier?, hereOnly?}.
-function CraftingRules.Matches(recipe, filter, nearby): boolean
-	if filter.category and CraftingRules.Category(recipe) ~= filter.category then
-		return false
-	end
-	if filter.tier and CraftingRules.Tier(recipe) ~= filter.tier then
-		return false
-	end
-	return not filter.hereOnly or CraftingRules.AvailableHere(recipe, nearby)
 end
 
 -- The recipes grouped by category, then by tier up the ladder, keeping list order

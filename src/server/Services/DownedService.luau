@@ -8,7 +8,7 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 
-local ArmorRules = require(ReplicatedStorage.Shared.Combat.ArmorRules)
+local ArmorRules = require(script.Parent.Parent.Rules.Combat.ArmorRules)
 local Characters = require(ReplicatedStorage.Shared.World.Characters)
 local DownedRules = require(script.Parent.Parent.Rules.Combat.DownedRules)
 local GameConstants = require(ReplicatedStorage.Shared.GameConstants)

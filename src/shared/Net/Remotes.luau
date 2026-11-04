@@ -5,7 +5,15 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 
-local RemoteGuard = require(script.Parent.RemoteGuard)
+-- The request guard (rate limits, argument checks) lives on the server, so clients
+-- never see its limits; the first guarded request loads it.
+local RemoteGuard = nil
+local function guard()
+	if RemoteGuard == nil then
+		RemoteGuard = require(game:GetService("ServerScriptService").Server.Rules.Net.RemoteGuard)
+	end
+	return RemoteGuard
+end
 
 local Remotes = {}
 
@@ -166,14 +174,14 @@ local function admit(player: Player, name: string, ...): boolean
 	local now = os.clock()
 	local bucket = perPlayer[name]
 	if bucket == nil then
-		bucket = RemoteGuard.NewBucket(now)
+		bucket = guard().NewBucket(now)
 		perPlayer[name] = bucket
 	end
-	if not RemoteGuard.Take(bucket, now) then
+	if not guard().Take(bucket, now) then
 		Remotes.OnViolation(player, name, "RateLimited")
 		return false
 	end
-	if not RemoteGuard.Check(table.pack(...)) then
+	if not guard().Check(table.pack(...)) then
 		Remotes.OnViolation(player, name, "MalformedArguments")
 		return false
 	end

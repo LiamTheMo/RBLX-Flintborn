@@ -24,10 +24,10 @@ local advance, join, play, stored, stacks = world.advance, world.join, world.pla
 local started = world.started
 
 local CrashRecoveryRules = require(Server.Rules.Recovery.CrashRecoveryRules)
-local EconomyRules = require(Shared.Economy.EconomyRules)
+local EconomyRules = require(Server.Rules.Economy.EconomyRules)
 local ForgeRules = require(Server.Rules.Crafting.ForgeRules)
 local ProfileSchema = require(Server.Rules.Data.ProfileSchema)
-local TradeRules = require(Shared.Economy.TradeRules)
+local TradeRules = require(Server.Rules.Economy.TradeRules)
 local TransitRules = require(Server.Rules.Admission.TransitRules)
 local CheckpointStore = require(Server.Infrastructure.CheckpointStore)
 local CrashRecoveryService = require(Server.Services.CrashRecoveryService)

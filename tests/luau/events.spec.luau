@@ -5,7 +5,7 @@ local EnemyCatalog = require(Server.Rules.Enemies.EnemyCatalog)
 local EventCatalog = require(Server.Rules.Events.EventCatalog)
 local EventRules = require(Server.Rules.Events.EventRules)
 local IslandLayout = require(Server.Rules.World.IslandLayout)
-local ItemCatalog = require(Shared.Items.ItemCatalog)
+local ItemCatalog = require(Server.Rules.Items.ItemCatalog)
 local Rarity = require(Shared.Items.Rarity)
 
 local function list(...)

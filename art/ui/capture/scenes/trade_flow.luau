@@ -82,7 +82,7 @@ local changed = Instance.new("RemoteEvent")
 changed.Name = "TradeChanged"
 changed.Parent = folder
 local Shared = ReplicatedStorage.Shared
-local TradeRules = require(Shared.Economy.TradeRules)
+local TradeRules = require(game:GetService("ServerScriptService").Server.Rules.Economy.TradeRules)
 -- Every listed slot and Amethyst trade in this scene.
 TradeRules.IsTradeableSlot = function(item)
 	return item.tradeable == true

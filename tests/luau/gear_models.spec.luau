@@ -4,8 +4,8 @@
 local Shared = game:GetService("ReplicatedStorage").Shared
 local Server = game:GetService("ServerScriptService").Server
 local GearModels = require(Server.Rules.Visuals.GearModels)
-local InventoryRules = require(Shared.Inventory.InventoryRules)
-local ItemCatalog = require(Shared.Items.ItemCatalog)
+local InventoryRules = require(Server.Rules.Inventory.InventoryRules)
+local ItemCatalog = require(Server.Rules.Items.ItemCatalog)
 local Recipe = require(Server.Rules.Visuals.Recipe)
 local Tiers = require(Shared.Items.Tiers)
 
