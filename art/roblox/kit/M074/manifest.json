@@ -1,0 +1,671 @@
+{
+ "version": 1,
+ "source": "art/blender/assets/kit/FlintbornWorldKit.blend",
+ "sheet": "M074",
+ "module": null,
+ "units": "1 stud = 1 Blender unit. Sizes and offsets are in studs; set each MeshPart's Size from 'size'.",
+ "axes": "Roblox axes (Y up). Blender (x, y, z) -> Roblox (x, z, -y); an asset's front (Blender -Y) faces Roblox +Z. The asset origin is the bottom centre of its footprint: a piece's MeshPart sits at origin CFrame * CFrame.new(offset); VFX positions are relative to the same origin.",
+ "palette": {
+  "file": "palette.png",
+  "width": 512,
+  "height": 128,
+  "cell": 16,
+  "columns": 32,
+  "uv": "row i, level j: u = (j + 0.5) / columns, v = 1 - (i + 0.5) * cell / height (v up from the bottom of the image); a row's spare cells repeat its last level",
+  "rows": [
+   {
+    "key": "m074_iron",
+    "hex": "#383538",
+    "levels": [
+     0.97139,
+     0.97342,
+     0.98032,
+     0.98291,
+     0.98676,
+     0.98841,
+     0.99049,
+     0.99269,
+     0.99522,
+     0.99697,
+     0.99886,
+     1.00128,
+     1.00348,
+     1.00539,
+     1.00712,
+     1.00946,
+     1.0117,
+     1.01326,
+     1.01563,
+     1.01754,
+     1.01991
+    ],
+    "used": true
+   },
+   {
+    "key": "m074_iron_in",
+    "hex": "#1C1A1C",
+    "levels": [
+     0.98183,
+     0.98579,
+     0.98769,
+     0.99006,
+     0.99307,
+     0.99466,
+     0.99678,
+     0.99909,
+     1.00098,
+     1.0029,
+     1.00486,
+     1.00718,
+     1.00927,
+     1.01139,
+     1.0133,
+     1.01598,
+     1.01816
+    ],
+    "used": true
+   },
+   {
+    "key": "m074_rope",
+    "hex": "#CCAE78",
+    "levels": [
+     0.97363,
+     0.98654,
+     0.98962,
+     0.99777,
+     1.02097,
+     1.02605
+    ],
+    "used": true
+   },
+   {
+    "key": "m074_rope_deep",
+    "hex": "#93744A",
+    "levels": [
+     0.97363,
+     0.98654,
+     0.98962,
+     0.99777,
+     1.02097,
+     1.02605
+    ],
+    "used": true
+   },
+   {
+    "key": "m074_stone",
+    "hex": "#72727E",
+    "levels": [
+     0.93627,
+     0.95604,
+     0.96466,
+     0.97164,
+     0.97619,
+     0.97997,
+     0.9834,
+     0.98664,
+     0.98875,
+     0.99099,
+     0.99294,
+     0.99583,
+     0.99801,
+     0.99992,
+     1.00187,
+     1.00388,
+     1.00587,
+     1.00807,
+     1.01116,
+     1.01277,
+     1.01479,
+     1.01646,
+     1.01832,
+     1.0216,
+     1.02609,
+     1.03004,
+     1.03313,
+     1.03747,
+     1.04387,
+     1.05024,
+     1.05639,
+     1.07437
+    ],
+    "used": true
+   },
+   {
+    "key": "m074_wood",
+    "hex": "#8B5429",
+    "levels": [
+     0.99124,
+     0.99465,
+     0.99632,
+     0.9994,
+     1.0021,
+     1.00476,
+     1.00717,
+     1.00896,
+     1.01083,
+     1.01304,
+     1.01532,
+     1.01914,
+     1.02155,
+     1.02368,
+     1.026,
+     1.02791,
+     1.02975,
+     1.03256,
+     1.03515,
+     1.03766,
+     1.03911,
+     1.04229,
+     1.04415,
+     1.04617,
+     1.04882,
+     1.05141,
+     1.0541,
+     1.05738,
+     1.0595
+    ],
+    "used": true
+   },
+   {
+    "key": "m074_wood_deep",
+    "hex": "#4E2C15",
+    "levels": [
+     0.99633,
+     1.00217,
+     1.00722,
+     1.01256,
+     1.01864,
+     1.02374,
+     1.0252,
+     1.02737,
+     1.031,
+     1.03794,
+     1.04032,
+     1.04837
+    ],
+    "used": true
+   },
+   {
+    "key": "m074_wood_end",
+    "hex": "#B07443",
+    "levels": [
+     0.98592,
+     0.98951,
+     0.99167,
+     0.99457,
+     0.9966,
+     0.99946,
+     1.00165,
+     1.0039,
+     1.00668,
+     1.00934,
+     1.01146,
+     1.01287,
+     1.01603,
+     1.01771,
+     1.02205,
+     1.02385,
+     1.02777,
+     1.02956,
+     1.03229,
+     1.03406,
+     1.03622,
+     1.03846,
+     1.04125,
+     1.04355,
+     1.04555,
+     1.04925,
+     1.052,
+     1.05464,
+     1.0566,
+     1.06213
+    ],
+    "used": true
+   }
+  ]
+ },
+ "water": {
+  "keys": {},
+  "material": "SmoothPlastic",
+  "tile_studs": 16.0,
+  "uv": "Water pieces carry their own UVs (not palette cells): a box projection in studs from the asset origin, one texture tile per tile_studs. Up-facing faces: u = X / tile, v = Z / tile (mod 1, Roblox axes); faces toward +-Z use (X, -Y), toward +-X use (-Z, -Y). Set MeshPart.TextureID to the uploaded texture (it wraps), Transparency from the piece, Material SmoothPlastic, CastShadow false. Assets placed on a tile_studs grid continue the pattern seamlessly.",
+  "flow": "Pieces of an asset with a water_flow socket carry flow = {direction (unit, Roblox X/Z), speed (studs/s), socket}. To animate, use a Texture (Face Top, StudsPerTileU/V = tile_studs) on the piece instead of TextureID and move OffsetStudsU/V along direction * speed each frame."
+ },
+ "assets": [
+  {
+   "name": "TripodCookfire",
+   "sheet": "M074",
+   "subject": "Fire and Light Station",
+   "role": "hero",
+   "size": [
+    8.6889,
+    6.4409,
+    8.9513
+   ],
+   "tris": 2640,
+   "budget": 4000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TripodCookfire.glb",
+     "kind": "solid",
+     "tris": 2640,
+     "offset": [
+      0.0,
+      3.2204,
+      0.0
+     ],
+     "size": [
+      8.6889,
+      6.4409,
+      8.9513
+     ]
+    }
+   ],
+   "vfx": [
+    {
+     "name": "VFX_TripodCookfire_campfire_1",
+     "kind": "campfire",
+     "position": [
+      -0.0985,
+      0.3,
+      -0.0194
+     ],
+     "vfx_scale": 1.0,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Flame",
+        "texture": "fire_flipbook_4x4",
+        "flipbook": "4x4",
+        "color": [
+         "#FFFFFF",
+         "#FFF4E0",
+         "#FFD2A8"
+        ],
+        "size": [
+         2.6,
+         3.4,
+         0.8
+        ],
+        "transparency": [
+         0.05,
+         0.15,
+         1.0
+        ],
+        "lifetime": [
+         0.5,
+         0.9
+        ],
+        "rate": 30,
+        "speed": [
+         1.8,
+         3.0
+        ],
+        "spread": 12,
+        "light_emission": 1.0,
+        "acceleration": [
+         0,
+         2.5,
+         0
+        ],
+        "rotation": [
+         -10,
+         10
+        ],
+        "shape": [
+         2.5,
+         0.2,
+         2.5
+        ]
+       },
+       {
+        "name": "Sparks",
+        "texture": "spark_diamond",
+        "color": [
+         "#FFF2B0",
+         "#FFB347"
+        ],
+        "size": [
+         0.45,
+         0.15
+        ],
+        "transparency": [
+         0,
+         1
+        ],
+        "lifetime": [
+         1.0,
+         2.2
+        ],
+        "rate": 8,
+        "speed": [
+         5,
+         8
+        ],
+        "spread": 30,
+        "light_emission": 1.0,
+        "drag": 1.4,
+        "acceleration": [
+         0,
+         1.5,
+         0
+        ]
+       },
+       {
+        "name": "Smoke",
+        "texture": "smoke_puff",
+        "color": [
+         "#6E6A66",
+         "#9A9692"
+        ],
+        "size": [
+         1.5,
+         4.5
+        ],
+        "transparency": [
+         0.6,
+         1.0
+        ],
+        "lifetime": [
+         2.5,
+         4.0
+        ],
+        "rate": 3,
+        "speed": [
+         2,
+         3
+        ],
+        "spread": 10,
+        "light_emission": 0.0,
+        "rotation": [
+         0,
+         360
+        ],
+        "rot_speed": [
+         -25,
+         25
+        ],
+        "acceleration": [
+         0.3,
+         0.3,
+         0
+        ]
+       }
+      ],
+      "light": {
+       "color": "#FF8C2A",
+       "brightness": 2.5,
+       "range": 28,
+       "flicker": true
+      }
+     }
+    },
+    {
+     "name": "VFX_TripodCookfire_heat_glow_1",
+     "kind": "heat_glow",
+     "position": [
+      -0.0985,
+      0.55,
+      -0.0194
+     ],
+     "vfx_scale": 1.0,
+     "trigger": null,
+     "spec": {
+      "emitters": [
+       {
+        "name": "Heat",
+        "texture": "glow_soft",
+        "color": [
+         "#FF8C2A",
+         "#FF5A1A"
+        ],
+        "size": [
+         1.0,
+         1.4
+        ],
+        "transparency": [
+         0.5,
+         1.0
+        ],
+        "lifetime": [
+         0.8,
+         1.2
+        ],
+        "rate": 3,
+        "speed": [
+         0.3,
+         0.6
+        ],
+        "spread": 5,
+        "light_emission": 1.0
+       }
+      ],
+      "light": {
+       "color": "#FF7A22",
+       "brightness": 1.2,
+       "range": 10,
+       "flicker": true
+      }
+     }
+    }
+   ],
+   "notes": "Tripod cookfire (sheet 074, Fire and Light Station): 8.69 x 8.95 x 6.44. Nine faceted stones (2.2 x 2.0 x 1.2) in a packed ring; three 0.46-square grooved poles as a twisted tripod (feet in the ring's three wide gaps, tops splayed clear of the bind) with a three-turn rope bind on the crossing and three diagonal wraps; a two-link iron chain from the crotch to the bail of a 2.0-wide iron cauldron (bottom 1.81); three split logs in the centre. The flames are a campfire VFX socket, not geometry; heat_glow socket over the logs."
+  },
+  {
+   "name": "TripodCookfireHangingPot",
+   "sheet": "M074",
+   "subject": "Fire and Light Station",
+   "role": "part",
+   "size": [
+    2.1149,
+    2.899,
+    2.0
+   ],
+   "tris": 672,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TripodCookfireHangingPot.glb",
+     "kind": "solid",
+     "tris": 672,
+     "offset": [
+      0.0,
+      1.4495,
+      0.0
+     ],
+     "size": [
+      2.1149,
+      2.899,
+      2.0
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Hanging Pot (+ hanger): iron cauldron with a thick rim, two lugs, bail and two chain links"
+  },
+  {
+   "name": "TripodCookfireLog",
+   "sheet": "M074",
+   "subject": "Fire and Light Station",
+   "role": "part",
+   "size": [
+    2.4,
+    0.56,
+    0.64
+   ],
+   "tris": 52,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "box"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TripodCookfireLog.glb",
+     "kind": "solid",
+     "tris": 52,
+     "offset": [
+      0.0,
+      0.28,
+      0.0
+     ],
+     "size": [
+      2.4,
+      0.56,
+      0.64
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Log Piece: a split log, chamfered, with its split groove"
+  },
+  {
+   "name": "TripodCookfirePole",
+   "sheet": "M074",
+   "subject": "Fire and Light Station",
+   "role": "part",
+   "size": [
+    4.1034,
+    6.4409,
+    2.2611
+   ],
+   "tris": 64,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TripodCookfirePole.glb",
+     "kind": "solid",
+     "tris": 64,
+     "offset": [
+      0.0,
+      3.2204,
+      0.0
+     ],
+     "size": [
+      4.1034,
+      6.4409,
+      2.2611
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Tripod Pole: one chamfered 0.46-square pole with three seam grooves, foot cut flat, end grain on top"
+  },
+  {
+   "name": "TripodCookfireRopeBind",
+   "sheet": "M074",
+   "subject": "Fire and Light Station",
+   "role": "part",
+   "size": [
+    1.8541,
+    0.7625,
+    1.7938
+   ],
+   "tris": 864,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Box",
+    "CanCollide": false,
+    "CanQuery": false,
+    "CanTouch": false,
+    "profile": "none"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TripodCookfireRopeBind.glb",
+     "kind": "solid",
+     "tris": 864,
+     "offset": [
+      0.0,
+      0.3812,
+      0.0
+     ],
+     "size": [
+      1.8541,
+      0.7625,
+      1.7938
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Rope Bind: three round rope turns and three diagonal wraps, as they bind the tripod"
+  },
+  {
+   "name": "TripodCookfireStone",
+   "sheet": "M074",
+   "subject": "Fire and Light Station",
+   "role": "part",
+   "size": [
+    2.2455,
+    1.2019,
+    2.0266
+   ],
+   "tris": 84,
+   "budget": 1000,
+   "collision": {
+    "CollisionFidelity": "Hull",
+    "CanCollide": true,
+    "CanQuery": true,
+    "CanTouch": true,
+    "profile": "hull"
+   },
+   "pieces": [
+    {
+     "file": "meshes/TripodCookfireStone.glb",
+     "kind": "solid",
+     "tris": 84,
+     "offset": [
+      0.0,
+      0.601,
+      0.0
+     ],
+     "size": [
+      2.2455,
+      1.2019,
+      2.0266
+     ]
+    }
+   ],
+   "vfx": [],
+   "notes": "Stone: one faceted ring stone"
+  }
+ ],
+ "stats": {
+  "assets": 6,
+  "pieces": 6,
+  "solid": 6,
+  "water": 0,
+  "glow": 0,
+  "tris": 4376,
+  "vfxSockets": 2,
+  "paletteColours": 8,
+  "paletteLevels": 153,
+  "meshBytes": 370624
+ },
+ "problems": []
+}
