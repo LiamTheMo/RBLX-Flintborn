@@ -1,7 +1,7 @@
 -- The Quest Journal on a phone held sideways (844 × 390, touch only, the top bar
 -- 58 px down): the real window fit (Kit.Scale.Window, as screen:Watch does)
 -- fills the room under the top bar, side tabs included (the screen is 50 px
--- wider each side for them). Pages: the book tab, the map tab.
+-- wider each side for them). Page: the book tab.
 --
 --   python3 art/ui/capture/capture.py journal_phone
 
@@ -43,7 +43,6 @@ end
 
 local window = JournalWindow.new(nil, {})
 window:SetPage("quests", JournalModel.QuestPage(quests, NOW))
-window:SetPartyAvailable(true)
 window:Select("DailyCraft")
 local screen = window.screen
 screen:Open()
@@ -60,7 +59,5 @@ print(
 )
 -- The smallest text on the page in screen px (row subtitles, 15 design px).
 print(("journal_phone: 15 px text draws at %.1f screen px"):format(15 * k))
-__dump(Players.LocalPlayer.PlayerGui, W, H)
-window:SelectTab("map")
 __dump(Players.LocalPlayer.PlayerGui, W, H)
 window:Destroy()

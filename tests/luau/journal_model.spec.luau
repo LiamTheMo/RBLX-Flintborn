@@ -74,8 +74,6 @@ test("a quest entry has one objective with its real count", function()
 	expectEq(entry.objectives[1].needed, 100, "needed")
 	expect(not entry.objectives[1].done, "not done")
 	expectEq(entry.icon, "logs", "icon by action")
-	expectEq(JournalModel.QuestEntry(quest("FirstGuardian", 0, false), 0).place, "KeepTower", "guardian place")
-	expectEq(JournalModel.QuestEntry(quest("DailyBoss", 0, false), 0).place, nil, "bosses have no fixed place")
 end)
 
 test("daily reset countdown", function()

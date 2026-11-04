@@ -17,8 +17,9 @@ Raw crops, font comparisons and the measuring scripts are in
 
 The Quest Journal (GDD §10.1, §25), a modal parchment window over the dimmed lobby HUD,
 opened by the Quests (scroll) tile of the HUD menu grid (`JournalController.Toggle`) and
-closed by ✕, ButtonB or the tile. Four icon tabs hang off the window's left edge (book
-active, trophy, map pin, party). The book tab shows: the quest list on the left (5 rows,
+closed by ✕, ButtonB or the tile. Two icon tabs hang off the window's left edge (book
+active, trophy); the mockup's map pin and party tabs were removed (owner, 2026-11-04:
+the Map and Party windows do those jobs). The book tab shows: the quest list on the left (5 rows,
 one selected), and on the right the selected quest's illustration, title and description,
 OBJECTIVES rows with progress and a check circle, REWARDS tiles, a CLAIM button, and a
 QUEST PROGRESS bar along the bottom ("1 / 5 Completed").

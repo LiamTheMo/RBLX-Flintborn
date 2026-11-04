@@ -1,6 +1,6 @@
 -- The Quest Journal window (art/reference/ui/lobby/07_quest_journal.png, spec
 -- docs/ui/JournalScreen.md, ARCHITECTURE §4.7 and D12), built only from the UI
--- kit. Four side tabs hang off the frame's left edge:
+-- kit. Two side tabs hang off the frame's left edge:
 --   book    quests: the list (daily first, then main; each row tagged with
 --           its group)
 --           and the chosen quest's page: illustration, name, description,
@@ -8,8 +8,6 @@
 --           QUEST PROGRESS bar along the bottom
 --   trophy  progression, read-only, in the same layout (level, masteries,
 --           titles; ProgressionController's snapshot)
---   map pin the painted island map (Hud/IslandMap) with the chosen quest's place
---   party   opens the Party window (the controller does it; no page here)
 -- The window only draws pages (JournalModel) and reports presses; the
 -- JournalController fetches quests and claims rewards.
 --
@@ -23,7 +21,6 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local JournalModel = require(ReplicatedStorage.Shared.UI.JournalModel)
 local KitModel = require(ReplicatedStorage.Shared.UI.KitModel)
 local Kit = require(script.Parent.Parent.Kit)
-local IslandMap = require(script.Parent.Parent.IslandMap)
 
 local JournalWindow = {}
 JournalWindow.__index = JournalWindow
@@ -32,10 +29,10 @@ JournalWindow.FRAME = { 1072, 688 }
 JournalWindow.MARGIN = 50
 JournalWindow.SIZE = { 1072 + 2 * 50, 688 }
 
--- Side tabs: {id, y}. The party tab opens another window.
+-- Side tabs: {id, y}.
 JournalWindow.TAB_X = -45
 JournalWindow.TAB_SIZE = { 82, 84 }
-JournalWindow.TAB_YS = { quests = 101, progress = 195, map = 288, party = 383 }
+JournalWindow.TAB_YS = { quests = 101, progress = 195 }
 
 local Z = 8
 -- The mockup's 357 × 95 quest cards at a 104 px pitch (the kit's soft row draws
@@ -54,10 +51,9 @@ local TILE = { 92, 104 }
 local TILE_PITCH = 98
 -- How wide a reward amount may be before the icon steps aside for it.
 local REWARD_AMOUNT_ROOM = 34
-local MAP = { 51, 108, 991, 512 }
 
 -- parent: where the ScreenGui goes (PlayerGui by default). handlers: onClose(),
--- onTab(id), onSelect(id), onClaim(id), onParty().
+-- onTab(id), onSelect(id), onClaim(id).
 function JournalWindow.new(parent: Instance?, handlers)
 	local self = setmetatable({}, JournalWindow)
 	self.handlers = handlers or {}
@@ -105,7 +101,7 @@ end
 function JournalWindow:_tabs(v: Frame)
 	local tabs = {}
 	self.tabs = {}
-	for _, id in { "quests", "progress", "map" } do
+	for _, id in JournalModel.TABS do
 		local tab = Kit.Tab.new(v, {
 			id = id,
 			name = "Tab" .. id,
@@ -132,27 +128,6 @@ function JournalWindow:_tabs(v: Frame)
 		end
 	end)
 	self.maid:Give(self.tabGroup)
-	self.partyTab = Kit.Tab.new(v, {
-		id = "party",
-		name = "Tabparty",
-		rect = {
-			JournalWindow.TAB_X,
-			JournalWindow.TAB_YS.party,
-			JournalWindow.TAB_SIZE[1],
-			JournalWindow.TAB_SIZE[2],
-		},
-		icon = "ink:" .. JournalModel.TAB_ICONS.party,
-		iconSize = 50,
-		variant = "side",
-		zIndex = Z + 4,
-		onPress = function()
-			if self.handlers.onParty then
-				self.handlers.onParty()
-			end
-		end,
-	})
-	self.tabs.party = self.partyTab
-	self.maid:Give(self.partyTab)
 end
 
 -- The list and the detail page, shared by the quest and progress tabs.
@@ -295,71 +270,31 @@ function JournalWindow:_footer(v: Frame)
 	})
 end
 
--- The map page, built the first time the map tab opens.
-function JournalWindow:_mapPage()
-	if self.map then
-		return
-	end
-	local v = self.visual
-	local frame = Kit.Core.Make("Frame", {
-		Name = "MapPage",
-		BackgroundTransparency = 1,
-		Size = UDim2.fromScale(1, 1),
-		Visible = false,
-		ZIndex = Z,
-	}, v)
-	self.mapFrame = frame
-	Kit.Panel.new(frame, { name = "MapPanel", rect = MAP, variant = "inset", zIndex = Z })
-	local inner = { MAP[1] + 8, MAP[2] + 8, MAP[3] - 16, MAP[4] - 16 }
-	self.map = IslandMap.new(frame, inner, {
-		zIndex = Z + 1,
-		zoomButtons = {
-			{ inner[1] + inner[3] - 70, inner[2] + inner[4] - 134, 58, 58 },
-			{ inner[1] + inner[3] - 70, inner[2] + inner[4] - 70, 58, 58 },
-		},
-	})
-	self.maid:Give(self.map)
-end
-
--- The page shown under the tabs: quests and progress draw entries; the map tab
--- shows the map with the quests' footer.
+-- The page shown under the tabs (quests or progress).
 function JournalWindow:SelectTab(id: string)
-	if id == "party" then
+	if self.tabs[id] == nil then
 		return
 	end
 	self.tab = id
 	self.tabGroup:Select(id)
-	local isMap = id == "map"
-	if isMap then
-		self:_mapPage()
-	end
-	self.entriesFrame.Visible = not isMap
-	if self.mapFrame then
-		self.mapFrame.Visible = isMap
-	end
 	self:_draw()
-	if isMap then
-		self:_pointMap()
-	end
 end
 
 function JournalWindow:Tab(): string
 	return self.tab
 end
 
--- The page a tab draws (JournalModel.QuestPage / ProgressPage). The map tab
--- uses the quest page's footer and places.
+-- The page a tab draws (JournalModel.QuestPage / ProgressPage).
 function JournalWindow:SetPage(tab: string, page)
 	self.pages[tab] = page
-	if tab == self.tab or (tab == "quests" and self.tab == "map") then
+	if tab == self.tab then
 		self:_draw()
 	end
 end
 
--- Chooses an entry on the current tab (quests on the map tab).
+-- Chooses an entry on the current tab.
 function JournalWindow:Select(id: string?)
-	local tab = if self.tab == "map" then "quests" else self.tab
-	self.selected[tab] = id
+	self.selected[self.tab] = id
 	self:_draw()
 	if self.handlers.onSelect then
 		self.handlers.onSelect(id)
@@ -368,18 +303,11 @@ end
 
 -- The id chosen on `tab` (default: the shown one).
 function JournalWindow:Selected(tab: string?): string?
-	local key = tab or (if self.tab == "map" then "quests" else self.tab)
-	return self.selected[key]
-end
-
--- The party tab works only where the Party window exists (the lobby).
-function JournalWindow:SetPartyAvailable(available: boolean)
-	self.partyTab:SetEnabled(available)
+	return self.selected[tab or self.tab]
 end
 
 function JournalWindow:_page()
-	local tab = if self.tab == "map" then "quests" else self.tab
-	return self.pages[tab], tab
+	return self.pages[self.tab], self.tab
 end
 
 function JournalWindow:_entry()
@@ -401,10 +329,6 @@ function JournalWindow:_draw()
 	self.footerLabel:SetText(footer and footer.label or "")
 	self.footerBar:Set(footer and footer.fraction or 0)
 	self.footerText:SetText(footer and footer.text or "")
-	if self.tab == "map" then
-		self:_pointMap()
-		return
-	end
 	self:_drawList(page, tab)
 	self:_drawDetail(self:_entry())
 end
@@ -475,8 +399,7 @@ function JournalWindow:_row(content: Instance, entry, order: number)
 			self:Select(entry.id)
 		end,
 	}))
-	local tab = if self.tab == "map" then "quests" else self.tab
-	row:SetSelected(entry.id == self.selected[tab])
+	row:SetSelected(entry.id == self.selected[self.tab])
 	local v = row.base.visual
 	if entry.tag then
 		Kit.Text.new(v, {
@@ -622,25 +545,6 @@ function JournalWindow:_reward(reward, index: number)
 		scaled = true,
 		zIndex = Z + 2,
 	})
-end
-
--- On the map tab: the chosen quest's place gets its name plate and the map
--- centres on it.
-function JournalWindow:_pointMap()
-	if self.map == nil then
-		return
-	end
-	local entry = self:_entry()
-	local place = entry and entry.place
-	if place == self.pointedAt then
-		return
-	end
-	self.pointedAt = place
-	self.map:Select(place)
-	local pin = place and self.map.pins[place]
-	if pin then
-		self.map:Focus(pin.place.x, pin.place.z)
-	end
 end
 
 function JournalWindow:Destroy()

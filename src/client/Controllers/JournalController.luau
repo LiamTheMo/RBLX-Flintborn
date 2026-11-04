@@ -1,18 +1,17 @@
 -- The Quest Journal (GDD §10.1, §25; docs/ui/JournalScreen.md): quests with their
--- progress and rewards, a read-only view of progression, and the painted island
--- map (Hud/Screens/JournalWindow). The lobby's Quests tile opens it.
+-- progress and rewards and a read-only view of progression
+-- (Hud/Screens/JournalWindow). The lobby's Quests tile opens it.
 --
 -- Quests come from the QuestView remote when the Journal opens, and again
 -- whenever the server publishes progress (ProgressionChanged follows every
 -- verified action and every claim) and at the daily reset; nothing polls. CLAIM
 -- pays a finished quest through QuestClaim. The trophy tab draws
--- ProgressionController's snapshot; the party tab opens the Party window.
+-- ProgressionController's snapshot.
 
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local JournalModel = require(ReplicatedStorage.Shared.UI.JournalModel)
-local PlaceConfig = require(ReplicatedStorage.Shared.Config.PlaceConfig)
 local Remotes = require(ReplicatedStorage.Shared.Net.Remotes)
 local Kit = require(script.Parent.Parent.Hud.Kit)
 local JournalWindow = require(script.Parent.Parent.Hud.Screens.JournalWindow)
@@ -49,20 +48,6 @@ local function progression()
 	end
 	local ok, controller = pcall(require, module)
 	return if ok and type(controller) == "table" then controller else nil
-end
-
--- The Party window's controller (lobby only), required when the party tab is
--- pressed so the two controllers never require each other while loading.
-local function partyController()
-	local module = script.Parent:FindFirstChild("PartyController")
-	if module == nil then
-		return nil
-	end
-	local ok, controller = pcall(require, module)
-	if ok and type(controller) == "table" and type(controller.Open) == "function" then
-		return controller
-	end
-	return nil
 end
 
 local function drawQuests()
@@ -174,13 +159,13 @@ function JournalController.IsOpen(): boolean
 	return window ~= nil and window.screen:IsOpen()
 end
 
--- Opens the Journal on `tab` ("quests" | "progress" | "map"; default: the tab it
+-- Opens the Journal on `tab` ("quests" | "progress"; default: the tab it
 -- showed last). Opening it again only switches the tab.
 function JournalController.Open(tab: string?)
 	if window == nil then
 		return
 	end
-	if tab and tab ~= "party" then
+	if tab then
 		window:SelectTab(tab)
 	end
 	if not window.screen:IsOpen() then
@@ -212,18 +197,7 @@ function JournalController.Start()
 		onClaim = function(questId: string)
 			task.spawn(claim, questId)
 		end,
-		onParty = function()
-			local party = partyController()
-			if party == nil then
-				return
-			end
-			local ok, err = pcall(party.Open)
-			if not ok then
-				warn("[Journal] the Party window did not open: " .. tostring(err))
-			end
-		end,
 	})
-	window:SetPartyAvailable(PlaceConfig.IsLobby() and script.Parent:FindFirstChild("PartyController") ~= nil)
 	window.screen:Watch()
 	window.screen.Opened:Connect(onOpened)
 	window.screen.Closed:Connect(function()

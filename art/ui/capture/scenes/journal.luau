@@ -8,8 +8,7 @@
 --   4 a claim on its way: CLAIM busy
 --   5 trophy tab: progression (level, masteries, titles), a mastery chosen
 --   6 trophy tab: titles chosen (several rows, scrolling objectives)
---   7 map pin tab: the island map with the Guardian's place
---   8 empty and loading states; side tabs hover / pressed / disabled (party)
+--   7 empty and loading states; side tabs hover / pressed
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Hud = game:GetService("StarterPlayer").StarterPlayerScripts.Client.Hud
@@ -80,7 +79,6 @@ local screen = window.screen
 local quests = questView()
 window:SetPage("quests", JournalModel.QuestPage(quests, NOW))
 window:SetPage("progress", JournalModel.ProgressPage(SNAPSHOT))
-window:SetPartyAvailable(true)
 screen:Open()
 -- Where the mockup has the frame: left 300, top 150 (the screen is 50 px wider
 -- each side for the tabs).
@@ -127,16 +125,9 @@ dump()
 window:Select("Titles")
 dump()
 
--- 7: map tab with the Guardian's place.
-window:SelectTab("quests")
-window:Select("FirstGuardian")
-window:SelectTab("map")
-dump()
-
--- 8: loading quests; tabs hover / pressed; party unavailable.
+-- 7: loading quests; tabs hover / pressed.
 window:SetPage("quests", JournalModel.QuestPage(nil, NOW))
 window:SelectTab("quests")
-window:SetPartyAvailable(false)
 force(window.tabs.progress, "hover")
-force(window.tabs.map, "pressed")
+force(window.tabs.quests, "pressed")
 dump()

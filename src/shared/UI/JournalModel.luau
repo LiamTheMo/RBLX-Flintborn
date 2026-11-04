@@ -6,7 +6,7 @@
 --   entry = { id, icon, title, subtitle, status?, illustration, heading,
 --             description, objectives = {{icon, title, description, count?,
 --             needed?, done}}, rewardsTitle, rewards = {{icon, amount, label}},
---             claim? = {enabled, label}, place? }
+--             claim? = {enabled, label} }
 --
 -- Every word and number comes from the data: quests have one objective, and pay
 -- Coins, Gems and an XP boost only.
@@ -18,10 +18,10 @@ local HudModel = require(ReplicatedStorage.Shared.UI.HudModel)
 
 local JournalModel = {}
 
--- The side tabs, top to bottom. "party" opens the Party window instead of a page.
-JournalModel.TABS = { "quests", "progress", "map", "party" }
+-- The side tabs, top to bottom.
+JournalModel.TABS = { "quests", "progress" }
 -- Flat glyph ids (drawn "ink:<id>", the selected tab "white:<id>" in leather).
-JournalModel.TAB_ICONS = { quests = "book", progress = "trophy", map = "map_pin", party = "people" }
+JournalModel.TAB_ICONS = { quests = "book", progress = "trophy" }
 
 -- Per quest action: the row icon, the detail illustration, the row's line, and
 -- the objective's title and description (what the server counts).
@@ -83,9 +83,6 @@ local DEFAULT_ACTION = {
 	objective = "Complete the Task",
 	hint = "",
 }
-
--- The map place a quest points at (IslandMap pin ids), when it has one.
-JournalModel.PLACES = { Guardian = "KeepTower" }
 
 -- Mastery track icons for the trophy tab.
 JournalModel.TRACK_ICONS = {
@@ -247,7 +244,6 @@ function JournalModel.QuestEntry(quest, now: number, claiming: boolean?)
 		rewardsTitle = "Rewards",
 		rewards = JournalModel.Rewards(quest),
 		claim = JournalModel.Claim(quest, claiming),
-		place = JournalModel.PLACES[quest.action or ""],
 	}
 end
 

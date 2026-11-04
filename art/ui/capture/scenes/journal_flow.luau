@@ -1,9 +1,8 @@
 -- Drives the Quest Journal through JournalController headlessly with real
 -- events: open, choose quests, claim (refused, then paid), progress published
--- by the server, the side tabs (trophy, map, party), close, and an open/close
--- leak check. Rows, tabs and CLAIM are pressed through their kit controls;
--- remotes are mocked as vault_flow does. Pages: after the paid claim (toast
--- showing), the map tab, the trophy tab.
+-- by the server, the trophy tab, close, and an open/close leak check. Rows,
+-- tabs and CLAIM are pressed through their kit controls; remotes are mocked as
+-- vault_flow does. Pages: after the paid claim (toast showing), the trophy tab.
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 workspace:SetAttribute("FlintbornPlaceRole", "Lobby")
@@ -166,15 +165,8 @@ snapshot.level = 13
 progressionChanged.OnClientEvent:Fire(snapshot)
 check(views == before + 1, "ProgressionChanged refreshes quests while open")
 
--- Side tabs.
-press(window.tabs.map)
-check(window:Tab() == "map" and window.mapFrame.Visible, "map tab shows the island map")
-check(not window.entriesFrame.Visible, "map hides the quest list")
-press(window.tabs.quests)
-press(window.rows.FirstGuardian)
-press(window.tabs.map)
-check(window.map.selected == "KeepTower", "map points at the Guardian's place")
-dump()
+-- Side tabs: only the book and the trophy.
+check(window.tabs.map == nil and window.tabs.party == nil, "no map or party tab")
 press(window.tabs.progress)
 check(window:Tab() == "progress", "trophy tab")
 check(window.rows.Level ~= nil and window.rows.MasteryMining ~= nil, "progression rows listed")
@@ -182,30 +174,14 @@ check(not window.claim.root.Visible, "no CLAIM on the trophy tab")
 check(window.footerText.root.Text == "450 / 750 XP", "level bar shows the real fraction")
 dump()
 
--- Party tab opens the Party window through PartyController.Open.
-local partyOpened = 0
-local okParty, PartyController = pcall(require, Client.Controllers.PartyController)
-if okParty and type(PartyController) == "table" then
-	PartyController.Open = function()
-		partyOpened += 1
-	end
-	check(window.partyTab.control:State() ~= "disabled", "party tab enabled in the lobby")
-	press(window.partyTab)
-	check(partyOpened == 1, "party tab calls PartyController.Open")
-	check(window:Tab() == "progress", "party tab does not switch the page")
-else
-	print("  (PartyController missing: party tab stays disabled)")
-	check(window.partyTab.control:State() == "disabled", "party tab disabled without a Party window")
-end
-
 -- Close, and Open(tab).
 JournalController.Toggle()
 check(not JournalController.IsOpen(), "Toggle closes")
 before = views
 progressionChanged.OnClientEvent:Fire(snapshot)
 check(views == before, "no fetch while closed")
-JournalController.Open("map")
-check(JournalController.IsOpen() and window:Tab() == "map", "Open(tab) opens on that tab")
+JournalController.Open("quests")
+check(JournalController.IsOpen() and window:Tab() == "quests", "Open(tab) opens on that tab")
 JournalController.Close()
 
 -- Leak check counts: the PlayerGui's instances, and the live connections on
