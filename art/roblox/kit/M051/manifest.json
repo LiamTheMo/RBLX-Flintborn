@@ -62,8 +62,7 @@
      0.99263,
      0.99556,
      0.99769,
-     1.00025,
-     1.00207,
+     1.00127,
      1.00625,
      1.00852,
      1.01731,
@@ -287,22 +286,8 @@
     "levels": [
      0.95182,
      0.95819,
-     1.01026,
-     1.01308,
-     1.01497,
      1.01662,
      1.02164
-    ],
-    "used": true
-   },
-   {
-    "key": "m051_wood_deep_x_wood_dark_10",
-    "hex": "#964814",
-    "levels": [
-     0.97788,
-     0.9804,
-     0.98438,
-     0.9902
     ],
     "used": true
    },
@@ -454,45 +439,6 @@
    ],
    "vfx": [],
    "notes": "Anchor Stone: one faceted anchor stone with its chunks"
-  },
-  {
-   "name": "RopeBridgeBrace",
-   "sheet": "M051",
-   "subject": "Rope Crossing",
-   "role": "part",
-   "size": [
-    1.0,
-    0.37,
-    4.04
-   ],
-   "tris": 12,
-   "budget": 1000,
-   "collision": {
-    "CollisionFidelity": "Box",
-    "CanCollide": true,
-    "CanQuery": true,
-    "CanTouch": true,
-    "profile": "box"
-   },
-   "pieces": [
-    {
-     "file": "meshes/RopeBridgeBrace.glb",
-     "kind": "solid",
-     "tris": 12,
-     "offset": [
-      0.0,
-      0.185,
-      0.0
-     ],
-     "size": [
-      1.0,
-      0.37,
-      4.04
-     ]
-    }
-   ],
-   "vfx": [],
-   "notes": "Brace (reusable): the 1.0 x 4.0 x 0.37 end sill between the base blocks"
   },
   {
    "name": "RopeBridgeEndPost",
@@ -651,45 +597,6 @@
    "notes": "Upper Rope Rail (Main Rope): one sagging twisted rope coil to coil with six knots"
   },
   {
-   "name": "RopeBridgePegBlock",
-   "sheet": "M051",
-   "subject": "Rope Crossing",
-   "role": "part",
-   "size": [
-    0.81,
-    0.8,
-    0.9
-   ],
-   "tris": 24,
-   "budget": 1000,
-   "collision": {
-    "CollisionFidelity": "Box",
-    "CanCollide": true,
-    "CanQuery": true,
-    "CanTouch": true,
-    "profile": "box"
-   },
-   "pieces": [
-    {
-     "file": "meshes/RopeBridgePegBlock.glb",
-     "kind": "solid",
-     "tris": 24,
-     "offset": [
-      0.0,
-      0.4,
-      0.0
-     ],
-     "size": [
-      0.81,
-      0.8,
-      0.9
-     ]
-    }
-   ],
-   "vfx": [],
-   "notes": "Peg Block (reusable): a timber block with a square peg that anchors a rope"
-  },
-  {
    "name": "RopeBridgePlank",
    "sheet": "M051",
    "subject": "Rope Crossing",
@@ -730,16 +637,16 @@
   }
  ],
  "stats": {
-  "assets": 9,
-  "pieces": 9,
-  "solid": 9,
+  "assets": 7,
+  "pieces": 7,
+  "solid": 7,
   "water": 0,
   "glow": 0,
-  "tris": 7210,
+  "tris": 7174,
   "vfxSockets": 0,
-  "paletteColours": 18,
-  "paletteLevels": 228,
-  "meshBytes": 664844
+  "paletteColours": 17,
+  "paletteLevels": 220,
+  "meshBytes": 660316
  },
  "problems": []
 }
