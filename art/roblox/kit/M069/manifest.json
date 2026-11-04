@@ -8,324 +8,189 @@
  "palette": {
   "file": "palette.png",
   "width": 512,
-  "height": 512,
+  "height": 256,
   "cell": 16,
   "columns": 32,
   "uv": "row i, level j: u = (j + 0.5) / columns, v = 1 - (i + 0.5) * cell / height (v up from the bottom of the image); a row's spare cells repeat its last level",
   "rows": [
    {
     "key": "m069_banner",
-    "hex": "#FC231F",
+    "hex": "#F01E1C",
     "levels": [
-     0.98797
+     0.97368,
+     0.98001,
+     0.98251,
+     0.98453,
+     0.98822,
+     0.99098,
+     0.99448
     ],
     "used": true
    },
    {
-    "key": "m069_banner_x_deep_25",
-    "hex": "#E71F1B",
+    "key": "m069_banner_deep",
+    "hex": "#86100F",
     "levels": [
-     0.98797
+     0.98178
     ],
     "used": true
    },
    {
-    "key": "m069_banner_x_deep_50",
-    "hex": "#D21C17",
+    "key": "m069_cream",
+    "hex": "#E6DCBC",
     "levels": [
-     1.01149
-    ],
-    "used": true
-   },
-   {
-    "key": "m069_cloth_white",
-    "hex": "#F4EEEC",
-    "levels": [
-     0.9842,
-     0.99803,
-     1.00806,
-     1.01577
-    ],
-    "used": true
-   },
-   {
-    "key": "m069_leaf",
-    "hex": "#9ACA1C",
-    "levels": [
-     0.97078,
-     0.97658,
-     0.97861,
-     0.98115,
-     0.98573,
-     0.99329,
-     0.9946,
-     0.99723,
-     1.0035,
-     1.00541,
-     1.00852,
-     1.01192,
-     1.01398,
-     1.02075,
-     1.02241,
-     1.02654
-    ],
-    "used": true
-   },
-   {
-    "key": "m069_leaf_light",
-    "hex": "#AACF0E",
-    "levels": [
-     0.97861,
-     0.98115,
-     0.98653,
-     0.9946,
-     0.99773,
-     1.0035,
-     1.01398,
-     1.02075
-    ],
-    "used": true
-   },
-   {
-    "key": "m069_leaf_x_dark_20",
-    "hex": "#84B41C",
-    "levels": [
-     0.97078,
-     0.97658,
-     0.98493,
-     0.99329,
-     0.99673,
-     1.00541,
-     1.00852,
-     1.01192,
-     1.02241,
-     1.02654
-    ],
-    "used": true
-   },
-   {
-    "key": "m069_leaf_x_dark_45",
-    "hex": "#68981C",
-    "levels": [
-     0.97861,
-     0.98115,
-     0.98653,
-     0.9946,
-     0.99773,
-     1.0035,
-     1.01398,
-     1.02075
-    ],
-    "used": true
-   },
-   {
-    "key": "m069_leaf_x_dark_55",
-    "hex": "#5E8E1C",
-    "levels": [
-     0.97078,
-     0.97658,
-     0.98493,
-     0.99329,
-     0.99673,
-     1.00541,
-     1.00852,
-     1.01192,
-     1.02241,
-     1.02654
+     0.98238,
+     0.99295,
+     1.00905,
+     1.01293
     ],
     "used": true
    },
    {
     "key": "m069_rock",
-    "hex": "#8A8594",
+    "hex": "#817E8C",
     "levels": [
-     0.96238,
-     0.96763,
-     0.9743,
-     0.9882,
-     1.01964,
-     1.02433,
-     1.03589
-    ],
-    "used": true
-   },
-   {
-    "key": "m069_rock_x_dark_20",
-    "hex": "#7E7A89",
-    "levels": [
-     0.96238,
-     0.96763,
-     0.9882,
-     1.01964,
-     1.03589
-    ],
-    "used": true
-   },
-   {
-    "key": "m069_rock_x_dark_25",
-    "hex": "#7B7786",
-    "levels": [
-     0.96238,
-     0.96763,
-     0.9743,
-     0.9882,
-     1.01964,
-     1.02433,
-     1.03589
-    ],
-    "used": true
-   },
-   {
-    "key": "m069_rock_x_dark_50",
-    "hex": "#6C6878",
-    "levels": [
-     0.96238,
-     0.96763,
-     0.9743,
-     0.9882,
-     1.01964,
-     1.02433,
-     1.03589
-    ],
-    "used": true
-   },
-   {
-    "key": "m069_rock_x_light_40",
-    "hex": "#9792A1",
-    "levels": [
-     0.96763,
-     0.9743,
-     0.9882,
-     1.01964,
-     1.02433,
-     1.03589
+     0.92203,
+     0.9425,
+     0.95038,
+     0.95897,
+     0.96744,
+     0.97285,
+     0.97682,
+     0.97904,
+     0.98091,
+     0.98443,
+     0.98755,
+     0.98929,
+     0.9939,
+     0.99744,
+     1.00187,
+     1.00638,
+     1.00922,
+     1.01338,
+     1.01609,
+     1.02086,
+     1.02312,
+     1.02632,
+     1.02871,
+     1.03286,
+     1.0383,
+     1.04113,
+     1.04577,
+     1.05243,
+     1.05615,
+     1.06359,
+     1.07875,
+     1.09464
     ],
     "used": true
    },
    {
     "key": "m069_rope",
-    "hex": "#C49A5C",
+    "hex": "#E8B470",
     "levels": [
-     0.97237,
-     0.9747,
-     0.97912,
-     0.98132,
-     0.98399,
-     0.98646,
-     0.9908,
-     0.99395,
-     0.99745,
-     1.00108,
-     1.00292,
-     1.00618,
-     1.00876,
-     1.01098,
-     1.01377,
-     1.0181,
-     1.02227,
-     1.02468,
-     1.02836
+     0.9725,
+     0.98127,
+     0.98435,
+     0.98852,
+     0.9913,
+     0.99373,
+     0.99631,
+     0.99975,
+     1.00474,
+     1.00797,
+     1.01168,
+     1.01415,
+     1.01687,
+     1.01936,
+     1.0205,
+     1.02412,
+     1.02557,
+     1.02843
     ],
     "used": true
    },
    {
     "key": "m069_rope_deep",
-    "hex": "#93652F",
+    "hex": "#AB874D",
     "levels": [
-     0.97237,
-     0.97471,
-     0.97912,
-     0.98132,
-     0.98399,
-     0.98646,
-     0.99079,
-     0.99395,
-     0.99743,
-     1.0011,
-     1.00292,
-     1.00618,
-     1.00875,
-     1.011,
-     1.01377,
-     1.01813,
-     1.02227,
-     1.02468,
-     1.02836
+     0.97256,
+     0.98127,
+     0.9844,
+     0.98853,
+     0.99129,
+     0.99375,
+     0.99631,
+     0.99976,
+     1.00469,
+     1.00802,
+     1.01166,
+     1.01413,
+     1.01687,
+     1.01929,
+     1.0205,
+     1.02414,
+     1.02558,
+     1.02843
     ],
     "used": true
    },
    {
     "key": "m069_timber",
-    "hex": "#8F5B28",
+    "hex": "#8B551B",
     "levels": [
-     0.95555,
-     0.95785,
-     0.96172,
+     0.95297,
+     0.95863,
      0.96442,
-     0.97063,
-     0.97199,
-     0.97757,
+     0.97695,
      0.98423,
-     0.98739,
-     0.99169,
      0.99521,
-     1.00124,
-     1.01685,
-     1.01986,
-     1.02799,
-     1.03041,
-     1.04486
+     1.00143,
+     1.00901,
+     1.01715,
+     1.02133,
+     1.02969,
+     1.03597,
+     1.04274,
+     1.04483
     ],
     "used": true
    },
    {
     "key": "m069_timber_end",
-    "hex": "#CFA266",
+    "hex": "#BF883E",
     "levels": [
-     0.95555,
-     0.95796,
-     0.96172,
+     0.95297,
+     0.95863,
      0.96442,
-     0.9727,
-     0.97757,
-     0.98423,
-     0.98739,
-     0.99131,
-     0.99521,
-     1.00111,
-     1.01685,
-     1.01986,
-     1.02779,
-     1.03041,
-     1.04486
-    ],
-    "used": true
-   },
-   {
-    "key": "m069_timber_x_deep_25",
-    "hex": "#865626",
-    "levels": [
-     0.95746,
-     0.96442,
-     0.97757,
+     0.96998,
+     0.97695,
+     0.98058,
      0.98423,
      0.99521,
-     1.01986,
+     1.00143,
+     1.00901,
+     1.01529,
+     1.01751,
+     1.02141,
      1.02969,
-     1.04486
+     1.03597,
+     1.04274,
+     1.04481
     ],
     "used": true
    },
    {
-    "key": "m069_timber_x_deep_50",
-    "hex": "#7C5024",
+    "key": "m069_timber_x_deep_30",
+    "hex": "#7E4C18",
     "levels": [
-     0.95746,
+     0.95297,
      0.96442,
-     0.97757,
      0.98423,
      0.99521,
-     1.01986,
+     1.00901,
+     1.01662,
+     1.02079,
      1.02969,
      1.04486
     ],
@@ -348,10 +213,10 @@
    "role": "hero",
    "size": [
     15.99,
-    12.2,
-    5.0
+    12.15,
+    4.7172
    ],
-   "tris": 3948,
+   "tris": 3594,
    "budget": 4000,
    "collision": {
     "CollisionFidelity": "PreciseConvexDecomposition",
@@ -364,21 +229,21 @@
     {
      "file": "meshes/Stockade.glb",
      "kind": "solid",
-     "tris": 3948,
+     "tris": 3594,
      "offset": [
       0.0,
-      6.1,
+      6.075,
       0.0
      ],
      "size": [
       15.99,
-      12.2,
-      5.0
+      12.15,
+      4.7172
      ]
     }
    ],
    "vfx": [],
-   "notes": "Palisade wall module (16-stud pitch, seams x -8 / +8, nothing crosses them; end logs L1 / L11 identical \u00d8 1.47 octagons with outer faces at -7.995 / +7.995): ten sharpened octagonal logs (two narrow fillers set back) and two banded posts (10.3, 12.2), rear rails at 2.80 / 5.90 and a stepped front pair at 5.40 / 7.10 (inner faces |y| 0.73) with stubs and seven rope lashings, a red swallowtail banner with a white double diamond on a knobbed rod, lavender-grey chock rocks and lime rosettes. Origin on the log line at mid-module (no PivotOffset). Studio: check a character can't climb the rocks and front rails over the tips (Requires Manual Validation). Sheet header 73/132."
+   "notes": "Palisade wall (remade sheet): one straight 16-stud tile. Twelve chamfered octagonal timbers (two posts \u00d8 1.80 to 10.6 / 12.15 with two three-turn rope bands each, eight logs, four narrow fillers) with pale pointed tips and flat-cut feet; a front rail with a stub, a short front beam at the right post's upper band, two rear rails (the upper with stubs past both posts), rope lashings; a red swallowtail banner with a cream double diamond on a knobbed rod; seven grey chock rocks. Tiles at 16 studs along X (seams at x +-8; the end logs meet face to face)."
   },
   {
    "name": "StockadeBanner",
@@ -386,11 +251,11 @@
    "subject": "Palisade Wall",
    "role": "part",
    "size": [
-    4.1,
-    6.7667,
-    1.3467
+    4.73,
+    7.1,
+    0.572
    ],
-   "tris": 276,
+   "tris": 268,
    "budget": 1000,
    "collision": {
     "CollisionFidelity": "Box",
@@ -403,21 +268,21 @@
     {
      "file": "meshes/StockadeBanner.glb",
      "kind": "solid",
-     "tris": 276,
+     "tris": 268,
      "offset": [
       0.0,
-      3.3834,
+      3.55,
       0.0
      ],
      "size": [
-      4.1,
-      6.7667,
-      1.3467
+      4.73,
+      7.1,
+      0.572
      ]
     }
    ],
    "vfx": [],
-   "notes": "Banner (optional and removable): two pegs, a knobbed rod, hem sleeve, red swallowtail cloth with two white edge stripes and a white double diamond; m069_hang holds the pegs' wall-face points"
+   "notes": "Banner: knobbed rod, hem sleeve, red swallowtail cloth with cream stripes and a cream double diamond"
   },
   {
    "name": "StockadeLog",
@@ -425,11 +290,11 @@
    "subject": "Palisade Wall",
    "role": "part",
    "size": [
-    1.35,
-    8.8,
-    1.35
+    2.12,
+    9.0,
+    2.12
    ],
-   "tris": 62,
+   "tris": 334,
    "budget": 1000,
    "collision": {
     "CollisionFidelity": "Box",
@@ -442,21 +307,21 @@
     {
      "file": "meshes/StockadeLog.glb",
      "kind": "solid",
-     "tris": 62,
+     "tris": 334,
      "offset": [
       0.0,
-      4.4,
+      4.5,
       0.0
      ],
      "size": [
-      1.35,
-      8.8,
-      1.35
+      2.12,
+      9.0,
+      2.12
      ]
     }
    ],
    "vfx": [],
-   "notes": "Palisade Log (uneven height): one octagonal chamfered log, \u00d8 1.35, pale 8-facet pyramid tip at 8.8, flat-cut foot"
+   "notes": "Palisade Log: one \u00d8 1.40 chamfered log, tip 9.0, flat-cut foot, a three-turn rope band"
   },
   {
    "name": "StockadePost",
@@ -464,11 +329,11 @@
    "subject": "Palisade Wall",
    "role": "part",
    "size": [
-    2.4124,
-    12.2,
-    2.4124
+    2.52,
+    12.15,
+    2.52
    ],
-   "tris": 542,
+   "tris": 622,
    "budget": 1000,
    "collision": {
     "CollisionFidelity": "Box",
@@ -481,21 +346,21 @@
     {
      "file": "meshes/StockadePost.glb",
      "kind": "solid",
-     "tris": 542,
+     "tris": 622,
      "offset": [
       0.0,
-      6.1,
+      6.075,
       0.0
      ],
      "size": [
-      2.4124,
-      12.2,
-      2.4124
+      2.52,
+      12.15,
+      2.52
      ]
     }
    ],
    "vfx": [],
-   "notes": "Post: the tall \u00d8 1.75 post (tip 12.2) with its two three-turn rope bands"
+   "notes": "Post: the \u00d8 1.80 post (tip 12.15) with its two three-turn rope bands"
   },
   {
    "name": "StockadeRail",
@@ -503,11 +368,11 @@
    "subject": "Palisade Wall",
    "role": "part",
    "size": [
-    9.0,
-    1.4063,
-    0.9981
+    8.0,
+    1.46,
+    1.31
    ],
-   "tris": 136,
+   "tris": 604,
    "budget": 1000,
    "collision": {
     "CollisionFidelity": "Box",
@@ -520,21 +385,21 @@
     {
      "file": "meshes/StockadeRail.glb",
      "kind": "solid",
-     "tris": 136,
+     "tris": 604,
      "offset": [
       0.0,
-      0.7031,
+      0.73,
       0.0
      ],
      "size": [
-      9.0,
-      1.4063,
-      0.9981
+      8.0,
+      1.46,
+      1.31
      ]
     }
    ],
    "vfx": [],
-   "notes": "Horizontal Beam: one 9-stud chamfered rail (0.90 x 0.70) with a three-turn rope lashing"
+   "notes": "Horizontal Beam: an 8.0 rail (0.90 x 0.75, chamfered, pale ends) with a three-turn lashing near each end"
   },
   {
    "name": "StockadeRock",
@@ -542,11 +407,11 @@
    "subject": "Palisade Wall",
    "role": "part",
    "size": [
-    1.3968,
-    1.6302,
-    1.4923
+    2.1053,
+    1.6647,
+    1.7265
    ],
-   "tris": 28,
+   "tris": 38,
    "budget": 1000,
    "collision": {
     "CollisionFidelity": "Hull",
@@ -559,60 +424,21 @@
     {
      "file": "meshes/StockadeRock.glb",
      "kind": "solid",
-     "tris": 28,
+     "tris": 38,
      "offset": [
       0.0,
-      0.8151,
+      0.8323,
       0.0
      ],
      "size": [
-      1.3968,
-      1.6302,
-      1.4923
+      2.1053,
+      1.6647,
+      1.7265
      ]
     }
    ],
    "vfx": [],
-   "notes": "Ground Rock (Stone): a chunky faceted lavender-grey chock stone, flat bottom"
-  },
-  {
-   "name": "StockadeRosette",
-   "sheet": "M069",
-   "subject": "Palisade Wall",
-   "role": "part",
-   "size": [
-    2.33,
-    1.5369,
-    1.8818
-   ],
-   "tris": 96,
-   "budget": 1000,
-   "collision": {
-    "CollisionFidelity": "Box",
-    "CanCollide": false,
-    "CanQuery": false,
-    "CanTouch": false,
-    "profile": "none"
-   },
-   "pieces": [
-    {
-     "file": "meshes/StockadeRosette.glb",
-     "kind": "solid",
-     "tris": 96,
-     "offset": [
-      0.0,
-      0.7684,
-      0.0
-     ],
-     "size": [
-      2.33,
-      1.5369,
-      1.8818
-     ]
-    }
-   ],
-   "vfx": [],
-   "notes": "Foliage (Decorative): six broad round folded lime leaves in two tiers round a dark centre"
+   "notes": "Stone: one squat faceted chock rock (2.15 x 1.65 x 1.62)"
   },
   {
    "name": "StockadeStraight",
@@ -621,11 +447,11 @@
    "role": "variant",
    "size": [
     15.99,
-    12.2,
-    3.3663
+    12.15,
+    3.541
    ],
-   "tris": 2584,
-   "budget": 3000,
+   "tris": 3036,
+   "budget": 4000,
    "collision": {
     "CollisionFidelity": "Box",
     "CanCollide": true,
@@ -637,34 +463,34 @@
     {
      "file": "meshes/StockadeStraight.glb",
      "kind": "solid",
-     "tris": 2584,
+     "tris": 3036,
      "offset": [
       0.0,
-      6.1,
+      6.075,
       0.0
      ],
      "size": [
       15.99,
-      12.2,
-      3.3663
+      12.15,
+      3.541
      ]
     }
    ],
    "vfx": [],
-   "notes": "The tiling module: the hero without banner, rocks and rosettes. Place every 16 studs along X with one rotation; module N's L11 meets module N+1's L1 across a 0.01 slot. Collision box."
+   "notes": "Tiling module: the wall without banner and rocks. Place at 16-stud steps along X, before or after the hero or another module; the end logs meet face to face at the seams (x +-8)."
   }
  ],
  "stats": {
-  "assets": 8,
-  "pieces": 8,
-  "solid": 8,
+  "assets": 7,
+  "pieces": 7,
+  "solid": 7,
   "water": 0,
   "glow": 0,
-  "tris": 7672,
+  "tris": 8496,
   "vfxSockets": 0,
-  "paletteColours": 20,
-  "paletteLevels": 178,
-  "meshBytes": 674956
+  "paletteColours": 9,
+  "paletteLevels": 120,
+  "meshBytes": 594864
  },
  "problems": []
 }
