@@ -98,14 +98,6 @@
     "used": true
    },
    {
-    "key": "m066_end_grain",
-    "hex": "#C9B08E",
-    "levels": [
-     0.9551
-    ],
-    "used": true
-   },
-   {
     "key": "m066_glow",
     "hex": "#F2B010",
     "levels": [
@@ -196,7 +188,7 @@
      0.98631,
      0.9904,
      0.99123,
-     0.99499,
+     0.99512,
      1.00035,
      1.00503,
      1.00936,
@@ -219,7 +211,7 @@
      0.98631,
      0.9904,
      0.99123,
-     0.99489,
+     0.9951,
      1.00035,
      1.00503,
      1.00936,
@@ -228,14 +220,6 @@
      1.02282,
      1.02775,
      1.0297
-    ],
-    "used": true
-   },
-   {
-    "key": "m066_rope_x_deep_50",
-    "hex": "#B8883F",
-    "levels": [
-     0.99449
     ],
     "used": true
    },
@@ -329,16 +313,6 @@
     "hex": "#CE9356",
     "levels": [
      0.96998
-    ],
-    "used": true
-   },
-   {
-    "key": "m066_timber_x_wood_dark_35",
-    "hex": "#A95E20",
-    "levels": [
-     0.94683,
-     0.95293,
-     0.95964
     ],
     "used": true
    },
@@ -859,45 +833,6 @@
    "notes": "Lantern: square dark frame, Neon glass, ring top; heat_glow socket"
   },
   {
-   "name": "CanvasShelterPeg",
-   "sheet": "M066",
-   "subject": "Canvas Shelter",
-   "role": "part",
-   "size": [
-    1.1564,
-    1.2304,
-    0.559
-   ],
-   "tris": 44,
-   "budget": 1000,
-   "collision": {
-    "CollisionFidelity": "Box",
-    "CanCollide": false,
-    "CanQuery": false,
-    "CanTouch": false,
-    "profile": "none"
-   },
-   "pieces": [
-    {
-     "file": "meshes/CanvasShelterPeg.glb",
-     "kind": "solid",
-     "tris": 44,
-     "offset": [
-      0.0,
-      0.6152,
-      0.0
-     ],
-     "size": [
-      1.1564,
-      1.2304,
-      0.559
-     ]
-    }
-   ],
-   "vfx": [],
-   "notes": "Peg (x4): square stake with a pale end-grain top and a rope band"
-  },
-  {
    "name": "CanvasShelterPost",
    "sheet": "M066",
    "subject": "Canvas Shelter",
@@ -1055,16 +990,16 @@
   }
  ],
  "stats": {
-  "assets": 13,
-  "pieces": 15,
-  "solid": 13,
+  "assets": 12,
+  "pieces": 14,
+  "solid": 12,
   "water": 0,
   "glow": 2,
-  "tris": 6572,
+  "tris": 6528,
   "vfxSockets": 2,
-  "paletteColours": 24,
-  "paletteLevels": 207,
-  "meshBytes": 535780
+  "paletteColours": 21,
+  "paletteLevels": 202,
+  "meshBytes": 531548
  },
  "problems": []
 }
