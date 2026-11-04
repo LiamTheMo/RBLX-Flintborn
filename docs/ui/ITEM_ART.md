@@ -28,9 +28,7 @@ Adamantine turned red (2026-11-04): the owner's 11 new Adamantine PNGs replaced
 the purple ones, so every item moved from the uploaded `atlas_lk_items2_1` /
 `_2` (retired, never changed) to the new `atlas_lk_items3_1` / `_2`, same split,
 same rects; only the 11 Adamantine icons differ. Their 11 hero copies are new
-images too. Until the new atlases are uploaded (empty ids in `UiAssetIds.json`)
-items show their kind glyph, so upload them before publishing:
-`roblox_upload_ui_assets.py --upload --only 'atlas_lk_items3_*,lk_item_Adamantine*__hi'`.
+images too. All 13 were uploaded the same day (ids in `UiAssetIds.json`).
 
 Rebuild this table from `ICONS.json` when an item is added; the `item_info`
 spec fails if a catalog item has no icon or hero copy in `UiSprites.json`.
