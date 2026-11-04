@@ -69,9 +69,8 @@ $PY art/blender/kit/mcp/bgmcp.py stop <port>                # when your stages a
 - **Crashes.** A crash takes down only that session, and the log is `art/blender/logs/bgmcp-<port>.log`. Restart with `start` on the saved work file.
 - **Shared helpers are frozen while sessions run in parallel.** Don't edit `kit_models.py`, `kit_mcp.py`, `build_kit.py` or `lib/vfx.py`. Put new helpers in your own `mNNN.py`. If a shared change is truly needed, report it and the main session makes it.
 - **Into the kit file.** When a model passes, the main session runs `mNNN.build()` in the GUI kit file (the builder is the source of truth), saves it, checks that the renders match, then exports and commits.
-  A rebuild that drops parts leaves the old objects in the kit file, where the export picks them up again (051's Brace
-  and PegBlock). Modellers list any dropped part names in their report. Before shipping, the main session deletes
-  those objects from the kit file and their meshes from `art/roblox/kit/MNNN/meshes/`.
+  `ship.sh` first deletes the sheet's old objects (`kit_sheet == MNNN`) and its exported meshes, so the parts a rebuild
+  drops don't survive in the kit file or the export (051's Brace and PegBlock, 066's Peg did before).
 
 How every numbered model (`art/blender/assets/references/NNN.png`, builders `mNNN.py`) is built. It follows the
 `roblox-blender-model` skill (`art/blender/skills/roblox-blender-model/SKILL.md`) and `docs/art/WorldModeling.md` (read §1, §2,

@@ -72,6 +72,9 @@ assert bpy.path.basename(bpy.data.filepath) == 'FlintbornWorldKit.blend', 'open 
 import kit_models, kit_parts, kit_verify, kit_build, $MOD
 for m in (kit_models, kit_parts, kit_verify, kit_build, $MOD):
     importlib.reload(m)
+# drop the sheet's old objects first, so parts a rebuild retires don't survive in the kit file and the export
+for o in [o for o in bpy.data.objects if o.get('kit_sheet') == '$CODE']:
+    bpy.data.objects.remove(o, do_unlink=True)
 t0 = time.time()
 out = $MOD.build() or {}
 bpy.ops.wm.save_mainfile()
@@ -115,6 +118,7 @@ elif [ $DRY -eq 1 ]; then
   step "   and require the log's STATS line to end in ', 0 problems'"
 else
   step "2. export ($EXPORT_BLEND -> ${EXPORT_OUT:-$EXPORT})"
+  rm -f "${EXPORT_OUT:-$EXPORT}"/meshes/*.glb   # the export rewrites every live mesh; retired ones must not linger
   set +e
   OUT="$(FB_RETINT=1 BLENDER_ARGS="$ARGS" art/blender/run.sh scripts/export_kit_roblox.py "$MANIFEST")"
   CODE_RUN=$?
