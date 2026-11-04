@@ -2,7 +2,7 @@
 
 Tracks the rebuild of every world-kit model in `art/blender/assets/kit/FlintbornWorldKit.blend` against its master reference sheet in `art/reference/kit/`. Update this file after every model. It is the hand-over point between sessions.
 
-- **Branch:** `feat/world-kit-rebuild` (from `v0.18`).
+- **Branch:** committed straight to the active version branch (`v0.19`), no feature branch (from 2026-11-04; the earlier work was on `feat/world-kit-rebuild`, now merged and deleted locally).
 - **Sheets:** 34 (W01–W16, R01–R08, V01–V10). Each sheet has 4 rows; each row is one **model** (136 in total).
 - **A model** is the whole row: the assembled hero, every exploded part, every variation and, for resources, the depleted state and drops. Each is its own mesh asset tagged with `kit_role`.
 - **Builders:** durable per-sheet MCP modules in `art/blender/kit/mcp/<sheet>.py` (shared tools in `kit_mcp.py`). Load with `sys.path.insert(0, ".../art/blender/kit/mcp"); import kit_mcp; kit_mcp.install()`.
@@ -369,6 +369,41 @@ Skill vs design doc / repo (design doc wins, reported):
 | 170 | Guardian awakening dust and runes | Event & VFX | ⬜ | | | |
 | 171 | Resin drip and amber glint | Event & VFX | ⬜ | | | |
 | 172 | Harvest Leaves and Pollen VFX Study | Event & VFX | ⬜ | | | |
+
+## Queue and tracks (from 2026-11-04)
+
+The owner added remade and new sheets (2026-11-03). Every reference is now a plain `NNN.png`; the owner's master folder
+is the source, and the list of titles and remakes is in `art/blender/assets/references/INDEX.md`. Sheets after 172 are
+copied into the repo when their batch starts.
+
+**Order of work** (owner's choice):
+1. **Rebuild the remade sheets that were already built:** 048, 050, 051, 052, 064, 066, 068, 069, 070. Their earlier
+   builds stay in the kit file until each rebuild passes.
+2. **Compare pass on 001–035,** whose sheets were restyled in place with the same designs. One agent compares each built
+   model with its new sheet and lists only real design changes; only those models are rebuilt.
+3. **Continue from 071 in order** through 172. These remakes come up in turn: 072, 073, 075, 076, 077, 080–084, 088–091,
+   093, 095, 100, 102, 143, 145, 147, 150, 153, 154, 157.
+4. **New sheets 173–212, 337, 338** (resources, picked states, building sets, placeables, landmarks), with family
+   builders for the ore deposits, the picked/depleted states and the three building sets.
+5. **Gear 247–270** with family builders per weapon type (12 tiers from one builder) and per armor set. Sheets 246, 249,
+   252 and 262 don't exist yet.
+
+**Separate tracks, not in the modelling queue:**
+- **VFX concepts 271–301:** each sheet says "rebuild as separate textures". These become Studio ParticleEmitter, Beam
+  and Trail setups with small textures, done a few sheets per agent, not Blender models.
+- **Creatures, bosses and NPCs 213–245:** these need a rig and animation decision (R6-style parts or a skinned rig)
+  before modelling starts. They wait for the owner.
+
+**Pipeline changes (2026-11-04):**
+- three modellers at a time;
+- the brief replaces the study (`art/blender/kit/mcp/HOUSE_RULES.md`, `BRIEF_TEMPLATE.md`);
+- shared parts library and builder scaffold;
+- the verify suite and compare image;
+- light work files;
+- verification sized to the model;
+- the ship script.
+
+STAGES.md has the details. The repository no longer runs GitHub checks: run README → Checks locally before a PR.
 
 ## Log
 

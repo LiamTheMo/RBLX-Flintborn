@@ -1,8 +1,14 @@
 # Numbered-model stage procedure
 
-**Agent grouping (user decision, 2026-10-28, revised the same day to speed things up):**
-- **Two new-model modellers at a time** (user decision, 2026-10-28, down from three). Fix modellers and verifiers come on top of that, but never more than **4 Blender agents in all**. Each agent runs on the high-effort model and starts with a fresh context. A modeller does stages 1–6 (modelling, optimisation and cleanup, UV, materials/colour/texture, lighting, VFX) for one model in its own background Blender (see "Parallel sessions").
-- **A separate verifier per model, with a fresh context, does stage 7.** It didn't do any other stage. The user wants clean context, because context bloat hurts the modelling. It works read-only in its own background Blender, on a copy of the kit file taken after the model has been put into it.
+**Agent grouping (user decisions of 2026-10-28, revised 2026-11-04 for speed):**
+- **Three new-model modellers at a time** (user decision, 2026-11-04). Fix modellers and verifiers come on top of that, but never more than **6 Blender agents in all** (the machine has 32 GB and 16 cores). Each agent runs on the high-effort model and starts with a fresh context. A modeller does stages 1–6 (modelling, optimisation and cleanup, UV, materials/colour/texture, lighting, VFX) for one model in its own background Blender (see "Parallel sessions").
+- **No separate study stage** (2026-11-04). The modeller writes a one-page brief (`BRIEF_TEMPLATE.md`) as its first step, answering everything the sheet doesn't decide from `HOUSE_RULES.md`. It doesn't wait for rulings; it notes departures and carries on.
+- **Family builders.** Sheets that are variants of one design (ore deposits, picked/depleted states, building sets, gear tiers, armor sets) get one parametric builder for the family. Each sheet's `mNNN.py` calls it with that sheet's parameters.
+- **A separate verifier, with a fresh context, does stage 7.** It didn't do any other stage. The user wants clean context, because context bloat hurts the modelling. It works read-only in its own background Blender, on a copy of the kit file taken after the model has been put into it.
+- **Verification is sized to the model** (2026-11-04):
+  - **Small models** (prop and asset classes, nothing to walk into): one verifier checks 3–4 of them in one session, in one round. On a fail, a fix modeller fixes it, and the main session confirms the fix with `kit_verify` and the compare image instead of a second verifier, unless the blocker was visual.
+  - **Large models** (structures, buildings, landmarks, anything enterable): one model per verifier, up to two rounds, as before.
+  - The pass bar is the same for both.
 - **The main session is the hub.** It:
   - starts every agent;
   - owns the open GUI Blender (`FlintbornWorldKit.blend`);
@@ -12,8 +18,7 @@
 - **Every agent starts with a fresh context** (a new agent, never a fork or a continuation of a finished one). It loads exactly what its job needs: the `roblox-blender-model` skill (Skill tool), this file, the model's spec, and the reference. Modellers also read the builder. Fixes after a failed verification go to a fresh modeller.
 - Each modeller still runs every check listed for its stages below and records each stage in the spec under its own heading.
 - Verification findings go back to a modeller (a fresh one if the first has finished). A model gets at most 2 verification rounds; after that the main session commits it with the leftovers noted, unless something is actually broken or the model's defining feature still reads clearly unlike the sheet. In those cases a targeted third round fixes only the named blockers (018's leaf rosette was the first).
-- A non-Blender study agent writes the next models' 2a studies ahead of time.
-- Passed models are batched into one PR into the version branch every 3–5 models; each model still gets its own commit.
+- Each passed model gets its own commit, straight on the active version branch (no feature branch or PR; owner's decision, 2026-11-04), pushed as it lands.
 
 ## Parallel sessions
 

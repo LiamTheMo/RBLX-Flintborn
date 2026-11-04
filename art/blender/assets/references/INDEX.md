@@ -178,3 +178,150 @@ that order here.
 | 170 | 170.png | Event & VFX | 28 | Guardian awakening dust and runes |
 | 171 | 171.png | Event & VFX | 29 | Resin drip and amber glint |
 | 172 | 172.png | Event & VFX | 30 | Harvest Leaves and Pollen VFX Study |
+
+## Remakes (2026-11-03)
+
+These sheets were redrawn. The remake replaced the older file under the same number, and the older file went to the
+Recycle Bin:
+048 Dock, 050 Timber bridge, 051 Rope crossing, 052 Boardwalk, 064 A-frame tent, 066 Canvas shelter, 068 Timber hut,
+069 Palisade wall, 070 Ruined lean-to, 072 Timber gate, 073 Barricade, 075 Wall walk, 076 Watchtower,
+077 Hunt workshop, 080 Guard lodge, 081 Mine support frame, 082 Tunnel module, 083 Lookout platform, 084 Mine track,
+088 Gantry and ore lift, 089 Ruin block wall, 090 Ruin arch, 091 Ruin column, 093 Courtyard floor and steps,
+095 Mosswick stump hall, 100 Lake ruin tower, 102 Ruin camp shelter, 143 Altar and cache plinth,
+145 Keep gate monument, 147 Temple gateway, 150 Courtyard ruin, 153 Mine stairs and ladder, 154 Timber scaffold,
+157 Wall catwalk.
+
+001-035 were also restyled in place (same designs, cleaner flat colours and the house layout).
+
+## Added after 172
+
+Numbers not listed here have no sheet yet: 196, 246, 249, 252, 262 and 302-336.
+
+| # | Title | Kind |
+| --- | --- | --- |
+| 173 | Silver Deposit | Resource |
+| 174 | Cobalt Deposit | Resource |
+| 175 | Mithril Deposit | Resource |
+| 176 | Jade Vein | Resource |
+| 177 | Redcap Mushroom Patch | Resource |
+| 178 | Chopped Tree Stump | Resource state |
+| 179 | Rock and Ore Rubble | Resource state |
+| 180 | Broken Crystal Stub | Resource state |
+| 181 | Picked Shrub | Resource state |
+| 182 | Picked Herb / Fiber Tuft | Resource state |
+| 183 | Picked Mushroom Patch | Resource state |
+| 184 | Rich Cobalt Lode | Resource |
+| 185 | Ember-Veined Rock | Event set-piece |
+| 186 | Heartstone Seam | Resource |
+| 187 | Starfall Lotus | Event set-piece |
+| 188 | Meteor Chunks and Crater | Scene resource |
+| 189 | Loot Pile | Prop |
+| 190 | Event Cache Rarity Trims | Prop |
+| 191 | Timber Building Set | Building set |
+| 192 | Stone Building Set | Building set |
+| 193 | Metal-Plate Building Set | Building set |
+| 194 | Bed | Placeable |
+| 195 | Cauldron | Placeable |
+| 197 | Planter | Placeable |
+| 198 | Planter Crops | Placeable |
+| 199 | Tribe Totem, Levels 1-3 | Placeable |
+| 200 | Extraction Portal Site | Landmark |
+| 201 | Crater Heart Portal | Landmark |
+| 202 | Portable Extraction Rune | Item |
+| 203 | Old Lighthouse | Landmark |
+| 204 | The Monoliths | Landmark |
+| 205 | Rebirth Shrine | Landmark |
+| 206 | Rarework Table | Placeable |
+| 207 | Recent Extractions Board | Lobby prop |
+| 208 | Riverbank Chunk | Terrain |
+| 209 | Stone Path | Terrain |
+| 210 | Stone Stair | Terrain |
+| 211 | Timber Fence | Prop |
+| 212 | Wayfinding Post | Prop |
+| 213 | Wild Boar | Creature |
+| 214 | Forest Stag | Creature |
+| 215 | Grey Wolf | Creature |
+| 216 | Brown Bear | Creature |
+| 217 | River Crocodile | Creature |
+| 218 | Plains Bison | Creature |
+| 219 | Meadow Rabbit | Creature |
+| 220 | Island Dodo | Creature |
+| 221 | River Capybara | Creature |
+| 222 | Highland Goat | Creature |
+| 223 | Forest Tapir | Creature |
+| 224 | Woolly Mammoth | Creature |
+| 225 | Giant Ground Sloth | Creature |
+| 226 | Ancient Tortoise | Creature |
+| 227 | Iron-Tusk Boar | Creature |
+| 228 | Saber-Toothed Tiger | Creature |
+| 229 | Stonehide Rhino | Creature |
+| 230 | Skeleton Warrior | Enemy |
+| 231 | Keep Skeleton | Enemy |
+| 232 | Ember Wisp | Enemy |
+| 233 | The Guardian | Boss |
+| 234 | Guardian Pillar and Shield | Boss prop |
+| 235 | Crater Gorilla | Boss |
+| 236 | Ironhide Behemoth | Boss |
+| 237 | Bone Colossus | Boss |
+| 238 | Minotaur | Boss |
+| 239 | Raider Warlord | Boss |
+| 240 | Greeter | NPC |
+| 241 | Elder | NPC |
+| 242 | Quest Giver | NPC |
+| 243 | Vault Keeper | NPC |
+| 244 | Blacksmith | NPC |
+| 245 | Merchant (4 outfits) | NPC |
+| 247 | Spears, forged | Gear |
+| 248 | Daggers, primitive | Gear |
+| 250 | Swords, primitive | Gear |
+| 251 | Swords, forged | Gear |
+| 253 | Axes, primitive | Gear |
+| 254 | Axes, forged | Gear |
+| 255 | Pickaxes, primitive | Gear |
+| 256 | Pickaxes, forged | Gear |
+| 257 | Tier Material Key | Gear reference |
+| 258 | Guardian's Fang | Gear |
+| 259 | Hide Armor | Armor |
+| 260 | Bone Armor | Armor |
+| 261 | Metal Armor | Armor |
+| 263 | Ember Pot | Throwable |
+| 264 | Wall Breaker | Throwable |
+| 265 | Workbench Kit | Held item |
+| 266 | Medicine and Potions | Consumables |
+| 267 | Draughts | Consumables |
+| 268 | Foods | Consumables |
+| 269 | Drops and Pickups | World drops |
+| 270 | Dropped Pack | World drop |
+| 271 | Dropped Loot Rarity Ladder | VFX concept |
+| 272 | Held Rare Gear and Permanent Mark | VFX concept |
+| 273 | Permanent Conversion at the Eternal Anvil | VFX concept |
+| 274 | Melee Hit Impact and Hit Flash | VFX concept |
+| 275 | Arrow Trail | VFX concept |
+| 276 | Creature Death | VFX concept |
+| 277 | Downed Player Marker and Revive | VFX concept |
+| 278 | Elite / Alpha Creature Tell | VFX concept |
+| 279 | Heal Burst and Heal Over Time | VFX concept |
+| 280 | Boost Aura and Level-Up | VFX concept |
+| 281 | Structure Placed, Hit and Destroyed | VFX concept |
+| 282 | Decay Countdown | VFX concept |
+| 283 | Totem Placed / Upgraded and Spike Trap | VFX concept |
+| 284 | Fire Bomb Burst | VFX concept |
+| 285 | Breaching Charge Fuse and Blast | VFX concept |
+| 286 | Crop Ripe and Node Regrow | VFX concept |
+| 287 | Material Drop Pop and Pickup | VFX concept |
+| 288 | Portal Site Idle and Extraction Zone Ring | VFX concept |
+| 289 | Extraction Beacon | VFX concept |
+| 290 | Extraction Departure and Lobby Arrival | VFX concept |
+| 291 | Portable Rune Activation | VFX concept |
+| 292 | Ritual Altar Summon and Boss Arrival | VFX concept |
+| 293 | Guardian Shield, Pillar Runes and Shield Break | VFX concept |
+| 294 | Legendary Released | VFX concept |
+| 295 | Boss Quake Telegraph | VFX concept |
+| 296 | Boss Bolt Projectile | VFX concept |
+| 297 | Boss Slam Impact | VFX concept |
+| 298 | Boss Spawn and Death | VFX concept |
+| 299 | Ember Wisp Body | VFX concept |
+| 300 | Cache Opening Burst | VFX concept |
+| 301 | Event Location Marker | VFX concept |
+| 337 | Vault Hall | Building |
+| 338 | Ancestral Forge | Building |
