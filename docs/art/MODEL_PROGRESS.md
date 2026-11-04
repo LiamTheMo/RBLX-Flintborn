@@ -381,6 +381,24 @@ copied into the repo when their batch starts.
    builds stay in the kit file until each rebuild passes.
 2. **Compare pass on 001–035,** whose sheets were restyled in place with the same designs. One agent compares each built
    model with its new sheet and lists only real design changes; only those models are rebuilt.
+   **Result (2026-11-04):** no silhouette, proportion or part count changed on any of 001–035. The restyled sheets drop
+   baked detail and glow. Touch-ups, batched several per agent; the new sheet governs, so glow and VFX the sheet no
+   longer shows are removed (house rule):
+   - **Colour and material only:**
+     - 012 Amber: drop the bright facet seams and glints.
+     - 014 Starstone: solid flat cyan core, no halo or sparkles.
+     - 015 Ember Meteor: no glow or particles.
+     - 019 Resin Node: plain cream cut ends, no sparkle sockets, darker inner wood `#926246`.
+     - 025 Emberbloom: plain faceted orange-yellow seedpod, no glow or sparks.
+     - 028 Frost Shrub: deeper blues `#31528A` / `#527ABE`.
+     - 032 Shoreline Corner: plain cyan water.
+     - 034 Streambed: plain cyan water with white foam outlines; the flow strips become painted bands.
+   - **Small mesh fixes:**
+     - 026 Softwood Log: trunk without the bark slits and plate steps.
+     - 015 Ember Meteor: chunky separate shell slabs over a large exposed core, as both sheets draw it.
+     - 002 Flint: flatter shards set in shallow recesses, not pyramid spikes.
+     - 032 Shoreline Corner: square, edge-matched grass top with white daisies.
+   - **Keep as built:** everything else in 001–035. 017's optional trim to 6 berries is left as is.
 3. **Continue from 071 in order** through 172. These remakes come up in turn: 072, 073, 075, 076, 077, 080–084, 088–091,
    093, 095, 100, 102, 143, 145, 147, 150, 153, 154, 157.
 4. **New sheets 173–212, 337, 338** (resources, picked states, building sets, placeables, landmarks), with family
