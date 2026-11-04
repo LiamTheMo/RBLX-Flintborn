@@ -395,7 +395,7 @@ copied into the repo when their batch starts.
   before modelling starts. They wait for the owner.
 
 **Pipeline changes (2026-11-04):**
-- three modellers at a time;
+- two modellers at a time;
 - the brief replaces the study (`art/blender/kit/mcp/HOUSE_RULES.md`, `BRIEF_TEMPLATE.md`);
 - shared parts library and builder scaffold;
 - the verify suite and compare image;
