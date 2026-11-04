@@ -42,6 +42,8 @@ local DEFINITIONS = {
 	CombatFeedback = "RemoteEvent",
 	TribeAction = "RemoteFunction", -- (action, argument) -> ok, reason
 	TribeChanged = "RemoteEvent", -- server -> client: tribe snapshot
+	-- server -> client, each second, to tribe members only: {{userId, name, x, z, heading}} of their mates
+	TribeMap = "RemoteEvent",
 	-- server -> client: (corpseId, {{index, key, catalogId, name, rarity, quantity?, qualityRoll?, permanent?}})
 	CorpseOpened = "RemoteEvent",
 	CorpseTake = "RemoteFunction", -- (corpseId, index, key) -> ok, reason; key from CorpseOpened (ListingKeys)

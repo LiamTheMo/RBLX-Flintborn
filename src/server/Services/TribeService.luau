@@ -24,6 +24,8 @@ local TribeService = {}
 TribeService.REQUEST_COOLDOWN_SECONDS = 0.25
 TribeService.PREFIX = "tribe:"
 TribeService.PARTY_PREFIX = "tribe:party:"
+-- How often tribe mates' map positions go out (sendMapPositions).
+TribeService.MAP_SECONDS = 1
 
 local state = TribeRules.NewState()
 local requests = Cooldown.new(function()
@@ -171,11 +173,54 @@ local function lookUpParty(player: Player)
 	joinPartyTribe(player)
 end
 
+-- Sends each member of a tribe of two or more where the others are and which way
+-- they face, for the world map. Positions only ever reach the same tribe.
+local function sendMapPositions()
+	local remote = Remotes.Get("TribeMap")
+	for _, tribe in state.tribes do
+		if #tribe.members > 1 then
+			local marks = {}
+			for _, userId in tribe.members do
+				local member = Players:GetPlayerByUserId(userId)
+				local root = member and member.Character and member.Character:FindFirstChild("HumanoidRootPart")
+				if root and root:IsA("BasePart") then
+					local look = root.CFrame.LookVector
+					table.insert(marks, {
+						userId = userId,
+						name = member.DisplayName,
+						x = math.round(root.Position.X),
+						z = math.round(root.Position.Z),
+						heading = math.round(math.deg(math.atan2(look.Z, look.X))),
+					})
+				end
+			end
+			for _, userId in tribe.members do
+				local member = Players:GetPlayerByUserId(userId)
+				if member then
+					local others = {}
+					for _, mark in marks do
+						if mark.userId ~= userId then
+							table.insert(others, mark)
+						end
+					end
+					remote:FireClient(member, others)
+				end
+			end
+		end
+	end
+end
+
 function TribeService.Start()
 	if not PlaceConfig.IsWorld() then
 		return
 	end
 	Remotes.Handle("TribeAction", handle)
+	task.spawn(function()
+		while true do
+			task.wait(TribeService.MAP_SECONDS)
+			sendMapPositions()
+		end
+	end)
 	WorldAdmissionService.RunStarted:Connect(function(player)
 		if partyOf[player] == nil then
 			task.spawn(lookUpParty, player)

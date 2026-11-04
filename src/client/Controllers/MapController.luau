@@ -2,8 +2,9 @@
 -- strip (Hud/Compass). The Map key (N by default; DPadDown) opens the world map in a
 -- kit window (docs/ui/ListWindows.md): the painted island (Hud/IslandMap, the
 -- Journal's map) in an inset panel with zoom buttons, pins for the safe camps
--- and main landmarks, the active portals and announced events, and your
--- position, followed while zoomed in, with a legend underneath (on phones a
+-- and main landmarks, the active portals and announced events, your position
+-- and heading (followed while zoomed in) and your tribe mates' (TribeService
+-- sends them to the tribe only), with a legend underneath (on phones a
 -- wide window with the legend beside the map, so the window draws larger and
 -- its words keep 9 screen px). Marker names carry a paper outline so they read
 -- over the painting. An authored map (not the generated island) shows the bare
@@ -51,6 +52,8 @@ MapController.LAYOUTS = {
 MapController.CAMP_COLOR = "toggleOn"
 MapController.PORTAL_COLOR = "blue"
 MapController.SAFE_CHECK_SECONDS = 0.25
+-- Tribe mates' markers go when no update came for this long (TribeService sends one a second).
+MapController.MATES_STALE_SECONDS = 3
 -- Live marker names, design px.
 MapController.MARKER_TEXT = 16
 
@@ -63,6 +66,9 @@ local following = true
 local builtPhone = nil
 
 local events = {}
+-- Tribe mates' markers from the server (TribeMap), and when they last came.
+local mates = {}
+local matesAt = 0
 local safeZones = {}
 local sinceSafeCheck = math.huge
 
@@ -140,16 +146,26 @@ local function inSafeZone(position: Vector3): string?
 	return nil
 end
 
+-- Your marker at your character, facing where it faces.
+local function placeMarker(root: BasePart)
+	map:SetMarker(root.Position.X, root.Position.Z, IslandMap.Heading(root.CFrame.LookVector))
+end
+
 local function update()
+	if #mates > 0 and os.clock() - matesAt > MapController.MATES_STALE_SECONDS then
+		-- No longer sent (you left the tribe, or it emptied).
+		mates = {}
+		map:SetMates(mates)
+	end
 	local root = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
 	if root then
 		if screen.gui.Enabled then
-			map:SetMarker(root.Position.X, root.Position.Z)
+			placeMarker(root)
 			-- Zoomed in, the map keeps you in view until you pan it yourself.
-			if map.dragging then
+			if map.panned then
 				following = false
 			end
-			if following and map.zoomIndex > 1 then
+			if following and map.zoom > 1 then
 				map:Focus(root.Position.X, root.Position.Z)
 			end
 		end
@@ -210,6 +226,7 @@ function buildWindow()
 	Kit.Panel.new(v, { name = "MapPanel", rect = panel, variant = "inset", zIndex = 6 })
 	local r = spec.map
 	map = IslandMap.new(v, r, {
+		fit = true,
 		zIndex = 7,
 		zoomButtons = {
 			{ r[1] + r[3] - 70, r[2] + r[4] - 134, 58, 58 },
@@ -218,16 +235,20 @@ function buildWindow()
 	})
 	-- North is up: the compass in the map's top-left corner says so.
 	Kit.Icon.new(v, { name = "Compass", rect = { r[1] + 12, r[2] + 12, 72, 72 }, icon = "compass", zIndex = 14 })
-	-- The legend: your arrow, the pins, and the coloured live markers.
+	-- The legend: your marker and your tribe's, the pins, and the coloured live markers.
 	local legend = {
-		{ icon = "compass_arrow", text = "You" },
+		{ arrow = IslandMap.YOU_DOT, text = "You" },
+		{ arrow = IslandMap.MATE_DOT, text = "Tribe" },
 		{ icon = "map_pin", text = "Camps and landmarks" },
 		{ dot = MapController.PORTAL_COLOR, text = "Portals" },
 		{ dot = "glow", text = "Events (by rarity)" },
 	}
 	local x, y = spec.legend[1], spec.legend[2]
 	for index, entry in legend do
-		if entry.icon then
+		if entry.arrow then
+			local arrow = IslandMap.Arrow(v, "LegendArrow" .. index, entry.arrow, IslandMap.YOU_SIZE, 8)
+			arrow.Position = UDim2.fromOffset(x + 16, y + 18)
+		elseif entry.icon then
 			Kit.Icon.new(
 				v,
 				{ name = "LegendIcon" .. index, rect = { x, y + 2, 32, 32 }, icon = entry.icon, zIndex = 8 }
@@ -280,11 +301,13 @@ function MapController.Toggle()
 	end
 	renderMarkers()
 	following = true
+	map.panned = false
 	local root = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
 	if root then
-		map:SetMarker(root.Position.X, root.Position.Z)
+		placeMarker(root)
 		map:Focus(root.Position.X, root.Position.Z)
 	end
+	map:SetMates(mates)
 	screen:Open(GuiService.SelectedObject ~= nil or UserInputService.GamepadEnabled)
 end
 
@@ -297,6 +320,13 @@ function MapController.Start()
 		events[view.id] = view
 		if screen:IsOpen() then
 			renderMarkers()
+		end
+	end)
+	Remotes.Get("TribeMap").OnClientEvent:Connect(function(marks)
+		mates = if type(marks) == "table" then marks else {}
+		matesAt = os.clock()
+		if screen:IsOpen() then
+			map:SetMates(mates)
 		end
 	end)
 	Remotes.Get("EventEnded").OnClientEvent:Connect(function(eventId)
