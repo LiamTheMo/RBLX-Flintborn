@@ -34,9 +34,7 @@ New spears (2026-11-04): the owner's 12 redrawn spears (every tier, Wooden to
 Adamantine) replaced theirs the same way: every item moved from the uploaded
 `atlas_lk_items3_*` (retired, never changed) to `atlas_lk_items4_1` / `_2`, same
 split and rects, only the 12 spear icons different, and the 12 spear hero copies
-rebuilt. Until they are uploaded (empty ids in `UiAssetIds.json`) items show
-their kind glyph, so upload them before publishing:
-`roblox_upload_ui_assets.py --upload --only 'atlas_lk_items4_*,lk_item_*Spear__hi'`.
+rebuilt. All 14 were uploaded the same day (ids in `UiAssetIds.json`).
 
 Rebuild this table from `ICONS.json` when an item is added; the `item_info`
 spec fails if a catalog item has no icon or hero copy in `UiSprites.json`.

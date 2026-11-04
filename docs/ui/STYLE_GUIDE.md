@@ -908,7 +908,7 @@ for new glyphs.
 | `atlas_lk_lobby_hi` | High-resolution copies: frames, bars, slots, paper buttons, pills, tile frame, round frame, toast, panel | new: uploaded by the owner |
 | `atlas_lk_window_hi` | High-resolution copies: dialog, leather buttons, tabs, plaques, inset panel, steppers, clasps, play glyph | new: uploaded by the owner |
 | `atlas_lk_journal_hi` | High-resolution Journal illustrations | new: uploaded by the owner |
-| `atlas_lk_items4_1`, `atlas_lk_items4_2` | Every catalog item's own 110 px icon (`lk_item_<id>`, §9.7): 81 and 63 icons (replace `atlas_lk_items3_*`, which replaced `atlas_lk_items2_*`: the red Adamantine art, then the redrawn spears) | not uploaded yet (empty ids) |
+| `atlas_lk_items4_1`, `atlas_lk_items4_2` | Every catalog item's own 110 px icon (`lk_item_<id>`, §9.7): 81 and 63 icons (replace `atlas_lk_items3_*`, which replaced `atlas_lk_items2_*`: the red Adamantine art, then the redrawn spears) | uploaded |
 | (no atlas) `lk_item_<id>__hi` | The 144 item icons' 356 px hero copies, one image each | uploaded |
 | `atlas_island_hi_1_1` … `_2_2` | The island painting at 2040 px as 2 × 2 tiles | new: uploaded by the owner |
 
