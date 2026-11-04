@@ -271,7 +271,7 @@ Skill vs design doc / repo (design doc wins, reported):
 | 072 | Timber gate (remade sheet, 2026-11-04) | World & resources | ✅ | 5448 (+10 parts) | built on the shared library; R1 PASS 7.5 | Studio check: walk through with the leaves swung (origins on the hinge axis; no frame-only hero, assemble from parts), heat_glow lanterns; timber about 10 % dark; ring handles thin; hinge knuckles slim; banner rod ties hidden; clumps sparse |
 | 073 | Barricade (LashedBarricade; remade sheet, 2026-11-04) | World & resources | ✅ | 3934 (+5 parts) | built on the shared library; R1 FAIL 6.5 (lashings, stones), R2 PASS 8 | tiles at pitch 32/3 (three modules per two 16-stud tiles), 0.21 gap between neighbouring end lashings; no lower band lashings (ruled); stones smooth bells rather than angular rocks; X arms have blunt dowel ends; rope a little orange; module about 5 % short at figure scale |
 | 074 | Flintborn fire and light station | World & resources | ⬜ | | | |
-| 075 | Flintborn wall walk study | World & resources | ⬜ | | | |
+| 075 | Wall walk (TimberWallWalk; remade sheet, 2026-11-04) | World & resources | ✅ | 5578 (+10 parts) | built on the shared library; R1 PASS 8 | Studio check: deck height 5.22 next to neighbouring pieces, climbing the five-step stair (ruled: five steps, not the sheet's four, for the 0.87 riser limit); stair off the −X short end (ruled); rope collars read as faceted bands up close; banner knobs small; 0.03 slit under each tread nose |
 | 076 | Flintborn watchtower model study | World & resources | ⬜ | | | |
 | 077 | Flintborn Hunt Workshop Model Study | World & resources | ⬜ | | | |
 | 078 | Flintborn craft rack study | World & resources | ⬜ | | | |
