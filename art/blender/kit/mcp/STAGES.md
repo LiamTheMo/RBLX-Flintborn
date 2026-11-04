@@ -84,6 +84,49 @@ session (the GUI or a background one) is driven by only one agent at a time.
 - **Record.** Write what the stage did and why into `art/blender/renders/models/MNNN/MNNN_spec.md`, under a heading for the stage.
 - **Report.** Your final message lists what changed, the measured numbers and anything left for later stages.
 
+## Verify suite (2026-11-04)
+
+The technical checks every modeller reports and every verifier re-measures are shared code now. Don't rewrite bmesh,
+BVH or raster checks in a builder or a scratch file.
+- **`kit_verify.run(objs, cls=..., **opts)`** runs every technical check in one call and returns the numbers plus a
+  `problems` list (empty means clean) and the run time per check. It takes about 10 s for an 8000-tri building and
+  its 12 parts, including the inside escape scan. It is read-only. `kit_verify.summary(r)` gives one line per object.
+  - **Always:**
+    - tris against the class budget (`cls`: `part` / `prop` < 1000, `asset` < 4000, `structure` ≤ 6000, `building`
+      ≤ 8000; the hero and variants get `cls`, parts get `part`; `classes=` / `budgets=` override);
+    - sizes (`size=`), origin at the bottom centre, transforms applied, no modifiers or custom normals;
+    - non-manifold edges, bowties, boundary / wire / loose, zero-area faces, n-gons, duplicate verts;
+    - per shell: winding errors, ray-parity inward faces, self-intersections, signed volume;
+    - the thinnest face corner (floor 0.3°);
+    - floating and unchained shells (contact ≤ 0.03, chained to the ground or another shell);
+    - buried shells (> 0.05 inside another; `bury_pairs` for ruled exceptions such as rope in rope 0.08). Edge
+      midpoints are sampled too, so it finds sinks that the builders' vertex and face-centre sampling misses: 070's
+      ivy pads sit 0.07–0.08 inside their stems. `bury_edges=False` gives the builders' numbers;
+    - pierces through thin sheets (`thin=`: canvas, banner, emblem, cloth, ...);
+    - UV overlaps, flips, island gap and border;
+    - Tint against the face normal per material (shading painted inside pieces);
+    - sockets (`sockets=`) and stored points (`stored=`), and `K.check`.
+  - Shells are named from the builder's piece register (`o["mNNN_pieces"]`) when there is one, else by material.
+    Options and reports use the build frame when the object stores `mNNN_offset`.
+  - **Optional checks, switched on by options:**
+    - `foliage=`: the 5° azimuth sweep with the whole-leaf rule above;
+    - `escape=`: the inside light-escape scan of an interior box, with `allow` boxes for doorways;
+    - `walk=`: a 5.5-stud character proxy along paths, with clearance, intersections, rises, headroom and turning
+      room;
+    - `seams=`: tiling, a copy at the pitch, with no crossing, identical end sections and nothing past the seams.
+  - The module docstring lists every option. Modellers pass the same options in `build()` and record the result in
+    the spec.
+- **`compare.compare(num, cells)`** crops each named cell from `references/NNN.png` (pixel boxes from the spec's §1),
+  renders the model at the matching camera, and writes one side-by-side PNG per cell and one `MNNN_compare.png`, each
+  pair labelled with its camera and the content W : H of both. A cell can be mirrored or turned. Output goes to
+  `<temp>/RBLX-Flintborn/compare/MNNN/` unless `out_dir` is given.
+- **Verifiers call both first**, quote their numbers, and then spend their time on the visual comparison: the
+  compare sheet view by view, colours sampled from both images, close-ups. A verifier re-derives a number with its
+  own code only when a result looks wrong; it reports that as a suite bug.
+- **Shipping.** The main session ships a passed model with `art/blender/kit/ship.sh MNNN "message"`. It builds in the
+  GUI, saves, exports, requires 0 export problems, checks the spec and builder for temp paths and assistant names,
+  stages exactly the model's files and commits. It never pushes. `--dry-run` prints the steps.
+
 ## Stages
 
 1. **Modelling.** Study the reference fully: every view, the exploded parts and the close-ups. Then write the 2a study into the spec.
