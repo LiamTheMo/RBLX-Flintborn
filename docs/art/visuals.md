@@ -220,7 +220,7 @@ Use geometry where it changes silhouette or explains a function. Evaluate whethe
 
 Keep collision simple and intentional. Decorative branches and roof fibers should not unexpectedly snag movement. Ensure cave and building openings fit the intended character and camera.
 
-Preserve category organization described in [src/assets/README.md](../../src/assets/README.md). Models belong under the existing model structure; world layouts belong in `src/maps`. Concept renders are reference art, not runtime models or collision assets.
+Runtime models and world layouts are imported and placed in Studio. Concept renders are reference art, not runtime models or collision assets.
 
 Everything, art included, reaches the live game through Studio ([DEPLOYMENT.md](../ops/DEPLOYMENT.md#art-and-images)). Adding this document does not apply a visual overhaul to the live game.
 

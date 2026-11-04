@@ -22,7 +22,6 @@ When documents disagree, the [GDD](design/GDD.md) wins on gameplay intent and th
 | [ops/DEPLOYMENT.md](ops/DEPLOYMENT.md) | Current | Releasing through VS Code → Rojo → Studio, the place IDs, importing art, the script mapping |
 | [maps/README.md](maps/README.md) | Current | Map documents and shared map conventions (scale, tags, authoring) |
 | [maps/lobby-hub.md](maps/lobby-hub.md) | Design record | The lobby hub's station list, flow and tags; the built layout is in [art/blender/lobby/LAYOUT.md](../art/blender/lobby/LAYOUT.md) |
-| [../src/assets/README.md](../src/assets/README.md) | Current | What lives in `src/assets` and how it reaches the game |
 
 ## Art
 

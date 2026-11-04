@@ -12,7 +12,6 @@ and are in the Git history.)
 | Owner | Contents | How it reaches the live places |
 | --- | --- | --- |
 | Git (`src/server`, `src/client`, `src/shared`) | Scripts and JSON modules, mapped by `default.project.json` | Rojo sync into Studio, then publish from Studio |
-| Git (`src/assets`, `src/maps`) | Models and images (`ReplicatedStorage.Assets`), map models (`ServerStorage.Maps`) | Rojo sync into Studio, then publish from Studio |
 | Studio | World geometry, terrain, the lobby map, the player character, lighting, hand-made UI, every other non-script instance | Publish from Studio |
 | Git (`art/roblox`, `art/ui`) | Exported meshes and textures, UI sprites and their recorded asset ids | Imported or uploaded through Studio (see [Art and images](#art-and-images)) |
 

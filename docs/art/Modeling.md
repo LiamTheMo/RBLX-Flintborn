@@ -299,7 +299,7 @@ The current character `.glb` files and joint manifest are produced by the charac
 
 The Blender README's prop/building targets do not establish tested character or animal budgets. Count triangles, bones, materials, textures and objects per creature and across a representative populated scene. Keep small wildlife especially economical; event size alone does not justify excessive geometry. LODs should preserve the species silhouette and identifying features while reducing fur groups, internal mouth detail and small appendages.
 
-References under `art/reference`, source libraries under `art/blender`, exports under `art/roblox` and runtime models under the existing `src/assets` structure serve different purposes. Use the current asset documentation and the specific upload workflow for integration. Committing a `.blend`, image or this guide does not replace a live Roblox model. Publish production-affecting asset changes only through the authorized main-based workflow.
+References under `art/reference`, source libraries under `art/blender`, exports under `art/roblox` and runtime models imported in Studio serve different purposes. Use the current asset documentation and the specific upload workflow for integration. Committing a `.blend`, image or this guide does not replace a live Roblox model. Publish production-affecting asset changes only through the authorized main-based workflow.
 
 ## 13. Common failure modes and corrections
 

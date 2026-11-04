@@ -22,8 +22,6 @@ Every document is listed in **[docs/README.md](docs/README.md)**, marked current
 | `src/server` | Server entry point (`init.server.luau`) → `ServerScriptService.Server`. `Services/` (one singleton per responsibility, run by the Loader), `Infrastructure/` (DataStore gateway, profile store, operation journal, checkpoint store, `RequestLedger` and `Cooldown` request guards), `WorldBuild/` (the placeholder island's terrain, landmarks, safe camps and scenery, built by `WorldBuildService`), `Config/` (admins, codes) |
 | `src/client` | Client entry point (`init.client.luau`) → `StarterPlayer.StarterPlayerScripts.Client`. `Controllers/` (run by the Loader), `Hud/` (HUD pieces, `Kit/` UI components, `Screens/` windows), `Ui/` (binds, reasons, theme) |
 | `src/shared` | Pure rules, catalogs and models shared by server, client and specs → `ReplicatedStorage.Shared`, one folder per domain (`Admission`, `Combat`, `Crafting`, `Data`, `Economy`, `Items`, `Net/Remotes`, `UI`, `Visuals`, `World`, …), plus `Core/Loader`, `Core/Signal`, `GameConstants` and `Config/PlaceConfig`. JSON files here are published as ModuleScripts |
-| `src/assets` | Models and images → `ReplicatedStorage.Assets` ([README](src/assets/README.md)) |
-| `src/maps` | Authored map models → `ServerStorage.Maps` (empty today; the island is generated) |
 | `tests/luau` | Headless Luau specs (`*.spec.luau`) for shared modules and server modules with injected fakes; `run.py` bundles them with `prelude.luau` stubs |
 | `tests/test_*.py` | Python tests: the spec runner, the UI upload script |
 | `scripts/` | `roblox_cloud_sync.py` (script mapping), `roblox_upload_ui_assets.py` (UI sprite records and uploads) and `studio/` (a command-bar script) |
